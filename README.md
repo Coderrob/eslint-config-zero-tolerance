@@ -2,12 +2,20 @@
 
 Zero-tolerance ESLint plugin and config for enforcing strict code quality standards.
 
+**✨ Now supports ESLint 9 with Flat Config! ✨**
+
 ## Packages
 
 This monorepo contains two packages:
 
 - `eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
 - `eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
+
+## Requirements
+
+- ESLint 8.57.0+ or 9.x
+- TypeScript-ESLint 8.x
+- TypeScript 5.x
 
 ## Installation
 
@@ -25,6 +33,79 @@ pnpm build
 
 ```bash
 pnpm test
+```
+
+## Usage
+
+### ESLint 9+ (Flat Config)
+
+**Using the recommended preset:**
+```javascript
+// eslint.config.js
+import zeroTolerance from 'eslint-plugin-zero-tolerance';
+
+export default [
+  zeroTolerance.configs.recommended,
+  // your other configs...
+];
+```
+
+**Using the strict preset:**
+```javascript
+// eslint.config.js
+import zeroTolerance from 'eslint-plugin-zero-tolerance';
+
+export default [
+  zeroTolerance.configs.strict,
+  // your other configs...
+];
+```
+
+**Custom configuration:**
+```javascript
+// eslint.config.js
+import zeroTolerance from 'eslint-plugin-zero-tolerance';
+
+export default [
+  {
+    plugins: {
+      'zero-tolerance': zeroTolerance,
+    },
+    rules: {
+      'zero-tolerance/interface-prefix': 'error',
+      'zero-tolerance/no-literal-unions': 'warn',
+      // ... other rules
+    },
+  },
+];
+```
+
+### ESLint 8.x (Legacy Config)
+
+**Using .eslintrc.js:**
+```javascript
+module.exports = {
+  plugins: ['zero-tolerance'],
+  extends: ['plugin:zero-tolerance/legacy-recommended'],
+  // or for strict mode:
+  // extends: ['plugin:zero-tolerance/legacy-strict'],
+};
+```
+
+**Or configure rules individually:**
+```javascript
+module.exports = {
+  plugins: ['zero-tolerance'],
+  rules: {
+    'zero-tolerance/interface-prefix': 'error',
+    'zero-tolerance/test-description-style': 'error',
+    'zero-tolerance/zod-schema-description': 'error',
+    'zero-tolerance/no-banned-types': 'error',
+    'zero-tolerance/no-relative-parent-imports': 'error',
+    'zero-tolerance/no-dynamic-import': 'error',
+    'zero-tolerance/no-literal-unions': 'error',
+  },
+};
 ```
 
 ## Rules
@@ -136,52 +217,16 @@ enum Status {
 type Status = "active" | "inactive";
 type Size = "small" | "medium" | "large";
 ```
+## Test Coverage
 
-## Usage
-
-### Using the Plugin
-
-1. Install the plugin:
-```bash
-npm install --save-dev eslint-plugin-zero-tolerance
-```
-
-2. Add to your ESLint configuration:
-```javascript
-{
-  "plugins": ["zero-tolerance"],
-  "rules": {
-    "zero-tolerance/interface-prefix": "error",
-    "zero-tolerance/test-description-style": "error",
-    "zero-tolerance/zod-schema-description": "error",
-    "zero-tolerance/no-banned-types": "error",
-    "zero-tolerance/no-relative-parent-imports": "error",
-    "zero-tolerance/no-dynamic-import": "error",
-    "zero-tolerance/no-literal-unions": "error"
-  }
-}
-```
-
-### Using the Config
-
-1. Install both packages:
-```bash
-npm install --save-dev eslint-plugin-zero-tolerance eslint-config-zero-tolerance
-```
-
-2. Use the recommended config (warnings):
-```javascript
-{
-  "extends": ["eslint-config-zero-tolerance/recommended"]
-}
-```
-
-3. Or use the strict config (errors):
-```javascript
-{
-  "extends": ["eslint-config-zero-tolerance/strict"]
-}
-```
+This project maintains comprehensive test coverage with:
+- **114 test cases** covering all rules
+- Named test cases for better documentation
+- Edge cases for each rule including:
+  - Generic types and type parameters
+  - Async/await patterns  
+  - Multiple error scenarios
+  - Boundary conditions
 
 ## Publishing
 
