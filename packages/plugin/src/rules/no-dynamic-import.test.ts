@@ -1,9 +1,12 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import * as tsParser from '@typescript-eslint/parser';
 import { noDynamicImport } from './no-dynamic-import';
 
-const ruleTester = new TSESLint.RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const ruleTester = new RuleTester({
+  languageOptions: {
+    parser: tsParser,
+  },
+} as any);
 
 ruleTester.run('no-dynamic-import', noDynamicImport, {
   valid: [
@@ -116,4 +119,4 @@ ruleTester.run('no-dynamic-import', noDynamicImport, {
       ],
     },
   ],
-});
+} as any);

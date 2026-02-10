@@ -1,9 +1,12 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import * as tsParser from '@typescript-eslint/parser';
 import { interfacePrefix } from './interface-prefix';
 
-const ruleTester = new TSESLint.RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const ruleTester = new RuleTester({
+  languageOptions: {
+    parser: tsParser,
+  },
+} as any);
 
 ruleTester.run('interface-prefix', interfacePrefix, {
   valid: [
@@ -102,4 +105,4 @@ ruleTester.run('interface-prefix', interfacePrefix, {
       ],
     },
   ],
-});
+} as any);

@@ -1,9 +1,12 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import * as tsParser from '@typescript-eslint/parser';
 import { zodSchemaDescription } from './zod-schema-description';
 
-const ruleTester = new TSESLint.RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const ruleTester = new RuleTester({
+  languageOptions: {
+    parser: tsParser,
+  },
+} as any);
 
 ruleTester.run('zod-schema-description', zodSchemaDescription, {
   valid: [
@@ -122,4 +125,4 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       ],
     },
   ],
-});
+} as any);

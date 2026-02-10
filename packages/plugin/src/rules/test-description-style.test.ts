@@ -1,9 +1,12 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import * as tsParser from '@typescript-eslint/parser';
 import { testDescriptionStyle } from './test-description-style';
 
-const ruleTester = new TSESLint.RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const ruleTester = new RuleTester({
+  languageOptions: {
+    parser: tsParser,
+  },
+} as any);
 
 ruleTester.run('test-description-style', testDescriptionStyle, {
   valid: [
@@ -113,4 +116,4 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       ],
     },
   ],
-});
+} as any);

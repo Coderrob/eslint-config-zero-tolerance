@@ -1,5 +1,41 @@
-// Re-export the configs from the plugin
-export const recommended = {
+import type { Linter } from 'eslint';
+import zeroTolerancePlugin from 'eslint-plugin-zero-tolerance';
+
+// Flat config presets
+export const recommended: Linter.Config = {
+  name: 'zero-tolerance/recommended',
+  plugins: {
+    'zero-tolerance': zeroTolerancePlugin as any,
+  },
+  rules: {
+    'zero-tolerance/interface-prefix': 'warn',
+    'zero-tolerance/test-description-style': 'warn',
+    'zero-tolerance/zod-schema-description': 'warn',
+    'zero-tolerance/no-banned-types': 'warn',
+    'zero-tolerance/no-relative-parent-imports': 'warn',
+    'zero-tolerance/no-dynamic-import': 'warn',
+    'zero-tolerance/no-literal-unions': 'warn',
+  },
+};
+
+export const strict: Linter.Config = {
+  name: 'zero-tolerance/strict',
+  plugins: {
+    'zero-tolerance': zeroTolerancePlugin as any,
+  },
+  rules: {
+    'zero-tolerance/interface-prefix': 'error',
+    'zero-tolerance/test-description-style': 'error',
+    'zero-tolerance/zod-schema-description': 'error',
+    'zero-tolerance/no-banned-types': 'error',
+    'zero-tolerance/no-relative-parent-imports': 'error',
+    'zero-tolerance/no-dynamic-import': 'error',
+    'zero-tolerance/no-literal-unions': 'error',
+  },
+};
+
+// Legacy config format (for backward compatibility with ESLint <9)
+export const legacyRecommended = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
@@ -17,7 +53,7 @@ export const recommended = {
   },
 };
 
-export const strict = {
+export const legacyStrict = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
@@ -38,4 +74,6 @@ export const strict = {
 export default {
   recommended,
   strict,
-};
+  legacyRecommended,
+  legacyStrict,
+} as any;

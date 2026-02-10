@@ -1,9 +1,12 @@
-import { TSESLint } from '@typescript-eslint/utils';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import * as tsParser from '@typescript-eslint/parser';
 import { noRelativeParentImports } from './no-relative-parent-imports';
 
-const ruleTester = new TSESLint.RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const ruleTester = new RuleTester({
+  languageOptions: {
+    parser: tsParser,
+  },
+} as any);
 
 ruleTester.run('no-relative-parent-imports', noRelativeParentImports, {
   valid: [
@@ -118,4 +121,4 @@ ruleTester.run('no-relative-parent-imports', noRelativeParentImports, {
       ],
     },
   ],
-});
+} as any);
