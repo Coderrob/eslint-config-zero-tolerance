@@ -110,4 +110,4 @@ const eslintPlugin: any = {
   },
 };
 
-export default eslintPlugin;
+export = eslintPlugin;

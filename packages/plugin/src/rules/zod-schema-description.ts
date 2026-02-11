@@ -51,19 +51,39 @@ export const zodSchemaDescription = createRule({
     }
 
     function hasDescribeCall(node: any): boolean {
-      if (node.type === 'CallExpression') {
+      // Traverse a chain like z.string().describe("...").optional()
+      // starting from the outermost CallExpression and walking inward.
+      if (node.type !== 'CallExpression') {
+        return false;
+      }
+
+      let current: any = node;
+
+      while (
+        current &&
+        current.type === 'CallExpression' &&
+        current.callee &&
+        current.callee.type === 'MemberExpression'
+      ) {
+        const callee = current.callee;
+
         if (
-          node.callee.type === 'MemberExpression' &&
-          node.callee.property.type === 'Identifier' &&
-          node.callee.property.name === 'describe'
+          callee.property &&
+          callee.property.type === 'Identifier' &&
+          callee.property.name === 'describe'
         ) {
           return true;
         }
-        // Recursively check the object
-        if (node.callee.type === 'MemberExpression') {
-          return hasDescribeCall(node.callee);
+
+        // Walk inward through the object of the MemberExpression, if it is
+        // itself a CallExpression in the chain.
+        if (callee.object && callee.object.type === 'CallExpression') {
+          current = callee.object;
+        } else {
+          break;
         }
       }
+
       return false;
     }
   },

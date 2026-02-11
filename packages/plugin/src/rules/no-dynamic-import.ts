@@ -1,5 +1,4 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
-import * as path from 'path';
 
 const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`

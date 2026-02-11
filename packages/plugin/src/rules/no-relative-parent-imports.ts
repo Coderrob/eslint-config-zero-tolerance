@@ -20,7 +20,8 @@ export const noRelativeParentImports = createRule({
   defaultOptions: [],
   create(context) {
     function checkImportPath(node: any, source: string) {
-      if (source.includes('../')) {
+      // Match parent directory paths: starts with ../ or contains /../ or is exactly '..'
+      if (/(^|\/)\.\.(?:\/|$)/.test(source)) {
         context.report({
           node,
           messageId: 'noRelativeParentImports',

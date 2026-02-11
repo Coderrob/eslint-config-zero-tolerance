@@ -232,11 +232,14 @@ This project maintains comprehensive test coverage with:
 
 To publish the packages to npm:
 
+**Before publishing the config package**, update `packages/config/package.json` to change the peer dependency from `"eslint-plugin-zero-tolerance": "workspace:*"` to `"eslint-plugin-zero-tolerance": "^1.0.0"` (or the appropriate version).
+
 ```bash
 cd packages/plugin
 npm publish
 
 cd ../config
+# Remember to update the peerDependency first!
 npm publish
 ```
 

@@ -21,12 +21,19 @@ export const testDescriptionStyle = createRule({
   create(context) {
     return {
       CallExpression(node) {
-        // Check for it() or test() calls
-        if (
-          node.callee.type === 'Identifier' &&
-          (node.callee.name === 'it' || node.callee.name === 'test') &&
-          node.arguments.length > 0
-        ) {
+        // Check for it() or test() calls (including it.skip, it.only, test.skip, test.only)
+        let isTestCall = false;
+        
+        if (node.callee.type === 'Identifier' &&
+            (node.callee.name === 'it' || node.callee.name === 'test')) {
+          isTestCall = true;
+        } else if (node.callee.type === 'MemberExpression' &&
+                   node.callee.object.type === 'Identifier' &&
+                   (node.callee.object.name === 'it' || node.callee.object.name === 'test')) {
+          isTestCall = true;
+        }
+        
+        if (isTestCall && node.arguments.length > 0) {
           const firstArg = node.arguments[0];
           if (firstArg.type === 'Literal' && typeof firstArg.value === 'string') {
             const description = firstArg.value.trim();
