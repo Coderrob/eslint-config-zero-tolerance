@@ -230,18 +230,46 @@ This project maintains comprehensive test coverage with:
 
 ## Publishing
 
-To publish the packages to npm:
+This monorepo provides automated scripts to handle versioned releases:
 
-**Before publishing the config package**, update `packages/config/package.json` to change the peer dependency from `"eslint-plugin-zero-tolerance": "workspace:*"` to `"eslint-plugin-zero-tolerance": "^1.0.0"` (or the appropriate version).
+### Automated Publishing Process
 
 ```bash
+# 1. Build all packages
+pnpm build
+
+# 2. Run tests to ensure everything works
+pnpm test
+
+# 3. Prepare packages for publishing (converts workspace:* to versioned dependencies)
+pnpm prepare-publish
+
+# 4. Publish the plugin package
 cd packages/plugin
 npm publish
 
+# 5. Publish the config package
 cd ../config
-# Remember to update the peerDependency first!
 npm publish
+
+# 6. Restore workspace:* for local development
+cd ../..
+pnpm restore-workspace
 ```
+
+### Manual Publishing Process
+
+If you prefer to publish manually:
+
+1. Update version in `packages/plugin/package.json`
+2. Update version in `packages/config/package.json`
+3. In `packages/config/package.json`, change:
+   - From: `"eslint-plugin-zero-tolerance": "workspace:*"`
+   - To: `"eslint-plugin-zero-tolerance": "^1.0.0"` (or current version)
+4. Build and publish both packages
+5. Restore `workspace:*` for continued development
+
+The automated scripts handle step 3 and 5 for you.
 
 ## License
 

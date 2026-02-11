@@ -21,7 +21,7 @@ export const testDescriptionStyle = createRule({
   create(context) {
     return {
       CallExpression(node) {
-        // Check for it() or test() calls (including it.skip, it.only, test.skip, test.only)
+        // Check for it() or test() calls (including it.only, test.only, but excluding it.skip, test.skip)
         let isTestCall = false;
         
         if (node.callee.type === 'Identifier' &&
@@ -30,6 +30,11 @@ export const testDescriptionStyle = createRule({
         } else if (node.callee.type === 'MemberExpression' &&
                    node.callee.object.type === 'Identifier' &&
                    (node.callee.object.name === 'it' || node.callee.object.name === 'test')) {
+          // Support .only but skip .skip to avoid annoyances
+          if (node.callee.property.type === 'Identifier' && 
+              node.callee.property.name === 'skip') {
+            return; // Don't enforce on skipped tests
+          }
           isTestCall = true;
         }
         
