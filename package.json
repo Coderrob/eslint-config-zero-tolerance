@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r --if-present test",
-    "lint": "eslint .",
+    "lint": "pnpm build && eslint .",
     "clean": "pnpm -r clean",
     "prepare-publish": "node scripts/prepare-publish.js",
     "restore-workspace": "node scripts/restore-workspace.js"
@@ -19,6 +19,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.6",
     "@typescript-eslint/eslint-plugin": "^8.55.0",

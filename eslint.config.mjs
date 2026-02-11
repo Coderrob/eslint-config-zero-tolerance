@@ -2,7 +2,7 @@
 import eslint from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import zeroTolerancePlugin from './packages/plugin/src/index.js';
+import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 
 export default [
   eslint.configs.recommended,
@@ -35,6 +35,13 @@ export default [
     },
   },
   {
+    files: ['**/packages/plugin/src/index.ts'],
+    rules: {
+      // Allow importing package.json from src/
+      'zero-tolerance/no-relative-parent-imports': 'off',
+    },
+  },
+  {
     files: ['**/*.test.ts', '**/*.spec.ts'],
     rules: {
       // Relax some rules for tests
@@ -47,6 +54,8 @@ export default [
       '**/dist/**',
       '**/*.d.ts',
       'pnpm-lock.yaml',
+      '**/jest.config.js',
+      '**/scripts/**',
     ],
   },
 ];

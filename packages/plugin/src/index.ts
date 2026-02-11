@@ -6,6 +6,7 @@ import noBannedTypes from './rules/no-banned-types';
 import noRelativeParentImports from './rules/no-relative-parent-imports';
 import noDynamicImport from './rules/no-dynamic-import';
 import noLiteralUnions from './rules/no-literal-unions';
+import packageJson from '../package.json';
 
 const rules = {
   'interface-prefix': interfacePrefix,
@@ -20,8 +21,8 @@ const rules = {
 // Plugin definition
 const plugin = {
   meta: {
-    name: 'eslint-plugin-zero-tolerance',
-    version: '1.0.0',
+    name: packageJson.name,
+    version: packageJson.version,
   },
   rules,
 } as any as ESLint.Plugin;
