@@ -61,6 +61,19 @@ export default [
 ];
 ```
 
+**Alternative: Import presets directly:**
+```javascript
+// eslint.config.js
+import recommended from 'eslint-config-zero-tolerance/recommended';
+// or
+import strict from 'eslint-config-zero-tolerance/strict';
+
+export default [
+  recommended, // or strict
+  // your other configs...
+];
+```
+
 **Custom configuration:**
 ```javascript
 // eslint.config.js
