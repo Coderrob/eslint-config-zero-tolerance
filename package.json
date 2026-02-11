@@ -5,7 +5,7 @@
   "description": "Zero-tolerance ESLint plugin and config",
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --if-present test",
     "lint": "eslint .",
     "clean": "pnpm -r clean"
   },
