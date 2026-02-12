@@ -1,0 +1,34 @@
+{
+  "name": "eslint-config-zero-tolerance-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zero-tolerance ESLint plugin and config",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm build && eslint .",
+    "clean": "pnpm -r clean",
+    "prepare-publish": "node scripts/prepare-publish.js",
+    "restore-workspace": "node scripts/restore-workspace.js"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslintconfig"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "@typescript-eslint/utils": "^8.55.0",
+    "eslint": "^9.17.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
