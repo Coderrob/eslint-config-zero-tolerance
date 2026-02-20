@@ -14,6 +14,10 @@ const recommended: Linter.Config = {
     'zero-tolerance/no-relative-parent-imports': 'warn',
     'zero-tolerance/no-dynamic-import': 'warn',
     'zero-tolerance/no-literal-unions': 'warn',
+    'zero-tolerance/no-export-alias': 'warn',
+    'zero-tolerance/no-jest-have-been-called': 'warn',
+    'zero-tolerance/no-mock-implementation': 'warn',
+    'zero-tolerance/require-jsdoc-functions': 'warn',
   },
 };
 
