@@ -15,12 +15,12 @@ export const noJestHaveBeenCalled = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Prohibit toHaveBeenCalled and toHaveBeenCalledWith; use toHaveBeenCalledTimes and toHaveBeenNthCalledWith instead',
+        'Prohibit toHaveBeenCalled and toHaveBeenCalledWith; instead use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments',
       recommended: 'recommended',
     },
     messages: {
       noHaveBeenCalled:
-        '"{{matcher}}" is not allowed; use "{{replacement}}" instead',
+        '"{{matcher}}" is not allowed; use "{{replacement}}" with an explicit call count (and nth-call index when applicable) instead',
     },
     schema: [],
   },
@@ -28,11 +28,22 @@ export const noJestHaveBeenCalled = createRule({
   create(context) {
     return {
       MemberExpression(node) {
-        if (node.property.type !== 'Identifier') {
+        let name: string | null = null;
+
+        if (!node.computed && node.property.type === 'Identifier') {
+          name = node.property.name;
+        } else if (
+          node.computed &&
+          node.property.type === 'Literal' &&
+          typeof node.property.value === 'string'
+        ) {
+          name = node.property.value;
+        }
+
+        if (!name) {
           return;
         }
 
-        const name = node.property.name;
         const replacement = BANNED_MATCHERS[name];
 
         if (replacement) {

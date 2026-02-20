@@ -54,6 +54,14 @@ export const requireJsdocFunctions = createRule({
       }
       if (
         node.parent &&
+        node.parent.type === 'PropertyDefinition' &&
+        node.parent.key &&
+        node.parent.key.type === 'Identifier'
+      ) {
+        return node.parent.key.name;
+      }
+      if (
+        node.parent &&
         node.parent.type === 'Property' &&
         node.parent.key &&
         node.parent.key.type === 'Identifier'
@@ -73,11 +81,18 @@ export const requireJsdocFunctions = createRule({
       if (node.parent?.type === 'MethodDefinition') {
         return node.parent;
       }
-      if (
-        node.parent?.type === 'VariableDeclarator' &&
-        node.parent.parent?.type === 'VariableDeclaration'
-      ) {
-        return node.parent.parent;
+      if (node.parent?.type === 'PropertyDefinition') {
+        return node.parent;
+      }
+      if (node.parent?.type === 'VariableDeclarator') {
+        const declaration = node.parent.parent;
+        if (
+          declaration?.type === 'VariableDeclaration' &&
+          declaration.declarations.length === 1
+        ) {
+          return declaration;
+        }
+        return node.parent;
       }
       if (node.parent?.type === 'Property') {
         return node.parent;

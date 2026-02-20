@@ -26,6 +26,21 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
+      code: 'class MyClass {\n  /** Field JSDoc. */\n  handler = () => {};\n}',
+      name: 'class field arrow function with JSDoc on PropertyDefinition',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: 'const obj = {\n  /** Method JSDoc. */\n  doWork() {},\n};',
+      name: 'object literal shorthand method with JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: 'const obj = {\n  /** Method JSDoc. */\n  doWork: () => {},\n};',
+      name: 'object literal arrow function property with JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
       code: 'function doSomething() {}',
       name: 'function without JSDoc in test file is skipped',
       filename: 'src/utils.test.ts',
@@ -94,6 +109,54 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
         {
           messageId: 'missingJsdoc',
           data: { name: 'doWork' },
+        },
+      ],
+    },
+    {
+      code: 'class MyClass {\n  handler = () => {};\n}',
+      name: 'class field arrow function without JSDoc',
+      filename: 'src/my-class.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: 'handler' },
+        },
+      ],
+    },
+    {
+      code: 'const obj = {\n  doWork() {},\n};',
+      name: 'object literal shorthand method without JSDoc',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: 'doWork' },
+        },
+      ],
+    },
+    {
+      code: 'const obj = {\n  doWork: () => {},\n};',
+      name: 'object literal arrow function property without JSDoc',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: 'doWork' },
+        },
+      ],
+    },
+    {
+      code: '/** Only one JSDoc */\nconst a = () => {}, b = () => {};',
+      name: 'multi-declarator const with single JSDoc reports undocumented declarators',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: 'a' },
+        },
+        {
+          messageId: 'missingJsdoc',
+          data: { name: 'b' },
         },
       ],
     },

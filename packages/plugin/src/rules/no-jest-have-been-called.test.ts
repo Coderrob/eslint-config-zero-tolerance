@@ -96,5 +96,25 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
         },
       ],
     },
+    {
+      code: "expect(fn)['toHaveBeenCalled']();",
+      name: 'computed access of toHaveBeenCalled is banned',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+        },
+      ],
+    },
+    {
+      code: "expect(fn)['toHaveBeenCalledWith']('arg');",
+      name: 'computed access of toHaveBeenCalledWith is banned',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toHaveBeenCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
   ],
 } as any);

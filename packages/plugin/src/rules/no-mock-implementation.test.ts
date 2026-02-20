@@ -94,5 +94,25 @@ ruleTester.run('no-mock-implementation', noMockImplementation, {
         },
       ],
     },
+    {
+      code: "jest.fn()['mockReturnValue'](42);",
+      name: 'computed access of mockReturnValue is banned',
+      errors: [
+        {
+          messageId: 'noMockImplementation',
+          data: { method: 'mockReturnValue', replacement: 'mockReturnValueOnce' },
+        },
+      ],
+    },
+    {
+      code: "jest.fn()['mockImplementation'](() => {});",
+      name: 'computed access of mockImplementation is banned',
+      errors: [
+        {
+          messageId: 'noMockImplementation',
+          data: { method: 'mockImplementation', replacement: 'mockImplementationOnce' },
+        },
+      ],
+    },
   ],
 } as any);

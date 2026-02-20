@@ -30,11 +30,20 @@ export const noMockImplementation = createRule({
   create(context) {
     return {
       MemberExpression(node) {
-        if (node.property.type !== 'Identifier') {
+        let name: string | null = null;
+
+        if (!node.computed && node.property.type === 'Identifier') {
+          name = node.property.name;
+        } else if (
+          node.computed &&
+          node.property.type === 'Literal' &&
+          typeof node.property.value === 'string'
+        ) {
+          name = node.property.value;
+        } else {
           return;
         }
 
-        const name = node.property.name;
         const replacement = BANNED_MOCK_METHODS[name];
 
         if (replacement) {
