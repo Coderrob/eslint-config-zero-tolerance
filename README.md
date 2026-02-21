@@ -286,4 +286,4 @@ The automated scripts handle step 3 and 5 for you.
 
 ## License
 
-MIT
+Apache 2.0 Copyright Robert Lindley
