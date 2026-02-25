@@ -4,8 +4,8 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
 );
 
-export const testDescriptionStyle = createRule({
-  name: 'test-description-style',
+export const requireTestDescriptionStyle = createRule({
+  name: 'require-test-description-style',
   meta: {
     type: 'suggestion',
     docs: {
@@ -13,7 +13,7 @@ export const testDescriptionStyle = createRule({
       recommended: 'recommended',
     },
     messages: {
-      testDescriptionStyle: 'Test description should start with "should"',
+      requireTestDescriptionStyle: 'Test description should start with "should"',
     },
     schema: [],
   },
@@ -45,7 +45,7 @@ export const testDescriptionStyle = createRule({
             if (!description.startsWith('should')) {
               context.report({
                 node: firstArg,
-                messageId: 'testDescriptionStyle',
+                messageId: 'requireTestDescriptionStyle',
               });
             }
           }
@@ -55,4 +55,4 @@ export const testDescriptionStyle = createRule({
   },
 });
 
-export default testDescriptionStyle;
+export default requireTestDescriptionStyle;

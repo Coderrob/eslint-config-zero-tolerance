@@ -7,9 +7,9 @@ const recommended: Linter.Config = {
     'zero-tolerance': zeroTolerancePlugin as any,
   },
   rules: {
-    'zero-tolerance/interface-prefix': 'warn',
-    'zero-tolerance/test-description-style': 'warn',
-    'zero-tolerance/zod-schema-description': 'warn',
+    'zero-tolerance/require-interface-prefix': 'warn',
+    'zero-tolerance/require-test-description-style': 'warn',
+    'zero-tolerance/require-zod-schema-description': 'warn',
     'zero-tolerance/no-banned-types': 'warn',
     'zero-tolerance/no-relative-parent-imports': 'warn',
     'zero-tolerance/no-dynamic-import': 'warn',
@@ -22,6 +22,8 @@ const recommended: Linter.Config = {
     'zero-tolerance/no-eslint-disable': 'warn',
     'zero-tolerance/sort-imports': 'warn',
     'zero-tolerance/sort-functions': 'warn',
+    'zero-tolerance/no-magic-numbers': 'warn',
+    'zero-tolerance/no-magic-strings': 'warn',
   },
 };
 

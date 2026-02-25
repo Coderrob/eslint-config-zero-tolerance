@@ -1,6 +1,6 @@
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
-import { interfacePrefix } from './interface-prefix';
+import { requireInterfacePrefix } from './require-interface-prefix';
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -8,7 +8,7 @@ const ruleTester = new RuleTester({
   },
 } as any);
 
-ruleTester.run('interface-prefix', interfacePrefix, {
+ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
   valid: [
     {
       code: 'interface IUser { name: string; }',

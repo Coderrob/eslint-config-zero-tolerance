@@ -4,8 +4,8 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
 );
 
-export const interfacePrefix = createRule({
-  name: 'interface-prefix',
+export const requireInterfacePrefix = createRule({
+  name: 'require-interface-prefix',
   meta: {
     type: 'suggestion',
     docs: {
@@ -36,4 +36,4 @@ export const interfacePrefix = createRule({
   },
 });
 
-export default interfacePrefix;
+export default requireInterfacePrefix;

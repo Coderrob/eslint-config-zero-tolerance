@@ -1,7 +1,9 @@
 import type { ESLint, Linter } from 'eslint';
-import interfacePrefix from './rules/interface-prefix';
-import testDescriptionStyle from './rules/test-description-style';
-import zodSchemaDescription from './rules/zod-schema-description';
+import requireInterfacePrefix from './rules/require-interface-prefix';
+import requireTestDescriptionStyle from './rules/require-test-description-style';
+import requireZodSchemaDescription from './rules/require-zod-schema-description';
+import noMagicNumbers from './rules/no-magic-numbers';
+import noMagicStrings from './rules/no-magic-strings';
 import noBannedTypes from './rules/no-banned-types';
 import noRelativeParentImports from './rules/no-relative-parent-imports';
 import noDynamicImport from './rules/no-dynamic-import';
@@ -17,9 +19,11 @@ import sortFunctions from './rules/sort-functions';
 import packageJson from '../package.json';
 
 const rules = {
-  'interface-prefix': interfacePrefix,
-  'test-description-style': testDescriptionStyle,
-  'zod-schema-description': zodSchemaDescription,
+  'require-interface-prefix': requireInterfacePrefix,
+  'require-test-description-style': requireTestDescriptionStyle,
+  'require-zod-schema-description': requireZodSchemaDescription,
+  'no-magic-numbers': noMagicNumbers,
+  'no-magic-strings': noMagicStrings,
   'no-banned-types': noBannedTypes,
   'no-relative-parent-imports': noRelativeParentImports,
   'no-dynamic-import': noDynamicImport,
@@ -50,9 +54,9 @@ const recommendedConfig: Linter.Config = {
     'zero-tolerance': plugin as any,
   },
   rules: {
-    'zero-tolerance/interface-prefix': 'warn',
-    'zero-tolerance/test-description-style': 'warn',
-    'zero-tolerance/zod-schema-description': 'warn',
+    'zero-tolerance/require-interface-prefix': 'warn',
+    'zero-tolerance/require-test-description-style': 'warn',
+    'zero-tolerance/require-zod-schema-description': 'warn',
     'zero-tolerance/no-banned-types': 'warn',
     'zero-tolerance/no-relative-parent-imports': 'warn',
     'zero-tolerance/no-dynamic-import': 'warn',
@@ -65,6 +69,8 @@ const recommendedConfig: Linter.Config = {
     'zero-tolerance/no-eslint-disable': 'warn',
     'zero-tolerance/sort-imports': 'warn',
     'zero-tolerance/sort-functions': 'warn',
+    'zero-tolerance/no-magic-numbers': 'warn',
+    'zero-tolerance/no-magic-strings': 'warn',
   },
 };
 
@@ -74,9 +80,9 @@ const strictConfig: Linter.Config = {
     'zero-tolerance': plugin as any,
   },
   rules: {
-    'zero-tolerance/interface-prefix': 'error',
-    'zero-tolerance/test-description-style': 'error',
-    'zero-tolerance/zod-schema-description': 'error',
+    'zero-tolerance/require-interface-prefix': 'error',
+    'zero-tolerance/require-test-description-style': 'error',
+    'zero-tolerance/require-zod-schema-description': 'error',
     'zero-tolerance/no-banned-types': 'error',
     'zero-tolerance/no-relative-parent-imports': 'error',
     'zero-tolerance/no-dynamic-import': 'error',
@@ -89,6 +95,8 @@ const strictConfig: Linter.Config = {
     'zero-tolerance/no-eslint-disable': 'error',
     'zero-tolerance/sort-imports': 'error',
     'zero-tolerance/sort-functions': 'error',
+    'zero-tolerance/no-magic-numbers': 'error',
+    'zero-tolerance/no-magic-strings': 'error',
   },
 };
 
@@ -101,9 +109,9 @@ const legacyRecommendedConfig = {
   },
   plugins: ['zero-tolerance'],
   rules: {
-    'zero-tolerance/interface-prefix': 'warn',
-    'zero-tolerance/test-description-style': 'warn',
-    'zero-tolerance/zod-schema-description': 'warn',
+    'zero-tolerance/require-interface-prefix': 'warn',
+    'zero-tolerance/require-test-description-style': 'warn',
+    'zero-tolerance/require-zod-schema-description': 'warn',
     'zero-tolerance/no-banned-types': 'warn',
     'zero-tolerance/no-relative-parent-imports': 'warn',
     'zero-tolerance/no-dynamic-import': 'warn',
@@ -116,6 +124,8 @@ const legacyRecommendedConfig = {
     'zero-tolerance/no-eslint-disable': 'warn',
     'zero-tolerance/sort-imports': 'warn',
     'zero-tolerance/sort-functions': 'warn',
+    'zero-tolerance/no-magic-numbers': 'warn',
+    'zero-tolerance/no-magic-strings': 'warn',
   },
 };
 
@@ -127,9 +137,9 @@ const legacyStrictConfig = {
   },
   plugins: ['zero-tolerance'],
   rules: {
-    'zero-tolerance/interface-prefix': 'error',
-    'zero-tolerance/test-description-style': 'error',
-    'zero-tolerance/zod-schema-description': 'error',
+    'zero-tolerance/require-interface-prefix': 'error',
+    'zero-tolerance/require-test-description-style': 'error',
+    'zero-tolerance/require-zod-schema-description': 'error',
     'zero-tolerance/no-banned-types': 'error',
     'zero-tolerance/no-relative-parent-imports': 'error',
     'zero-tolerance/no-dynamic-import': 'error',
@@ -142,6 +152,8 @@ const legacyStrictConfig = {
     'zero-tolerance/no-eslint-disable': 'error',
     'zero-tolerance/sort-imports': 'error',
     'zero-tolerance/sort-functions': 'error',
+    'zero-tolerance/no-magic-numbers': 'error',
+    'zero-tolerance/no-magic-strings': 'error',
   },
 };
 
