@@ -19,19 +19,25 @@ Alphabetically sorted imports eliminate merge conflicts caused by two developers
 ### ✅ Correct
 
 ```typescript
-import { foo } from './foo';
-import { bar } from './utils/bar';
-import fs from 'fs';
+// External packages sorted alphabetically
+import express from 'express';
 import path from 'path';
+
+// Relative imports sorted alphabetically
+import { auth } from './auth';
+import { users } from './users';
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-import fs from 'fs';
+// External packages out of order
 import path from 'path';
-import { foo } from './foo';  // './foo' should come before 'fs'
-import { bar } from './utils/bar';
+import express from 'express';  // 'express' should come before 'path'
+
+// Relative imports out of order
+import { users } from './users';
+import { auth } from './auth';  // './auth' should come before './users'
 ```
 
 ## Configuration
