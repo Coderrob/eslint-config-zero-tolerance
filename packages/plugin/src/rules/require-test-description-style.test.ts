@@ -1,6 +1,6 @@
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
-import { testDescriptionStyle } from './test-description-style';
+import { requireTestDescriptionStyle } from './require-test-description-style';
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -8,7 +8,7 @@ const ruleTester = new RuleTester({
   },
 } as any);
 
-ruleTester.run('test-description-style', testDescriptionStyle, {
+ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
   valid: [
     {
       code: 'it("should test something", () => {});',
@@ -57,7 +57,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'it without should prefix',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -66,7 +66,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'test without should prefix',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -75,7 +75,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'capitalized but wrong format',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -84,7 +84,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'descriptive but missing should',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -93,7 +93,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'async test without should prefix',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -102,7 +102,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'Should with capital S',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },
@@ -111,7 +111,7 @@ ruleTester.run('test-description-style', testDescriptionStyle, {
       name: 'leading whitespace without should',
       errors: [
         {
-          messageId: 'testDescriptionStyle',
+          messageId: 'requireTestDescriptionStyle',
         },
       ],
     },

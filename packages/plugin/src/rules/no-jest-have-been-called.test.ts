@@ -34,17 +34,27 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
   invalid: [
     {
       code: 'expect(fn).toHaveBeenCalled();',
-      name: 'toHaveBeenCalled is banned',
+      name: 'should ban toHaveBeenCalled',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
           data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+        },
+      ],
+    },
+    {
+      code: 'expect(fn).toBeCalled();',
+      name: 'should ban toBeCalled (alias for toHaveBeenCalled)',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalled', replacement: 'toHaveBeenCalledTimes' },
         },
       ],
     },
     {
       code: 'expect(fn).toHaveBeenCalledWith("arg");',
-      name: 'toHaveBeenCalledWith is banned',
+      name: 'should ban toHaveBeenCalledWith',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -53,8 +63,38 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
       ],
     },
     {
+      code: 'expect(fn).toBeCalledWith("arg");',
+      name: 'should ban toBeCalledWith (alias for toHaveBeenCalledWith)',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
+      code: 'expect(fn).toHaveBeenLastCalledWith("arg");',
+      name: 'should ban toHaveBeenLastCalledWith',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toHaveBeenLastCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
+      code: 'expect(fn).toLastCalledWith("arg");',
+      name: 'should ban toLastCalledWith (alias for toHaveBeenLastCalledWith)',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toLastCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
       code: 'expect(fn).not.toHaveBeenCalled();',
-      name: 'negated toHaveBeenCalled is banned',
+      name: 'should ban negated toHaveBeenCalled',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -63,8 +103,18 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
       ],
     },
     {
+      code: 'expect(fn).not.toBeCalled();',
+      name: 'should ban negated toBeCalled',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalled', replacement: 'toHaveBeenCalledTimes' },
+        },
+      ],
+    },
+    {
       code: 'expect(fn).not.toHaveBeenCalledWith("arg");',
-      name: 'negated toHaveBeenCalledWith is banned',
+      name: 'should ban negated toHaveBeenCalledWith',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -73,8 +123,18 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
       ],
     },
     {
+      code: 'expect(fn).not.toBeCalledWith("arg");',
+      name: 'should ban negated toBeCalledWith',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
       code: 'const x = obj.toHaveBeenCalled;',
-      name: 'property access of banned matcher is also banned',
+      name: 'should ban property access of toHaveBeenCalled',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -84,7 +144,7 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
     },
     {
       code: 'expect(fn).toHaveBeenCalledWith("a"); expect(fn).toHaveBeenCalled();',
-      name: 'both banned matchers in same code',
+      name: 'should ban multiple banned matchers in same code',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -98,7 +158,7 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
     },
     {
       code: "expect(fn)['toHaveBeenCalled']();",
-      name: 'computed access of toHaveBeenCalled is banned',
+      name: 'should ban computed access of toHaveBeenCalled',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
@@ -108,11 +168,51 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
     },
     {
       code: "expect(fn)['toHaveBeenCalledWith']('arg');",
-      name: 'computed access of toHaveBeenCalledWith is banned',
+      name: 'should ban computed access of toHaveBeenCalledWith',
       errors: [
         {
           messageId: 'noHaveBeenCalled',
           data: { matcher: 'toHaveBeenCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
+      code: "expect(fn)['toBeCalled']();",
+      name: 'should ban computed access of toBeCalled',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalled', replacement: 'toHaveBeenCalledTimes' },
+        },
+      ],
+    },
+    {
+      code: "expect(fn)['toBeCalledWith']('arg');",
+      name: 'should ban computed access of toBeCalledWith',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toBeCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
+      code: "expect(fn)['toHaveBeenLastCalledWith']('arg');",
+      name: 'should ban computed access of toHaveBeenLastCalledWith',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toHaveBeenLastCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+        },
+      ],
+    },
+    {
+      code: "expect(fn)['toLastCalledWith']('arg');",
+      name: 'should ban computed access of toLastCalledWith',
+      errors: [
+        {
+          messageId: 'noHaveBeenCalled',
+          data: { matcher: 'toLastCalledWith', replacement: 'toHaveBeenNthCalledWith' },
         },
       ],
     },

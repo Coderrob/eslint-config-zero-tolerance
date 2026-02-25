@@ -2,7 +2,7 @@
   "name": "eslint-config-zero-tolerance-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Zero-tolerance ESLint plugin and config",
+  "description": "Monorepo for eslint-plugin-zero-tolerance and eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r --if-present test",
@@ -13,11 +13,16 @@
   },
   "keywords": [
     "eslint",
-    "eslintplugin",
-    "eslintconfig"
+    "eslint-plugin",
+    "eslint-config",
+    "typescript",
+    "code-quality",
+    "zero-tolerance",
+    "strict",
+    "linting"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Robert Lindley",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/jest": "^29.5.11",

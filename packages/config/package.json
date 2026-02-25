@@ -1,7 +1,7 @@
 {
   "name": "eslint-config-zero-tolerance",
   "version": "1.0.0",
-  "description": "ESLint config with zero-tolerance rules for code quality",
+  "description": "Ready-to-use ESLint configurations (recommended and strict presets) built on eslint-plugin-zero-tolerance — zero-tolerance code quality enforcement for TypeScript projects.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -31,10 +31,31 @@
   },
   "keywords": [
     "eslint",
-    "eslintconfig"
+    "eslint-config",
+    "eslintconfig",
+    "typescript",
+    "typescript-eslint",
+    "code-quality",
+    "strict",
+    "zero-tolerance",
+    "linting",
+    "recommended",
+    "best-practices"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Robert Lindley",
+  "license": "Apache-2.0",
+  "homepage": "https://coderrob.github.io/eslint-config-zero-tolerance/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coderrob/eslint-config-zero-tolerance.git",
+    "directory": "packages/config"
+  },
+  "bugs": {
+    "url": "https://github.com/Coderrob/eslint-config-zero-tolerance/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "peerDependencies": {
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^8.57.0 || ^9.0.0",

@@ -10,23 +10,34 @@ This repository is a monorepo containing an ESLint plugin (`eslint-plugin-zero-t
 
 ```
 eslint-config-zero-tolerance/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml        # CI: install, build, test on every PR and push to main
+│       └── docs.yml      # Publishes MkDocs site to GitHub Pages on push to main
+├── docs/                 # MkDocs source pages
+│   ├── index.md          # Site home page
+│   ├── getting-started.md
+│   ├── configuration.md
+│   └── rules/            # One .md per rule plus overview index
 ├── packages/
-│   ├── plugin/          # eslint-plugin-zero-tolerance
+│   ├── plugin/           # eslint-plugin-zero-tolerance
 │   │   └── src/
 │   │       ├── index.ts          # Plugin entry point; registers all rules and config presets
 │   │       └── rules/
 │   │           ├── <rule-name>.ts        # Rule implementation
 │   │           └── <rule-name>.test.ts   # Rule unit tests
-│   └── config/          # eslint-config-zero-tolerance
+│   └── config/           # eslint-config-zero-tolerance
 │       └── src/
 │           ├── index.ts          # Re-exports all config presets
 │           ├── recommended.ts    # Recommended config (warn severity)
 │           └── strict.ts         # Strict config (error severity)
-├── scripts/             # Release and workspace utility scripts
-├── AGENTS.md            # This file
-├── CHANGELOG.md         # Audit trail of all changes
-├── README.md            # Public-facing documentation
-└── package.json         # Workspace root
+├── scripts/              # Release and workspace utility scripts
+├── AGENTS.md             # This file
+├── CHANGELOG.md          # Audit trail of all changes
+├── CONTRIBUTING.md       # Contributor guide
+├── mkdocs.yml            # MkDocs site configuration (Material theme)
+├── README.md             # Public-facing documentation
+└── package.json          # Workspace root
 ```
 
 ---
@@ -130,7 +141,8 @@ export default myRuleName;
 1. Implement the rule and its tests in `packages/plugin/src/rules/`.
 2. Register the rule in `packages/plugin/src/index.ts` and all config presets.
 3. Sync the rule to `packages/config/src/`.
-4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
-5. Run `pnpm test` and confirm all tests pass.
-6. Run `pnpm build` to validate the TypeScript compilation.
-7. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm prepare-publish`.
+4. Add a doc page in `docs/rules/<rule-name>.md` and register it in `mkdocs.yml`.
+5. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
+6. Run `pnpm test` and confirm all tests pass.
+7. Run `pnpm build` to validate the TypeScript compilation.
+8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm prepare-publish`.

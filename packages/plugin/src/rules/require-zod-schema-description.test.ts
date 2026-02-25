@@ -1,6 +1,6 @@
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
-import { zodSchemaDescription } from './zod-schema-description';
+import { requireZodSchemaDescription } from './require-zod-schema-description';
 
 const ruleTester = new RuleTester({
   languageOptions: {
@@ -8,7 +8,7 @@ const ruleTester = new RuleTester({
   },
 } as any);
 
-ruleTester.run('zod-schema-description', zodSchemaDescription, {
+ruleTester.run('require-zod-schema-description', requireZodSchemaDescription, {
   valid: [
     {
       code: 'const schema = z.string().describe("A string");',
@@ -57,7 +57,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'string schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -66,7 +66,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'object schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -75,7 +75,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'chained schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -84,7 +84,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'array schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -93,7 +93,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'union schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -102,7 +102,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'optional schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -111,7 +111,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'nullable schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },
@@ -120,7 +120,7 @@ ruleTester.run('zod-schema-description', zodSchemaDescription, {
       name: 'refined schema without description',
       errors: [
         {
-          messageId: 'zodSchemaDescription',
+          messageId: 'requireZodSchemaDescription',
         },
       ],
     },

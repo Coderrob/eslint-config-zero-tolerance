@@ -5,8 +5,12 @@ const createRule = ESLintUtils.RuleCreator(
 );
 
 const BANNED_MATCHERS: Record<string, string> = {
+  toBeCalled: 'toHaveBeenCalledTimes',
+  toBeCalledWith: 'toHaveBeenNthCalledWith',
   toHaveBeenCalled: 'toHaveBeenCalledTimes',
   toHaveBeenCalledWith: 'toHaveBeenNthCalledWith',
+  toHaveBeenLastCalledWith: 'toHaveBeenNthCalledWith',
+  toLastCalledWith: 'toHaveBeenNthCalledWith',
 };
 
 export const noJestHaveBeenCalled = createRule({
@@ -15,7 +19,7 @@ export const noJestHaveBeenCalled = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Prohibit toHaveBeenCalled and toHaveBeenCalledWith; instead use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments',
+        'Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead',
       recommended: 'recommended',
     },
     messages: {

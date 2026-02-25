@@ -4,8 +4,8 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
 );
 
-export const zodSchemaDescription = createRule({
-  name: 'zod-schema-description',
+export const requireZodSchemaDescription = createRule({
+  name: 'require-zod-schema-description',
   meta: {
     type: 'suggestion',
     docs: {
@@ -13,7 +13,7 @@ export const zodSchemaDescription = createRule({
       recommended: 'recommended',
     },
     messages: {
-      zodSchemaDescription: 'Zod schema should have .describe() called',
+      requireZodSchemaDescription: 'Zod schema should have .describe() called',
     },
     schema: [],
   },
@@ -27,7 +27,7 @@ export const zodSchemaDescription = createRule({
           if (hasZodCall && !hasDescribeCall(node.init)) {
             context.report({
               node: node.init,
-              messageId: 'zodSchemaDescription',
+              messageId: 'requireZodSchemaDescription',
             });
           }
         }
@@ -89,4 +89,4 @@ export const zodSchemaDescription = createRule({
   },
 });
 
-export default zodSchemaDescription;
+export default requireZodSchemaDescription;
