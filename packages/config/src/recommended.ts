@@ -18,6 +18,10 @@ const recommended: Linter.Config = {
     'zero-tolerance/no-jest-have-been-called': 'warn',
     'zero-tolerance/no-mock-implementation': 'warn',
     'zero-tolerance/require-jsdoc-functions': 'warn',
+    'zero-tolerance/no-type-assertion': 'warn',
+    'zero-tolerance/no-eslint-disable': 'warn',
+    'zero-tolerance/sort-imports': 'warn',
+    'zero-tolerance/sort-functions': 'warn',
   },
 };
 

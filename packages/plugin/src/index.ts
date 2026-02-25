@@ -10,6 +10,10 @@ import noExportAlias from './rules/no-export-alias';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noMockImplementation from './rules/no-mock-implementation';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
+import noTypeAssertion from './rules/no-type-assertion';
+import noEslintDisable from './rules/no-eslint-disable';
+import sortImports from './rules/sort-imports';
+import sortFunctions from './rules/sort-functions';
 import packageJson from '../package.json';
 
 const rules = {
@@ -24,6 +28,10 @@ const rules = {
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-mock-implementation': noMockImplementation,
   'require-jsdoc-functions': requireJsdocFunctions,
+  'no-type-assertion': noTypeAssertion,
+  'no-eslint-disable': noEslintDisable,
+  'sort-imports': sortImports,
+  'sort-functions': sortFunctions,
 } as any;
 
 // Plugin definition
@@ -53,6 +61,10 @@ const recommendedConfig: Linter.Config = {
     'zero-tolerance/no-jest-have-been-called': 'warn',
     'zero-tolerance/no-mock-implementation': 'warn',
     'zero-tolerance/require-jsdoc-functions': 'warn',
+    'zero-tolerance/no-type-assertion': 'warn',
+    'zero-tolerance/no-eslint-disable': 'warn',
+    'zero-tolerance/sort-imports': 'warn',
+    'zero-tolerance/sort-functions': 'warn',
   },
 };
 
@@ -73,6 +85,10 @@ const strictConfig: Linter.Config = {
     'zero-tolerance/no-jest-have-been-called': 'error',
     'zero-tolerance/no-mock-implementation': 'error',
     'zero-tolerance/require-jsdoc-functions': 'error',
+    'zero-tolerance/no-type-assertion': 'error',
+    'zero-tolerance/no-eslint-disable': 'error',
+    'zero-tolerance/sort-imports': 'error',
+    'zero-tolerance/sort-functions': 'error',
   },
 };
 
@@ -96,6 +112,10 @@ const legacyRecommendedConfig = {
     'zero-tolerance/no-jest-have-been-called': 'warn',
     'zero-tolerance/no-mock-implementation': 'warn',
     'zero-tolerance/require-jsdoc-functions': 'warn',
+    'zero-tolerance/no-type-assertion': 'warn',
+    'zero-tolerance/no-eslint-disable': 'warn',
+    'zero-tolerance/sort-imports': 'warn',
+    'zero-tolerance/sort-functions': 'warn',
   },
 };
 
@@ -118,6 +138,10 @@ const legacyStrictConfig = {
     'zero-tolerance/no-jest-have-been-called': 'error',
     'zero-tolerance/no-mock-implementation': 'error',
     'zero-tolerance/require-jsdoc-functions': 'error',
+    'zero-tolerance/no-type-assertion': 'error',
+    'zero-tolerance/no-eslint-disable': 'error',
+    'zero-tolerance/sort-imports': 'error',
+    'zero-tolerance/sort-functions': 'error',
   },
 };
 
