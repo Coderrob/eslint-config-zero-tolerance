@@ -1,3 +1,10 @@
+<p align="center">
+  <img
+    src="public/img/zero-tolerance-icon.png"
+    alt="ESLint Plugin Zero Tolerance"
+  />
+</p>
+
 # eslint-plugin-zero-tolerance
 
 Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
