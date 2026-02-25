@@ -114,7 +114,7 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 | Rule | Description |
 |---|---|
-| [`require-interface-prefix`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-interface-prefix/) | Enforce that TypeScript interface names start with `I` |
+| [`require-interface-prefix`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-interface-prefix/) | Enforce that TypeScript interface names start with `I` followed by an uppercase letter |
 
 ### Documentation
 
@@ -128,7 +128,7 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 | Rule | Description |
 |---|---|
 | [`require-test-description-style`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-test-description-style/) | Enforce that test descriptions start with `should` |
-| [`no-jest-have-been-called`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/) | Prohibit `toHaveBeenCalled` and `toHaveBeenCalledWith`; use precise alternatives |
+| [`no-jest-have-been-called`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/) | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [`no-mock-implementation`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-mock-implementation/) | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds |
 
 ### Type Safety

@@ -19,19 +19,19 @@ Alphabetically sorted imports eliminate merge conflicts caused by two developers
 ### ✅ Correct
 
 ```typescript
-import fs from 'fs';
-import path from 'path';
 import { foo } from './foo';
 import { bar } from './utils/bar';
+import fs from 'fs';
+import path from 'path';
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-import { bar } from './utils/bar';
-import fs from 'fs';         // 'fs' should come before './utils/bar'
-import { foo } from './foo';
+import fs from 'fs';
 import path from 'path';
+import { foo } from './foo';  // './foo' should come before 'fs'
+import { bar } from './utils/bar';
 ```
 
 ## Configuration
