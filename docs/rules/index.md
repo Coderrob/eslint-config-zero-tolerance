@@ -20,7 +20,7 @@
 | Rule | Type | Description |
 |---|---|---|
 | [require-test-description-style](require-test-description-style.md) | suggestion | Enforce that test descriptions start with `should` |
-| [no-jest-have-been-called](no-jest-have-been-called.md) | suggestion | Prohibit `toHaveBeenCalled` and `toHaveBeenCalledWith`; use precise alternatives |
+| [no-jest-have-been-called](no-jest-have-been-called.md) | suggestion | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [no-mock-implementation](no-mock-implementation.md) | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds |
 
 ## Type Safety
