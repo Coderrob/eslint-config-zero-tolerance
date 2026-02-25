@@ -1,15 +1,20 @@
-# eslint-config-zero-tolerance
+# eslint-plugin-zero-tolerance
 
-Zero-tolerance ESLint plugin and config for enforcing strict code quality standards.
+Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
+
+[![npm version](https://img.shields.io/npm/v/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/eslint-plugin-zero-tolerance)
+[![License](https://img.shields.io/npm/l/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 
 **✨ Now supports ESLint 9 with Flat Config! ✨**
+
+📖 **[Full documentation](https://coderrob.github.io/eslint-config-zero-tolerance/)**
 
 ## Packages
 
 This monorepo contains two packages:
 
-- `eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
-- `eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
+- `eslint-plugin-zero-tolerance` — ESLint plugin with 25 custom rules
+- `eslint-config-zero-tolerance` — ESLint config that exports recommended and strict presets
 
 ## Requirements
 
@@ -20,19 +25,7 @@ This monorepo contains two packages:
 ## Installation
 
 ```bash
-pnpm install
-```
-
-## Building
-
-```bash
-pnpm build
-```
-
-## Testing
-
-```bash
-pnpm test
+npm install --save-dev eslint-plugin-zero-tolerance @typescript-eslint/parser
 ```
 
 ## Usage
@@ -61,7 +54,7 @@ export default [
 ];
 ```
 
-**Alternative: Import presets directly:**
+**Alternative: Import presets directly from the config package:**
 ```javascript
 // eslint.config.js
 import recommended from 'eslint-config-zero-tolerance/recommended';
@@ -85,8 +78,9 @@ export default [
       'zero-tolerance': zeroTolerance,
     },
     rules: {
-      'zero-tolerance/interface-prefix': 'error',
-      'zero-tolerance/no-literal-unions': 'warn',
+      'zero-tolerance/require-interface-prefix': 'error',
+      'zero-tolerance/no-throw-literal': 'error',
+      'zero-tolerance/max-function-lines': ['warn', { max: 40 }],
       // ... other rules
     },
   },
@@ -95,7 +89,7 @@ export default [
 
 ### ESLint 8.x (Legacy Config)
 
-**Using .eslintrc.js:**
+**Using `.eslintrc.js`:**
 ```javascript
 module.exports = {
   plugins: ['zero-tolerance'],
@@ -105,147 +99,98 @@ module.exports = {
 };
 ```
 
-**Or configure rules individually:**
-```javascript
-module.exports = {
-  plugins: ['zero-tolerance'],
-  rules: {
-    'zero-tolerance/interface-prefix': 'error',
-    'zero-tolerance/test-description-style': 'error',
-    'zero-tolerance/zod-schema-description': 'error',
-    'zero-tolerance/no-banned-types': 'error',
-    'zero-tolerance/no-relative-parent-imports': 'error',
-    'zero-tolerance/no-dynamic-import': 'error',
-    'zero-tolerance/no-literal-unions': 'error',
-  },
-};
-```
-
 ## Rules
 
-### interface-prefix
-Enforces that TypeScript interface names start with "I" (capitalized).
+All 25 rules are included in the `recommended` (`warn`) and `strict` (`error`) presets.
 
-**Example:**
-```typescript
-// ✓ Good
-interface IUser {
-  name: string;
-}
+### Naming Conventions
 
-// ✗ Bad
-interface User {
-  name: string;
-}
+| Rule | Description |
+|---|---|
+| [`require-interface-prefix`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-interface-prefix/) | Enforce that TypeScript interface names start with `I` |
+
+### Documentation
+
+| Rule | Description |
+|---|---|
+| [`require-jsdoc-functions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-jsdoc-functions/) | Require JSDoc comments on all functions (except test files) |
+| [`require-zod-schema-description`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-zod-schema-description/) | Enforce that Zod schemas have `.describe()` called |
+
+### Testing
+
+| Rule | Description |
+|---|---|
+| [`require-test-description-style`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-test-description-style/) | Enforce that test descriptions start with `should` |
+| [`no-jest-have-been-called`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/) | Prohibit `toHaveBeenCalled` and `toHaveBeenCalledWith`; use precise alternatives |
+| [`no-mock-implementation`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-mock-implementation/) | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds |
+
+### Type Safety
+
+| Rule | Description |
+|---|---|
+| [`no-type-assertion`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-type-assertion/) | Prevent use of TypeScript `as` type assertions |
+| [`no-non-null-assertion`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-non-null-assertion/) | Disallow non-null assertions using the `!` postfix operator |
+| [`no-literal-unions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-literal-unions/) | Ban literal union types in favour of enums |
+| [`no-banned-types`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-banned-types/) | Ban `ReturnType` and indexed access types |
+
+### Code Quality
+
+| Rule | Description |
+|---|---|
+| [`max-function-lines`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-function-lines/) | Enforce a maximum number of lines per function body |
+| [`max-params`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-params/) | Enforce a maximum number of function parameters |
+| [`no-magic-numbers`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-numbers/) | Disallow magic numbers; use named constants instead |
+| [`no-magic-strings`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-strings/) | Disallow magic strings in comparisons and switch cases |
+| [`sort-imports`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-imports/) | Require import declarations to be sorted alphabetically |
+| [`sort-functions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-functions/) | Require top-level function declarations to be sorted alphabetically |
+
+### Error Handling
+
+| Rule | Description |
+|---|---|
+| [`no-empty-catch`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-empty-catch/) | Disallow empty catch blocks that silently swallow errors |
+| [`no-throw-literal`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-throw-literal/) | Disallow throwing literals, objects, or templates; always throw a new Error instance |
+
+### Imports
+
+| Rule | Description |
+|---|---|
+| [`no-relative-parent-imports`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-relative-parent-imports/) | Ban `../` parent-directory imports and re-exports |
+| [`no-dynamic-import`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-dynamic-import/) | Ban `await import()` and `require()` outside test files |
+| [`no-export-alias`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-export-alias/) | Prevent use of aliases in export statements |
+
+### Bug Prevention
+
+| Rule | Description |
+|---|---|
+| [`no-identical-expressions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-identical-expressions/) | Disallow identical expressions on both sides of a binary or logical operator |
+| [`no-redundant-boolean`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-redundant-boolean/) | Disallow redundant comparisons to boolean literals |
+| [`no-await-in-loop`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-await-in-loop/) | Disallow `await` inside loops; use `Promise.all()` instead |
+| [`no-eslint-disable`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-eslint-disable/) | Prevent use of `eslint-disable` comments |
+
+## Development
+
+### Setup
+
+```bash
+pnpm install
 ```
 
-### test-description-style
-Enforces that test descriptions start with "should".
+### Building
 
-**Example:**
-```typescript
-// ✓ Good
-it("should render correctly", () => {});
-test("should handle errors", () => {});
-
-// ✗ Bad
-it("renders correctly", () => {});
-test("handles errors", () => {});
+```bash
+pnpm build
 ```
 
-### zod-schema-description
-Enforces that Zod schemas have `.describe()` called.
+### Testing
 
-**Example:**
-```typescript
-// ✓ Good
-const schema = z.string().describe("A string value");
-const userSchema = z.object({
-  name: z.string()
-}).describe("User object");
-
-// ✗ Bad
-const schema = z.string();
-const userSchema = z.object({
-  name: z.string()
-});
+```bash
+pnpm test
 ```
-
-### no-banned-types
-Bans the use of `ReturnType` and indexed access types.
-
-**Example:**
-```typescript
-// ✓ Good
-type MyFunction = (x: number) => number;
-
-// ✗ Bad
-type MyReturnType = ReturnType<typeof myFunction>;
-type Value = MyObject["key"];
-```
-
-### no-relative-parent-imports
-Bans imports and re-exports using `../` (parent directory imports).
-
-**Example:**
-```typescript
-// ✓ Good
-import { foo } from "./sibling";
-import { bar } from "./child/module";
-import pkg from "package-name";
-
-// ✗ Bad
-import { foo } from "../parent";
-export { bar } from "../../grandparent";
-```
-
-### no-dynamic-import
-Bans `await import()` and `require()` except in test files (*.test.* or *.spec.*).
-
-**Example:**
-```typescript
-// ✓ Good (in test files)
-// file: mymodule.test.ts
-const module = await import("./module");
-const pkg = require("./package");
-
-// ✗ Bad (in non-test files)
-// file: mymodule.ts
-const module = await import("./module");
-const pkg = require("./package");
-```
-
-### no-literal-unions
-Bans literal union types in favor of enums.
-
-**Example:**
-```typescript
-// ✓ Good
-enum Status {
-  Active = "active",
-  Inactive = "inactive"
-}
-
-// ✗ Bad
-type Status = "active" | "inactive";
-type Size = "small" | "medium" | "large";
-```
-## Test Coverage
-
-This project maintains comprehensive test coverage with:
-- **114 test cases** covering all rules
-- Named test cases for better documentation
-- Edge cases for each rule including:
-  - Generic types and type parameters
-  - Async/await patterns  
-  - Multiple error scenarios
-  - Boundary conditions
 
 ## Publishing
 
 This monorepo provides automated scripts to handle versioned releases:
-
-### Automated Publishing Process
 
 ```bash
 # 1. Build all packages
@@ -269,20 +214,6 @@ npm publish
 cd ../..
 pnpm restore-workspace
 ```
-
-### Manual Publishing Process
-
-If you prefer to publish manually:
-
-1. Update version in `packages/plugin/package.json`
-2. Update version in `packages/config/package.json`
-3. In `packages/config/package.json`, change:
-   - From: `"eslint-plugin-zero-tolerance": "workspace:*"`
-   - To: `"eslint-plugin-zero-tolerance": "^1.0.0"` (or current version)
-4. Build and publish both packages
-5. Restore `workspace:*` for continued development
-
-The automated scripts handle step 3 and 5 for you.
 
 ## License
 

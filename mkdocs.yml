@@ -1,0 +1,87 @@
+site_name: eslint-plugin-zero-tolerance
+site_description: Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
+site_url: https://coderrob.github.io/eslint-config-zero-tolerance/
+repo_name: Coderrob/eslint-config-zero-tolerance
+repo_url: https://github.com/Coderrob/eslint-config-zero-tolerance
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Configuration: configuration.md
+  - Rules:
+    - Overview: rules/index.md
+    - Naming Conventions:
+      - require-interface-prefix: rules/require-interface-prefix.md
+    - Documentation:
+      - require-jsdoc-functions: rules/require-jsdoc-functions.md
+      - require-zod-schema-description: rules/require-zod-schema-description.md
+    - Testing:
+      - require-test-description-style: rules/require-test-description-style.md
+      - no-jest-have-been-called: rules/no-jest-have-been-called.md
+      - no-mock-implementation: rules/no-mock-implementation.md
+    - Type Safety:
+      - no-type-assertion: rules/no-type-assertion.md
+      - no-non-null-assertion: rules/no-non-null-assertion.md
+      - no-literal-unions: rules/no-literal-unions.md
+      - no-banned-types: rules/no-banned-types.md
+    - Code Quality:
+      - max-function-lines: rules/max-function-lines.md
+      - max-params: rules/max-params.md
+      - no-magic-numbers: rules/no-magic-numbers.md
+      - no-magic-strings: rules/no-magic-strings.md
+      - sort-imports: rules/sort-imports.md
+      - sort-functions: rules/sort-functions.md
+    - Error Handling:
+      - no-empty-catch: rules/no-empty-catch.md
+      - no-throw-literal: rules/no-throw-literal.md
+    - Imports:
+      - no-relative-parent-imports: rules/no-relative-parent-imports.md
+      - no-dynamic-import: rules/no-dynamic-import.md
+      - no-export-alias: rules/no-export-alias.md
+    - Bug Prevention:
+      - no-identical-expressions: rules/no-identical-expressions.md
+      - no-redundant-boolean: rules/no-redundant-boolean.md
+      - no-await-in-loop: rules/no-await-in-loop.md
+      - no-eslint-disable: rules/no-eslint-disable.md
