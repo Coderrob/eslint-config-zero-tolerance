@@ -16,6 +16,13 @@ import noTypeAssertion from './rules/no-type-assertion';
 import noEslintDisable from './rules/no-eslint-disable';
 import sortImports from './rules/sort-imports';
 import sortFunctions from './rules/sort-functions';
+import maxFunctionLines from './rules/max-function-lines';
+import maxParams from './rules/max-params';
+import noIdenticalExpressions from './rules/no-identical-expressions';
+import noRedundantBoolean from './rules/no-redundant-boolean';
+import noEmptyCatch from './rules/no-empty-catch';
+import noNonNullAssertion from './rules/no-non-null-assertion';
+import noAwaitInLoop from './rules/no-await-in-loop';
 import packageJson from '../package.json';
 
 const rules = {
@@ -36,6 +43,13 @@ const rules = {
   'no-eslint-disable': noEslintDisable,
   'sort-imports': sortImports,
   'sort-functions': sortFunctions,
+  'max-function-lines': maxFunctionLines,
+  'max-params': maxParams,
+  'no-identical-expressions': noIdenticalExpressions,
+  'no-redundant-boolean': noRedundantBoolean,
+  'no-empty-catch': noEmptyCatch,
+  'no-non-null-assertion': noNonNullAssertion,
+  'no-await-in-loop': noAwaitInLoop,
 } as any;
 
 // Plugin definition
@@ -71,6 +85,13 @@ const recommendedConfig: Linter.Config = {
     'zero-tolerance/sort-functions': 'warn',
     'zero-tolerance/no-magic-numbers': 'warn',
     'zero-tolerance/no-magic-strings': 'warn',
+    'zero-tolerance/max-function-lines': ['warn', { max: 30 }] as any,
+    'zero-tolerance/max-params': ['warn', { max: 4 }] as any,
+    'zero-tolerance/no-identical-expressions': 'warn',
+    'zero-tolerance/no-redundant-boolean': 'warn',
+    'zero-tolerance/no-empty-catch': 'warn',
+    'zero-tolerance/no-non-null-assertion': 'warn',
+    'zero-tolerance/no-await-in-loop': 'warn',
   },
 };
 
@@ -97,6 +118,13 @@ const strictConfig: Linter.Config = {
     'zero-tolerance/sort-functions': 'error',
     'zero-tolerance/no-magic-numbers': 'error',
     'zero-tolerance/no-magic-strings': 'error',
+    'zero-tolerance/max-function-lines': ['error', { max: 20 }] as any,
+    'zero-tolerance/max-params': ['error', { max: 4 }] as any,
+    'zero-tolerance/no-identical-expressions': 'error',
+    'zero-tolerance/no-redundant-boolean': 'error',
+    'zero-tolerance/no-empty-catch': 'error',
+    'zero-tolerance/no-non-null-assertion': 'error',
+    'zero-tolerance/no-await-in-loop': 'error',
   },
 };
 
@@ -126,6 +154,13 @@ const legacyRecommendedConfig = {
     'zero-tolerance/sort-functions': 'warn',
     'zero-tolerance/no-magic-numbers': 'warn',
     'zero-tolerance/no-magic-strings': 'warn',
+    'zero-tolerance/max-function-lines': ['warn', { max: 30 }],
+    'zero-tolerance/max-params': ['warn', { max: 4 }],
+    'zero-tolerance/no-identical-expressions': 'warn',
+    'zero-tolerance/no-redundant-boolean': 'warn',
+    'zero-tolerance/no-empty-catch': 'warn',
+    'zero-tolerance/no-non-null-assertion': 'warn',
+    'zero-tolerance/no-await-in-loop': 'warn',
   },
 };
 
@@ -154,6 +189,13 @@ const legacyStrictConfig = {
     'zero-tolerance/sort-functions': 'error',
     'zero-tolerance/no-magic-numbers': 'error',
     'zero-tolerance/no-magic-strings': 'error',
+    'zero-tolerance/max-function-lines': ['error', { max: 20 }],
+    'zero-tolerance/max-params': ['error', { max: 4 }],
+    'zero-tolerance/no-identical-expressions': 'error',
+    'zero-tolerance/no-redundant-boolean': 'error',
+    'zero-tolerance/no-empty-catch': 'error',
+    'zero-tolerance/no-non-null-assertion': 'error',
+    'zero-tolerance/no-await-in-loop': 'error',
   },
 };
 

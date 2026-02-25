@@ -24,6 +24,13 @@ const recommended: Linter.Config = {
     'zero-tolerance/sort-functions': 'warn',
     'zero-tolerance/no-magic-numbers': 'warn',
     'zero-tolerance/no-magic-strings': 'warn',
+    'zero-tolerance/max-function-lines': ['warn', { max: 30 }] as any,
+    'zero-tolerance/max-params': ['warn', { max: 4 }] as any,
+    'zero-tolerance/no-identical-expressions': 'warn',
+    'zero-tolerance/no-redundant-boolean': 'warn',
+    'zero-tolerance/no-empty-catch': 'warn',
+    'zero-tolerance/no-non-null-assertion': 'warn',
+    'zero-tolerance/no-await-in-loop': 'warn',
   },
 };
 
