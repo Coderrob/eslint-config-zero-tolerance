@@ -32,7 +32,7 @@ export const noTypeAssertion = createRule({
       TSAsExpression(node) {
         const filename = context.getFilename();
         const typeText = context.getSourceCode().getText(node.typeAnnotation);
-        if (isTestFile(filename) && typeText === 'unknown') {
+        if (isTestFile(filename) && typeText.trim() === 'unknown') {
           return;
         }
         context.report({
