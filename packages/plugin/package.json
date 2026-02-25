@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-zero-tolerance",
   "version": "1.0.0",
-  "description": "25 strict, opinionated ESLint rules for TypeScript — enforcing type safety, code quality, testing standards, and maintainable patterns with zero exceptions.",
+  "description": "Strict, opinionated ESLint rules for TypeScript — enforcing type safety, code quality, testing standards, and maintainable patterns with zero exceptions.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

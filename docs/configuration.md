@@ -53,7 +53,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-All 25 rules are included in every preset. The only difference between `recommended` and `strict` is the severity level and the tighter limits for configurable rules.
+All rules are included in every preset. The only difference between `recommended` and `strict` is the severity level and the tighter limits for configurable rules.
 
 | Rule | Recommended | Strict |
 |---|---|---|

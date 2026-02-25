@@ -13,7 +13,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 This monorepo contains two packages:
 
-- `eslint-plugin-zero-tolerance` — ESLint plugin with 25 custom rules
+- `eslint-plugin-zero-tolerance` — ESLint plugin with custom rules
 - `eslint-config-zero-tolerance` — ESLint config that exports recommended and strict presets
 
 ## Requirements
@@ -101,7 +101,7 @@ module.exports = {
 
 ## Rules
 
-All 25 rules are included in the `recommended` (`warn`) and `strict` (`error`) presets.
+All rules are included in the `recommended` (`warn`) and `strict` (`error`) presets.
 
 ### Naming Conventions
 
