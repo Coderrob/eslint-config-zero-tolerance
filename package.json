@@ -16,8 +16,8 @@
     "eslintplugin",
     "eslintconfig"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Robert Lindley",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/jest": "^29.5.11",
