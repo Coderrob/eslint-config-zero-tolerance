@@ -31,6 +31,7 @@ const recommended: Linter.Config = {
     'zero-tolerance/no-empty-catch': 'warn',
     'zero-tolerance/no-non-null-assertion': 'warn',
     'zero-tolerance/no-await-in-loop': 'warn',
+    'zero-tolerance/no-throw-literal': 'warn',
   },
 };
 

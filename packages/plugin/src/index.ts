@@ -23,6 +23,7 @@ import noRedundantBoolean from './rules/no-redundant-boolean';
 import noEmptyCatch from './rules/no-empty-catch';
 import noNonNullAssertion from './rules/no-non-null-assertion';
 import noAwaitInLoop from './rules/no-await-in-loop';
+import noThrowLiteral from './rules/no-throw-literal';
 import packageJson from '../package.json';
 
 const rules = {
@@ -50,6 +51,7 @@ const rules = {
   'no-empty-catch': noEmptyCatch,
   'no-non-null-assertion': noNonNullAssertion,
   'no-await-in-loop': noAwaitInLoop,
+  'no-throw-literal': noThrowLiteral,
 } as any;
 
 // Plugin definition
@@ -92,6 +94,7 @@ const recommendedConfig: Linter.Config = {
     'zero-tolerance/no-empty-catch': 'warn',
     'zero-tolerance/no-non-null-assertion': 'warn',
     'zero-tolerance/no-await-in-loop': 'warn',
+    'zero-tolerance/no-throw-literal': 'warn',
   },
 };
 
@@ -125,6 +128,7 @@ const strictConfig: Linter.Config = {
     'zero-tolerance/no-empty-catch': 'error',
     'zero-tolerance/no-non-null-assertion': 'error',
     'zero-tolerance/no-await-in-loop': 'error',
+    'zero-tolerance/no-throw-literal': 'error',
   },
 };
 
@@ -161,6 +165,7 @@ const legacyRecommendedConfig = {
     'zero-tolerance/no-empty-catch': 'warn',
     'zero-tolerance/no-non-null-assertion': 'warn',
     'zero-tolerance/no-await-in-loop': 'warn',
+    'zero-tolerance/no-throw-literal': 'warn',
   },
 };
 
@@ -196,6 +201,7 @@ const legacyStrictConfig = {
     'zero-tolerance/no-empty-catch': 'error',
     'zero-tolerance/no-non-null-assertion': 'error',
     'zero-tolerance/no-await-in-loop': 'error',
+    'zero-tolerance/no-throw-literal': 'error',
   },
 };
 
