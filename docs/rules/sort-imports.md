@@ -1,6 +1,6 @@
 # sort-imports
 
-Require import declarations to be sorted alphabetically by module path.
+Require import declarations to be grouped and sorted: external → parent → peer → index, with alphabetical ordering within each group.
 
 ## Rule Details
 
@@ -12,32 +12,43 @@ Require import declarations to be sorted alphabetically by module path.
 
 ## Rationale
 
-Alphabetically sorted imports eliminate merge conflicts caused by two developers adding imports to the same file, make it easy to spot duplicates, and provide a predictable place to look for any given import. Sorting is case-insensitive.
+Consistent import ordering reduces merge conflicts and makes it immediately clear where a dependency comes from. Imports must appear in four groups in order — external packages, parent-directory (`../`) imports, peer (`./`) imports, and the index (`.`) import — with each group sorted alphabetically (case-insensitive).
 
 ## Examples
 
 ### ✅ Correct
 
 ```typescript
-// External packages sorted alphabetically
+// 1. External packages — alphabetical
 import express from 'express';
 import path from 'path';
 
-// Relative imports sorted alphabetically
+// 2. Parent imports — alphabetical
+import { models } from '../models';
+import { utils } from '../utils';
+
+// 3. Peer imports — alphabetical
 import { auth } from './auth';
 import { users } from './users';
+
+// 4. Index import
+import self from '.';
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-// External packages out of order
+// Peer import placed before external — wrong group order
+import { auth } from './auth';
+import express from 'express';
+
+// Parent import placed before external — wrong group order
+import { utils } from '../utils';
+import path from 'path';
+
+// External packages out of alphabetical order
 import path from 'path';
 import express from 'express';  // 'express' should come before 'path'
-
-// Relative imports out of order
-import { users } from './users';
-import { auth } from './auth';  // './auth' should come before './users'
 ```
 
 ## Configuration
