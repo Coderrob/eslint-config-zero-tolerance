@@ -9,15 +9,15 @@ const createRule = ESLintUtils.RuleCreator(
  * values that do not require a named constant: 0, 1, or -1.
  */
 function isAllowedValue(node: TSESTree.Literal): boolean {
-  if (node.value === 0 || node.value === 1) {
-    return true;
-  }
   // -1 is represented as UnaryExpression('-', Literal(1))
-  return (
+  if (
     node.value === 1 &&
     node.parent?.type === 'UnaryExpression' &&
     (node.parent as TSESTree.UnaryExpression).operator === '-'
-  );
+  ) {
+    return true;
+  }
+  return node.value === 0 || node.value === 1;
 }
 
 /**
