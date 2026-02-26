@@ -18,9 +18,9 @@ export const noExportAlias = createRule({
   name: 'no-export-alias',
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description: 'Prevent use of alias in export statements',
-      recommended: 'recommended',
     },
     messages: {
       noExportAlias: 'Export alias "{{alias}}" is not allowed; export "{{local}}" directly',
@@ -29,6 +29,8 @@ export const noExportAlias = createRule({
   },
   defaultOptions: [],
   create(context) {
+    const sourceCode = context.sourceCode;
+
     return {
       ExportNamedDeclaration(node) {
         for (const specifier of node.specifiers) {
@@ -46,6 +48,9 @@ export const noExportAlias = createRule({
               data: {
                 local: localName,
                 alias: exportedName,
+              },
+              fix(fixer) {
+                return fixer.replaceText(specifier, sourceCode.getText(specifier.local));
               },
             });
           }

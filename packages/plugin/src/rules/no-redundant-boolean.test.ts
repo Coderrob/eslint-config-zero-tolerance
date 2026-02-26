@@ -35,26 +35,31 @@ ruleTester.run('no-redundant-boolean', noRedundantBoolean, {
     {
       name: 'should error for strict equality with true',
       code: 'if (isActive === true) {}',
+      output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
       name: 'should error for strict inequality with false',
       code: 'if (isActive !== false) {}',
+      output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
       name: 'should error for boolean literal on the left side',
       code: 'if (true === isActive) {}',
+      output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
       name: 'should error for assignment with boolean comparison',
       code: 'const ok = isValid === true;',
+      output: 'const ok = isValid;',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
       name: 'should error for strict inequality with true',
       code: 'if (result !== true) {}',
+      output: 'if (!(result)) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
   ],

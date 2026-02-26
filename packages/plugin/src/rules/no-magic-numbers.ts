@@ -57,7 +57,6 @@ export const noMagicNumbers = createRule({
     docs: {
       description:
         'Disallow magic numbers; use named constants instead of raw numeric literals',
-      recommended: 'recommended',
     },
     messages: {
       noMagicNumbers:
@@ -67,6 +66,7 @@ export const noMagicNumbers = createRule({
   },
   defaultOptions: [],
   create(context) {
+    const sourceCode = context.sourceCode;
     return {
       Literal(node) {
         if (typeof node.value !== 'number') {
@@ -82,10 +82,11 @@ export const noMagicNumbers = createRule({
         if (isInEnumMember(numericNode)) {
           return;
         }
+        const rawValue = numericNode.raw ?? sourceCode.getText(numericNode);
         context.report({
           node,
           messageId: 'noMagicNumbers',
-          data: { value: String(node.raw ?? node.value) },
+          data: { value: rawValue },
         });
       },
     };

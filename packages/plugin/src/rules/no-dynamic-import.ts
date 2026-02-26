@@ -10,7 +10,6 @@ export const noDynamicImport = createRule({
     type: 'problem',
     docs: {
       description: 'Ban await import() and require() except in test files',
-      recommended: 'recommended',
     },
     messages: {
       noDynamicImport: 'Dynamic import() with await is not allowed outside of test files',

@@ -10,7 +10,6 @@ export const noBannedTypes = createRule({
     type: 'problem',
     docs: {
       description: 'Ban ReturnType and indexed access types',
-      recommended: 'recommended',
     },
     messages: {
       bannedReturnType: 'ReturnType is not allowed',

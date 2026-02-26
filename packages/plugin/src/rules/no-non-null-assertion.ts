@@ -11,7 +11,6 @@ export const noNonNullAssertion = createRule({
     docs: {
       description:
         'Disallow non-null assertions using the "!" postfix operator',
-      recommended: 'recommended',
     },
     messages: {
       noNonNullAssertion:

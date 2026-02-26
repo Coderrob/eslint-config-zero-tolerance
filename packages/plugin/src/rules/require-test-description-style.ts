@@ -10,7 +10,6 @@ export const requireTestDescriptionStyle = createRule({
     type: 'suggestion',
     docs: {
       description: 'Enforce that test descriptions start with "should"',
-      recommended: 'recommended',
     },
     messages: {
       requireTestDescriptionStyle: 'Test description should start with "should"',

@@ -20,7 +20,6 @@ export const noJestHaveBeenCalled = createRule({
     docs: {
       description:
         'Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead',
-      recommended: 'recommended',
     },
     messages: {
       noHaveBeenCalled:

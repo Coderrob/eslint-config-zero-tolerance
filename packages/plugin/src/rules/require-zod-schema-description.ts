@@ -10,7 +10,6 @@ export const requireZodSchemaDescription = createRule({
     type: 'suggestion',
     docs: {
       description: 'Enforce that Zod schemas have .describe() called',
-      recommended: 'recommended',
     },
     messages: {
       requireZodSchemaDescription: 'Zod schema should have .describe() called',

@@ -10,7 +10,6 @@ export const noEmptyCatch = createRule({
     type: 'problem',
     docs: {
       description: 'Disallow empty catch blocks that silently swallow errors',
-      recommended: 'recommended',
     },
     messages: {
       emptyCatch:

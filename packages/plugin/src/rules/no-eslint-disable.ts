@@ -10,7 +10,6 @@ export const noEslintDisable = createRule({
     type: 'suggestion',
     docs: {
       description: 'Prevent use of eslint-disable comments',
-      recommended: 'recommended',
     },
     messages: {
       noEslintDisable:

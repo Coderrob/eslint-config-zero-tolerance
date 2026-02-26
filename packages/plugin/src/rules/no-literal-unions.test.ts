@@ -42,6 +42,10 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       code: 'type ArrayType = string[] | number[];',
       name: 'array type union',
     },
+    {
+      code: 'type Flags = true | false;',
+      name: 'boolean literal union',
+    },
   ],
   invalid: [
     {
@@ -81,8 +85,8 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
     {
-      code: 'type Flags = true | false;',
-      name: 'boolean literal union',
+      code: 'type MixedBooleanLiteral = true | "yes";',
+      name: 'boolean literal mixed with string literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',

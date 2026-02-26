@@ -19,7 +19,6 @@ export const noTypeAssertion = createRule({
     type: 'suggestion',
     docs: {
       description: 'Prevent use of TypeScript "as" type assertions',
-      recommended: 'recommended',
     },
     messages: {
       noTypeAssertion: 'Type assertion "as {{type}}" is not allowed',

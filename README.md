@@ -195,9 +195,39 @@ pnpm build
 pnpm test
 ```
 
+### Type Checking
+
+```bash
+pnpm --filter eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+```
+
 ## Publishing
 
-This monorepo provides automated scripts to handle versioned releases:
+This monorepo provides automated scripts to handle versioned releases.
+
+Quick release (single command):
+
+```bash
+pnpm prepare-publish --release patch --commit --tag --publish
+```
+
+This will:
+- bump the root, plugin, and config package versions
+- replace `workspace:*` with a versioned peer dependency in `packages/config`
+- run `pnpm build` and `pnpm test`
+- create a release commit and annotated git tag
+- publish both packages to npm
+
+If you want to restore `workspace:*` after publishing for local development, run:
+
+```bash
+pnpm restore-workspace
+```
+
+Or include `--restore-workspace` and commit that restoration separately.
+
+Manual/stepwise release flow:
 
 ```bash
 # 1. Build all packages
@@ -206,7 +236,7 @@ pnpm build
 # 2. Run tests to ensure everything works
 pnpm test
 
-# 3. Prepare packages for publishing (converts workspace:* to versioned dependencies)
+# 3. Prepare packages for publishing (converts workspace:* to versioned dependency)
 pnpm prepare-publish
 
 # 4. Publish the plugin package
@@ -220,6 +250,19 @@ npm publish
 # 6. Restore workspace:* for local development
 cd ../..
 pnpm restore-workspace
+```
+
+Additional `prepare-publish` options:
+
+```bash
+# Bump versions and prepare manifests without publishing
+pnpm prepare-publish --release minor
+
+# Skip build/test if already run in CI or a previous step
+pnpm prepare-publish --release 1.2.0 --skip-build --skip-test --commit --tag --publish
+
+# Dry run the full flow
+pnpm prepare-publish --release patch --commit --tag --publish --dry-run
 ```
 
 ## License

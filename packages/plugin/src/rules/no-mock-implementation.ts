@@ -18,7 +18,6 @@ export const noMockImplementation = createRule({
     docs: {
       description:
         'Prohibit persistent mock implementations; use the Once variants to avoid test bleeds',
-      recommended: 'recommended',
     },
     messages: {
       noMockImplementation:

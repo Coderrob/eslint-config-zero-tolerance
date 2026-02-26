@@ -38,7 +38,6 @@ export const noMagicStrings = createRule({
     docs: {
       description:
         'Disallow magic strings in comparisons and switch cases; use named constants instead',
-      recommended: 'recommended',
     },
     messages: {
       noMagicStrings:

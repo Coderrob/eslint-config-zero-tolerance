@@ -10,7 +10,6 @@ export const requireInterfacePrefix = createRule({
     type: 'suggestion',
     docs: {
       description: 'Enforce that interface names start with "I"',
-      recommended: 'recommended',
     },
     messages: {
       interfacePrefix: 'Interface name "{{name}}" should start with "I"',

@@ -38,7 +38,6 @@ export const maxParams = createRule({
     type: 'suggestion',
     docs: {
       description: 'Enforce a maximum number of function parameters',
-      recommended: 'recommended',
     },
     messages: {
       tooManyParams:

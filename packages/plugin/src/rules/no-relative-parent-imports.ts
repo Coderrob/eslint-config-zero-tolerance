@@ -10,7 +10,6 @@ export const noRelativeParentImports = createRule({
     type: 'problem',
     docs: {
       description: 'Ban ../ re-exports and imports',
-      recommended: 'recommended',
     },
     messages: {
       noRelativeParentImports: 'Parent directory imports/re-exports using ../ are not allowed',

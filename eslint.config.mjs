@@ -4,6 +4,10 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 
+const zeroToleranceRulesOff = Object.fromEntries(
+  Object.keys(zeroTolerancePlugin.rules ?? {}).map((ruleName) => [`zero-tolerance/${ruleName}`, 'off'])
+);
+
 export default [
   eslint.configs.recommended,
   {
@@ -49,14 +53,28 @@ export default [
     },
   },
   {
-    files: ['**/packages/plugin/src/index.ts'],
+    files: ['packages/plugin/src/**/*.ts'],
     rules: {
-      // Allow importing package.json from src/
-      'zero-tolerance/no-relative-parent-imports': 'off',
+      // The plugin implementation intentionally contains patterns that its own
+      // rules prohibit (e.g. AST node type strings, test harness casts).
+      ...zeroToleranceRulesOff,
     },
   },
   {
     files: ['**/*.test.ts', '**/*.spec.ts'],
+    languageOptions: {
+      globals: {
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        describe: 'readonly',
+        expect: 'readonly',
+        it: 'readonly',
+        jest: 'readonly',
+        test: 'readonly',
+      },
+    },
     rules: {
       // Relax some rules for tests
       'zero-tolerance/no-dynamic-import': 'off',

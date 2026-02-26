@@ -13,7 +13,6 @@ export const noIdenticalExpressions = createRule({
     docs: {
       description:
         'Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)',
-      recommended: 'recommended',
     },
     messages: {
       identicalExpressions:
@@ -23,12 +22,14 @@ export const noIdenticalExpressions = createRule({
   },
   defaultOptions: [],
   create(context) {
+    const sourceCode = context.sourceCode;
+
     function checkExpression(node: TSESTree.BinaryExpression | TSESTree.LogicalExpression): void {
       if (!CHECKED_BINARY_OPERATORS.has(node.operator)) {
         return;
       }
-      const leftText = context.getSourceCode().getText(node.left);
-      const rightText = context.getSourceCode().getText(node.right);
+      const leftText = sourceCode.getText(node.left);
+      const rightText = sourceCode.getText(node.right);
       if (leftText === rightText) {
         context.report({
           node,

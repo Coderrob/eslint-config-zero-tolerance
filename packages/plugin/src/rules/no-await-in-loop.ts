@@ -43,7 +43,6 @@ export const noAwaitInLoop = createRule({
     docs: {
       description:
         'Disallow await expressions inside loops; use Promise.all() for parallel execution',
-      recommended: 'recommended',
     },
     messages: {
       noAwaitInLoop:

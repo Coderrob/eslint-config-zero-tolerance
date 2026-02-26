@@ -42,11 +42,16 @@ ruleTester.run('no-export-alias', noExportAlias, {
       code: "export * from './module';",
       name: 'wildcard re-export',
     },
+    {
+      code: 'export { foo as "foo" };',
+      name: 'string literal export name without alias',
+    },
   ],
   invalid: [
     {
       code: 'export { foo as bar };',
       name: 'named export with alias',
+      output: 'export { foo };',
       errors: [
         {
           messageId: 'noExportAlias',
@@ -57,6 +62,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: "export { foo as bar } from './module';",
       name: 're-export with alias',
+      output: "export { foo } from './module';",
       errors: [
         {
           messageId: 'noExportAlias',
@@ -67,6 +73,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { MyClass as default };',
       name: 'export aliased as default',
+      output: 'export { MyClass };',
       errors: [
         {
           messageId: 'noExportAlias',
@@ -77,6 +84,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { foo as bar, baz as qux };',
       name: 'multiple aliased exports',
+      output: 'export { foo, baz };',
       errors: [
         {
           messageId: 'noExportAlias',
@@ -91,10 +99,22 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: "export { alpha as beta, gamma } from './module';",
       name: 'mixed aliased and direct re-exports',
+      output: "export { alpha, gamma } from './module';",
       errors: [
         {
           messageId: 'noExportAlias',
           data: { local: 'alpha', alias: 'beta' },
+        },
+      ],
+    },
+    {
+      code: 'export { foo as "bar" };',
+      name: 'string literal export alias',
+      output: 'export { foo };',
+      errors: [
+        {
+          messageId: 'noExportAlias',
+          data: { local: 'foo', alias: 'bar' },
         },
       ],
     },

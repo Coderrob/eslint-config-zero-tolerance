@@ -17,7 +17,6 @@ export const requireJsdocFunctions = createRule({
     type: 'suggestion',
     docs: {
       description: 'Require JSDoc comments on all functions (except in test files)',
-      recommended: 'recommended',
     },
     messages: {
       missingJsdoc: 'Function "{{name}}" is missing a JSDoc comment',

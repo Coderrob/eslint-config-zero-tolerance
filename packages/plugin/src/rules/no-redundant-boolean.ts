@@ -13,10 +13,10 @@ export const noRedundantBoolean = createRule({
   name: 'no-redundant-boolean',
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description:
         'Disallow redundant comparisons to boolean literals (Sonar S1125)',
-      recommended: 'recommended',
     },
     messages: {
       redundantBoolean:
@@ -26,13 +26,56 @@ export const noRedundantBoolean = createRule({
   },
   defaultOptions: [],
   create(context) {
+    const sourceCode = context.sourceCode;
+
+    const getNonLiteralSide = (
+      node: TSESTree.BinaryExpression
+    ): TSESTree.Expression | null => {
+      if (isBooleanLiteral(node.left)) {
+        return node.right;
+      }
+      if (isBooleanLiteral(node.right) && node.left.type !== 'PrivateIdentifier') {
+        return node.left;
+      }
+      return null;
+    };
+
+    const getBooleanLiteralValue = (node: TSESTree.BinaryExpression): boolean | null => {
+      if (isBooleanLiteral(node.left)) {
+        return Boolean((node.left as TSESTree.Literal).value);
+      }
+      if (isBooleanLiteral(node.right)) {
+        return Boolean((node.right as TSESTree.Literal).value);
+      }
+      return null;
+    };
+
     return {
       BinaryExpression(node) {
         if (node.operator !== '===' && node.operator !== '!==') {
           return;
         }
         if (isBooleanLiteral(node.left) || isBooleanLiteral(node.right)) {
-          context.report({ node, messageId: 'redundantBoolean' });
+          const nonLiteralSide = getNonLiteralSide(node);
+          const literalValue = getBooleanLiteralValue(node);
+
+          context.report({
+            node,
+            messageId: 'redundantBoolean',
+            fix:
+              nonLiteralSide !== null && literalValue !== null
+                ? (fixer) => {
+                    const shouldNegate =
+                      (node.operator === '===' && literalValue === false) ||
+                      (node.operator === '!==' && literalValue === true);
+                    const expressionText = sourceCode.getText(nonLiteralSide);
+                    const replacement = shouldNegate
+                      ? `!(${expressionText})`
+                      : expressionText;
+                    return fixer.replaceText(node, replacement);
+                  }
+                : null,
+          });
         }
       },
     };

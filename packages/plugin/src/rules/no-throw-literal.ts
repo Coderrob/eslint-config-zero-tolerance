@@ -28,7 +28,6 @@ export const noThrowLiteral = createRule({
     docs: {
       description:
         'Disallow throwing literals, objects, or templates; always throw a new Error instance',
-      recommended: 'recommended',
     },
     messages: {
       noThrowLiteral:

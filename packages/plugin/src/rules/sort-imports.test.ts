@@ -83,32 +83,53 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report two external imports out of alphabetical order',
       code: "import b from 'b';\nimport a from 'a';",
+      output: "import a from 'a';\nimport b from 'b';",
       errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'b' } }],
     },
     {
       name: 'should report third external import out of alphabetical order',
       code: "import a from 'a';\nimport c from 'c';\nimport b from 'b';",
+      output: "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
       errors: [{ messageId: 'unsortedImport', data: { current: 'b', previous: 'c' } }],
     },
     {
       name: 'should report when first external import is not the smallest',
       code: "import z from 'z';\nimport a from 'a';",
+      output: "import a from 'a';\nimport z from 'z';",
       errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'z' } }],
     },
     {
       name: 'should report multiple external imports out of alphabetical order',
       code: "import c from 'c';\nimport a from 'a';\nimport b from 'b';",
-      errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } }],
+      output: [
+        "import a from 'a';\nimport c from 'c';\nimport b from 'b';",
+        "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
+      ],
+      errors: [
+        { messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } },
+        { messageId: 'unsortedImport', data: { current: 'b', previous: 'c' } },
+      ],
     },
     {
       name: 'should report case-insensitive alphabetical violation within external group',
       code: "import b from 'Beta';\nimport a from 'alpha';",
+      output: "import a from 'alpha';\nimport b from 'Beta';",
       errors: [{ messageId: 'unsortedImport', data: { current: 'alpha', previous: 'Beta' } }],
     },
     {
       name: 'should report parent import placed before external import',
       code: "import utils from '../utils';\nimport express from 'express';",
+      output: "import express from 'express';\nimport utils from '../utils';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: '../utils',
+            next: 'express',
+            currentGroup: 'parent',
+            nextGroup: 'external',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -123,7 +144,17 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report peer import placed before external import',
       code: "import auth from './auth';\nimport express from 'express';",
+      output: "import express from 'express';\nimport auth from './auth';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './auth',
+            next: 'express',
+            currentGroup: 'peer',
+            nextGroup: 'external',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -138,7 +169,17 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report index import placed before external import',
       code: "import self from '.';\nimport express from 'express';",
+      output: "import express from 'express';\nimport self from '.';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: '.',
+            next: 'express',
+            currentGroup: 'index',
+            nextGroup: 'external',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -153,7 +194,17 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report peer import placed before parent import',
       code: "import auth from './auth';\nimport utils from '../utils';",
+      output: "import utils from '../utils';\nimport auth from './auth';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './auth',
+            next: '../utils',
+            currentGroup: 'peer',
+            nextGroup: 'parent',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -166,9 +217,50 @@ ruleTester.run('sort-imports', sortImports, {
       ],
     },
     {
+      name: 'should report interleaved groups holistically',
+      code: [
+        "import alpha from 'alpha';",
+        "import utils from '../utils';",
+        "import beta from 'beta';",
+        "import auth from './auth';",
+      ].join('\n'),
+      output:
+        "import alpha from 'alpha';\nimport beta from 'beta';\nimport utils from '../utils';\nimport auth from './auth';",
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: '../utils',
+            next: 'beta',
+            currentGroup: 'parent',
+            nextGroup: 'external',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'beta',
+            previous: '../utils',
+            currentGroup: 'external',
+            previousGroup: 'parent',
+          },
+        },
+      ],
+    },
+    {
       name: 'should report index import placed before parent import',
       code: "import self from '.';\nimport utils from '../utils';",
+      output: "import utils from '../utils';\nimport self from '.';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: '.',
+            next: '../utils',
+            currentGroup: 'index',
+            nextGroup: 'parent',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -183,7 +275,17 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report index import placed before peer import',
       code: "import self from '.';\nimport auth from './auth';",
+      output: "import auth from './auth';\nimport self from '.';",
       errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: '.',
+            next: './auth',
+            currentGroup: 'index',
+            nextGroup: 'peer',
+          },
+        },
         {
           messageId: 'wrongGroup',
           data: {
@@ -198,6 +300,7 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report peer imports out of alphabetical order',
       code: "import users from './users';\nimport auth from './auth';",
+      output: "import auth from './auth';\nimport users from './users';",
       errors: [
         { messageId: 'unsortedImport', data: { current: './auth', previous: './users' } },
       ],
@@ -205,6 +308,7 @@ ruleTester.run('sort-imports', sortImports, {
     {
       name: 'should report parent imports out of alphabetical order',
       code: "import utils from '../utils';\nimport models from '../models';",
+      output: "import models from '../models';\nimport utils from '../utils';",
       errors: [
         {
           messageId: 'unsortedImport',

@@ -21,7 +21,6 @@ export const maxFunctionLines = createRule({
     type: 'suggestion',
     docs: {
       description: 'Enforce a maximum number of lines per function body',
-      recommended: 'recommended',
     },
     messages: {
       tooManyLines:
