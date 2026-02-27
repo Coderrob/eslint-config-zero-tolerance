@@ -4,11 +4,15 @@ Ban `await import()` and `require()` calls outside of test files.
 
 ## Rule Details
 
-| Type    | Fixable | Recommended | Strict |
-|---------|---------|-------------|--------|
-| problem | No      | warn        | error  |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
+
 Dynamic imports and `require()` calls load modules at runtime rather than at bundle time. This hides dependencies from static analysis tools, prevents tree-shaking, complicates code-splitting strategies, and can introduce subtle load-order bugs. Static `import` declarations at the top of a file are always preferable in application code.
 
 The rule is **automatically skipped** in test files (files matching `*.test.{ts,js,tsx,jsx}` or `*.spec.{ts,js,tsx,jsx}`), where dynamic loading is sometimes required by test utilities.

@@ -4,7 +4,7 @@ Disallow re-export statements from parent or ancestor modules in non-barrel file
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

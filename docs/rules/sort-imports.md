@@ -4,7 +4,7 @@ Require import declarations to be grouped and sorted: external → parent → pe
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | Yes (`code`) |

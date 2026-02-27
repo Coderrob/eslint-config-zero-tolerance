@@ -4,7 +4,7 @@ Enforce that Zod schema variable initialisers include a `.describe()` call.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

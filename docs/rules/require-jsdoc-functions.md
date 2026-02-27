@@ -4,7 +4,7 @@ Require JSDoc documentation comments on all function declarations, function expr
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

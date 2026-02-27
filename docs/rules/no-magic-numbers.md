@@ -4,7 +4,7 @@ Disallow raw numeric literals in expressions; use named constants instead.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

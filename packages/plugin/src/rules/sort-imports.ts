@@ -100,10 +100,7 @@ export const sortImports = createRule({
      * @returns True if a and b are adjacent, false otherwise.
      * @throws Does not throw.
      */
-    const areAdjacent = (
-      a: TSESTree.ImportDeclaration,
-      b: TSESTree.ImportDeclaration,
-    ): boolean => {
+    const areAdjacent = (a: TSESTree.ImportDeclaration, b: TSESTree.ImportDeclaration): boolean => {
       const aIdx = imports.findIndex((e) => e.node === a);
       const bIdx = imports.findIndex((e) => e.node === b);
       return Math.abs(bIdx - aIdx) === 1;

@@ -52,9 +52,7 @@ function unwrapExpression(expression: TSESTree.Expression): TSESTree.Expression 
  * @param property - The computed property expression or private identifier.
  * @returns True when the key is safe to use in an auto-fix.
  */
-function isSafeComputedKey(
-  property: TSESTree.Expression | TSESTree.PrivateIdentifier,
-): boolean {
+function isSafeComputedKey(property: TSESTree.Expression | TSESTree.PrivateIdentifier): boolean {
   if (property.type === AST_NODE_TYPES.Identifier) {
     return true;
   }
@@ -62,6 +60,23 @@ function isSafeComputedKey(
     return typeof property.value === 'string' || typeof property.value === 'number';
   }
   return false;
+}
+
+/**
+ * Returns true when a MemberExpression is safe as a guard.
+ *
+ * @param node - The MemberExpression node.
+ * @returns True when safe.
+ */
+function isSafeMemberExpression(node: TSESTree.MemberExpression): boolean {
+  let isSafe = true;
+  if (node.computed) {
+    isSafe = isSafeComputedKey(node.property);
+  }
+  if (!isSafe) {
+    return false;
+  }
+  return isSafeGuardExpression(node.object);
 }
 
 /**
@@ -76,10 +91,7 @@ function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
     return true;
   }
   if (node.type === AST_NODE_TYPES.MemberExpression) {
-    if (node.computed && !isSafeComputedKey(node.property)) {
-      return false;
-    }
-    return isSafeGuardExpression(node.object);
+    return isSafeMemberExpression(node);
   }
   return false;
 }

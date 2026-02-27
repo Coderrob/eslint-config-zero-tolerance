@@ -4,7 +4,7 @@ Prevent use of `eslint-disable` comments; fix the underlying issue instead.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

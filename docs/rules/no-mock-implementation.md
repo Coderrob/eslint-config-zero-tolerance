@@ -4,7 +4,7 @@ Prohibit persistent mock setup methods; use their `Once` variants to prevent tes
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

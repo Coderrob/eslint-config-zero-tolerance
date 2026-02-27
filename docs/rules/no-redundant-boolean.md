@@ -4,7 +4,7 @@ Disallow redundant comparisons to `true` or `false` (Sonar S1125).
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | Yes (`code`) |

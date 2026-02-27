@@ -4,7 +4,7 @@ Prevent use of aliases in `export` statements; export values under their origina
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | Yes (`code`) |

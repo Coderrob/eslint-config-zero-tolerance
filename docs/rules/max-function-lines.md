@@ -4,7 +4,7 @@ Enforce a maximum number of lines per function body.
 
 ## Rule Details
 
-|                 |                   |
+| Property        | Value             |
 | --------------- | ----------------- |
 | **Type**        | `suggestion`      |
 | **Fixable**     | No                |

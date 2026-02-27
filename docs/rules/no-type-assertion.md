@@ -4,7 +4,7 @@ Prevent use of TypeScript `as` type assertions outside of test files.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

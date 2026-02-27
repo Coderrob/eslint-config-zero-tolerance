@@ -4,7 +4,7 @@ Enforce that TypeScript interface names start with `I` (capital letter) followed
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

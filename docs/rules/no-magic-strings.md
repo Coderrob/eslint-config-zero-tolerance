@@ -4,7 +4,7 @@ Disallow magic string literals in comparisons and switch-case clauses; use named
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

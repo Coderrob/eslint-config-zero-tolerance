@@ -4,7 +4,7 @@ Disallow throwing literals, plain objects, or template strings; always throw a `
 
 ## Rule Details
 
-|                 |           |
+| Property        | Value     |
 | --------------- | --------- |
 | **Type**        | `problem` |
 | **Fixable**     | No        |

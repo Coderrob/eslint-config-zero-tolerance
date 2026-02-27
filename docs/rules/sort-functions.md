@@ -4,7 +4,7 @@ Require top-level function declarations to be sorted alphabetically by name.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

@@ -35,14 +35,14 @@
 
 ## Code Quality
 
-| Rule                                        | Type       | Description                                                                            |
-| ------------------------------------------- | ---------- | -------------------------------------------------------------------------------------- |
-| [max-function-lines](max-function-lines.md) | suggestion | Enforce a maximum number of lines per function body                                    |
-| [max-params](max-params.md)                 | suggestion | Enforce a maximum number of function parameters                                        |
-| [no-magic-numbers](no-magic-numbers.md)     | suggestion | Disallow magic numbers; use named constants instead                                    |
-| [no-magic-strings](no-magic-strings.md)     | suggestion | Disallow magic strings in comparisons and switch cases                                 |
+| Rule                                        | Type       | Description                                                                             |
+| ------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
+| [max-function-lines](max-function-lines.md) | suggestion | Enforce a maximum number of lines per function body                                     |
+| [max-params](max-params.md)                 | suggestion | Enforce a maximum number of function parameters                                         |
+| [no-magic-numbers](no-magic-numbers.md)     | suggestion | Disallow magic numbers; use named constants instead                                     |
+| [no-magic-strings](no-magic-strings.md)     | suggestion | Disallow magic strings in comparisons and switch cases                                  |
 | [sort-imports](sort-imports.md)             | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
-| [sort-functions](sort-functions.md)         | suggestion | Require top-level functions and const function expressions to be sorted alphabetically |
+| [sort-functions](sort-functions.md)         | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
 
 ## Error Handling
 

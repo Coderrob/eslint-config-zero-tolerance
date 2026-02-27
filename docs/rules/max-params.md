@@ -4,7 +4,7 @@ Enforce a maximum number of function parameters.
 
 ## Rule Details
 
-|                 |                  |
+| Property        | Value            |
 | --------------- | ---------------- |
 | **Type**        | `suggestion`     |
 | **Fixable**     | No               |

@@ -4,12 +4,12 @@ Disallow empty catch blocks that silently swallow errors.
 
 ## Rule Details
 
-| Property      | Value    |
-| ------------- | -------- |
-| **Type**      | `problem`|
-| **Fixable**   | No       |
-| **Recommended** | `warn` |
-| **Strict**    | `error`  |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 

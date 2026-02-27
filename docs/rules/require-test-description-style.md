@@ -4,7 +4,7 @@ Enforce that `it()` and `test()` descriptions start with the word `should`.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |

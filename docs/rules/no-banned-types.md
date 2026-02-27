@@ -4,12 +4,12 @@ Ban `ReturnType` utility type and TypeScript indexed access types (`T["key"]`).
 
 ## Rule Details
 
-|                 |              |
-| --------------- | ------------ |
-| **Type**        | `problem`    |
-| **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 

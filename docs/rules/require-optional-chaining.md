@@ -4,7 +4,7 @@ Require optional chaining instead of repeated logical guard access.
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | Yes (`code`) |

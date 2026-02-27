@@ -4,7 +4,7 @@ Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toH
 
 ## Rule Details
 
-|                 |              |
+| Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |
