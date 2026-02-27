@@ -4,10 +4,12 @@ Disallow `await` expressions inside loop bodies; use `Promise.all()` or `Promise
 
 ## Rule Details
 
-|            |           |
-| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
-| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
-| **Strict** | `error`   |
+| Property      | Value    |
+| ------------- | -------- |
+| **Type**      | `problem` |
+| **Fixable**   | No       |
+| **Recommended** | `warn` |
+| **Strict**    | `error`  |
 
 ## Rationale
 
