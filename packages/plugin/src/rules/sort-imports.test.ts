@@ -318,5 +318,87 @@ ruleTester.run('sort-imports', sortImports, {
         },
       ],
     },
+    {
+      name: 'should report group violation without fix when wrongGroup anchor is non-adjacent',
+      code: [
+        "import auth from './auth';",
+        "import express from 'express';",
+        "import path from 'path';",
+      ].join('\n'),
+      output: [
+        "import express from 'express';\nimport auth from './auth';\nimport path from 'path';",
+        "import express from 'express';\nimport path from 'path';\nimport auth from './auth';",
+      ],
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './auth',
+            next: 'express',
+            currentGroup: 'peer',
+            nextGroup: 'external',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'express',
+            previous: './auth',
+            currentGroup: 'external',
+            previousGroup: 'peer',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'path',
+            previous: './auth',
+            currentGroup: 'external',
+            previousGroup: 'peer',
+          },
+        },
+      ],
+    },
+    {
+      name: 'should report group violation without fix when wrongGroupAfter anchor is non-adjacent',
+      code: [
+        "import auth from './auth';",
+        "import users from './users';",
+        "import express from 'express';",
+      ].join('\n'),
+      output: [
+        "import auth from './auth';\nimport express from 'express';\nimport users from './users';",
+        "import express from 'express';\nimport auth from './auth';\nimport users from './users';",
+      ],
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './auth',
+            next: 'express',
+            currentGroup: 'peer',
+            nextGroup: 'external',
+          },
+        },
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './users',
+            next: 'express',
+            currentGroup: 'peer',
+            nextGroup: 'external',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'express',
+            previous: './users',
+            currentGroup: 'external',
+            previousGroup: 'peer',
+          },
+        },
+      ],
+    },
   ],
 } as any);

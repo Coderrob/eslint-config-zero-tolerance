@@ -62,6 +62,14 @@ ruleTester.run('sort-functions', sortFunctions, {
       name: 'should ignore destructured top-level variable declarations',
       code: 'const { alpha } = obj;\nconst beta = () => {};',
     },
+    {
+      name: 'should ignore top-level let arrow functions',
+      code: 'let beta = () => {};\nlet alpha = () => {};',
+    },
+    {
+      name: 'should ignore top-level var arrow functions',
+      code: 'var beta = () => {};\nvar alpha = () => {};',
+    },
   ],
   invalid: [
     {

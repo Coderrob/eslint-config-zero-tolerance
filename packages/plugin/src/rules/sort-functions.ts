@@ -122,6 +122,9 @@ export const sortFunctions = createRule({
      * @param node - The variable declaration node.
      */
     const processVariableDeclaration = (node: TSESTree.VariableDeclaration): void => {
+      if (node.kind !== 'const') {
+        return;
+      }
       if (!isTopLevelVariableDeclaration(node)) {
         return;
       }

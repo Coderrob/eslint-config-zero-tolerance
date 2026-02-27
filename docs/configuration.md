@@ -64,7 +64,6 @@ All rules are included in every preset. The only difference between `recommended
 | `no-magic-numbers`               | warn           | error           |
 | `no-magic-strings`               | warn           | error           |
 | `no-banned-types`                | warn           | error           |
-| `no-relative-parent-imports`     | warn           | error           |
 | `no-dynamic-import`              | warn           | error           |
 | `no-literal-unions`              | warn           | error           |
 | `no-export-alias`                | warn           | error           |

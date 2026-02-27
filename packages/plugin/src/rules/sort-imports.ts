@@ -92,6 +92,24 @@ export const sortImports = createRule({
     const imports: ImportEntry[] = [];
 
     /**
+     * Returns true when two import nodes are consecutive in the collected imports array.
+     * Only adjacent imports are safe to swap without disturbing in-between imports.
+     *
+     * @param a First import declaration node.
+     * @param b Second import declaration node.
+     * @returns True if a and b are adjacent, false otherwise.
+     * @throws Does not throw.
+     */
+    const areAdjacent = (
+      a: TSESTree.ImportDeclaration,
+      b: TSESTree.ImportDeclaration,
+    ): boolean => {
+      const aIdx = imports.findIndex((e) => e.node === a);
+      const bIdx = imports.findIndex((e) => e.node === b);
+      return Math.abs(bIdx - aIdx) === 1;
+    };
+
+    /**
      * Builds a fixer that swaps two import declarations while preserving the
      * exact whitespace/newlines between them.
      *
@@ -157,7 +175,9 @@ export const sortImports = createRule({
           currentGroup: GROUP_NAMES[entry.group],
           previousGroup: GROUP_NAMES[highestEntry.group],
         },
-        fix: getSwapFix(highestEntry.node, entry.node),
+        ...(areAdjacent(highestEntry.node, entry.node)
+          ? { fix: getSwapFix(highestEntry.node, entry.node) }
+          : {}),
       });
       reportedNodes.add(entry.node);
     };
@@ -185,7 +205,9 @@ export const sortImports = createRule({
           currentGroup: GROUP_NAMES[entry.group],
           nextGroup: GROUP_NAMES[lowestEntry.group],
         },
-        fix: getSwapFix(entry.node, lowestEntry.node),
+        ...(areAdjacent(entry.node, lowestEntry.node)
+          ? { fix: getSwapFix(entry.node, lowestEntry.node) }
+          : {}),
       });
       reportedNodes.add(entry.node);
     };
@@ -208,7 +230,9 @@ export const sortImports = createRule({
         node: entry.node,
         messageId: 'unsortedImport',
         data: { current: entry.value, previous: existing.value },
-        fix: getSwapFix(existing.node, entry.node),
+        ...(areAdjacent(existing.node, entry.node)
+          ? { fix: getSwapFix(existing.node, entry.node) }
+          : {}),
       });
       reportedNodes.add(entry.node);
     };
