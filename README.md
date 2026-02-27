@@ -171,11 +171,11 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 ### Imports
 
-| Rule                                                                     | Description                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------- |
-| [`no-relative-parent-imports`](docs/rules/no-relative-parent-imports.md) | Ban `../` parent-directory imports and re-exports       |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)                   | Ban `await import()` and `require()` outside test files |
-| [`no-export-alias`](docs/rules/no-export-alias.md)                       | Prevent use of aliases in export statements             |
+| Rule                                                   | Description                                             |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| [`no-re-exports`](docs/rules/no-re-exports.md)         | Ban `../` parent-directory imports and re-exports       |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban `await import()` and `require()` outside test files |
+| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements             |
 
 ### Bug Prevention
 
