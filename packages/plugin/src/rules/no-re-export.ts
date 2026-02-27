@@ -11,7 +11,7 @@ const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}
  */
 function getFilename(filePath: string): string {
   const parts = filePath.split(/[\\/]/);
-  return parts.at(-1) || '';
+  return parts.at(-1) ?? '';
 }
 
 /**

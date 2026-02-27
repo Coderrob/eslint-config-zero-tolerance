@@ -46,6 +46,10 @@ ruleTester.run('no-magic-numbers', noMagicNumbers, {
       code: 'const OFFSET = -2;',
       name: 'should allow unary literal when assigned to const',
     },
+    {
+      code: 'const obj = { [0]: "zero", [1]: "one" };',
+      name: 'should allow 0 and 1 in computed property keys',
+    },
   ],
   invalid: [
     {
@@ -109,6 +113,26 @@ ruleTester.run('no-magic-numbers', noMagicNumbers, {
         {
           messageId: 'noMagicNumbers',
           data: { value: '-2' },
+        },
+      ],
+    },
+    {
+      code: 'const obj = { [42]: "value" };',
+      name: 'should disallow magic number in computed property key',
+      errors: [
+        {
+          messageId: 'noMagicNumbers',
+          data: { value: '42' },
+        },
+      ],
+    },
+    {
+      code: 'function foo() { return 99; }',
+      name: 'should disallow magic number in return statement',
+      errors: [
+        {
+          messageId: 'noMagicNumbers',
+          data: { value: '99' },
         },
       ],
     },

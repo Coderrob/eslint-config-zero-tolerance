@@ -54,11 +54,16 @@ export const noLiteralUnions = createRule({
 
       // Check if this union contains literal types
       const hasLiterals = node.types.some((type) => {
-        return (
-          type.type === AST_NODE_TYPES.TSLiteralType &&
-          (type.literal.type === AST_NODE_TYPES.Literal ||
-            type.literal.type === AST_NODE_TYPES.TemplateLiteral)
-        );
+        if (type.type !== AST_NODE_TYPES.TSLiteralType) {
+          return false;
+        }
+        switch (type.literal.type) {
+          case AST_NODE_TYPES.Literal:
+          case AST_NODE_TYPES.TemplateLiteral:
+            return true;
+          default:
+            return false;
+        }
       });
 
       if (!hasLiterals) {
