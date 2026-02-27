@@ -5,13 +5,14 @@ import requireZodSchemaDescription from './rules/require-zod-schema-description'
 import noMagicNumbers from './rules/no-magic-numbers';
 import noMagicStrings from './rules/no-magic-strings';
 import noBannedTypes from './rules/no-banned-types';
-import noRelativeParentImports from './rules/no-relative-parent-imports';
 import noDynamicImport from './rules/no-dynamic-import';
 import noLiteralUnions from './rules/no-literal-unions';
 import noExportAlias from './rules/no-export-alias';
+import noReExport from './rules/no-re-export';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noMockImplementation from './rules/no-mock-implementation';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
+import requireOptionalChaining from './rules/require-optional-chaining';
 import noTypeAssertion from './rules/no-type-assertion';
 import noEslintDisable from './rules/no-eslint-disable';
 import sortImports from './rules/sort-imports';
@@ -54,13 +55,14 @@ const rules = {
   'no-magic-numbers': noMagicNumbers,
   'no-magic-strings': noMagicStrings,
   'no-banned-types': noBannedTypes,
-  'no-relative-parent-imports': noRelativeParentImports,
   'no-dynamic-import': noDynamicImport,
   'no-literal-unions': noLiteralUnions,
   'no-export-alias': noExportAlias,
+  'no-re-export': noReExport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-mock-implementation': noMockImplementation,
   'require-jsdoc-functions': requireJsdocFunctions,
+  'require-optional-chaining': requireOptionalChaining,
   'no-type-assertion': noTypeAssertion,
   'no-eslint-disable': noEslintDisable,
   'sort-imports': sortImports,

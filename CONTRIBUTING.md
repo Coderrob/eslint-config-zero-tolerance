@@ -4,11 +4,11 @@ Thank you for contributing to `eslint-plugin-zero-tolerance`! This guide walks y
 
 ## Prerequisites
 
-| Tool | Version |
-|---|---|
-| Node.js | 20+ |
-| pnpm | 10+ |
-| Python | 3.x (only if working on the docs site) |
+| Tool    | Version                                |
+| ------- | -------------------------------------- |
+| Node.js | 20+                                    |
+| pnpm    | 10+                                    |
+| Python  | 3.x (only if working on the docs site) |
 
 ## Setup
 
@@ -73,7 +73,7 @@ Use the template below. The rule creator URL must stay in sync with the GitHub r
 import { ESLintUtils } from '@typescript-eslint/utils';
 
 const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
+  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`,
 );
 
 /**
@@ -120,9 +120,7 @@ import noFoo from './no-foo';
 const ruleTester = new RuleTester();
 
 ruleTester.run('no-foo', noFoo, {
-  valid: [
-    { name: 'should allow bar()', code: 'bar();' },
-  ],
+  valid: [{ name: 'should allow bar()', code: 'bar();' }],
   invalid: [
     {
       name: 'should disallow foo()',

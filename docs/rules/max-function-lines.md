@@ -4,15 +4,16 @@ Enforce a maximum number of lines per function body.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` (max: 30) |
-| **Strict** | `error` (max: 20) |
+|                 |                   |
+| --------------- | ----------------- |
+| **Type**        | `suggestion`      |
+| **Fixable**     | No                |
+| **Recommended** | `warn` (max: 20)  |
+| **Strict**      | `error` (max: 10) |
 
 ## Rationale
 
-Long functions are harder to understand, test, and maintain. Keeping functions small forces a single-responsibility design: each function does one thing, has a clear name, and can be tested in isolation. This rule flags any function body that exceeds the configured line limit.
+Long functions are harder to understand, test, and maintain. Keeping functions small forces a single-responsibility design: each function does one thing, has a clear name, and can be tested in isolation. This rule counts the lines of a function's block body (inclusive of opening and closing braces) and reports any function that exceeds the configured limit. Arrow functions with concise expression bodies (no block) are not checked.
 
 ## Examples
 
@@ -40,12 +41,14 @@ function doEverything(user: IUser) {
 
 ## Options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `max` | `number` | `30` | Maximum allowed lines in a function body |
+| Option | Type     | Default | Description                              |
+| ------ | -------- | ------- | ---------------------------------------- |
+| `max`  | `number` | `30`    | Maximum allowed lines in a function body |
+
+The standalone default is **30** lines. The `recommended` preset overrides this to **20** and the `strict` preset to **10**.
 
 ```js
-// Recommended (default 30 lines)
+// Use the recommended preset value (20 lines)
 'zero-tolerance/max-function-lines': 'warn'
 
 // Custom limit

@@ -4,11 +4,12 @@ Prevent use of `eslint-disable` comments; fix the underlying issue instead.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -37,7 +38,9 @@ if (items.length > MAX_SIZE) {
 
 ```typescript
 // eslint-disable-next-line zero-tolerance/no-magic-numbers
-if (items.length > 100) { /* ... */ }
+if (items.length > 100) {
+  /* ... */
+}
 
 /* eslint-disable zero-tolerance/no-throw-literal */
 throw 'something went wrong';

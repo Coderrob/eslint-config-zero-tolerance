@@ -7,7 +7,8 @@ import zeroTolerancePlugin from 'eslint-plugin-zero-tolerance';
  */
 export const recommended: Linter.Config = zeroTolerancePlugin.configs.recommended;
 export const strict: Linter.Config = zeroTolerancePlugin.configs.strict;
-export const legacyRecommended: Linter.LegacyConfig = zeroTolerancePlugin.configs['legacy-recommended'];
+export const legacyRecommended: Linter.LegacyConfig =
+  zeroTolerancePlugin.configs['legacy-recommended'];
 export const legacyStrict: Linter.LegacyConfig = zeroTolerancePlugin.configs['legacy-strict'];
 
 const configs: {

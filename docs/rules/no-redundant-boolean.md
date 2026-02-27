@@ -4,11 +4,12 @@ Disallow redundant comparisons to `true` or `false` (Sonar S1125).
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | Yes (`code`) |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -21,9 +22,13 @@ Comparing a boolean expression to `true` or `false` adds noise without adding me
 ### ✅ Correct
 
 ```typescript
-if (isValid) { /* ... */ }
+if (isValid) {
+  /* ... */
+}
 
-if (!isActive) { /* ... */ }
+if (!isActive) {
+  /* ... */
+}
 
 return hasPermission;
 ```
@@ -31,9 +36,13 @@ return hasPermission;
 ### ❌ Incorrect
 
 ```typescript
-if (isValid === true) { /* ... */ }
+if (isValid === true) {
+  /* ... */
+}
 
-if (isActive !== false) { /* ... */ }
+if (isActive !== false) {
+  /* ... */
+}
 
 return hasPermission === true;
 ```

@@ -4,11 +4,10 @@ Disallow throwing literals, plain objects, or template strings; always throw a `
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|            |           |
+| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
+| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
+| **Strict** | `error`   |
 
 ## Rationale
 
@@ -16,13 +15,13 @@ Only `Error` instances (and subclasses) include a `stack` trace. Throwing a stri
 
 **Allowed throw arguments:**
 
-| Node type | Example |
-|---|---|
-| `NewExpression` | `throw new Error('msg')` |
-| `Identifier` | `throw err` (re-throw a caught error) |
-| `MemberExpression` | `throw this.lastError` |
-| `CallExpression` | `throw createError('msg')` |
-| `AwaitExpression` | `throw await buildError()` |
+| Node type          | Example                               |
+| ------------------ | ------------------------------------- |
+| `NewExpression`    | `throw new Error('msg')`              |
+| `Identifier`       | `throw err` (re-throw a caught error) |
+| `MemberExpression` | `throw this.lastError`                |
+| `CallExpression`   | `throw createError('msg')`            |
+| `AwaitExpression`  | `throw await buildError()`            |
 
 ## Examples
 

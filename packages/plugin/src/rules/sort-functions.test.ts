@@ -39,6 +39,10 @@ ruleTester.run('sort-functions', sortFunctions, {
       code: 'export const alpha = () => {};\nexport const beta = () => {};',
     },
     {
+      name: 'should allow exported function declarations in alphabetical order',
+      code: 'export function alpha() {}\nexport function beta() {}',
+    },
+    {
       name: 'should allow files without functions',
       code: 'const x = 1;',
     },

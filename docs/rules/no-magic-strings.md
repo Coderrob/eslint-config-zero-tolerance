@@ -4,17 +4,19 @@ Disallow magic string literals in comparisons and switch-case clauses; use named
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
 String literals used in comparisons (`=== 'admin'`) or `switch` cases are magic strings: their meaning is implicit, they can be mis-typed silently, and every occurrence must be updated if the value changes. Defining them as named constants (`const ROLE_ADMIN = 'admin'`) adds meaning and creates a single source of truth.
 
 **Checked locations:**
+
 - `===`, `!==`, `==`, `!=` binary comparisons
 - `switch` case test values
 
@@ -26,21 +28,28 @@ String literals used in comparisons (`=== 'admin'`) or `switch` cases are magic 
 const ROLE_ADMIN = 'admin';
 const STATUS_ACTIVE = 'active';
 
-if (user.role === ROLE_ADMIN) { /* ... */ }
+if (user.role === ROLE_ADMIN) {
+  /* ... */
+}
 
 switch (user.status) {
-  case STATUS_ACTIVE: break;
+  case STATUS_ACTIVE:
+    break;
 }
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-if (user.role === 'admin') { /* ... */ }
+if (user.role === 'admin') {
+  /* ... */
+}
 
 switch (user.status) {
-  case 'active': break;
-  case 'inactive': break;
+  case 'active':
+    break;
+  case 'inactive':
+    break;
 }
 ```
 

@@ -30,6 +30,14 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
       code: 'expect(result).toEqual({ key: "value" });',
       name: 'toEqual is allowed',
     },
+    {
+      code: 'const matcher = "toHaveBeenCalled"; expect(fn)[matcher]();',
+      name: 'computed identifier property is ignored',
+    },
+    {
+      code: 'expect(fn)[0]();',
+      name: 'computed numeric property is ignored',
+    },
   ],
   invalid: [
     {

@@ -1,38 +1,31 @@
 # no-relative-parent-imports
 
-Ban imports and re-exports that use `../` to traverse into a parent directory.
+**Deprecated**: This rule no longer enforces any restrictions. Imports from parent directories are allowed.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|            |           |
+| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
+| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
+| **Strict** | `error`   |
 
 ## Rationale
 
-Parent-relative imports (`../`) tightly couple a module to its position in the directory tree. Moving a file requires updating every `../` import path in it and in anything that imported it. Using absolute paths (via TypeScript path aliases or package imports) or sibling imports makes modules more portable and refactoring safer.
+This rule was previously designed to ban parent-relative imports (`../`) to prevent tight coupling to directory structure. However, imports from parent directories are now considered acceptable.
+
+Re-export restrictions are handled by the `no-re-export` rule.
 
 ## Examples
 
-### ✅ Correct
+All import patterns are allowed:
 
 ```typescript
 import { foo } from './sibling';
 import { bar } from './child/module';
-import { baz } from '@myapp/shared';
+import { baz } from '../parent'; // Now allowed
+import { qux } from '../../grandparent'; // Now allowed
+import { pkg } from '@myapp/shared';
 import pkg from 'some-npm-package';
-```
-
-### ❌ Incorrect
-
-```typescript
-import { foo } from '../parent';
-import { bar } from '../../grandparent/utils';
-
-export { baz } from '../other-module';
-export * from '../../root';
 ```
 
 ## Configuration

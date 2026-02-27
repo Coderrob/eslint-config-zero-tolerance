@@ -1,8 +1,7 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
 export const noRelativeParentImports = createRule({
   name: 'no-relative-parent-imports',
@@ -17,33 +16,9 @@ export const noRelativeParentImports = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    function checkImportPath(node: any, source: string) {
-      // Match parent directory paths: starts with ../ or contains /../ or is exactly '..'
-      if (/(^|\/)\.\.(?:\/|$)/.test(source)) {
-        context.report({
-          node,
-          messageId: 'noRelativeParentImports',
-        });
-      }
-    }
-
+  create() {
     return {
-      ImportDeclaration(node) {
-        if (node.source.value && typeof node.source.value === 'string') {
-          checkImportPath(node, node.source.value);
-        }
-      },
-      ExportNamedDeclaration(node) {
-        if (node.source?.value && typeof node.source.value === 'string') {
-          checkImportPath(node, node.source.value);
-        }
-      },
-      ExportAllDeclaration(node) {
-        if (node.source.value && typeof node.source.value === 'string') {
-          checkImportPath(node, node.source.value);
-        }
-      },
+      // No longer checking imports - imports from parents are allowed
     };
   },
 });

@@ -4,11 +4,12 @@ Enforce a maximum number of function parameters.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` (max: 4) |
-| **Strict** | `error` (max: 4) |
+|                 |                  |
+| --------------- | ---------------- |
+| **Type**        | `suggestion`     |
+| **Fixable**     | No               |
+| **Recommended** | `warn` (max: 4)  |
+| **Strict**      | `error` (max: 4) |
 
 ## Rationale
 
@@ -50,9 +51,9 @@ function createUser(
 
 ## Options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `max` | `number` | `4` | Maximum number of allowed parameters |
+| Option | Type     | Default | Description                          |
+| ------ | -------- | ------- | ------------------------------------ |
+| `max`  | `number` | `4`     | Maximum number of allowed parameters |
 
 ```js
 // Default (max 4)

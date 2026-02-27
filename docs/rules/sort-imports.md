@@ -4,11 +4,12 @@ Require import declarations to be grouped and sorted: external → parent → pe
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | Yes (`code`) |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -48,7 +49,7 @@ import path from 'path';
 
 // External packages out of alphabetical order
 import path from 'path';
-import express from 'express';  // 'express' should come before 'path'
+import express from 'express'; // 'express' should come before 'path'
 ```
 
 ## Configuration

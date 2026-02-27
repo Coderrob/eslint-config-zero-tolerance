@@ -4,11 +4,10 @@ Disallow non-null assertions using the `!` postfix operator.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|            |           |
+| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
+| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
+| **Strict** | `error`   |
 
 ## Rationale
 

@@ -1,8 +1,8 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
+import { getMemberPropertyName } from '../ast-helpers';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
 const BANNED_MOCK_METHODS: Record<string, string> = {
   mockImplementation: 'mockImplementationOnce',
@@ -11,6 +11,9 @@ const BANNED_MOCK_METHODS: Record<string, string> = {
   mockRejectedValue: 'mockRejectedValueOnce',
 };
 
+/**
+ * ESLint rule that prohibits persistent mock implementations in favor of Once variants.
+ */
 export const noMockImplementation = createRule({
   name: 'no-mock-implementation',
   meta: {
@@ -28,33 +31,30 @@ export const noMockImplementation = createRule({
   defaultOptions: [],
   create(context) {
     return {
+      /**
+       * Checks member expressions for banned mock methods.
+       *
+       * @param node - The member expression node to check.
+       */
       MemberExpression(node) {
-        let name: string | null = null;
-
-        if (!node.computed && node.property.type === 'Identifier') {
-          name = node.property.name;
-        } else if (
-          node.computed &&
-          node.property.type === 'Literal' &&
-          typeof node.property.value === 'string'
-        ) {
-          name = node.property.value;
-        } else {
+        const name = getMemberPropertyName(node);
+        if (!name) {
           return;
         }
 
         const replacement = BANNED_MOCK_METHODS[name];
-
-        if (replacement) {
-          context.report({
-            node: node.property,
-            messageId: 'noMockImplementation',
-            data: {
-              method: name,
-              replacement,
-            },
-          });
+        if (!replacement) {
+          return;
         }
+
+        context.report({
+          node: node.property,
+          messageId: 'noMockImplementation',
+          data: {
+            method: name,
+            replacement,
+          },
+        });
       },
     };
   },

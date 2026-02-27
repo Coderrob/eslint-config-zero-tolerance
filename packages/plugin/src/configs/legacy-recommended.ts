@@ -1,5 +1,6 @@
 import type { Linter } from 'eslint';
 import { buildRules } from '../rule-map';
+import { PRESET_RECOMMENDED } from '../constants';
 import { legacyParserOptions } from './legacy-base';
 
 /**
@@ -7,5 +8,5 @@ import { legacyParserOptions } from './legacy-base';
  */
 export const legacyRecommendedConfig: Linter.LegacyConfig = {
   ...legacyParserOptions,
-  rules: buildRules('recommended'),
+  rules: buildRules(PRESET_RECOMMENDED),
 };

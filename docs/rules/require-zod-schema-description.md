@@ -4,11 +4,12 @@ Enforce that Zod schema variable initialisers include a `.describe()` call.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -36,7 +37,7 @@ const nameSchema = z.string();
 
 const userSchema = z.object({
   name: z.string(),
-  age:  z.number(),
+  age: z.number(),
 });
 ```
 

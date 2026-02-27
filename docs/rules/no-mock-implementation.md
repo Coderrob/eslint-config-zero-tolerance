@@ -4,11 +4,12 @@ Prohibit persistent mock setup methods; use their `Once` variants to prevent tes
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|                 |              |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -16,12 +17,12 @@ Prohibit persistent mock setup methods; use their `Once` variants to prevent tes
 
 The `Once` variants (`mockImplementationOnce`, `mockReturnValueOnce`, `mockResolvedValueOnce`, `mockRejectedValueOnce`) only apply for a single call and then revert. This eliminates the source of test bleeds entirely.
 
-| Banned | Replacement |
-|---|---|
+| Banned               | Replacement              |
+| -------------------- | ------------------------ |
 | `mockImplementation` | `mockImplementationOnce` |
-| `mockReturnValue` | `mockReturnValueOnce` |
-| `mockResolvedValue` | `mockResolvedValueOnce` |
-| `mockRejectedValue` | `mockRejectedValueOnce` |
+| `mockReturnValue`    | `mockReturnValueOnce`    |
+| `mockResolvedValue`  | `mockResolvedValueOnce`  |
+| `mockRejectedValue`  | `mockRejectedValueOnce`  |
 
 ## Examples
 

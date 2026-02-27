@@ -75,6 +75,10 @@ ruleTester.run('sort-imports', sortImports, {
       code: "import models from '../models';\nimport utils from '../utils';",
     },
     {
+      name: 'should allow bare parent import path',
+      code: "import parent from '..';\nimport sibling from './sibling';",
+    },
+    {
       name: 'should allow ./index as an index import after peer imports',
       code: "import auth from './auth';\nimport self from './index';",
     },
@@ -301,9 +305,7 @@ ruleTester.run('sort-imports', sortImports, {
       name: 'should report peer imports out of alphabetical order',
       code: "import users from './users';\nimport auth from './auth';",
       output: "import auth from './auth';\nimport users from './users';",
-      errors: [
-        { messageId: 'unsortedImport', data: { current: './auth', previous: './users' } },
-      ],
+      errors: [{ messageId: 'unsortedImport', data: { current: './auth', previous: './users' } }],
     },
     {
       name: 'should report parent imports out of alphabetical order',

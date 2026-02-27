@@ -1,8 +1,8 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
+import { getMemberPropertyName } from '../ast-helpers';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
 const BANNED_MATCHERS: Record<string, string> = {
   toBeCalled: 'toHaveBeenCalledTimes',
@@ -13,6 +13,9 @@ const BANNED_MATCHERS: Record<string, string> = {
   toLastCalledWith: 'toHaveBeenNthCalledWith',
 };
 
+/**
+ * ESLint rule that prohibits deprecated Jest matchers in favor of explicit call count variants.
+ */
 export const noJestHaveBeenCalled = createRule({
   name: 'no-jest-have-been-called',
   meta: {
@@ -30,35 +33,30 @@ export const noJestHaveBeenCalled = createRule({
   defaultOptions: [],
   create(context) {
     return {
+      /**
+       * Checks member expressions for banned Jest matchers.
+       *
+       * @param node - The member expression node to check.
+       */
       MemberExpression(node) {
-        let name: string | null = null;
-
-        if (!node.computed && node.property.type === 'Identifier') {
-          name = node.property.name;
-        } else if (
-          node.computed &&
-          node.property.type === 'Literal' &&
-          typeof node.property.value === 'string'
-        ) {
-          name = node.property.value;
-        }
-
+        const name = getMemberPropertyName(node);
         if (!name) {
           return;
         }
 
         const replacement = BANNED_MATCHERS[name];
-
-        if (replacement) {
-          context.report({
-            node: node.property,
-            messageId: 'noHaveBeenCalled',
-            data: {
-              matcher: name,
-              replacement,
-            },
-          });
+        if (!replacement) {
+          return;
         }
+
+        context.report({
+          node: node.property,
+          messageId: 'noHaveBeenCalled',
+          data: {
+            matcher: name,
+            replacement,
+          },
+        });
       },
     };
   },

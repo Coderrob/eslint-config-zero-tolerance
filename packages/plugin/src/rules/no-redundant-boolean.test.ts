@@ -30,6 +30,10 @@ ruleTester.run('no-redundant-boolean', noRedundantBoolean, {
       name: 'should pass for loose equality with boolean (not flagged)',
       code: 'if (value == true) {}',
     },
+    {
+      name: 'should pass for strict comparison to non-boolean literal',
+      code: 'if (value === 1) {}',
+    },
   ],
   invalid: [
     {
@@ -60,6 +64,18 @@ ruleTester.run('no-redundant-boolean', noRedundantBoolean, {
       name: 'should error for strict inequality with true',
       code: 'if (result !== true) {}',
       output: 'if (!(result)) {}',
+      errors: [{ messageId: 'redundantBoolean' }],
+    },
+    {
+      name: 'should error for strict equality with false',
+      code: 'if (result === false) {}',
+      output: 'if (!(result)) {}',
+      errors: [{ messageId: 'redundantBoolean' }],
+    },
+    {
+      name: 'should error for strict inequality with false',
+      code: 'if (result !== false) {}',
+      output: 'if (result) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
   ],

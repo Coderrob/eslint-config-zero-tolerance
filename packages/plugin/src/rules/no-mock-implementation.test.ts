@@ -38,6 +38,14 @@ ruleTester.run('no-mock-implementation', noMockImplementation, {
       code: 'jest.fn().mockReset();',
       name: 'mockReset is allowed',
     },
+    {
+      code: 'const method = "mockReturnValue"; jest.fn()[method](42);',
+      name: 'computed identifier property is ignored',
+    },
+    {
+      code: 'jest.fn()[1](42);',
+      name: 'computed numeric property is ignored',
+    },
   ],
   invalid: [
     {

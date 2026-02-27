@@ -4,11 +4,10 @@ Ban `await import()` and `require()` calls outside of test files.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+|            |           |
+| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
+| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
+| **Strict** | `error`   |
 
 ## Rationale
 

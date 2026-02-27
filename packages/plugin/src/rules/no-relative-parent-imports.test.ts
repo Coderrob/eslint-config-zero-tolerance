@@ -24,7 +24,15 @@ ruleTester.run('no-relative-parent-imports', noRelativeParentImports, {
     },
     {
       code: 'export { foo } from "./sibling";',
-      name: 'same directory re-export',
+      name: 'same directory re-export (allowed)',
+    },
+    {
+      code: 'export { foo } from "../sibling";',
+      name: 'peer directory re-export (allowed)',
+    },
+    {
+      code: 'export * from "../parent";',
+      name: 'parent directory re-export (allowed by this rule)',
     },
     {
       code: 'import type { IUser } from "./types";',
@@ -46,79 +54,24 @@ ruleTester.run('no-relative-parent-imports', noRelativeParentImports, {
       code: 'import { bar } from "~/components";',
       name: 'tilde path alias import',
     },
-  ],
-  invalid: [
     {
       code: 'import { foo } from "../parent";',
-      name: 'parent directory import',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
+      name: 'parent directory import (now allowed)',
     },
     {
       code: 'import { bar } from "../../grandparent";',
-      name: 'grandparent directory import',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
-    },
-    {
-      code: 'export { foo } from "../parent";',
-      name: 'parent directory re-export',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
-    },
-    {
-      code: 'export * from "../parent/module";',
-      name: 'wildcard re-export from parent',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
+      name: 'grandparent directory import (now allowed)',
     },
     {
       code: 'import type { IUser } from "../types";',
-      name: 'type-only import from parent',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
-    },
-    {
-      code: 'export type { IUser } from "../types";',
-      name: 'type-only re-export from parent',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
+      name: 'type-only import from parent (now allowed)',
     },
     {
       code: 'import { foo } from "../../../deeply/nested";',
-      name: 'deeply nested parent import',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
+      name: 'deeply nested parent import (now allowed)',
     },
-    {
-      code: 'export * as namespace from "../parent";',
-      name: 'namespace re-export from parent',
-      errors: [
-        {
-          messageId: 'noRelativeParentImports',
-        },
-      ],
-    },
+  ],
+  invalid: [
+    // No invalid cases - all imports are allowed
   ],
 } as any);

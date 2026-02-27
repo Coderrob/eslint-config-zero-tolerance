@@ -38,6 +38,10 @@ ruleTester.run('no-magic-strings', noMagicStrings, {
       code: "const arr = ['a', 'b'];",
       name: 'should allow strings in array literal',
     },
+    {
+      code: 'const n = 123;',
+      name: 'should ignore non-string literals',
+    },
   ],
   invalid: [
     {

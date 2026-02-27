@@ -91,7 +91,7 @@ Each new ESLint rule must follow this structure:
 import { ESLintUtils } from '@typescript-eslint/utils';
 
 const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
+  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`,
 );
 
 export const myRuleName = createRule({

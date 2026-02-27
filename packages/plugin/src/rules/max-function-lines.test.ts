@@ -21,10 +21,7 @@ ruleTester.run('max-function-lines', maxFunctionLines, {
     {
       name: 'should pass for a function with exactly 30 lines with max 30',
       options: [{ max: 30 }],
-      code:
-        'function f() {\n' +
-        '  const _a = 1;\n'.repeat(28) +
-        '}',
+      code: 'function f() {\n' + '  const _a = 1;\n'.repeat(28) + '}',
     },
     {
       name: 'should pass for a 5-line function expression assigned to const',
@@ -58,8 +55,7 @@ ruleTester.run('max-function-lines', maxFunctionLines, {
     {
       name: 'should error for a class method exceeding the limit',
       options: [{ max: 3 }],
-      code:
-        'class C {\n  method() {\n    const a = 1;\n    const b = 2;\n    const c = 3;\n  }\n}',
+      code: 'class C {\n  method() {\n    const a = 1;\n    const b = 2;\n    const c = 3;\n  }\n}',
       errors: [{ messageId: 'tooManyLines' }],
     },
     {
@@ -67,6 +63,18 @@ ruleTester.run('max-function-lines', maxFunctionLines, {
       options: [{ max: 3 }],
       code: 'const fn = function() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n};',
       errors: [{ messageId: 'tooManyLines' }],
+    },
+    {
+      name: 'should error for computed method key and use anonymous fallback name',
+      options: [{ max: 3 }],
+      code: 'class C {\n  ["method"]() {\n    const a = 1;\n    const b = 2;\n    const c = 3;\n  }\n}',
+      errors: [{ messageId: 'tooManyLines', data: { name: '<anonymous>', lines: 5, max: 3 } }],
+    },
+    {
+      name: 'should error for anonymous function expression and use anonymous fallback name',
+      options: [{ max: 3 }],
+      code: '(function() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n});',
+      errors: [{ messageId: 'tooManyLines', data: { name: '<anonymous>', lines: 5, max: 3 } }],
     },
   ],
 } as any);

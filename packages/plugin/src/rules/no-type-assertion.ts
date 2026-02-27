@@ -1,18 +1,13 @@
-import { ESLintUtils } from '@typescript-eslint/utils';
+import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
+import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from '../rule-constants';
+import { isTestFile } from '../ast-guards';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
-
-const TEST_FILE_PATTERN = /\.(test|spec)\.[jt]sx?$/;
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
 /**
- * Determines whether the given filename belongs to a test file.
+ * ESLint rule that prevents use of TypeScript "as" type assertions.
  */
-function isTestFile(filename: string): boolean {
-  return TEST_FILE_PATTERN.test(filename);
-}
-
 export const noTypeAssertion = createRule({
   name: 'no-type-assertion',
   meta: {
@@ -26,20 +21,36 @@ export const noTypeAssertion = createRule({
     schema: [],
   },
   defaultOptions: [],
+  /**
+   * Creates an ESLint rule that prevents TypeScript type assertions.
+   *
+   * @param context - The ESLint rule context.
+   * @returns An object with visitor functions for AST nodes.
+   */
   create(context) {
+    /**
+     * Checks a TypeScript "as" expression for validity.
+     *
+     * @param node - The TSAsExpression node to check.
+     */
+    const checkTSAsExpression = (node: TSESTree.TSAsExpression): void => {
+      const filename = context.filename;
+      const typeText = context.sourceCode.getText(node.typeAnnotation);
+
+      // Allow specific type assertions in test files
+      if (isTestFile(filename) && typeText.trim() === TYPE_ASSERTION_ALLOWED_IN_TESTS) {
+        return;
+      }
+
+      context.report({
+        node,
+        messageId: 'noTypeAssertion',
+        data: { type: typeText },
+      });
+    };
+
     return {
-      TSAsExpression(node) {
-        const filename = context.getFilename();
-        const typeText = context.getSourceCode().getText(node.typeAnnotation);
-        if (isTestFile(filename) && typeText.trim() === 'unknown') {
-          return;
-        }
-        context.report({
-          node,
-          messageId: 'noTypeAssertion',
-          data: { type: typeText },
-        });
-      },
+      TSAsExpression: checkTSAsExpression,
     };
   },
 });

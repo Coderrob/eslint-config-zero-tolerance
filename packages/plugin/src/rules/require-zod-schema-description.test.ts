@@ -50,6 +50,10 @@ ruleTester.run('require-zod-schema-description', requireZodSchemaDescription, {
       code: 'let schema; schema = z.string().describe("Assigned later");',
       name: 'schema assigned with description',
     },
+    {
+      code: 'const schema = makeSchema();',
+      name: 'plain call expression with non-member callee is ignored',
+    },
   ],
   invalid: [
     {
@@ -118,6 +122,24 @@ ruleTester.run('require-zod-schema-description', requireZodSchemaDescription, {
     {
       code: 'const refinedSchema = z.string().refine((val) => val.length > 0);',
       name: 'refined schema without description',
+      errors: [
+        {
+          messageId: 'requireZodSchemaDescription',
+        },
+      ],
+    },
+    {
+      code: "const schema = z.string()['optional']();",
+      name: 'computed member chain without describe should still fail',
+      errors: [
+        {
+          messageId: 'requireZodSchemaDescription',
+        },
+      ],
+    },
+    {
+      code: "const schema = z.string()['describe']('A string');",
+      name: 'computed describe property is not recognized as describe call',
       errors: [
         {
           messageId: 'requireZodSchemaDescription',

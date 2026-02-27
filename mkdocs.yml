@@ -51,37 +51,38 @@ nav:
   - Getting Started: getting-started.md
   - Configuration: configuration.md
   - Rules:
-    - Overview: rules/index.md
-    - Naming Conventions:
-      - require-interface-prefix: rules/require-interface-prefix.md
-    - Documentation:
-      - require-jsdoc-functions: rules/require-jsdoc-functions.md
-      - require-zod-schema-description: rules/require-zod-schema-description.md
-    - Testing:
-      - require-test-description-style: rules/require-test-description-style.md
-      - no-jest-have-been-called: rules/no-jest-have-been-called.md
-      - no-mock-implementation: rules/no-mock-implementation.md
-    - Type Safety:
-      - no-type-assertion: rules/no-type-assertion.md
-      - no-non-null-assertion: rules/no-non-null-assertion.md
-      - no-literal-unions: rules/no-literal-unions.md
-      - no-banned-types: rules/no-banned-types.md
-    - Code Quality:
-      - max-function-lines: rules/max-function-lines.md
-      - max-params: rules/max-params.md
-      - no-magic-numbers: rules/no-magic-numbers.md
-      - no-magic-strings: rules/no-magic-strings.md
-      - sort-imports: rules/sort-imports.md
-      - sort-functions: rules/sort-functions.md
-    - Error Handling:
-      - no-empty-catch: rules/no-empty-catch.md
-      - no-throw-literal: rules/no-throw-literal.md
-    - Imports:
-      - no-relative-parent-imports: rules/no-relative-parent-imports.md
-      - no-dynamic-import: rules/no-dynamic-import.md
-      - no-export-alias: rules/no-export-alias.md
-    - Bug Prevention:
-      - no-identical-expressions: rules/no-identical-expressions.md
-      - no-redundant-boolean: rules/no-redundant-boolean.md
-      - no-await-in-loop: rules/no-await-in-loop.md
-      - no-eslint-disable: rules/no-eslint-disable.md
+      - Overview: rules/index.md
+      - Naming Conventions:
+          - require-interface-prefix: rules/require-interface-prefix.md
+      - Documentation:
+          - require-jsdoc-functions: rules/require-jsdoc-functions.md
+          - require-optional-chaining: rules/require-optional-chaining.md
+          - require-zod-schema-description: rules/require-zod-schema-description.md
+      - Testing:
+          - require-test-description-style: rules/require-test-description-style.md
+          - no-jest-have-been-called: rules/no-jest-have-been-called.md
+          - no-mock-implementation: rules/no-mock-implementation.md
+      - Type Safety:
+          - no-type-assertion: rules/no-type-assertion.md
+          - no-non-null-assertion: rules/no-non-null-assertion.md
+          - no-literal-unions: rules/no-literal-unions.md
+          - no-banned-types: rules/no-banned-types.md
+      - Code Quality:
+          - max-function-lines: rules/max-function-lines.md
+          - max-params: rules/max-params.md
+          - no-magic-numbers: rules/no-magic-numbers.md
+          - no-magic-strings: rules/no-magic-strings.md
+          - sort-imports: rules/sort-imports.md
+          - sort-functions: rules/sort-functions.md
+      - Error Handling:
+          - no-empty-catch: rules/no-empty-catch.md
+          - no-throw-literal: rules/no-throw-literal.md
+      - Imports:
+          - no-dynamic-import: rules/no-dynamic-import.md
+          - no-export-alias: rules/no-export-alias.md
+          - no-re-export: rules/no-re-export.md
+      - Bug Prevention:
+          - no-identical-expressions: rules/no-identical-expressions.md
+          - no-redundant-boolean: rules/no-redundant-boolean.md
+          - no-await-in-loop: rules/no-await-in-loop.md
+          - no-eslint-disable: rules/no-eslint-disable.md
