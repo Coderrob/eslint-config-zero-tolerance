@@ -46,6 +46,10 @@ ruleTester.run('no-export-alias', noExportAlias, {
       code: 'export { foo as "foo" };',
       name: 'string literal export name without alias',
     },
+    {
+      code: 'export { type Foo };',
+      name: 'type-only export without alias',
+    },
   ],
   invalid: [
     {
@@ -115,6 +119,28 @@ ruleTester.run('no-export-alias', noExportAlias, {
         {
           messageId: 'noExportAlias',
           data: { local: 'foo', alias: 'bar' },
+        },
+      ],
+    },
+    {
+      code: 'export { type Foo as Bar };',
+      name: 'type-only export with alias preserves type modifier in autofix',
+      output: 'export { type Foo };',
+      errors: [
+        {
+          messageId: 'noExportAlias',
+          data: { local: 'Foo', alias: 'Bar' },
+        },
+      ],
+    },
+    {
+      code: "export { type Foo as Bar } from './module';",
+      name: 'type-only re-export with alias preserves type modifier in autofix',
+      output: "export { type Foo } from './module';",
+      errors: [
+        {
+          messageId: 'noExportAlias',
+          data: { local: 'Foo', alias: 'Bar' },
         },
       ],
     },

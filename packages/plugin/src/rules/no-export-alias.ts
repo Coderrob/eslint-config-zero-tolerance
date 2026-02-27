@@ -75,7 +75,9 @@ export const noExportAlias = createRule({
         messageId: 'noExportAlias',
         data: aliasInfo,
         fix(fixer) {
-          return fixer.replaceText(specifier, sourceCode.getText(specifier.local));
+          const localText = sourceCode.getText(specifier.local);
+          const typePrefix = specifier.exportKind === 'type' ? 'type ' : '';
+          return fixer.replaceText(specifier, `${typePrefix}${localText}`);
         },
       });
     };
