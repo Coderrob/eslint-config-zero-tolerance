@@ -60,6 +60,18 @@ function hasMemberExpressionCallee(
 }
 
 /**
+ * Returns true when the property represents 'skip'.
+ * @param property - The property node to check.
+ * @returns True if the property is 'skip'.
+ */
+function isSkipProperty(property: TSESTree.Expression): boolean {
+  if (isIdentifierNode(property)) {
+    return property.name === TEST_METHOD_SKIP;
+  }
+  return property.type === AST_NODE_TYPES.Literal && property.value === TEST_METHOD_SKIP;
+}
+
+/**
  * Returns true for skipped test calls like `it.skip()`, `test.skip()`,
  * `it['skip']()`, and `test['skip']()`.
  * @param node - The call expression node to check.
@@ -69,14 +81,7 @@ function isSkippedTestCall(node: TSESTree.CallExpression): boolean {
   if (!isMemberTestCall(node) || !hasMemberExpressionCallee(node)) {
     return false;
   }
-  const callee = node.callee;
-  if (isIdentifierNode(callee.property)) {
-    return callee.property.name === TEST_METHOD_SKIP;
-  }
-  if (callee.property.type === AST_NODE_TYPES.Literal) {
-    return callee.property.value === TEST_METHOD_SKIP;
-  }
-  return false;
+  return isSkipProperty(node.callee.property);
 }
 
 /**
