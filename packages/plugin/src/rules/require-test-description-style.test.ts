@@ -64,7 +64,15 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: "it['skip']('should not enforce', () => {});",
-      name: 'computed skip is treated as member call and ignored by string check path',
+      name: 'should allow computed skip with valid description',
+    },
+    {
+      code: "it['skip']('tests something skipped', () => {});",
+      name: 'should allow computed skip with description not starting with should',
+    },
+    {
+      code: "test['skip']('skipped test', () => {});",
+      name: 'should allow test computed skip with description not starting with should',
     },
     {
       code: 'helper.it("should be ignored", () => {});',
