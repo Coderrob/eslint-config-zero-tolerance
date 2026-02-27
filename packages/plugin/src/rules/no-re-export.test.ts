@@ -89,5 +89,15 @@ ruleTester.run('no-re-export', noReExport, {
       name: 'namespace re-export from grandparent module',
       errors: [{ messageId: 'noReExport' }],
     },
+    {
+      code: "export { foo } from '..';",
+      name: 're-export from bare parent path (no trailing slash)',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "export * from '..';",
+      name: 'wildcard re-export from bare parent path (no trailing slash)',
+      errors: [{ messageId: 'noReExport' }],
+    },
   ],
 } as any);

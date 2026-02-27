@@ -62,7 +62,7 @@ export const noReExport = createRule({
         // Check for re-export with specifiers: export { foo } from './module'
         if (node.source) {
           const importPath = node.source.value;
-          if (importPath.startsWith('../')) {
+          if (importPath === '..' || importPath.startsWith('../')) {
             context.report({
               node,
               messageId: 'noReExport',
@@ -78,7 +78,7 @@ export const noReExport = createRule({
       ExportAllDeclaration(node) {
         // Check for wildcard re-export: export * from './module'
         const importPath = node.source.value;
-        if (importPath.startsWith('../')) {
+        if (importPath === '..' || importPath.startsWith('../')) {
           context.report({
             node,
             messageId: 'noReExport',
