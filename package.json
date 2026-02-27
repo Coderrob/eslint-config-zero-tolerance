@@ -1,34 +1,6 @@
 {
-  "name": "eslint-config-zero-tolerance-monorepo",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Monorepo for eslint-plugin-zero-tolerance and eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
-  "scripts": {
-    "build": "pnpm -r build",
-    "test": "pnpm -r --if-present test && pnpm coverage:badge",
-    "lint": "pnpm build && eslint .",
-    "lint:fix": "pnpm build && eslint . --fix && pnpm format",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "coverage:badge": "node scripts/update-coverage-badge.js",
-    "deps:graph": "madge --extensions ts packages/plugin/src",
-    "deps:circular": "madge --extensions ts --circular packages/plugin/src",
-    "clean": "pnpm -r clean",
-    "prepare-publish": "node scripts/prepare-publish.js",
-    "restore-workspace": "node scripts/restore-workspace.js"
-  },
-  "keywords": [
-    "eslint",
-    "eslint-plugin",
-    "eslint-config",
-    "typescript",
-    "code-quality",
-    "zero-tolerance",
-    "strict",
-    "linting"
-  ],
   "author": "Robert Lindley",
-  "license": "Apache-2.0",
+  "description": "Monorepo for eslint-plugin-zero-tolerance and eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/jest": "^29.5.11",
@@ -43,5 +15,33 @@
     "ts-jest": "^29.1.1",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
-  }
+  },
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "eslint-config",
+    "typescript",
+    "code-quality",
+    "zero-tolerance",
+    "strict",
+    "linting"
+  ],
+  "license": "Apache-2.0",
+  "name": "eslint-config-zero-tolerance-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "coverage:badge": "node scripts/update-coverage-badge.js",
+    "deps:circular": "madge --extensions ts --circular packages/plugin/src",
+    "deps:graph": "madge --extensions ts packages/plugin/src",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "pnpm build && eslint .",
+    "lint:fix": "pnpm build && eslint . --fix && pnpm format",
+    "prepare-publish": "node scripts/prepare-publish.js",
+    "restore-workspace": "node scripts/restore-workspace.js",
+    "test": "pnpm -r --if-present test && pnpm coverage:badge"
+  },
+  "version": "1.0.0"
 }
