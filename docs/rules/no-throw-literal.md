@@ -4,10 +4,12 @@ Disallow throwing literals, plain objects, or template strings; always throw a `
 
 ## Rule Details
 
-|            |           |
-| ---------- | --------- | --- | ----------- | --- | --- | --------------- | ------ |
-| **Type**   | `problem` |     | **Fixable** | No  |     | **Recommended** | `warn` |
-| **Strict** | `error`   |
+|                 |           |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
