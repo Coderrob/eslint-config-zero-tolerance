@@ -16,8 +16,11 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const repoRoot = join(__dirname, '..');
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = join(currentFilePath, '..');
+const repoRoot = join(currentDirPath, '..');
 const rootPackagePath = join(repoRoot, 'package.json');
 const configPackagePath = join(repoRoot, 'packages/config/package.json');
 const pluginPackagePath = join(repoRoot, 'packages/plugin/package.json');
@@ -35,8 +38,8 @@ function printHelp() {
   console.log(
     `
 Usage:
-  pnpm prepare-publish
-  pnpm prepare-publish --release <patch|minor|major|x.y.z> [options]
+  pnpm release:prepare
+  pnpm release:prepare --release <patch|minor|major|x.y.z> [options]
 
 Default:
   Replaces packages/config peerDependencies.eslint-plugin-zero-tolerance workspace:* with ^<pluginVersion>.
@@ -53,9 +56,9 @@ Release options:
   --help                 Show this help
 
 Examples:
-  pnpm prepare-publish
-  pnpm prepare-publish --release patch --commit --tag --publish
-  pnpm prepare-publish --release 1.2.0 --publish --restore-workspace
+  pnpm release:prepare
+  pnpm release:prepare --release patch --commit --tag --publish
+  pnpm release:prepare --release 1.2.0 --publish --restore-workspace
 `.trim(),
   );
 }

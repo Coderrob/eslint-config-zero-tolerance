@@ -32,16 +32,16 @@
   "scripts": {
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
-    "coverage:badge": "node scripts/update-coverage-badge.js",
+    "coverage:update-badge": "node scripts/update-coverage-badge.mjs",
     "deps:circular": "madge --extensions ts --circular packages/plugin/src",
     "deps:graph": "madge --extensions ts packages/plugin/src",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "pnpm build && eslint .",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
-    "prepare-publish": "node scripts/prepare-publish.js",
-    "restore-workspace": "node scripts/restore-workspace.js",
-    "test": "pnpm -r --if-present test && pnpm coverage:badge"
+    "release:prepare": "node scripts/prepare-publish.mjs",
+    "release:restore-workspace": "node scripts/restore-workspace.mjs",
+    "test": "pnpm -r --if-present test && pnpm coverage:update-badge"
   },
   "version": "1.0.0"
 }

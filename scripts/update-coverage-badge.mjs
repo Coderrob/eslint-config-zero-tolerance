@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 
-const fs = require('node:fs');
-const path = require('node:path');
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const README_PATH = path.resolve(__dirname, '..', 'README.md');
-const COVERAGE_SUMMARY_PATH = path.resolve(
-  __dirname,
-  '..',
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = dirname(currentFilePath);
+const repoRoot = resolve(currentDirPath, '..');
+
+const README_PATH = resolve(repoRoot, 'README.md');
+const COVERAGE_SUMMARY_PATH = resolve(
+  repoRoot,
   'packages',
   'plugin',
   'coverage',
   'coverage-summary.json',
 );
-const LCOV_PATH = path.resolve(__dirname, '..', 'packages', 'plugin', 'coverage', 'lcov.info');
+const LCOV_PATH = resolve(repoRoot, 'packages', 'plugin', 'coverage', 'lcov.info');
 
 const BADGE_PATTERN = /https:\/\/img\.shields\.io\/badge\/coverage-[^)\s]+/;
 
@@ -39,14 +43,14 @@ function getCoverageColor(percentage) {
 }
 
 /**
- * Returns line coverage percentage from Jest coverage summary.
+ * Returns line coverage percentage from Jest coverage summary or lcov fallback.
  *
  * @param {string} coverageSummaryPath - Path to coverage-summary.json.
  * @returns {number} Rounded line coverage percentage.
  */
 function getLineCoverage(coverageSummaryPath) {
-  if (fs.existsSync(coverageSummaryPath)) {
-    const summary = JSON.parse(fs.readFileSync(coverageSummaryPath, 'utf8'));
+  if (existsSync(coverageSummaryPath)) {
+    const summary = JSON.parse(readFileSync(coverageSummaryPath, 'utf8'));
     const lineCoverage = summary?.total?.lines?.pct;
     if (typeof lineCoverage === 'number') {
       return Math.round(lineCoverage * 100) / 100;
@@ -62,10 +66,10 @@ function getLineCoverage(coverageSummaryPath) {
  * @returns {number} Rounded line coverage percentage.
  */
 function getLineCoverageFromLcov(lcovPath) {
-  if (!fs.existsSync(lcovPath)) {
+  if (!existsSync(lcovPath)) {
     throw new Error('Coverage files not found (coverage-summary.json or lcov.info)');
   }
-  const lcov = fs.readFileSync(lcovPath, 'utf8');
+  const lcov = readFileSync(lcovPath, 'utf8');
   const totalFound = [...lcov.matchAll(/^LF:(\d+)$/gm)].reduce(
     (sum, match) => sum + Number(match[1]),
     0,
@@ -90,12 +94,12 @@ function updateReadmeCoverageBadge(readmePath, coverage) {
   const color = getCoverageColor(coverage);
   const encodedCoverage = `${coverage}%25`;
   const badgeUrl = `https://img.shields.io/badge/coverage-${encodedCoverage}-${color}`;
-  const readme = fs.readFileSync(readmePath, 'utf8');
+  const readme = readFileSync(readmePath, 'utf8');
   if (!BADGE_PATTERN.test(readme)) {
     throw new Error('README does not contain a coverage badge URL to update');
   }
   const nextReadme = readme.replace(BADGE_PATTERN, badgeUrl);
-  fs.writeFileSync(readmePath, nextReadme);
+  writeFileSync(readmePath, nextReadme);
 }
 
 function main() {

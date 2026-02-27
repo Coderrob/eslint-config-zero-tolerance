@@ -145,4 +145,4 @@ export default myRuleName;
 5. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
 6. Run `pnpm test` and confirm all tests pass.
 7. Run `pnpm build` to validate the TypeScript compilation.
-8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm prepare-publish`.
+8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.

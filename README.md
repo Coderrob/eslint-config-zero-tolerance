@@ -229,7 +229,7 @@ This monorepo provides automated scripts to handle versioned releases.
 Quick release (single command):
 
 ```bash
-pnpm prepare-publish --release patch --commit --tag --publish
+pnpm release:prepare --release patch --commit --tag --publish
 ```
 
 This will:
@@ -243,7 +243,7 @@ This will:
 If you want to restore `workspace:*` after publishing for local development, run:
 
 ```bash
-pnpm restore-workspace
+pnpm release:restore-workspace
 ```
 
 Or include `--restore-workspace` and commit that restoration separately.
@@ -258,7 +258,7 @@ pnpm build
 pnpm test
 
 # 3. Prepare packages for publishing (converts workspace:* to versioned dependency)
-pnpm prepare-publish
+pnpm release:prepare
 
 # 4. Publish the plugin package
 cd packages/plugin
@@ -270,20 +270,20 @@ npm publish
 
 # 6. Restore workspace:* for local development
 cd ../..
-pnpm restore-workspace
+pnpm release:restore-workspace
 ```
 
-Additional `prepare-publish` options:
+Additional `release:prepare` options:
 
 ```bash
 # Bump versions and prepare manifests without publishing
-pnpm prepare-publish --release minor
+pnpm release:prepare --release minor
 
 # Skip build/test if already run in CI or a previous step
-pnpm prepare-publish --release 1.2.0 --skip-build --skip-test --commit --tag --publish
+pnpm release:prepare --release 1.2.0 --skip-build --skip-test --commit --tag --publish
 
 # Dry run the full flow
-pnpm prepare-publish --release patch --commit --tag --publish --dry-run
+pnpm release:prepare --release patch --commit --tag --publish --dry-run
 ```
 
 ## License
