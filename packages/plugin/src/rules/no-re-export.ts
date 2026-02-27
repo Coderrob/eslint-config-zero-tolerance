@@ -4,7 +4,33 @@ import { RULE_CREATOR_URL } from '../constants';
 const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
 /**
- * ESLint rule that disallows re-export statements from parent or grandparent modules.
+ * Returns the file name (last path segment) from a file path.
+ *
+ * @param filePath - Full or relative file system path.
+ * @returns The file name portion of the path.
+ */
+function getFilename(filePath: string): string {
+  const parts = filePath.split(/[\\/]/);
+  return parts[parts.length - 1];
+}
+
+/**
+ * Returns true when the file is a barrel file (index.*).
+ * Only single-extension index files (e.g. index.ts, index.js, index.mts) are
+ * treated as barrel files. Double-extension files such as index.d.ts,
+ * index.test.ts, or index.spec.js are intentionally excluded.
+ * Barrel files exist solely to aggregate and re-export; they are exempt
+ * from the re-export restrictions enforced by this rule.
+ *
+ * @param filePath - Path to the current file being linted.
+ * @returns True if the file is a barrel index file.
+ */
+function isBarrelFile(filePath: string): boolean {
+  return /^index\.\w+$/.test(getFilename(filePath));
+}
+
+/**
+ * ESLint rule that disallows re-export statements from parent or ancestor modules.
  */
 export const noReExport = createRule({
   name: 'no-re-export',
@@ -12,16 +38,20 @@ export const noReExport = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Disallow re-export statements from peers, parent, or grandparent modules; barrel files may re-export from children or peer modules but not from ancestors',
+        'Disallow re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction',
     },
     messages: {
       noReExport:
-        'Re-export statements from peers, parent, or grandparent modules are not allowed; barrel files may re-export from children or peer modules but not from ancestors',
+        'Re-export statements from parent or ancestor modules are not allowed in non-barrel files',
     },
     schema: [],
   },
   defaultOptions: [],
   create(context) {
+    if (isBarrelFile(context.filename)) {
+      return {};
+    }
+
     return {
       /**
        * Checks named export declarations for re-exports from parent modules.
@@ -32,8 +62,6 @@ export const noReExport = createRule({
         // Check for re-export with specifiers: export { foo } from './module'
         if (node.source) {
           const importPath = node.source.value;
-          // Allow re-exports from children (./*)
-          // Disallow re-exports from peers (../), parents (../../*), and grandparents (../../../*)
           if (importPath.startsWith('../')) {
             context.report({
               node,
@@ -50,8 +78,6 @@ export const noReExport = createRule({
       ExportAllDeclaration(node) {
         // Check for wildcard re-export: export * from './module'
         const importPath = node.source.value;
-        // Allow re-exports from children (./*)
-        // Disallow re-exports from peers (../), parents (../../*), and grandparents (../../../*)
         if (importPath.startsWith('../')) {
           context.report({
             node,

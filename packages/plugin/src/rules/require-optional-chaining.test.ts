@@ -46,6 +46,14 @@ ruleTester.run('require-optional-chaining', requireOptionalChaining, {
       name: 'should pass when guard is type assertion expression',
       code: 'const value = (getUser() as User) && getUser().profile;',
     },
+    {
+      name: 'should pass when guard contains computed access with side-effecting key',
+      code: 'const value = obj[getKey()] && obj[getKey()].value;',
+    },
+    {
+      name: 'should pass when guard contains computed access with non-safe literal key',
+      code: 'const value = obj[true] && obj[true].value;',
+    },
   ],
   invalid: [
     {
@@ -94,6 +102,12 @@ ruleTester.run('require-optional-chaining', requireOptionalChaining, {
       name: 'should require optional chaining for asserted member guards',
       code: 'const value = (user as User) && user.profile;',
       output: 'const value = user?.profile;',
+      errors: [{ messageId: 'useOptionalChaining' }],
+    },
+    {
+      name: 'should require optional chaining for numeric literal computed access',
+      code: 'const value = arr && arr[0];',
+      output: 'const value = arr?.[0];',
       errors: [{ messageId: 'useOptionalChaining' }],
     },
   ],

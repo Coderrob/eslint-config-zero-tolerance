@@ -42,6 +42,21 @@ ruleTester.run('no-re-export', noReExport, {
       code: "export * from './child';",
       name: 'wildcard re-export from child module',
     },
+    {
+      code: "export { foo } from '../sibling';",
+      name: 'should allow any re-export in a barrel file (named)',
+      filename: 'src/index.ts',
+    },
+    {
+      code: "export * from '../../parent';",
+      name: 'should allow any re-export in a barrel file (wildcard)',
+      filename: 'src/index.ts',
+    },
+    {
+      code: "export { foo } from '../sibling';",
+      name: 'should allow any re-export in a barrel file with .js extension',
+      filename: 'src/index.js',
+    },
   ],
   invalid: [
     {

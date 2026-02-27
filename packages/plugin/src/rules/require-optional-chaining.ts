@@ -43,6 +43,28 @@ function unwrapExpression(expression: TSESTree.Expression): TSESTree.Expression 
 }
 
 /**
+ * Returns true when a computed property key is side-effect-free.
+ * Only identifier names and string/number literal values qualify;
+ * call expressions or other dynamic keys may produce side effects and
+ * must not be auto-fixed. RegExp, BigInt, and boolean literals are
+ * excluded as they are not idiomatic computed property keys.
+ *
+ * @param property - The computed property expression or private identifier.
+ * @returns True when the key is safe to use in an auto-fix.
+ */
+function isSafeComputedKey(
+  property: TSESTree.Expression | TSESTree.PrivateIdentifier,
+): boolean {
+  if (property.type === AST_NODE_TYPES.Identifier) {
+    return true;
+  }
+  if (property.type === AST_NODE_TYPES.Literal) {
+    return typeof property.value === 'string' || typeof property.value === 'number';
+  }
+  return false;
+}
+
+/**
  * Returns true when expression kind is safe as an optional-chaining guard.
  *
  * @param expression - The guard expression to validate.
@@ -54,6 +76,9 @@ function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
     return true;
   }
   if (node.type === AST_NODE_TYPES.MemberExpression) {
+    if (node.computed && !isSafeComputedKey(node.property)) {
+      return false;
+    }
     return isSafeGuardExpression(node.object);
   }
   return false;

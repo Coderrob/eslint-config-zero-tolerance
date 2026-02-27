@@ -108,7 +108,7 @@ ruleTester.run('no-magic-numbers', noMagicNumbers, {
       errors: [
         {
           messageId: 'noMagicNumbers',
-          data: { value: '2' },
+          data: { value: '-2' },
         },
       ],
     },

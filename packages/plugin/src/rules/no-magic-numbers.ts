@@ -127,6 +127,9 @@ function getNumericLiteralText(
   node: TSESTree.Literal,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
+  if (isUnaryMinus(node.parent)) {
+    return sourceCode.getText(node.parent);
+  }
   if (node.raw !== null) {
     return node.raw;
   }

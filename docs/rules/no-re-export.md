@@ -1,6 +1,6 @@
 # no-re-export
 
-Disallow re-export statements from parent or grandparent modules; barrel files may re-export from children or peer modules but not from ancestors.
+Disallow re-export statements from parent or ancestor modules in non-barrel files.
 
 ## Rule Details
 
@@ -13,7 +13,7 @@ Disallow re-export statements from parent or grandparent modules; barrel files m
 
 ## Rationale
 
-Re-export statements from parent or grandparent modules (`export { foo } from '../../parent'` and `export * from '../../../grandparent'`) create upward dependencies that violate proper module hierarchy. While re-exports from children (`./child`) and peers (`../sibling`) are allowed to support barrel file patterns, re-exports that reach upward through the directory tree should be avoided to maintain clear dependency direction.
+Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. Only barrel files (`index.*`) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
 
 ## Examples
 
@@ -25,23 +25,27 @@ export { foo, bar };
 export const value = 42;
 export function myFunction() {}
 
-// Re-exports from children (allowed)
+// Re-exports from children (always allowed)
 export { childFunction } from './child';
 export * from './child/utils';
 
-// Re-exports from peers (allowed)
-export { peerFunction } from '../sibling';
-export * from '../utils';
+// In a barrel file (index.ts) — any re-export is allowed
+// export { peerFunction } from '../sibling';
+// export * from '../../parent';
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-// Re-exports from parents (two levels up — not allowed)
+// Re-exports from peers — not allowed in non-barrel files
+export { peerFunction } from '../sibling';
+export * from '../utils';
+
+// Re-exports from parents — not allowed
 export { parentFunction } from '../../parent';
 export * from '../../grandparent';
 
-// Re-exports from grandparents (three or more levels up — not allowed)
+// Re-exports from grandparents — not allowed
 export { grandparentFunction } from '../../../ancestor';
 export * as ns from '../../../../distant-ancestor';
 ```
