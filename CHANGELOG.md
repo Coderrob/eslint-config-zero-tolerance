@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`no-export-alias` rule**: Prevents the use of aliases in export statements (e.g., `export { foo as bar }`). Ensures exports use their original names directly to maintain clear and consistent module interfaces.
 
-- **`no-re-export` rule**: Disallows re-export statements (`export { foo } from './module'` and `export * from './module'`). Barrel files may only export they may not declare or otherwise define functionality within them.
+- **`no-re-export` rule**: Disallows re-export statements that target modules outside the current directory (for example, `export { foo } from '../module'` and `export * from '../module'`). Re-exports from the same directory (`./*`) are allowed. Barrel files may only re-export modules; they may not declare or otherwise define functionality within them.
 
 - **`no-jest-have-been-called` rule**: Prohibits the use of `toHaveBeenCalled` and `toHaveBeenCalledWith` in test assertions. Enforces use of `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead, which require explicit call-count and argument expectations.
 
