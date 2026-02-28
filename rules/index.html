@@ -829,6 +829,34 @@
   
   
     <li class="md-nav__item">
+      <a href="require-optional-chaining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-optional-chaining
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="require-zod-schema-description/" class="md-nav__link">
         
   
@@ -1602,34 +1630,6 @@
   
   
     <li class="md-nav__item">
-      <a href="no-relative-parent-imports/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-relative-parent-imports
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="no-dynamic-import/" class="md-nav__link">
         
   
@@ -1666,6 +1666,34 @@
     
   
     no-export-alias
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-re-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-re-export
   
 
     
@@ -2045,6 +2073,11 @@
 <td>Require JSDoc comments on all functions (except test files)</td>
 </tr>
 <tr>
+<td><a href="require-optional-chaining/">require-optional-chaining</a></td>
+<td>suggestion</td>
+<td>Require optional chaining instead of repeated guard access</td>
+</tr>
+<tr>
 <td><a href="require-zod-schema-description/">require-zod-schema-description</a></td>
 <td>suggestion</td>
 <td>Enforce that Zod schemas have <code>.describe()</code> called</td>
@@ -2143,12 +2176,12 @@
 <tr>
 <td><a href="sort-imports/">sort-imports</a></td>
 <td>suggestion</td>
-<td>Require import declarations to be sorted alphabetically</td>
+<td>Require import declarations to be ordered by group and alphabetically within each group</td>
 </tr>
 <tr>
 <td><a href="sort-functions/">sort-functions</a></td>
 <td>suggestion</td>
-<td>Require top-level function declarations to be sorted alphabetically</td>
+<td>Require top-level functions and const function expressions to be sorted alphabetically</td>
 </tr>
 </tbody>
 </table>
@@ -2185,11 +2218,6 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="no-relative-parent-imports/">no-relative-parent-imports</a></td>
-<td>problem</td>
-<td>Ban <code>../</code> parent-directory imports and re-exports</td>
-</tr>
-<tr>
 <td><a href="no-dynamic-import/">no-dynamic-import</a></td>
 <td>problem</td>
 <td>Ban <code>await import()</code> and <code>require()</code> outside test files</td>
@@ -2198,6 +2226,11 @@
 <td><a href="no-export-alias/">no-export-alias</a></td>
 <td>suggestion</td>
 <td>Prevent use of aliases in export statements</td>
+</tr>
+<tr>
+<td><a href="no-re-export/">no-re-export</a></td>
+<td>suggestion</td>
+<td>Disallow re-export statements from parent/grandparent modules</td>
 </tr>
 </tbody>
 </table>

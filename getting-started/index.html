@@ -859,6 +859,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../rules/require-optional-chaining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-optional-chaining
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../rules/require-zod-schema-description/" class="md-nav__link">
         
   
@@ -1617,34 +1645,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../rules/no-relative-parent-imports/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-relative-parent-imports
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../rules/no-dynamic-import/" class="md-nav__link">
         
   
@@ -1681,6 +1681,34 @@
     
   
     no-export-alias
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/no-re-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-re-export
   
 
     
@@ -2118,12 +2146,10 @@
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">];</span>
 </code></pre></div>
 <h3 id="strict-preset">Strict preset</h3>
-<p>The strict preset enables all rules at <strong>error</strong> severity and applies tighter limits (e.g. max function body: 20 lines).</p>
+<p>The strict preset enables all rules at <strong>error</strong> severity and applies tighter limits (e.g. max function body: 10 lines).</p>
 <div class="highlight"><span class="filename">eslint.config.js</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;eslint-plugin-zero-tolerance&#39;</span><span class="p">;</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nx">zeroTolerance</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">strict</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">];</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">[</span><span class="nx">zeroTolerance</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">strict</span><span class="p">];</span>
 </code></pre></div>
 <h3 id="custom-configuration">Custom configuration</h3>
 <p>Pick individual rules and set severities yourself:</p>
@@ -2193,7 +2219,7 @@
 <a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">      </span><span class="s1">&#39;zero-tolerance/require-jsdoc-functions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
 <a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">      </span><span class="s1">&#39;zero-tolerance/no-type-assertion&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
 <a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">  </span><span class="p">},</span>
 <a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="p">);</span>
 </code></pre></div>
 <h2 id="configuring-tsconfigjson">Configuring <code>tsconfig.json</code></h2>
