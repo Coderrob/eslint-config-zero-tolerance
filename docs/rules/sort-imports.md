@@ -45,11 +45,11 @@ import express from 'express';
 
 // Parent import placed before external — wrong group order
 import { utils } from '../utils';
-import path from 'path';
+import lodash from 'lodash';
 
 // External packages out of alphabetical order
-import path from 'path';
-import express from 'express'; // 'express' should come before 'path'
+import zlib from 'zlib';
+import axios from 'axios'; // 'axios' should come before 'zlib'
 ```
 
 ## Configuration
