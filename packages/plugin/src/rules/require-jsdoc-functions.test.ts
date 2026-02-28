@@ -55,6 +55,11 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       name: 'function without JSDoc in test file (.js) is skipped',
       filename: 'utils.test.js',
     },
+    {
+      code: 'class C {\n  /** Named computed method. */\n  ["x"]() {}\n}',
+      name: 'computed class method with JSDoc is allowed',
+      filename: 'src/utils.ts',
+    },
   ],
   invalid: [
     {
@@ -179,6 +184,28 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
         {
           messageId: 'missingJsdoc',
           data: { name: 'doSomething' },
+        },
+      ],
+    },
+    {
+      code: 'export default function () {}',
+      name: 'anonymous default export function without JSDoc',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: '<anonymous>' },
+        },
+      ],
+    },
+    {
+      code: 'class C { ["x"]() {} }',
+      name: 'computed class method key without JSDoc uses anonymous fallback',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: 'missingJsdoc',
+          data: { name: '<anonymous>' },
         },
       ],
     },

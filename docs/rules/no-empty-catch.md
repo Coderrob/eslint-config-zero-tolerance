@@ -4,11 +4,12 @@ Disallow empty catch blocks that silently swallow errors.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
@@ -51,7 +52,8 @@ try {
 
 try {
   cleanup();
-} catch (err) {} finally {
+} catch (err) {
+} finally {
   teardown();
 }
 ```

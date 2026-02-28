@@ -55,5 +55,20 @@ ruleTester.run('max-params', maxParams, {
       code: 'class C { method(a: number, b: number, c: number, d: number, e: number) {} }',
       errors: [{ messageId: 'tooManyParams' }],
     },
+    {
+      name: 'should error for anonymous function expression and report anonymous name',
+      code: '(function(a: number, b: number, c: number, d: number, e: number) {})',
+      errors: [{ messageId: 'tooManyParams', data: { name: '<anonymous>', count: 5, max: 4 } }],
+    },
+    {
+      name: 'should error for computed method key and report anonymous name fallback',
+      code: 'class C { ["method"](a: number, b: number, c: number, d: number, e: number) {} }',
+      errors: [{ messageId: 'tooManyParams', data: { name: '<anonymous>', count: 5, max: 4 } }],
+    },
+    {
+      name: 'should error for default anonymous function declaration',
+      code: 'export default function(a: number, b: number, c: number, d: number, e: number) {}',
+      errors: [{ messageId: 'tooManyParams', data: { name: '<anonymous>', count: 5, max: 4 } }],
+    },
   ],
 } as any);

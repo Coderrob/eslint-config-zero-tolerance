@@ -4,11 +4,12 @@ Disallow raw numeric literals in expressions; use named constants instead.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -17,6 +18,7 @@ Magic numbers are numeric literals that appear without explanation. They make co
 **Allowed values:** `0`, `1`, and `-1` are universally understood and are always permitted.
 
 **Allowed locations:**
+
 - `const` variable initialisers — this is how you _define_ a named constant
 - TypeScript `enum` member values
 
@@ -40,9 +42,11 @@ const length = arr.length + 1;
 ```typescript
 setTimeout(callback, 86400 * 1000);
 
-if (response.status === 200) { /* ... */ }
+if (response.status === 200) {
+  /* ... */
+}
 
-const retries = 3;  // let or var declaration — not a named const
+let retries = 3; // let or var declaration — not a named const
 ```
 
 ## Configuration

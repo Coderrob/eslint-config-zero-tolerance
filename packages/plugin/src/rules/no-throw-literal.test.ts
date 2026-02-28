@@ -67,9 +67,7 @@ ruleTester.run('no-throw-literal', noThrowLiteral, {
     {
       name: 'should error when throwing an object expression',
       code: 'throw { message: "error", code: 500 };',
-      errors: [
-        { messageId: 'noThrowLiteral', data: { type: 'object expression' } },
-      ],
+      errors: [{ messageId: 'noThrowLiteral', data: { type: 'object expression' } }],
     },
     {
       name: 'should error when throwing a template literal',
@@ -84,9 +82,7 @@ ruleTester.run('no-throw-literal', noThrowLiteral, {
     {
       name: 'should error when throwing an array expression',
       code: 'throw ["error", 500];',
-      errors: [
-        { messageId: 'noThrowLiteral', data: { type: 'array expression' } },
-      ],
+      errors: [{ messageId: 'noThrowLiteral', data: { type: 'array expression' } }],
     },
     {
       name: 'should error when throwing a conditional expression',

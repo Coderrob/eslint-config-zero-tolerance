@@ -42,6 +42,14 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       code: 'type ArrayType = string[] | number[];',
       name: 'array type union',
     },
+    {
+      code: 'type Flags = true | false;',
+      name: 'boolean literal union',
+    },
+    {
+      code: 'type T = `foo`;',
+      name: 'single template literal type is allowed',
+    },
   ],
   invalid: [
     {
@@ -81,8 +89,8 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
     {
-      code: 'type Flags = true | false;',
-      name: 'boolean literal union',
+      code: 'type MixedBooleanLiteral = true | "yes";',
+      name: 'boolean literal mixed with string literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -119,6 +127,15 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type Direction = "up" | "down" | "left" | "right";',
       name: 'direction literals',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type Slug = `a-${string}` | "fixed";',
+      name: 'template literal union is disallowed',
       errors: [
         {
           messageId: 'noLiteralUnions',

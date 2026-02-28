@@ -50,6 +50,38 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       code: 'const obj = { test: "value" };',
       name: 'test as object property',
     },
+    {
+      code: 'it.skip(123, () => {});',
+      name: 'skipped test with non-string description is ignored',
+    },
+    {
+      code: 'it(`should template`, () => {});',
+      name: 'template literal description is ignored',
+    },
+    {
+      code: 'test.only(100, () => {});',
+      name: 'numeric description is ignored',
+    },
+    {
+      code: "it['skip']('should not enforce', () => {});",
+      name: 'should allow computed skip with valid description',
+    },
+    {
+      code: "it['skip']('tests something skipped', () => {});",
+      name: 'should allow computed skip with description not starting with should',
+    },
+    {
+      code: "test['skip']('skipped test', () => {});",
+      name: 'should allow test computed skip with description not starting with should',
+    },
+    {
+      code: 'helper.it("should be ignored", () => {});',
+      name: 'member call on non-test object is ignored',
+    },
+    {
+      code: 'it();',
+      name: 'test call without args is ignored',
+    },
   ],
   invalid: [
     {

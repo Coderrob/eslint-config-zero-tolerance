@@ -30,6 +30,10 @@ ruleTester.run('no-identical-expressions', noIdenticalExpressions, {
       name: 'should pass for different operands with !==',
       code: 'if (a !== b) {}',
     },
+    {
+      name: 'should pass for identical operands with unsupported operator',
+      code: 'const squared = a * a;',
+    },
   ],
   invalid: [
     {

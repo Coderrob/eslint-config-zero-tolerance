@@ -104,5 +104,25 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
         },
       ],
     },
+    {
+      code: 'interface I_Thing { name: string; }',
+      name: 'I prefix followed by underscore instead of uppercase letter',
+      errors: [
+        {
+          messageId: 'interfacePrefix',
+          data: { name: 'I_Thing' },
+        },
+      ],
+    },
+    {
+      code: 'interface I1Thing { name: string; }',
+      name: 'I prefix followed by digit instead of uppercase letter',
+      errors: [
+        {
+          messageId: 'interfacePrefix',
+          data: { name: 'I1Thing' },
+        },
+      ],
+    },
   ],
 } as any);

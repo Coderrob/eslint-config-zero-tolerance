@@ -4,11 +4,12 @@ Prevent use of TypeScript `as` type assertions outside of test files.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -23,7 +24,7 @@ The rule allows `as unknown` in test files (`.test.*`, `.spec.*`) because it is 
 ```typescript
 // Use a type guard instead
 function isUser(value: unknown): value is IUser {
-  return typeof (value as any).name === 'string';
+  return typeof value === 'object' && value !== null && 'name' in value && 'email' in value;
 }
 
 // Generic function with a constraint

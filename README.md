@@ -11,17 +11,22 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-98.49%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
-**✨ Now supports ESLint 9 with Flat Config! ✨**
+**Now supports ESLint 9 with Flat Config**
 
-📖 **[Full documentation](https://coderrob.github.io/eslint-config-zero-tolerance/)**
+Documentation:
+
+- Hosted docs: <https://coderrob.github.io/eslint-config-zero-tolerance/>
+- Repository docs fallback: [`docs/index.md`](docs/index.md)
+- Rules index fallback: [`docs/rules/index.md`](docs/rules/index.md)
 
 ## Packages
 
 This monorepo contains two packages:
 
-- `eslint-plugin-zero-tolerance` — ESLint plugin with custom rules
-- `eslint-config-zero-tolerance` — ESLint config that exports recommended and strict presets
+- `eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
+- `eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
 
 ## Requirements
 
@@ -40,6 +45,7 @@ npm install --save-dev eslint-plugin-zero-tolerance @typescript-eslint/parser
 ### ESLint 9+ (Flat Config)
 
 **Using the recommended preset:**
+
 ```javascript
 // eslint.config.js
 import zeroTolerance from 'eslint-plugin-zero-tolerance';
@@ -51,6 +57,7 @@ export default [
 ```
 
 **Using the strict preset:**
+
 ```javascript
 // eslint.config.js
 import zeroTolerance from 'eslint-plugin-zero-tolerance';
@@ -62,6 +69,7 @@ export default [
 ```
 
 **Alternative: Import presets directly from the config package:**
+
 ```javascript
 // eslint.config.js
 import recommended from 'eslint-config-zero-tolerance/recommended';
@@ -75,6 +83,7 @@ export default [
 ```
 
 **Custom configuration:**
+
 ```javascript
 // eslint.config.js
 import zeroTolerance from 'eslint-plugin-zero-tolerance';
@@ -97,6 +106,7 @@ export default [
 ### ESLint 8.x (Legacy Config)
 
 **Using `.eslintrc.js`:**
+
 ```javascript
 module.exports = {
   plugins: ['zero-tolerance'],
@@ -112,68 +122,69 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 ### Naming Conventions
 
-| Rule | Description |
-|---|---|
-| [`require-interface-prefix`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-interface-prefix/) | Enforce that TypeScript interface names start with `I` |
+| Rule                                                                 | Description                                                                            |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [`require-interface-prefix`](docs/rules/require-interface-prefix.md) | Enforce that TypeScript interface names start with `I` followed by an uppercase letter |
 
 ### Documentation
 
-| Rule | Description |
-|---|---|
-| [`require-jsdoc-functions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-jsdoc-functions/) | Require JSDoc comments on all functions (except test files) |
-| [`require-zod-schema-description`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-zod-schema-description/) | Enforce that Zod schemas have `.describe()` called |
+| Rule                                                                             | Description                                                 |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)               | Require JSDoc comments on all functions (except test files) |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)           | Require optional chaining instead of repeated guard access  |
+| [`require-zod-schema-description`](docs/rules/require-zod-schema-description.md) | Enforce that Zod schemas have `.describe()` called          |
 
 ### Testing
 
-| Rule | Description |
-|---|---|
-| [`require-test-description-style`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-test-description-style/) | Enforce that test descriptions start with `should` |
-| [`no-jest-have-been-called`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/) | Prohibit `toHaveBeenCalled` and `toHaveBeenCalledWith`; use precise alternatives |
-| [`no-mock-implementation`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-mock-implementation/) | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds |
+| Rule                                                                             | Description                                                                                                   |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [`require-test-description-style`](docs/rules/require-test-description-style.md) | Enforce that test descriptions start with `should`                                                            |
+| [`no-jest-have-been-called`](docs/rules/no-jest-have-been-called.md)             | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
+| [`no-mock-implementation`](docs/rules/no-mock-implementation.md)                 | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
 
 ### Type Safety
 
-| Rule | Description |
-|---|---|
-| [`no-type-assertion`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-type-assertion/) | Prevent use of TypeScript `as` type assertions |
-| [`no-non-null-assertion`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-non-null-assertion/) | Disallow non-null assertions using the `!` postfix operator |
-| [`no-literal-unions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-literal-unions/) | Ban literal union types in favour of enums |
-| [`no-banned-types`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-banned-types/) | Ban `ReturnType` and indexed access types |
+| Rule                                                           | Description                                                 |
+| -------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)         | Prevent use of TypeScript `as` type assertions              |
+| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md) | Disallow non-null assertions using the `!` postfix operator |
+| [`no-literal-unions`](docs/rules/no-literal-unions.md)         | Ban literal union types in favour of enums                  |
+| [`no-banned-types`](docs/rules/no-banned-types.md)             | Ban `ReturnType` and indexed access types                   |
 
 ### Code Quality
 
-| Rule | Description |
-|---|---|
-| [`max-function-lines`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-function-lines/) | Enforce a maximum number of lines per function body |
-| [`max-params`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-params/) | Enforce a maximum number of function parameters |
-| [`no-magic-numbers`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-numbers/) | Disallow magic numbers; use named constants instead |
-| [`no-magic-strings`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-strings/) | Disallow magic strings in comparisons and switch cases |
-| [`sort-imports`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-imports/) | Require import declarations to be sorted alphabetically |
-| [`sort-functions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-functions/) | Require top-level function declarations to be sorted alphabetically |
+| Rule                                                     | Description                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`max-function-lines`](docs/rules/max-function-lines.md) | Enforce a maximum number of lines per function body                 |
+| [`max-params`](docs/rules/max-params.md)                 | Enforce a maximum number of function parameters                     |
+| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)     | Disallow magic numbers; use named constants instead                 |
+| [`no-magic-strings`](docs/rules/no-magic-strings.md)     | Disallow magic strings in comparisons and switch cases              |
+| [`sort-imports`](docs/rules/sort-imports.md)             | Require import declarations to be sorted alphabetically             |
+| [`sort-functions`](docs/rules/sort-functions.md)         | Require top-level function declarations to be sorted alphabetically |
 
 ### Error Handling
 
-| Rule | Description |
-|---|---|
-| [`no-empty-catch`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-empty-catch/) | Disallow empty catch blocks that silently swallow errors |
-| [`no-throw-literal`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-throw-literal/) | Disallow throwing literals, objects, or templates; always throw a new Error instance |
+| Rule                                                 | Description                                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [`no-empty-catch`](docs/rules/no-empty-catch.md)     | Disallow empty catch blocks that silently swallow errors                             |
+| [`no-throw-literal`](docs/rules/no-throw-literal.md) | Disallow throwing literals, objects, or templates; always throw a new Error instance |
 
 ### Imports
 
-| Rule | Description |
-|---|---|
-| [`no-relative-parent-imports`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-relative-parent-imports/) | Ban `../` parent-directory imports and re-exports |
-| [`no-dynamic-import`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-dynamic-import/) | Ban `await import()` and `require()` outside test files |
-| [`no-export-alias`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-export-alias/) | Prevent use of aliases in export statements |
+| Rule                                                   | Description                                             |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| [`no-re-exports`](docs/rules/no-re-exports.md)         | Ban `../` parent-directory imports and re-exports       |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban `await import()` and `require()` outside test files |
+| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements             |
 
 ### Bug Prevention
 
-| Rule | Description |
-|---|---|
-| [`no-identical-expressions`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-identical-expressions/) | Disallow identical expressions on both sides of a binary or logical operator |
-| [`no-redundant-boolean`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-redundant-boolean/) | Disallow redundant comparisons to boolean literals |
-| [`no-await-in-loop`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-await-in-loop/) | Disallow `await` inside loops; use `Promise.all()` instead |
-| [`no-eslint-disable`](https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-eslint-disable/) | Prevent use of `eslint-disable` comments |
+| Rule                                                                 | Description                                                                  |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [`no-identical-expressions`](docs/rules/no-identical-expressions.md) | Disallow identical expressions on both sides of a binary or logical operator |
+| [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)         | Disallow redundant comparisons to boolean literals                           |
+| [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
+| [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
 
 ## Development
 
@@ -195,9 +206,49 @@ pnpm build
 pnpm test
 ```
 
+This also refreshes the coverage badge in `README.md` using coverage output in `packages/plugin/coverage/`.
+
+### Type Checking
+
+```bash
+pnpm --filter eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+```
+
+### Dependency Graph
+
+```bash
+pnpm deps:graph
+pnpm deps:circular
+```
+
 ## Publishing
 
-This monorepo provides automated scripts to handle versioned releases:
+This monorepo provides automated scripts to handle versioned releases.
+
+Quick release (single command):
+
+```bash
+pnpm release:prepare --release patch --commit --tag --publish
+```
+
+This will:
+
+- bump the root, plugin, and config package versions
+- replace `workspace:*` with a versioned peer dependency in `packages/config`
+- run `pnpm build` and `pnpm test`
+- create a release commit and annotated git tag
+- publish both packages to npm
+
+If you want to restore `workspace:*` after publishing for local development, run:
+
+```bash
+pnpm release:restore-workspace
+```
+
+Or include `--restore-workspace` and commit that restoration separately.
+
+Manual/stepwise release flow:
 
 ```bash
 # 1. Build all packages
@@ -206,8 +257,8 @@ pnpm build
 # 2. Run tests to ensure everything works
 pnpm test
 
-# 3. Prepare packages for publishing (converts workspace:* to versioned dependencies)
-pnpm prepare-publish
+# 3. Prepare packages for publishing (converts workspace:* to versioned dependency)
+pnpm release:prepare
 
 # 4. Publish the plugin package
 cd packages/plugin
@@ -219,7 +270,20 @@ npm publish
 
 # 6. Restore workspace:* for local development
 cd ../..
-pnpm restore-workspace
+pnpm release:restore-workspace
+```
+
+Additional `release:prepare` options:
+
+```bash
+# Bump versions and prepare manifests without publishing
+pnpm release:prepare --release minor
+
+# Skip build/test if already run in CI or a previous step
+pnpm release:prepare --release 1.2.0 --skip-build --skip-test --commit --tag --publish
+
+# Dry run the full flow
+pnpm release:prepare --release patch --commit --tag --publish --dry-run
 ```
 
 ## License

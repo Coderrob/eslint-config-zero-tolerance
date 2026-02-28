@@ -4,11 +4,12 @@ Disallow `await` expressions inside loop bodies; use `Promise.all()` or `Promise
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
@@ -22,10 +23,10 @@ The rule detects `await` inside `for`, `for...in`, `for...of`, `while`, and `do.
 
 ```typescript
 // Run all requests in parallel
-const results = await Promise.all(ids.map(id => fetchUser(id)));
+const results = await Promise.all(ids.map((id) => fetchUser(id)));
 
 // Settle all, collecting errors
-const settled = await Promise.allSettled(items.map(item => process(item)));
+const settled = await Promise.allSettled(items.map((item) => process(item)));
 ```
 
 ### ❌ Incorrect

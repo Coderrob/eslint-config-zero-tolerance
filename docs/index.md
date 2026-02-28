@@ -22,9 +22,9 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 This monorepo publishes two packages:
 
-| Package | Description |
-|---|---|
-| [`eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/eslint-plugin-zero-tolerance) | The ESLint plugin with all custom rules |
+| Package                                                                                      | Description                                     |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| [`eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/eslint-plugin-zero-tolerance) | The ESLint plugin with all custom rules         |
 | [`eslint-config-zero-tolerance`](https://www.npmjs.com/package/eslint-config-zero-tolerance) | Pre-built recommended and strict config presets |
 
 ## Quick Start
@@ -37,9 +37,7 @@ npm install --save-dev eslint-plugin-zero-tolerance
 // eslint.config.js (ESLint 9+ Flat Config)
 import zeroTolerance from 'eslint-plugin-zero-tolerance';
 
-export default [
-  zeroTolerance.configs.recommended,
-];
+export default [zeroTolerance.configs.recommended];
 ```
 
 See the [Getting Started](getting-started.md) guide for full setup instructions and the [Rules](rules/index.md) reference for descriptions of every rule.

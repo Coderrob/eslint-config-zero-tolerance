@@ -4,12 +4,12 @@ This guide shows how to add `eslint-plugin-zero-tolerance` to a TypeScript proje
 
 ## Requirements
 
-| Dependency | Version |
-|---|---|
-| Node.js | 18+ |
-| TypeScript | 5.x |
-| ESLint | 8.57+ or 9.x |
-| `@typescript-eslint/parser` | 8.x |
+| Dependency                  | Version      |
+| --------------------------- | ------------ |
+| Node.js                     | 18+          |
+| TypeScript                  | 5.x          |
+| ESLint                      | 8.57+ or 9.x |
+| `@typescript-eslint/parser` | 8.x          |
 
 ## Installation
 
@@ -48,14 +48,12 @@ export default [
 
 ### Strict preset
 
-The strict preset enables all rules at **error** severity and applies tighter limits (e.g. max function body: 20 lines).
+The strict preset enables all rules at **error** severity and applies tighter limits (e.g. max function body: 10 lines).
 
 ```js title="eslint.config.js"
 import zeroTolerance from 'eslint-plugin-zero-tolerance';
 
-export default [
-  zeroTolerance.configs.strict,
-];
+export default [zeroTolerance.configs.strict];
 ```
 
 ### Custom configuration
@@ -142,7 +140,7 @@ export default tseslint.config(
       'zero-tolerance/require-jsdoc-functions': 'off',
       'zero-tolerance/no-type-assertion': 'off',
     },
-  }
+  },
 );
 ```
 

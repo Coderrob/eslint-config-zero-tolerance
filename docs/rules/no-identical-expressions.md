@@ -4,11 +4,12 @@ Disallow identical expressions on both sides of a binary or logical operator (So
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `problem` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
@@ -21,7 +22,9 @@ When the left and right operands of a binary or logical expression are identical
 ### ✅ Correct
 
 ```typescript
-if (a === b) { /* ... */ }
+if (a === b) {
+  /* ... */
+}
 
 const result = left || right;
 
@@ -31,13 +34,17 @@ const diff = endDate - startDate;
 ### ❌ Incorrect
 
 ```typescript
-if (value === value) { /* always true */ }
+if (value === value) {
+  /* always true */
+}
 
-const x = obj || obj;           // always obj
+const x = obj || obj; // always obj
 
-const zero = count - count;     // always 0
+const zero = count - count; // always 0
 
-if (user && user) { /* user is checked twice */ }
+if (user && user) {
+  /* user is checked twice */
+}
 ```
 
 ## Configuration

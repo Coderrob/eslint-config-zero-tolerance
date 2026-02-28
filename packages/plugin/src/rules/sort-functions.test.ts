@@ -11,51 +11,111 @@ const ruleTester = new RuleTester({
 ruleTester.run('sort-functions', sortFunctions, {
   valid: [
     {
-      name: 'single top-level function',
+      name: 'should allow a single top-level function',
       code: 'function alpha() {}',
     },
     {
-      name: 'two top-level functions in alphabetical order',
+      name: 'should allow two top-level functions in alphabetical order',
       code: 'function alpha() {}\nfunction beta() {}',
     },
     {
-      name: 'multiple top-level functions in alphabetical order',
+      name: 'should allow multiple top-level functions in alphabetical order',
       code: 'function alpha() {}\nfunction beta() {}\nfunction gamma() {}',
     },
     {
-      name: 'no functions',
+      name: 'should allow top-level const arrow functions in alphabetical order',
+      code: 'const alpha = () => {};\nconst beta = () => {};',
+    },
+    {
+      name: 'should allow top-level const function expressions in alphabetical order',
+      code: 'const alpha = function () {};\nconst beta = function () {};',
+    },
+    {
+      name: 'should allow mixed function declarations and const arrows in alphabetical order',
+      code: 'function alpha() {}\nconst beta = () => {};\nfunction gamma() {}',
+    },
+    {
+      name: 'should allow exported const arrow functions in alphabetical order',
+      code: 'export const alpha = () => {};\nexport const beta = () => {};',
+    },
+    {
+      name: 'should allow exported function declarations in alphabetical order',
+      code: 'export function alpha() {}\nexport function beta() {}',
+    },
+    {
+      name: 'should allow files without functions',
       code: 'const x = 1;',
     },
     {
-      name: 'nested functions are ignored',
+      name: 'should ignore nested functions',
       code: 'function alpha() { function zeta() {} }\nfunction beta() {}',
+    },
+    {
+      name: 'should ignore nested const arrow functions',
+      code: 'function alpha() { const zeta = () => {}; }\nconst beta = () => {};',
+    },
+    {
+      name: 'should ignore anonymous default exported functions',
+      code: 'export default function () {}',
+    },
+    {
+      name: 'should ignore destructured top-level variable declarations',
+      code: 'const { alpha } = obj;\nconst beta = () => {};',
+    },
+    {
+      name: 'should ignore top-level let arrow functions',
+      code: 'let beta = () => {};\nlet alpha = () => {};',
+    },
+    {
+      name: 'should ignore top-level var arrow functions',
+      code: 'var beta = () => {};\nvar alpha = () => {};',
     },
   ],
   invalid: [
     {
-      name: 'two top-level functions out of order',
+      name: 'should flag two top-level functions out of order',
       code: 'function beta() {}\nfunction alpha() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
-      name: 'third function out of order',
+      name: 'should flag when the third function is out of order',
       code: 'function alpha() {}\nfunction gamma() {}\nfunction beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'beta', previous: 'gamma' } }],
     },
     {
-      name: 'first function is not the smallest',
+      name: 'should flag when the first function is not alphabetically smallest',
       code: 'function zeta() {}\nfunction alpha() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'zeta' } }],
     },
     {
-      name: 'multiple functions out of order',
+      name: 'should flag multiple functions out of order',
       code: 'function gamma() {}\nfunction alpha() {}\nfunction beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'gamma' } }],
     },
     {
-      name: 'case-insensitive violation',
+      name: 'should compare names case-insensitively',
       code: 'function Beta() {}\nfunction alpha() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'Beta' } }],
+    },
+    {
+      name: 'should flag top-level const arrow functions out of order',
+      code: 'const beta = () => {};\nconst alpha = () => {};',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should flag mixed function declarations and arrows out of order',
+      code: 'const beta = () => {};\nfunction alpha() {}',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should flag exported const arrow functions out of order',
+      code: 'export const beta = () => {};\nexport const alpha = () => {};',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should flag top-level const function expressions out of order',
+      code: 'const beta = function () {};\nconst alpha = function () {};',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
   ],
 } as any);

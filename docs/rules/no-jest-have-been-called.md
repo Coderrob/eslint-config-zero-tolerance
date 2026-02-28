@@ -4,11 +4,12 @@ Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toH
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -16,14 +17,14 @@ Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toH
 
 Using `toHaveBeenCalledTimes(n)` forces you to declare the exact call count. Using `toHaveBeenNthCalledWith(n, ...args)` forces you to assert the arguments for a specific invocation. Together they produce precise, non-ambiguous test assertions.
 
-| Banned | Replacement |
-|---|---|
-| `toHaveBeenCalled` | `toHaveBeenCalledTimes` |
-| `toBeCalled` | `toHaveBeenCalledTimes` |
-| `toHaveBeenCalledWith` | `toHaveBeenNthCalledWith` |
-| `toBeCalledWith` | `toHaveBeenNthCalledWith` |
+| Banned                     | Replacement               |
+| -------------------------- | ------------------------- |
+| `toHaveBeenCalled`         | `toHaveBeenCalledTimes`   |
+| `toBeCalled`               | `toHaveBeenCalledTimes`   |
+| `toHaveBeenCalledWith`     | `toHaveBeenNthCalledWith` |
+| `toBeCalledWith`           | `toHaveBeenNthCalledWith` |
 | `toHaveBeenLastCalledWith` | `toHaveBeenNthCalledWith` |
-| `toLastCalledWith` | `toHaveBeenNthCalledWith` |
+| `toLastCalledWith`         | `toHaveBeenNthCalledWith` |
 
 ## Examples
 

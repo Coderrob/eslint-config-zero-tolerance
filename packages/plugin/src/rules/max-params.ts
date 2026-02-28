@@ -1,44 +1,33 @@
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { ESLintUtils } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
+import { type FunctionNode } from '../ast-guards';
+import { resolveFunctionName } from '../ast-helpers';
+import { isNumber } from '../type-guards';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+const MAX_PARAMS_MAX = 4;
 
-/** Returns the configured parameter limit, defaulting to 4. */
+/**
+ * Returns the configured parameter limit, defaulting to 4.
+ *
+ * @param options - The rule options array.
+ * @returns The maximum allowed number of parameters.
+ */
 function resolveMax(options: unknown[]): number {
-  const opt = options[0] as { max?: number } | undefined;
-  return opt?.max ?? 4;
+  const opt = options[0] as { max?: unknown } | undefined;
+  const max = opt?.max;
+  return isNumber(max) && max > 0 ? max : MAX_PARAMS_MAX;
 }
 
-/** Extracts a human-readable function name from the node and its parent. */
-function resolveName(
-  node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression
-): string {
-  if (node.type === 'FunctionDeclaration' && node.id) {
-    return node.id.name;
-  }
-  if (
-    node.parent?.type === 'VariableDeclarator' &&
-    node.parent.id.type === 'Identifier'
-  ) {
-    return node.parent.id.name;
-  }
-  if (
-    node.parent?.type === 'MethodDefinition' &&
-    node.parent.key.type === 'Identifier'
-  ) {
-    return node.parent.key.name;
-  }
-  return '<anonymous>';
-}
-
+/**
+ * ESLint rule that enforces a maximum number of function parameters.
+ */
 export const maxParams = createRule({
   name: 'max-params',
   meta: {
     type: 'suggestion',
     docs: {
       description: 'Enforce a maximum number of function parameters',
-      recommended: 'recommended',
     },
     messages: {
       tooManyParams:
@@ -56,9 +45,12 @@ export const maxParams = createRule({
   create(context) {
     const max = resolveMax(context.options);
 
-    function checkFunction(
-      node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression
-    ): void {
+    /**
+     * Checks a function node for parameter count violations.
+     *
+     * @param node - The function node to check.
+     */
+    function checkFunction(node: FunctionNode): void {
       const count = node.params.length;
       if (count <= max) {
         return;
@@ -66,7 +58,7 @@ export const maxParams = createRule({
       context.report({
         node,
         messageId: 'tooManyParams',
-        data: { name: resolveName(node), count, max },
+        data: { name: resolveFunctionName(node), count, max },
       });
     }
 

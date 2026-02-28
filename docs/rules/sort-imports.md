@@ -1,37 +1,55 @@
 # sort-imports
 
-Require import declarations to be sorted alphabetically by module path.
+Require import declarations to be grouped and sorted: external → parent → peer → index, with alphabetical ordering within each group.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | Yes (`code`) |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
-Alphabetically sorted imports eliminate merge conflicts caused by two developers adding imports to the same file, make it easy to spot duplicates, and provide a predictable place to look for any given import. Sorting is case-insensitive.
+Consistent import ordering reduces merge conflicts and makes it immediately clear where a dependency comes from. Imports must appear in four groups in order — external packages, parent-directory (`../`) imports, peer (`./`) imports, and the index (`.`) import — with each group sorted alphabetically (case-insensitive).
 
 ## Examples
 
 ### ✅ Correct
 
 ```typescript
-import fs from 'fs';
+// 1. External packages — alphabetical
+import express from 'express';
 import path from 'path';
-import { foo } from './foo';
-import { bar } from './utils/bar';
+
+// 2. Parent imports — alphabetical
+import { models } from '../models';
+import { utils } from '../utils';
+
+// 3. Peer imports — alphabetical
+import { auth } from './auth';
+import { users } from './users';
+
+// 4. Index import
+import self from '.';
 ```
 
 ### ❌ Incorrect
 
 ```typescript
-import { bar } from './utils/bar';
-import fs from 'fs';         // 'fs' should come before './utils/bar'
-import { foo } from './foo';
-import path from 'path';
+// Peer import placed before external — wrong group order
+import { auth } from './auth';
+import express from 'express';
+
+// Parent import placed before external — wrong group order
+import { utils } from '../utils';
+import lodash from 'lodash';
+
+// External packages out of alphabetical order
+import zlib from 'zlib';
+import axios from 'axios'; // 'axios' should come before 'zlib'
 ```
 
 ## Configuration

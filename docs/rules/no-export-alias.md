@@ -4,11 +4,12 @@ Prevent use of aliases in `export` statements; export values under their origina
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | Yes (`code`) |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 

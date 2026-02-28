@@ -4,11 +4,12 @@ Ban literal union types in favour of enums.
 
 ## Rule Details
 
-| | |
-|---|---|
-| **Type** | `suggestion` |
-| **Recommended** | `warn` |
-| **Strict** | `error` |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -20,7 +21,7 @@ Literal union types (`"active" | "inactive"`) scatter magic strings throughout t
 
 ```typescript
 enum Status {
-  Active   = 'active',
+  Active = 'active',
   Inactive = 'inactive',
 }
 
@@ -40,6 +41,15 @@ type Status = 'active' | 'inactive';
 type Direction = 'north' | 'south' | 'east' | 'west';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
+```
+
+## Exceptions
+
+Pure boolean unions (`true | false`) are exempt because they represent the full boolean domain and do not benefit from an enum:
+
+```typescript
+// ✅ Allowed — exhaustive boolean union
+type Toggle = true | false;
 ```
 
 ## Configuration

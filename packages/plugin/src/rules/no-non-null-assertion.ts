@@ -1,17 +1,17 @@
-import { ESLintUtils } from '@typescript-eslint/utils';
+import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { RULE_CREATOR_URL } from '../constants';
 
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`
-);
+const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
+/**
+ * ESLint rule that disallows non-null assertions using the "!" postfix operator.
+ */
 export const noNonNullAssertion = createRule({
   name: 'no-non-null-assertion',
   meta: {
     type: 'problem',
     docs: {
-      description:
-        'Disallow non-null assertions using the "!" postfix operator',
-      recommended: 'recommended',
+      description: 'Disallow non-null assertions using the "!" postfix operator',
     },
     messages: {
       noNonNullAssertion:
@@ -20,11 +20,24 @@ export const noNonNullAssertion = createRule({
     schema: [],
   },
   defaultOptions: [],
+  /**
+   * Creates an ESLint rule that prevents TypeScript non-null assertions.
+   *
+   * @param context - The ESLint rule context.
+   * @returns An object with visitor functions for AST nodes.
+   */
   create(context) {
+    /**
+     * Checks a TypeScript non-null expression.
+     *
+     * @param node - The TSNonNullExpression node to check.
+     */
+    const checkTSNonNullExpression = (node: TSESTree.TSNonNullExpression): void => {
+      context.report({ node, messageId: 'noNonNullAssertion' });
+    };
+
     return {
-      TSNonNullExpression(node) {
-        context.report({ node, messageId: 'noNonNullAssertion' });
-      },
+      TSNonNullExpression: checkTSNonNullExpression,
     };
   },
 });
