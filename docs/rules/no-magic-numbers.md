@@ -46,7 +46,7 @@ if (response.status === 200) {
   /* ... */
 }
 
-const retries = 3; // let or var declaration — not a named const
+let retries = 3; // let or var declaration — not a named const
 ```
 
 ## Configuration
