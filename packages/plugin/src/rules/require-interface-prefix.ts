@@ -37,7 +37,7 @@ export const requireInterfacePrefix = createRule({
       return (
         interfaceName.startsWith(INTERFACE_REQUIRED_PREFIX) &&
         interfaceName.length >= 2 &&
-        interfaceName[1] === interfaceName[1].toUpperCase()
+        /[A-Z]/.test(interfaceName[1])
       );
     };
 
