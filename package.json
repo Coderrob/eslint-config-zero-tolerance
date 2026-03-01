@@ -1,5 +1,7 @@
 {
-  "author": "Robert Lindley",
+  "author": {
+    "name": "Robert Lindley"
+  },
   "description": "Monorepo for eslint-plugin-zero-tolerance and eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -27,7 +29,7 @@
     "linting"
   ],
   "license": "Apache-2.0",
-  "name": "eslint-config-zero-tolerance-monorepo",
+  "name": "eslint-config-zero-tolerance",
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
