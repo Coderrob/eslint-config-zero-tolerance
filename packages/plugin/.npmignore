@@ -1,11 +1,7 @@
-# Source files (compiled output in dist/ is published via "files" in package.json)
-src/
+# Source files
+*
 
-# TypeScript project configs
-tsconfig.json
-tsconfig.test.json
-
-# Test infrastructure
-jest.config.js
-**/*.test.ts
-**/*.spec.ts
+# Packaged artifacts
+!package.json
+!README.md
+!LICENSE
