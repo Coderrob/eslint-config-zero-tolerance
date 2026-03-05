@@ -1,5 +1,7 @@
-# Source files (compiled output in dist/ is published via "files" in package.json)
-src/
+# Source files
+*
 
-# TypeScript project config
-tsconfig.json
+# Packaged artifacts
+!package.json
+!README.md
+!LICENSE
