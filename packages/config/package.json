@@ -17,19 +17,19 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./recommended": {
+      "types": "./dist/recommended.d.ts",
       "import": "./dist/recommended.mjs",
-      "require": "./dist/recommended.js",
-      "types": "./dist/recommended.d.ts"
+      "require": "./dist/recommended.js"
     },
     "./strict": {
+      "types": "./dist/strict.d.ts",
       "import": "./dist/strict.mjs",
-      "require": "./dist/strict.js",
-      "types": "./dist/strict.d.ts"
+      "require": "./dist/strict.js"
     }
   },
   "files": [
