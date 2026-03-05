@@ -1,0 +1,22 @@
+name: Copyright Files
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add Copyright Headers
+        uses: CoderRob/add-copyright@v1
+        with:
+          name: 'Robert Lindley'
+          license: 'Apache-2.0'
+          working-directory: 'packages'
