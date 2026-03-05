@@ -41,6 +41,8 @@
     "format:check": "prettier . --check",
     "lint": "pnpm build && eslint .",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
+    "publish:config": "pnpm --filter eslint-config-zero-tolerance publish",
+    "publish:plugin": "pnpm --filter eslint-plugin-zero-tolerance publish",
     "release:prepare": "node scripts/prepare-publish.mjs",
     "release:restore-workspace": "node scripts/restore-workspace.mjs",
     "test": "pnpm -r --if-present test && pnpm coverage:update-badge"
