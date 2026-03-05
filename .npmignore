@@ -1,0 +1,6 @@
+# Failsafe for accidental root-level npm publish.
+# Real publish targets are packages/plugin and packages/config.
+*
+!package.json
+!README.md
+!LICENSE
