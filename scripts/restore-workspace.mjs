@@ -30,10 +30,10 @@ const configPackagePath = join(currentDirPath, '..', 'packages', 'config', 'pack
 
 const configPackage = JSON.parse(readFileSync(configPackagePath, 'utf8'));
 
-if (configPackage.peerDependencies?.['eslint-plugin-zero-tolerance']) {
-  configPackage.peerDependencies['eslint-plugin-zero-tolerance'] = 'workspace:*';
+if (configPackage.peerDependencies?.['@coderrob/eslint-plugin-zero-tolerance']) {
+  configPackage.peerDependencies['@coderrob/eslint-plugin-zero-tolerance'] = 'workspace:*';
   writeFileSync(configPackagePath, JSON.stringify(configPackage, null, 2) + '\n', 'utf8');
   console.log('Restored workspace:* for development');
 } else {
-  console.log('No eslint-plugin-zero-tolerance peer dependency found');
+  console.log('No @coderrob/eslint-plugin-zero-tolerance peer dependency found');
 }

@@ -66,6 +66,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`eslint.config.mjs`**: Fixed stale rule names (`interface-prefix` → `require-interface-prefix`, `test-description-style` → `require-test-description-style`, `zod-schema-description` → `require-zod-schema-description`) and expanded dogfooding to include all 25 plugin rules.
 
-- **`eslint-plugin-zero-tolerance` index** (`packages/plugin/src/index.ts`): Registered all new rules in the `rules` map and in all four config presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
+- **`@coderrob/eslint-plugin-zero-tolerance` index** (`packages/plugin/src/index.ts`): Registered all new rules in the `rules` map and in all four config presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
 
 - **`eslint-config-zero-tolerance` configs** (`packages/config/src/index.ts`, `recommended.ts`, `strict.ts`): Synced all new rules into both the recommended (warn) and strict (error) config presets.

@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for contributing to `eslint-plugin-zero-tolerance`! This guide walks you through the environment setup, the process for adding a new rule, and the release workflow.
+Thank you for contributing to `@coderrob/eslint-plugin-zero-tolerance`! This guide walks you through the environment setup, the process for adding a new rule, and the release workflow.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ pnpm install
 pnpm build
 
 # Build a single package
-pnpm --filter eslint-plugin-zero-tolerance build
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance build
 ```
 
 ## Running Tests
@@ -38,7 +38,7 @@ pnpm --filter eslint-plugin-zero-tolerance build
 pnpm test
 
 # Run tests for the plugin only (in watch mode during development)
-pnpm --filter eslint-plugin-zero-tolerance test -- --watch
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- --watch
 ```
 
 ## Coding Standards

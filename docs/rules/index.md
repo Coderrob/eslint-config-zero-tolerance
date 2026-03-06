@@ -1,6 +1,6 @@
 # Rules
 
-`eslint-plugin-zero-tolerance` provides a suite of **custom rules** grouped into seven categories.
+`@coderrob/eslint-plugin-zero-tolerance` provides a suite of **custom rules** grouped into seven categories.
 
 ## Naming Conventions
 
