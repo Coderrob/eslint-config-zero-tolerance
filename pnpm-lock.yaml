@@ -50,15 +50,15 @@ importers:
 
   packages/config:
     dependencies:
+      '@coderrob/eslint-plugin-zero-tolerance':
+        specifier: workspace:*
+        version: link:../plugin
       '@typescript-eslint/parser':
         specifier: ^8.0.0
         version: 8.55.0(eslint@9.39.2)(typescript@5.9.3)
       eslint:
         specifier: ^8.57.0 || ^9.0.0
         version: 9.39.2
-      eslint-plugin-zero-tolerance:
-        specifier: workspace:*
-        version: link:../plugin
     devDependencies:
       '@types/node':
         specifier: ^20.10.6
