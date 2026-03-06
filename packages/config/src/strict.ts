@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { Linter } from 'eslint';
 import zeroTolerancePlugin from '@coderrob/eslint-plugin-zero-tolerance';
+import type { Linter } from 'eslint';
 
 /**
  * Strict config preset (error severity).
