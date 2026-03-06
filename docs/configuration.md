@@ -1,6 +1,6 @@
 # Configuration
 
-`eslint-plugin-zero-tolerance` ships with four built-in config presets so you can go from zero to linting in one line.
+`@coderrob/eslint-plugin-zero-tolerance` ships with four built-in config presets so you can go from zero to linting in one line.
 
 ## Preset Overview
 
@@ -18,7 +18,7 @@
 All rules enabled at `warn`. Function body limit: **20 lines**. Parameter limit: **4**.
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [zeroTolerance.configs.recommended];
 ```
@@ -28,7 +28,7 @@ export default [zeroTolerance.configs.recommended];
 All rules enabled at `error`. Function body limit: **10 lines**. Parameter limit: **4**.
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [zeroTolerance.configs.strict];
 ```
@@ -89,7 +89,7 @@ All rules are included in every preset. The only difference between `recommended
 Override any rule to `off` inside your config:
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   zeroTolerance.configs.recommended,

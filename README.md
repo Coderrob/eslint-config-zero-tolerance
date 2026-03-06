@@ -5,12 +5,12 @@
   />
 </p>
 
-# eslint-plugin-zero-tolerance
+# @coderrob/eslint-plugin-zero-tolerance
 
 Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
 
-[![npm version](https://img.shields.io/npm/v/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/eslint-plugin-zero-tolerance)
-[![License](https://img.shields.io/npm/l/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
+[![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 [![Coverage](https://img.shields.io/badge/coverage-98.49%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
@@ -25,8 +25,8 @@ Documentation:
 
 This monorepo contains two packages:
 
-- `eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
-- `eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
+- `@coderrob/eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
+- `@coderrob/eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
 
 ## Requirements
 
@@ -37,7 +37,7 @@ This monorepo contains two packages:
 ## Installation
 
 ```bash
-npm install --save-dev eslint-plugin-zero-tolerance @typescript-eslint/parser
+npm install --save-dev @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
 ```
 
 ## Usage
@@ -48,7 +48,7 @@ npm install --save-dev eslint-plugin-zero-tolerance @typescript-eslint/parser
 
 ```javascript
 // eslint.config.js
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   zeroTolerance.configs.recommended,
@@ -60,7 +60,7 @@ export default [
 
 ```javascript
 // eslint.config.js
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   zeroTolerance.configs.strict,
@@ -72,9 +72,9 @@ export default [
 
 ```javascript
 // eslint.config.js
-import recommended from 'eslint-config-zero-tolerance/recommended';
+import recommended from '@coderrob/eslint-config-zero-tolerance/recommended';
 // or
-import strict from 'eslint-config-zero-tolerance/strict';
+import strict from '@coderrob/eslint-config-zero-tolerance/strict';
 
 export default [
   recommended, // or strict
@@ -86,7 +86,7 @@ export default [
 
 ```javascript
 // eslint.config.js
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   {
@@ -211,8 +211,8 @@ This also refreshes the coverage badge in `README.md` using coverage output in `
 ### Type Checking
 
 ```bash
-pnpm --filter eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
-pnpm --filter eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
 ```
 
 ### Dependency Graph

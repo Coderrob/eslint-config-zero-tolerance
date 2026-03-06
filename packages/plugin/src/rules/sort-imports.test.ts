@@ -82,6 +82,29 @@ ruleTester.run('sort-imports', sortImports, {
       name: 'should allow ./index as an index import after peer imports',
       code: "import auth from './auth';\nimport self from './index';",
     },
+    {
+      name: 'should allow side-effect import before external import',
+      code: "import 'reflect-metadata';\nimport { injectable } from 'inversify';",
+    },
+    {
+      name: 'should allow multiple side-effect imports in alphabetical order before external imports',
+      code: "import 'polyfill';\nimport 'reflect-metadata';\nimport express from 'express';",
+    },
+    {
+      name: 'should allow side-effect imports followed by all groups in correct order',
+      code: [
+        "import 'reflect-metadata';",
+        "import express from 'express';",
+        "import path from 'path';",
+        "import models from '../models';",
+        "import auth from './auth';",
+        "import self from '.';",
+      ].join('\n'),
+    },
+    {
+      name: 'should allow multiple side-effect imports alphabetically sorted',
+      code: "import 'a-polyfill';\nimport 'b-setup';",
+    },
   ],
   invalid: [
     {
@@ -394,6 +417,69 @@ ruleTester.run('sort-imports', sortImports, {
           data: {
             current: 'express',
             previous: './users',
+            currentGroup: 'external',
+            previousGroup: 'peer',
+          },
+        },
+      ],
+    },
+    {
+      name: 'should report external import placed before side-effect import',
+      code: "import { injectable } from 'inversify';\nimport 'reflect-metadata';",
+      output: "import 'reflect-metadata';\nimport { injectable } from 'inversify';",
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: 'inversify',
+            next: 'reflect-metadata',
+            currentGroup: 'external',
+            nextGroup: 'side-effect',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'reflect-metadata',
+            previous: 'inversify',
+            currentGroup: 'side-effect',
+            previousGroup: 'external',
+          },
+        },
+      ],
+    },
+    {
+      name: 'should report side-effect imports out of alphabetical order',
+      code: "import 'z-polyfill';\nimport 'a-setup';",
+      output: "import 'a-setup';\nimport 'z-polyfill';",
+      errors: [
+        { messageId: 'unsortedImport', data: { current: 'a-setup', previous: 'z-polyfill' } },
+      ],
+    },
+    {
+      name: 'should report non-side-effect import placed between side-effect imports and external imports',
+      code: [
+        "import 'reflect-metadata';",
+        "import auth from './auth';",
+        "import express from 'express';",
+      ].join('\n'),
+      output:
+        "import 'reflect-metadata';\nimport express from 'express';\nimport auth from './auth';",
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: './auth',
+            next: 'express',
+            currentGroup: 'peer',
+            nextGroup: 'external',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'express',
+            previous: './auth',
             currentGroup: 'external',
             previousGroup: 'peer',
           },

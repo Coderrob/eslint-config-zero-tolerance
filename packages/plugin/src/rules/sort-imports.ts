@@ -19,7 +19,7 @@ import { RULE_CREATOR_URL } from '../constants';
 
 const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 
-const GROUP_NAMES = ['external', 'parent', 'peer', 'index'] as const;
+const GROUP_NAMES = ['side-effect', 'external', 'parent', 'peer', 'index'] as const;
 
 type ImportEntry = {
   node: TSESTree.ImportDeclaration;
@@ -54,26 +54,30 @@ function isIndexImportPath(importPath: string): boolean {
 
 /**
  * Returns the group rank for an import path.
- * Groups are ordered: external (0) -> parent (1) -> peer (2) -> index (3).
+ * Groups are ordered: side-effect (0) -> external (1) -> parent (2) -> peer (3) -> index (4).
  *
  * @param importPath Import source path from an `ImportDeclaration`.
+ * @param isSideEffect Whether the import has no specifiers (bare/side-effect import).
  * @returns Numeric group rank used for ordering comparisons.
  * @throws Does not throw.
  */
-function getImportGroup(importPath: string): number {
-  return importPath.startsWith('.') ? getRelativeImportGroup(importPath) : 0;
+function getImportGroup(importPath: string, isSideEffect: boolean): number {
+  if (isSideEffect) {
+    return 0;
+  }
+  return importPath.startsWith('.') ? getRelativeImportGroup(importPath) : 1;
 }
 
 /**
  * Returns group rank for relative import paths.
  * @param importPath - The relative import path to categorize.
- * @returns The group rank: 1 for parent imports, 3 for index imports, 2 for peer imports.
+ * @returns The group rank: 2 for parent imports, 4 for index imports, 3 for peer imports.
  */
 function getRelativeImportGroup(importPath: string): number {
   if (isParentImportPath(importPath)) {
-    return 1;
+    return 2;
   }
-  return isIndexImportPath(importPath) ? 3 : 2;
+  return isIndexImportPath(importPath) ? 4 : 3;
 }
 
 /** Enforces top-level import grouping and alphabetical ordering with adjacent-swap fixes. */
@@ -84,7 +88,7 @@ export const sortImports = createRule({
     fixable: 'code',
     docs: {
       description:
-        'Require import declarations to be grouped (external -> parent -> peer -> index) and sorted alphabetically within each group',
+        'Require import declarations to be grouped (side-effect -> external -> parent -> peer -> index) and sorted alphabetically within each group',
     },
     messages: {
       unsortedImport: 'Import "{{current}}" should come before "{{previous}}"',
@@ -157,11 +161,12 @@ export const sortImports = createRule({
      */
     const collectImport = (node: TSESTree.ImportDeclaration): void => {
       const value = node.source.value;
+      const isSideEffect = node.specifiers.length === 0;
       imports.push({
         node,
         value,
         valueLower: value.toLowerCase(),
-        group: getImportGroup(value),
+        group: getImportGroup(value, isSideEffect),
       });
     };
 

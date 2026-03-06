@@ -2,7 +2,7 @@
   "author": {
     "name": "Robert Lindley"
   },
-  "description": "Monorepo for eslint-plugin-zero-tolerance and eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
+  "description": "Monorepo for @coderrob/eslint-plugin-zero-tolerance and @coderrob/eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/jest": "^29.5.11",
@@ -41,8 +41,8 @@
     "format:check": "prettier . --check",
     "lint": "pnpm build && eslint .",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
-    "publish:config": "pnpm --filter eslint-config-zero-tolerance publish",
-    "publish:plugin": "pnpm --filter eslint-plugin-zero-tolerance publish",
+    "publish:config": "pnpm --filter @coderrob/eslint-config-zero-tolerance publish",
+    "publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance publish",
     "release:prepare": "node scripts/prepare-publish.mjs",
     "release:restore-workspace": "node scripts/restore-workspace.mjs",
     "test": "pnpm -r --if-present test && pnpm coverage:update-badge"

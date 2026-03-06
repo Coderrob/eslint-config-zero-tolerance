@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository is a monorepo containing an ESLint plugin (`eslint-plugin-zero-tolerance`) and a config package (`eslint-config-zero-tolerance`). It is published to NPM and enforces zero-tolerance coding standards via custom ESLint rules.
+This repository is a monorepo containing an ESLint plugin (`@coderrob/eslint-plugin-zero-tolerance`) and a config package (`@coderrob/eslint-config-zero-tolerance`). It is published to NPM and enforces zero-tolerance coding standards via custom ESLint rules.
 
 ---
 
@@ -20,7 +20,7 @@ eslint-config-zero-tolerance/
 │   ├── configuration.md
 │   └── rules/            # One .md per rule plus overview index
 ├── packages/
-│   ├── plugin/           # eslint-plugin-zero-tolerance
+│   ├── plugin/           # @coderrob/eslint-plugin-zero-tolerance
 │   │   └── src/
 │   │       ├── index.ts          # Plugin entry point; registers all rules and config presets
 │   │       └── rules/

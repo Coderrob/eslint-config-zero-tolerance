@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide shows how to add `eslint-plugin-zero-tolerance` to a TypeScript project from scratch.
+This guide shows how to add `@coderrob/eslint-plugin-zero-tolerance` to a TypeScript project from scratch.
 
 ## Requirements
 
@@ -16,19 +16,19 @@ This guide shows how to add `eslint-plugin-zero-tolerance` to a TypeScript proje
 === "npm"
 
     ```bash
-    npm install --save-dev eslint-plugin-zero-tolerance @typescript-eslint/parser
+    npm install --save-dev @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
     ```
 
 === "pnpm"
 
     ```bash
-    pnpm add -D eslint-plugin-zero-tolerance @typescript-eslint/parser
+    pnpm add -D @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
     ```
 
 === "yarn"
 
     ```bash
-    yarn add -D eslint-plugin-zero-tolerance @typescript-eslint/parser
+    yarn add -D @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
     ```
 
 ## ESLint 9+ (Flat Config)
@@ -38,7 +38,7 @@ This guide shows how to add `eslint-plugin-zero-tolerance` to a TypeScript proje
 The recommended preset enables all rules at **warn** severity, making it easy to adopt incrementally.
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   zeroTolerance.configs.recommended,
@@ -51,7 +51,7 @@ export default [
 The strict preset enables all rules at **error** severity and applies tighter limits (e.g. max function body: 10 lines).
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [zeroTolerance.configs.strict];
 ```
@@ -61,7 +61,7 @@ export default [zeroTolerance.configs.strict];
 Pick individual rules and set severities yourself:
 
 ```js title="eslint.config.js"
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   {
@@ -84,13 +84,13 @@ export default [
 If you prefer to import pre-built config presets as separate modules:
 
 ```bash
-npm install --save-dev eslint-config-zero-tolerance
+npm install --save-dev @coderrob/eslint-config-zero-tolerance
 ```
 
 ```js title="eslint.config.js"
-import recommended from 'eslint-config-zero-tolerance/recommended';
+import recommended from '@coderrob/eslint-config-zero-tolerance/recommended';
 // or
-import strict from 'eslint-config-zero-tolerance/strict';
+import strict from '@coderrob/eslint-config-zero-tolerance/strict';
 
 export default [
   recommended, // or strict
@@ -120,7 +120,7 @@ A complete `eslint.config.js` for a TypeScript project:
 ```js title="eslint.config.js"
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import zeroTolerance from 'eslint-plugin-zero-tolerance';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default tseslint.config(
   js.configs.recommended,

@@ -1,4 +1,4 @@
-site_name: eslint-plugin-zero-tolerance
+site_name: '@coderrob/eslint-plugin-zero-tolerance'
 site_description: Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
 site_url: https://coderrob.github.io/eslint-config-zero-tolerance/
 repo_name: Coderrob/eslint-config-zero-tolerance

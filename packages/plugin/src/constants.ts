@@ -40,7 +40,7 @@ export type Preset = typeof PRESET_RECOMMENDED | typeof PRESET_STRICT;
 export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';
 
 /** npm package name of the plugin, as declared in package.json. */
-export const PLUGIN_PACKAGE_NAME = 'eslint-plugin-zero-tolerance';
+export const PLUGIN_PACKAGE_NAME = '@coderrob/eslint-plugin-zero-tolerance';
 
 /** Config map key for the legacy recommended preset. */
 export const CONFIG_KEY_LEGACY_RECOMMENDED = 'legacy-recommended';

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import zeroTolerancePlugin from '@coderrob/eslint-plugin-zero-tolerance';
 import type { Linter } from 'eslint';
-import zeroTolerancePlugin from 'eslint-plugin-zero-tolerance';
 
 /**
- * All config presets, re-exported directly from eslint-plugin-zero-tolerance.
+ * All config presets, re-exported directly from @coderrob/eslint-plugin-zero-tolerance.
  * Rules are derived from the canonical rule map — no manual sync required here.
  */
 export const recommended: Linter.Config = zeroTolerancePlugin.configs.recommended;

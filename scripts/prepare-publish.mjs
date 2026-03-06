@@ -42,7 +42,7 @@ const configPackagePath = join(repoRoot, 'packages/config/package.json');
 const pluginPackagePath = join(repoRoot, 'packages/plugin/package.json');
 const pluginPackageDir = join(repoRoot, 'packages/plugin');
 const configPackageDir = join(repoRoot, 'packages/config');
-const pluginPackageName = 'eslint-plugin-zero-tolerance';
+const pluginPackageName = '@coderrob/eslint-plugin-zero-tolerance';
 const releaseManifestPaths = [
   'package.json',
   'packages/plugin/package.json',
@@ -58,7 +58,7 @@ Usage:
   pnpm release:prepare --release <patch|minor|major|x.y.z> [options]
 
 Default:
-  Replaces packages/config peerDependencies.eslint-plugin-zero-tolerance workspace:* with ^<pluginVersion>.
+  Replaces packages/config peerDependencies.@coderrob/eslint-plugin-zero-tolerance workspace:* with ^<pluginVersion>.
 
 Release options:
   --release <value>      Required for full release flow (patch|minor|major|x.y.z)
@@ -332,7 +332,7 @@ function updateVersions(targetVersion, dryRun) {
 
   console.log(`Updated versions to ${targetVersion}`);
   console.log(
-    `Set eslint-config peer dependency on eslint-plugin-zero-tolerance to ^${targetVersion}`,
+    `Set eslint-config peer dependency on @coderrob/eslint-plugin-zero-tolerance to ^${targetVersion}`,
   );
 }
 
@@ -348,12 +348,14 @@ function prepareOnly(dryRun) {
   const updated = setPluginPeerDependencyVersion(configPackage, pluginVersion);
 
   if (!updated) {
-    console.log('No eslint-plugin-zero-tolerance peer dependency found');
+    console.log('No @coderrob/eslint-plugin-zero-tolerance peer dependency found');
     return;
   }
 
   writeJson(configPackagePath, configPackage, dryRun);
-  console.log(`Updated eslint-plugin-zero-tolerance peer dependency to ^${pluginVersion}`);
+  console.log(
+    `Updated @coderrob/eslint-plugin-zero-tolerance peer dependency to ^${pluginVersion}`,
+  );
 }
 
 /**
@@ -365,7 +367,7 @@ function maybeRestoreWorkspace(dryRun) {
   const restored = restoreWorkspacePeerDependency(configPackage);
 
   if (!restored) {
-    console.log('No eslint-plugin-zero-tolerance peer dependency found to restore');
+    console.log('No @coderrob/eslint-plugin-zero-tolerance peer dependency found to restore');
     return;
   }
 
