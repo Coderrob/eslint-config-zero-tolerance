@@ -14,45 +14,131 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from '../rule-constants';
-import { isBoolean } from '../type-guards';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type FixInputs = Readonly<{
+  literalValue: boolean;
+  nonLiteralSide: TSESTree.Expression;
+}>;
 
-/**
- * Returns true when the node is a boolean literal (true or false).
- *
- * @param node - The node to check.
- * @returns True if the node is a boolean literal, false otherwise.
- */
-function isBooleanLiteral(node: TSESTree.Node): boolean {
-  return node.type === AST_NODE_TYPES.Literal && isBoolean((node as TSESTree.Literal).value);
-}
+/** Rule context type for `no-redundant-boolean`. */
+type NoRedundantBooleanContext = Readonly<TSESLint.RuleContext<'redundantBoolean', []>>;
 
 /**
- * Returns true when operator is strict equality/inequality.
+ * Checks a binary expression and reports when it compares a value against a boolean literal.
  *
- * @param operator - The operator to check.
- * @returns True if the operator is strict comparison, false otherwise.
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Binary expression to inspect.
  */
-function isStrictComparisonOperator(operator: string): boolean {
-  return operator === OPERATOR_STRICT_EQ || operator === OPERATOR_STRICT_NEQ;
-}
-
-/**
- * Returns true when replacement expression should negate the non-literal side.
- *
- * @param operator - The comparison operator.
- * @param literalValue - The boolean literal value.
- * @returns True if the expression should be negated, false otherwise.
- */
-function shouldNegateComparison(operator: string, literalValue: boolean): boolean {
-  if (operator === OPERATOR_STRICT_EQ) {
-    return literalValue === false;
+function checkBinaryExpression(
+  context: NoRedundantBooleanContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.BinaryExpression,
+): void {
+  const fixInputs = getFixInputs(node);
+  if (fixInputs === null) {
+    return;
   }
-  return literalValue === true;
+  context.report({
+    node,
+    messageId: 'redundantBoolean',
+    fix: createFix(sourceCode, node, fixInputs),
+  });
+}
+
+/**
+ * Creates a deterministic replacement fixer for redundant comparisons.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - The binary expression being fixed.
+ * @param fixInputs - Precomputed fix inputs.
+ * @returns A fixer callback for ESLint.
+ */
+function createFix(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.BinaryExpression,
+  fixInputs: FixInputs,
+): TSESLint.ReportFixFunction {
+  return replaceRedundantBooleanComparison.bind(undefined, sourceCode, node, fixInputs);
+}
+
+/**
+ * Creates listeners for no-redundant-boolean rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoRedundantBooleanListeners(
+  context: NoRedundantBooleanContext,
+): TSESLint.RuleListener {
+  const sourceCode = context.sourceCode;
+  return {
+    BinaryExpression: checkBinaryExpression.bind(undefined, context, sourceCode),
+  };
+}
+
+/**
+ * Creates the replacement text for redundant boolean comparisons.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Binary expression being replaced.
+ * @param fixInputs - Precomputed fix inputs.
+ * @returns Replacement expression text.
+ */
+function createReplacementText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.BinaryExpression,
+  fixInputs: FixInputs,
+): string {
+  const expressionText = sourceCode.getText(fixInputs.nonLiteralSide);
+  if (!shouldNegateComparison(node.operator, fixInputs.literalValue)) {
+    return expressionText;
+  }
+  return `!(${expressionText})`;
+}
+
+/** Returns fix inputs for redundant boolean comparisons, or null when not fixable. */
+function getBooleanLiteralValueFromRedundantComparison(node: TSESTree.BinaryExpression): boolean {
+  return isBooleanLiteral(node.left) ? node.left.value : node.right.value;
+}
+
+/**
+ * Returns the non-literal side from a known redundant boolean comparison.
+ *
+ * @param node - The binary expression node.
+ * @returns The non-literal side expression.
+ */
+function getFixInputs(node: TSESTree.BinaryExpression): FixInputs | null {
+  if (!isRedundantBooleanComparison(node)) {
+    return null;
+  }
+  return {
+    literalValue: getBooleanLiteralValueFromRedundantComparison(node),
+    nonLiteralSide: getNonLiteralSideFromRedundantComparison(node),
+  };
+}
+
+/**
+ * Returns the boolean literal value from a known redundant boolean comparison.
+ *
+ * @param node - The binary expression node.
+ * @returns Boolean literal value.
+ */
+function getNonLiteralSideFromRedundantComparison(
+  node: TSESTree.BinaryExpression,
+): TSESTree.Expression {
+  if (isBooleanLiteral(node.left)) {
+    return node.right;
+  }
+  return getRightLiteralSide(node);
+}
+
+/** Returns left side when right side is the boolean literal in a redundant comparison. */
+function getRightLiteralSide(node: TSESTree.BinaryExpression): TSESTree.Expression {
+  return node.left;
 }
 
 /**
@@ -69,50 +155,13 @@ function hasBooleanLiteralOperand(node: TSESTree.BinaryExpression): boolean {
 }
 
 /**
- * Returns the non-literal side, unless right literal compares against private identifier.
+ * Returns true when the node is a boolean literal (true or false).
  *
- * @param node - The binary expression node.
- * @returns The non-literal side expression, or null if not applicable.
+ * @param node - The node to check.
+ * @returns True if the node is a boolean literal, false otherwise.
  */
-function getNonLiteralSide(node: TSESTree.BinaryExpression): TSESTree.Expression | null {
-  if (isBooleanLiteral(node.left)) {
-    return node.right;
-  }
-  return getRightLiteralNonPrivateSide(node);
-}
-
-/** Returns left side when right side is a fixable boolean literal comparison. */
-function getRightLiteralNonPrivateSide(
-  node: TSESTree.BinaryExpression,
-): TSESTree.Expression | null {
-  return node.left.type === AST_NODE_TYPES.PrivateIdentifier ? null : node.left;
-}
-
-/**
- * Returns the boolean literal value from either side of the comparison.
- *
- * @param node - The binary expression node.
- * @returns The boolean literal value, or null if not found.
- */
-function getBooleanLiteralValue(node: TSESTree.BinaryExpression): boolean | null {
-  if (isBooleanLiteral(node.left)) {
-    return Boolean((node.left as TSESTree.Literal).value);
-  }
-  return Boolean((node.right as TSESTree.Literal).value);
-}
-
-/** Returns fix inputs for redundant boolean comparisons, or null when not fixable. */
-function getFixInputs(
-  node: TSESTree.BinaryExpression,
-): { nonLiteralSide: TSESTree.Expression; literalValue: boolean } | null {
-  if (!isRedundantBooleanComparison(node)) {
-    return null;
-  }
-  const nonLiteralSide = getNonLiteralSide(node);
-  if (nonLiteralSide === null) {
-    return null;
-  }
-  return { nonLiteralSide, literalValue: getBooleanLiteralValue(node) as boolean };
+function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { value: boolean } {
+  return node.type === AST_NODE_TYPES.Literal && typeof node.value === 'boolean';
 }
 
 /** Returns true when node is strict comparison against at least one boolean literal. */
@@ -121,6 +170,48 @@ function isRedundantBooleanComparison(node: TSESTree.BinaryExpression): boolean 
     return false;
   }
   return hasBooleanLiteralOperand(node);
+}
+
+/**
+ * Returns true when operator is strict equality/inequality.
+ *
+ * @param operator - The operator to check.
+ * @returns True if the operator is strict comparison, false otherwise.
+ */
+function isStrictComparisonOperator(operator: string): boolean {
+  return operator === OPERATOR_STRICT_EQ || operator === OPERATOR_STRICT_NEQ;
+}
+
+/**
+ * Applies a replacement fix for a redundant boolean comparison.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Binary expression being replaced.
+ * @param fixInputs - Precomputed fix inputs.
+ * @param fixer - ESLint fixer.
+ * @returns Generated text replacement fix.
+ */
+function replaceRedundantBooleanComparison(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.BinaryExpression,
+  fixInputs: FixInputs,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  return fixer.replaceText(node, createReplacementText(sourceCode, node, fixInputs));
+}
+
+/**
+ * Returns true when replacement expression should negate the non-literal side.
+ *
+ * @param operator - The comparison operator.
+ * @param literalValue - The boolean literal value.
+ * @returns True if the expression should be negated, false otherwise.
+ */
+function shouldNegateComparison(operator: string, literalValue: boolean): boolean {
+  if (operator === OPERATOR_STRICT_EQ) {
+    return !literalValue;
+  }
+  return literalValue;
 }
 
 /**
@@ -141,53 +232,7 @@ export const noRedundantBoolean = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    const sourceCode = context.sourceCode;
-
-    /**
-     * Creates a deterministic replacement fixer for a redundant comparison.
-     *
-     * @param node - The binary expression node.
-     * @param nonLiteralSide - The non-literal side expression.
-     * @param literalValue - The boolean literal value.
-     * @returns A fixer function.
-     */
-    const createFix = (
-      node: TSESTree.BinaryExpression,
-      nonLiteralSide: TSESTree.Expression,
-      literalValue: boolean,
-    ) => {
-      return (fixer: TSESLint.RuleFixer) => {
-        const expressionText = sourceCode.getText(nonLiteralSide);
-        const replacement = shouldNegateComparison(node.operator, literalValue)
-          ? `!(${expressionText})`
-          : expressionText;
-        return fixer.replaceText(node, replacement);
-      };
-    };
-
-    /**
-     * Reports redundant strict comparisons to boolean literals.
-     *
-     * @param node - The binary expression node to check.
-     */
-    const checkBinaryExpression = (node: TSESTree.BinaryExpression): void => {
-      const fixInputs = getFixInputs(node);
-      if (fixInputs === null) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'redundantBoolean',
-        fix: createFix(node, fixInputs.nonLiteralSide, fixInputs.literalValue),
-      });
-    };
-
-    return {
-      BinaryExpression: checkBinaryExpression,
-    };
-  },
+  create: createNoRedundantBooleanListeners,
 });
 
 export default noRedundantBoolean;

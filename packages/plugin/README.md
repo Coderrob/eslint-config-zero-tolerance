@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript — enforcing type safety, code
 
 ## Features
 
-- 26 custom ESLint rules covering type safety, code quality, testing, imports, and more
+- 32 custom ESLint rules covering type safety, code quality, testing, imports, and more
 - **Recommended** preset (all rules at `warn`) and **Strict** preset (all rules at `error`)
 - ESLint 9 Flat Config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for full TypeScript AST support
@@ -88,11 +88,10 @@ export default [
 
 ### Documentation
 
-| Rule                             | Description                                                 |
-| -------------------------------- | ----------------------------------------------------------- |
-| `require-jsdoc-functions`        | Require JSDoc comments on all functions (except test files) |
-| `require-optional-chaining`      | Require optional chaining instead of repeated guard access  |
-| `require-zod-schema-description` | Enforce that Zod schemas have `.describe()` called          |
+| Rule                        | Description                                                 |
+| --------------------------- | ----------------------------------------------------------- |
+| `require-jsdoc-functions`   | Require JSDoc comments on all functions (except test files) |
+| `require-optional-chaining` | Require optional chaining instead of repeated guard access  |
 
 ### Testing
 
@@ -106,7 +105,7 @@ export default [
 
 | Rule                    | Description                                                 |
 | ----------------------- | ----------------------------------------------------------- |
-| `no-type-assertion`     | Prevent use of TypeScript `as` type assertions              |
+| `no-type-assertion`     | Prevent use of TypeScript `as` and angle-bracket assertions |
 | `no-non-null-assertion` | Disallow non-null assertions using the `!` postfix operator |
 | `no-literal-unions`     | Ban literal union types in favour of enums                  |
 | `no-banned-types`       | Ban `ReturnType` and indexed access types                   |
@@ -131,20 +130,27 @@ export default [
 
 ### Imports
 
-| Rule                | Description                                             |
-| ------------------- | ------------------------------------------------------- |
-| `no-re-export`      | Ban `../` parent-directory imports and re-exports       |
-| `no-dynamic-import` | Ban `await import()` and `require()` outside test files |
-| `no-export-alias`   | Prevent use of aliases in export statements             |
+| Rule                | Description                                                   |
+| ------------------- | ------------------------------------------------------------- |
+| `no-parent-imports` | Ban `..` and `../*` parent-directory import traversal         |
+| `no-dynamic-import` | Ban dynamic `import()` and `require()` outside test files     |
+| `no-export-alias`   | Prevent use of aliases in export statements                   |
+| `no-re-export`      | Disallow re-export statements from parent/grandparent modules |
 
 ### Bug Prevention
 
 | Rule                       | Description                                                                  |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `no-identical-expressions` | Disallow identical expressions on both sides of a binary or logical operator |
+| `no-identical-branches`    | Disallow identical branches in if/else and ternary conditionals              |
 | `no-redundant-boolean`     | Disallow redundant comparisons to boolean literals                           |
 | `no-await-in-loop`         | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | `no-eslint-disable`        | Prevent use of `eslint-disable` comments                                     |
+| `no-parameter-reassign`    | Disallow reassigning function parameters                                     |
+| `no-flag-argument`         | Disallow boolean flag parameters in function signatures                      |
+| `prefer-guard-clauses`     | Prefer guard clauses by removing else blocks after terminating if branches   |
+| `prefer-shortcut-return`   | Prefer shortcut boolean returns over if branches that return true/false      |
+| `no-query-side-effects`    | Disallow side effects in query-style functions                               |
 
 ## Documentation
 

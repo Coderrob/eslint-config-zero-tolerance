@@ -1,82 +1,83 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { noRedundantBoolean } from './no-redundant-boolean';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-redundant-boolean', noRedundantBoolean, {
   valid: [
     {
-      name: 'should pass for direct boolean value usage',
+      name: 'should allow direct boolean value usage',
       code: 'if (isActive) {}',
     },
     {
-      name: 'should pass for negated value',
+      name: 'should allow negated value',
       code: 'if (!isValid) {}',
     },
     {
-      name: 'should pass for comparison without boolean literal',
+      name: 'should allow comparison without boolean literal',
       code: 'const ok = x > 0;',
     },
     {
-      name: 'should pass for comparison between non-literals',
+      name: 'should allow comparison between non-literals',
       code: 'if (a === b) {}',
     },
     {
-      name: 'should pass for loose equality with boolean (not flagged)',
+      name: 'should allow loose equality with boolean',
       code: 'if (value == true) {}',
     },
     {
-      name: 'should pass for strict comparison to non-boolean literal',
+      name: 'should allow strict comparison to non-boolean literal',
       code: 'if (value === 1) {}',
     },
   ],
   invalid: [
     {
-      name: 'should error for strict equality with true',
+      name: 'should report strict equality with true',
       code: 'if (isActive === true) {}',
       output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for strict inequality with false',
+      name: 'should report strict inequality with false',
       code: 'if (isActive !== false) {}',
       output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for boolean literal on the left side',
+      name: 'should report boolean literal on the left side',
       code: 'if (true === isActive) {}',
       output: 'if (isActive) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for assignment with boolean comparison',
+      name: 'should report assignment with boolean comparison',
       code: 'const ok = isValid === true;',
       output: 'const ok = isValid;',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for strict inequality with true',
+      name: 'should report strict inequality with true',
       code: 'if (result !== true) {}',
       output: 'if (!(result)) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for strict equality with false',
+      name: 'should report strict equality with false',
       code: 'if (result === false) {}',
       output: 'if (!(result)) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
     {
-      name: 'should error for strict inequality with false',
+      name: 'should report strict inequality with false',
       code: 'if (result !== false) {}',
       output: 'if (result) {}',
       errors: [{ messageId: 'redundantBoolean' }],
     },
   ],
-} as any);
+});

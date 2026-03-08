@@ -1,6 +1,6 @@
 # no-type-assertion
 
-Prevent use of TypeScript `as` type assertions outside of test files.
+Prevent use of TypeScript type assertions (`as` and angle-bracket assertions) outside of test files.
 
 ## Rule Details
 
@@ -13,9 +13,9 @@ Prevent use of TypeScript `as` type assertions outside of test files.
 
 ## Rationale
 
-`as` type assertions tell the TypeScript compiler to trust you over the type system. They are a common source of runtime errors because they bypass inference and structural checks. In production code, explicit type guards, generic functions, or proper data modelling should be used instead.
+Type assertions tell the TypeScript compiler to trust you over the type system. They are a common source of runtime errors because they bypass inference and structural checks. In production code, explicit type guards, generic functions, or proper data modelling should be used instead.
 
-The rule allows `as unknown` in test files (`.test.*`, `.spec.*`) because it is a necessary pattern in rule testers and other test utilities.
+The rule allows `as unknown` and `<unknown>` in test files (`.test.*`, `.spec.*`, `.e2e.*`, `.integration.*`, and files under `__tests__/`) because this pattern is common in test utilities and rule tester setups.
 
 ## Examples
 
@@ -39,6 +39,8 @@ function first<T>(arr: T[]): T | undefined {
 const user = response.data as IUser;
 
 const element = document.querySelector('#app') as HTMLDivElement;
+
+const value = <MyType>getValue();
 ```
 
 ## Configuration

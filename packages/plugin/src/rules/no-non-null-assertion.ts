@@ -14,10 +14,37 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoNonNullAssertionContext = Readonly<TSESLint.RuleContext<'noNonNullAssertion', []>>;
+
+/**
+ * Creates listeners for TS non-null assertion nodes.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoNonNullAssertionListeners(
+  context: NoNonNullAssertionContext,
+): TSESLint.RuleListener {
+  return {
+    TSNonNullExpression: reportNonNullAssertion.bind(undefined, context),
+  };
+}
+
+/**
+ * Reports a TS non-null assertion expression.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - TS non-null expression node.
+ */
+function reportNonNullAssertion(
+  context: NoNonNullAssertionContext,
+  node: TSESTree.TSNonNullExpression,
+): void {
+  context.report({ node, messageId: 'noNonNullAssertion' });
+}
 
 /**
  * ESLint rule that disallows non-null assertions using the "!" postfix operator.
@@ -36,26 +63,7 @@ export const noNonNullAssertion = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that prevents TypeScript non-null assertions.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks a TypeScript non-null expression.
-     *
-     * @param node - The TSNonNullExpression node to check.
-     */
-    const checkTSNonNullExpression = (node: TSESTree.TSNonNullExpression): void => {
-      context.report({ node, messageId: 'noNonNullAssertion' });
-    };
-
-    return {
-      TSNonNullExpression: checkTSNonNullExpression,
-    };
-  },
+  create: createNoNonNullAssertionListeners,
 });
 
 export default noNonNullAssertion;

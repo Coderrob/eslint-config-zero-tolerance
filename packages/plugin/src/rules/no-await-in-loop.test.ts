@@ -1,12 +1,13 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { noAwaitInLoop } from './no-await-in-loop';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-await-in-loop', noAwaitInLoop, {
   valid: [
@@ -58,4 +59,4 @@ ruleTester.run('no-await-in-loop', noAwaitInLoop, {
       errors: [{ messageId: 'noAwaitInLoop' }],
     },
   ],
-} as any);
+});

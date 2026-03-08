@@ -47,12 +47,6 @@ export const TEST_FUNCTION_TEST = 'test';
 /** Jest/Vitest skip modifier name. */
 export const TEST_METHOD_SKIP = 'skip';
 
-/** Zod library root identifier (require-zod-schema-description rule). */
-export const ZOD_IDENTIFIER = 'z';
-
-/** Zod `.describe()` method name (require-zod-schema-description rule). */
-export const ZOD_DESCRIBE_METHOD = 'describe';
-
 /** TypeScript built-in `ReturnType` utility type name (no-banned-types rule). */
 export const RETURN_TYPE_NAME = 'ReturnType';
 

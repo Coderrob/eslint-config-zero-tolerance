@@ -15,7 +15,7 @@ Enforce that `it()` and `test()` descriptions start with the word `should`.
 
 Test descriptions starting with `should` form a consistent, human-readable specification language. Reading them aloud reveals the intended behaviour: "it should render correctly", "it should throw when the input is invalid". This convention makes test reports self-documenting and helps reviewers scan failures quickly.
 
-The rule applies to `it()`, `test()`, `it.only()`, and `test.only()`. It deliberately skips `it.skip()` and `test.skip()` to avoid friction when temporarily disabling tests.
+The rule applies to `it()`, `test()`, `it.only()`, and `test.only()`. By default it skips `it.skip()` and `test.skip()` to avoid friction when temporarily disabling tests.
 
 ## Examples
 
@@ -41,8 +41,14 @@ it('Check that user is saved', () => {});
 
 ## Configuration
 
-This rule has no options:
+This rule accepts an optional options object:
 
 ```js
-'zero-tolerance/require-test-description-style': 'error'
+'zero-tolerance/require-test-description-style': [
+  'error',
+  {
+    prefix: 'should',
+    ignoreSkip: true,
+  },
+]
 ```

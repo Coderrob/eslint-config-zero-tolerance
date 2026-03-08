@@ -14,12 +14,63 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
-import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from '../rule-constants';
+import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isTestFile } from '../ast-guards';
+import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from '../rule-constants';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoTypeAssertionContext = Readonly<TSESLint.RuleContext<'noTypeAssertion', []>>;
+
+/**
+ * Checks a TypeScript assertion expression for validity.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Type assertion node to inspect.
+ */
+function checkTypeAssertion(
+  context: NoTypeAssertionContext,
+  node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
+): void {
+  const typeText = context.sourceCode.getText(node.typeAnnotation);
+  if (isTestFile(context.filename) && typeText.trim() === TYPE_ASSERTION_ALLOWED_IN_TESTS) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'noTypeAssertion',
+    data: { assertion: getAssertionSyntax(node, typeText) },
+  });
+}
+
+/**
+ * Creates listeners for no-type-assertion rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoTypeAssertionListeners(context: NoTypeAssertionContext): TSESLint.RuleListener {
+  return {
+    TSAsExpression: checkTypeAssertion.bind(undefined, context),
+    TSTypeAssertion: checkTypeAssertion.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns the assertion syntax shown in diagnostics.
+ *
+ * @param node - The assertion node.
+ * @param typeText - The asserted type source text.
+ * @returns Human-readable assertion syntax text.
+ */
+function getAssertionSyntax(
+  node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
+  typeText: string,
+): string {
+  if (node.type === AST_NODE_TYPES.TSAsExpression) {
+    return `as ${typeText}`;
+  }
+  return `<${typeText}>`;
+}
 
 /**
  * ESLint rule that prevents use of TypeScript "as" type assertions.
@@ -32,43 +83,12 @@ export const noTypeAssertion = createRule({
       description: 'Prevent use of TypeScript "as" type assertions',
     },
     messages: {
-      noTypeAssertion: 'Type assertion "as {{type}}" is not allowed',
+      noTypeAssertion: 'Type assertion "{{assertion}}" is not allowed',
     },
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that prevents TypeScript type assertions.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks a TypeScript "as" expression for validity.
-     *
-     * @param node - The TSAsExpression node to check.
-     */
-    const checkTSAsExpression = (node: TSESTree.TSAsExpression): void => {
-      const filename = context.filename;
-      const typeText = context.sourceCode.getText(node.typeAnnotation);
-
-      // Allow specific type assertions in test files
-      if (isTestFile(filename) && typeText.trim() === TYPE_ASSERTION_ALLOWED_IN_TESTS) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'noTypeAssertion',
-        data: { type: typeText },
-      });
-    };
-
-    return {
-      TSAsExpression: checkTSAsExpression,
-    };
-  },
+  create: createNoTypeAssertionListeners,
 });
 
 export default noTypeAssertion;

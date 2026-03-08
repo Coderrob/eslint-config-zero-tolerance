@@ -14,11 +14,53 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { TSESLint } from '@typescript-eslint/utils';
 import { ESLINT_DISABLE_PREFIX } from '../rule-constants';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoEslintDisableContext = Readonly<TSESLint.RuleContext<'noEslintDisable', []>>;
+
+/**
+ * Reports all eslint-disable comments found in the file.
+ *
+ * @param context - ESLint rule execution context.
+ */
+function checkProgram(context: NoEslintDisableContext): void {
+  const comments = context.sourceCode.getAllComments();
+
+  for (const comment of comments) {
+    if (!isEslintDisableComment(comment.value)) {
+      continue;
+    }
+
+    context.report({
+      loc: comment.loc,
+      messageId: 'noEslintDisable',
+    });
+  }
+}
+
+/**
+ * Creates listeners that detect eslint-disable comments.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoEslintDisableListeners(context: NoEslintDisableContext): TSESLint.RuleListener {
+  return {
+    Program: checkProgram.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns true when a comment value starts with an eslint-disable directive.
+ *
+ * @param value - Raw comment text.
+ * @returns True when the comment is an eslint-disable directive.
+ */
+function isEslintDisableComment(value: string): boolean {
+  return value.trim().startsWith(ESLINT_DISABLE_PREFIX);
+}
 
 /**
  * ESLint rule that prevents use of eslint-disable comments.
@@ -36,26 +78,7 @@ export const noEslintDisable = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    return {
-      /**
-       * Checks the program for eslint-disable comments.
-       */
-      Program() {
-        const sourceCode = context.sourceCode;
-        const comments = sourceCode.getAllComments();
-        for (const comment of comments) {
-          const value = comment.value.trim();
-          if (value.startsWith(ESLINT_DISABLE_PREFIX)) {
-            context.report({
-              loc: comment.loc,
-              messageId: 'noEslintDisable',
-            });
-          }
-        }
-      },
-    };
-  },
+  create: createNoEslintDisableListeners,
 });
 
 export default noEslintDisable;

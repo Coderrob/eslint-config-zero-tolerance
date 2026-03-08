@@ -5,6 +5,7 @@ import {
   getFunctionMethodName,
   resolveFunctionName,
   getMemberPropertyName,
+  getMappedMemberPropertyName,
 } from './ast-helpers';
 
 describe('ast-helpers', () => {
@@ -147,6 +148,47 @@ describe('ast-helpers', () => {
         property: { type: 'Literal', value: 42 },
       };
       expect(getMemberPropertyName(node)).toBeNull();
+    });
+  });
+
+  describe('getMappedMemberPropertyName', () => {
+    it('should return mapped replacement when member name is banned', () => {
+      const node = {
+        computed: false,
+        property: { type: 'Identifier', name: 'mockImplementation' },
+      };
+
+      expect(
+        getMappedMemberPropertyName(node, {
+          mockImplementation: 'mockImplementationOnce',
+        }),
+      ).toEqual({ name: 'mockImplementation', replacement: 'mockImplementationOnce' });
+    });
+
+    it('should return null when member name is not in map', () => {
+      const node = {
+        computed: false,
+        property: { type: 'Identifier', name: 'mockClear' },
+      };
+
+      expect(
+        getMappedMemberPropertyName(node, {
+          mockImplementation: 'mockImplementationOnce',
+        }),
+      ).toBeNull();
+    });
+
+    it('should return null when member property name cannot be resolved', () => {
+      const node = {
+        computed: true,
+        property: { type: 'Literal', value: 1 },
+      };
+
+      expect(
+        getMappedMemberPropertyName(node, {
+          mockImplementation: 'mockImplementationOnce',
+        }),
+      ).toBeNull();
     });
   });
 });

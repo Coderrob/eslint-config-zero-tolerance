@@ -14,11 +14,100 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 import { isBoolean } from '../type-guards';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoLiteralUnionsContext = Readonly<TSESLint.RuleContext<'noLiteralUnions', []>>;
+const BANNED_LITERAL_NODE_TYPES = new Set([AST_NODE_TYPES.Literal, AST_NODE_TYPES.TemplateLiteral]);
+
+/**
+ * Checks union types and reports banned literal unions.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Union type node to inspect.
+ */
+function checkUnionType(context: NoLiteralUnionsContext, node: TSESTree.TSUnionType): void {
+  if (isBooleanLiteralUnion(node)) {
+    return;
+  }
+  if (!hasBannedLiteralUnionMember(node)) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'noLiteralUnions',
+  });
+}
+
+/**
+ * Creates listeners for literal-union checks.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoLiteralUnionsListeners(context: NoLiteralUnionsContext): TSESLint.RuleListener {
+  return {
+    TSUnionType: checkUnionType.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns true when a union includes any banned literal member.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the union should be reported.
+ */
+function hasBannedLiteralUnionMember(node: TSESTree.TSUnionType): boolean {
+  return node.types.some(isBannedLiteralUnionMember);
+}
+
+/**
+ * Returns true when a literal union member is banned by this rule.
+ *
+ * @param type - Union member type node.
+ * @returns True when the member is a string/number/bigint/template literal.
+ */
+function isBannedLiteralUnionMember(type: TSESTree.TypeNode): boolean {
+  if (!isLiteralTypeNode(type)) {
+    return false;
+  }
+  return BANNED_LITERAL_NODE_TYPES.has(type.literal.type);
+}
+
+/**
+ * Returns true when a type node represents a boolean literal type.
+ *
+ * @param type - Type node to inspect.
+ * @returns True when the type is a `true`/`false` literal.
+ */
+function isBooleanLiteralType(type: TSESTree.TypeNode): boolean {
+  return (
+    isLiteralTypeNode(type) &&
+    type.literal.type === AST_NODE_TYPES.Literal &&
+    isBoolean(type.literal.value)
+  );
+}
+
+/**
+ * Returns true when all union members are boolean literals.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True for `true | false` style unions.
+ */
+function isBooleanLiteralUnion(node: TSESTree.TSUnionType): boolean {
+  return node.types.every(isBooleanLiteralType);
+}
+
+/**
+ * Returns true when a type node is a literal type.
+ *
+ * @param type - Type node to inspect.
+ * @returns True when the node is a `TSLiteralType`.
+ */
+function isLiteralTypeNode(type: TSESTree.TypeNode): type is TSESTree.TSLiteralType {
+  return type.type === AST_NODE_TYPES.TSLiteralType;
+}
 
 /**
  * ESLint rule that prohibits literal unions in favor of enums.
@@ -36,66 +125,7 @@ export const noLiteralUnions = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that detects literal unions.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks if a type node represents a boolean literal type.
-     *
-     * @param type - The type node to check.
-     * @returns True if the type is a boolean literal.
-     */
-    const isBooleanLiteralType = (type: TSESTree.TypeNode): boolean => {
-      return (
-        type.type === AST_NODE_TYPES.TSLiteralType &&
-        type.literal.type === AST_NODE_TYPES.Literal &&
-        isBoolean(type.literal.value)
-      );
-    };
-
-    /**
-     * Checks if a union type contains literal types that should be banned.
-     *
-     * @param node - The union type node to check.
-     */
-    const checkTSUnionType = (node: TSESTree.TSUnionType): void => {
-      // Allow boolean literal unions (true | false)
-      if (node.types.every(isBooleanLiteralType)) {
-        return;
-      }
-
-      // Check if this union contains literal types
-      const hasLiterals = node.types.some((type) => {
-        if (type.type !== AST_NODE_TYPES.TSLiteralType) {
-          return false;
-        }
-        switch (type.literal.type) {
-          case AST_NODE_TYPES.Literal:
-          case AST_NODE_TYPES.TemplateLiteral:
-            return true;
-          default:
-            return false;
-        }
-      });
-
-      if (!hasLiterals) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'noLiteralUnions',
-      });
-    };
-
-    return {
-      TSUnionType: checkTSUnionType,
-    };
-  },
+  create: createNoLiteralUnionsListeners,
 });
 
 export default noLiteralUnions;

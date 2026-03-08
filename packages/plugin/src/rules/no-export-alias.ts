@@ -14,23 +14,75 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isIdentifierNode } from '../ast-guards';
-import { RULE_CREATOR_URL } from '../constants';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoExportAliasContext = Readonly<TSESLint.RuleContext<'noExportAlias', []>>;
+type ExportAliasInfo = { local: string; alias: string };
+const EXPORT_KIND_TYPE = 'type';
 
 /**
- * Extracts the name from an identifier or string literal specifier.
+ * Checks named export declarations for alias specifiers.
  *
- * @param node - The specifier node (Identifier or StringLiteral).
- * @returns The extracted name, or null if not a valid specifier.
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code utility from ESLint context.
+ * @param node - Named export declaration to inspect.
  */
-function getSpecifierName(node: TSESTree.Identifier | TSESTree.StringLiteral): string | null {
-  if (isIdentifierNode(node)) {
-    return node.name;
+function checkExportNamedDeclaration(
+  context: NoExportAliasContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.ExportNamedDeclaration,
+): void {
+  for (const specifier of node.specifiers) {
+    reportAliasSpecifier(context, sourceCode, specifier);
   }
-  return node.value;
+}
+
+/**
+ * Creates listeners that enforce direct exports without aliases.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.RuleListener {
+  const sourceCode = context.sourceCode;
+
+  return {
+    ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context, sourceCode),
+  };
+}
+
+/**
+ * Builds replacement text that removes aliasing while preserving `type` exports.
+ *
+ * @param sourceCode - Source code utility from ESLint context.
+ * @param specifier - Export specifier to rewrite.
+ * @returns Replacement export specifier text.
+ */
+function createSpecifierReplacement(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  specifier: TSESTree.ExportSpecifier,
+): string {
+  const localText = sourceCode.getText(specifier.local);
+  const typePrefix = specifier.exportKind === EXPORT_KIND_TYPE ? `${EXPORT_KIND_TYPE} ` : '';
+  return `${typePrefix}${localText}`;
+}
+
+/**
+ * Builds a fix that rewrites aliased export specifiers.
+ *
+ * @param sourceCode - Source code utility from ESLint context.
+ * @param specifier - Export specifier node.
+ * @param fixer - ESLint fixer utility.
+ * @returns Rule fix operation.
+ */
+function fixAliasSpecifier(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  specifier: TSESTree.ExportSpecifier,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  return fixer.replaceText(specifier, createSpecifierReplacement(sourceCode, specifier));
 }
 
 /**
@@ -38,15 +90,51 @@ function getSpecifierName(node: TSESTree.Identifier | TSESTree.StringLiteral): s
  * @param specifier - The export specifier to analyze.
  * @returns Object with local and alias names if it's an alias, null otherwise.
  */
-function getAliasInfo(
-  specifier: TSESTree.ExportSpecifier,
-): { local: string; alias: string } | null {
+function getAliasInfo(specifier: TSESTree.ExportSpecifier): ExportAliasInfo | null {
   const localName = getSpecifierName(specifier.local);
   const exportedName = getSpecifierName(specifier.exported);
 
-  const isValidAlias = localName !== null && exportedName !== null && localName !== exportedName;
+  const isValidAlias = localName !== exportedName;
 
   return isValidAlias ? { local: localName, alias: exportedName } : null;
+}
+
+/**
+ * Extracts the name from an identifier or string literal specifier.
+ *
+ * @param node - The specifier node (Identifier or StringLiteral).
+ * @returns The extracted name, or null if not a valid specifier.
+ */
+function getSpecifierName(node: TSESTree.Identifier | TSESTree.StringLiteral): string {
+  if (isIdentifierNode(node)) {
+    return node.name;
+  }
+  return node.value;
+}
+
+/**
+ * Reports aliased export specifiers and provides an autofix.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code utility from ESLint context.
+ * @param specifier - Export specifier to inspect.
+ */
+function reportAliasSpecifier(
+  context: NoExportAliasContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  specifier: TSESTree.ExportSpecifier,
+): void {
+  const aliasInfo = getAliasInfo(specifier);
+  if (aliasInfo === null) {
+    return;
+  }
+
+  context.report({
+    node: specifier,
+    messageId: 'noExportAlias',
+    data: aliasInfo,
+    fix: fixAliasSpecifier.bind(undefined, sourceCode, specifier),
+  });
 }
 
 /**
@@ -66,51 +154,7 @@ export const noExportAlias = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that prevents export aliases.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    const sourceCode = context.sourceCode;
-
-    /**
-     * Processes an export specifier to check for aliases.
-     *
-     * @param specifier - The export specifier to check.
-     */
-    const processExportSpecifier = (specifier: TSESTree.ExportSpecifier): void => {
-      const aliasInfo = getAliasInfo(specifier);
-      if (aliasInfo === null) {
-        return;
-      }
-
-      context.report({
-        node: specifier,
-        messageId: 'noExportAlias',
-        data: aliasInfo,
-        fix(fixer) {
-          const localText = sourceCode.getText(specifier.local);
-          const typePrefix = specifier.exportKind === 'type' ? 'type ' : '';
-          return fixer.replaceText(specifier, `${typePrefix}${localText}`);
-        },
-      });
-    };
-
-    return {
-      /**
-       * Checks named export declarations for aliased specifiers.
-       *
-       * @param node - The ExportNamedDeclaration node.
-       */
-      ExportNamedDeclaration(node) {
-        for (const specifier of node.specifiers) {
-          processExportSpecifier(specifier);
-        }
-      },
-    };
-  },
+  create: createNoExportAliasListeners,
 });
 
 export default noExportAlias;

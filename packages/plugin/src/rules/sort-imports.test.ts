@@ -1,12 +1,13 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { sortImports } from './sort-imports';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('sort-imports', sortImports, {
   valid: [
@@ -105,6 +106,32 @@ ruleTester.run('sort-imports', sortImports, {
       name: 'should allow multiple side-effect imports alphabetically sorted',
       code: "import 'a-polyfill';\nimport 'b-setup';",
     },
+    {
+      name: 'should allow builtin import after side-effect and before external import',
+      code: "import 'reflect-metadata';\nimport { dirname } from 'node:path';\nimport { injectable } from 'inversify';",
+    },
+    {
+      name: 'should allow multiple builtin imports in alphabetical order',
+      code: "import { readFile } from 'node:fs';\nimport { dirname } from 'node:path';",
+    },
+    {
+      name: 'should allow builtin imports followed by parent imports',
+      code: "import { dirname } from 'node:path';\nimport utils from '../utils';",
+    },
+    {
+      name: 'should allow side-effect, builtin, external, and parent imports in correct order with type imports',
+      code: [
+        "import 'reflect-metadata';",
+        '',
+        "import { dirname } from 'node:path';",
+        '',
+        "import { inject, injectable } from 'inversify';",
+        '',
+        "import type { IWorkflowReader } from '../interfaces/parsing/IWorkflowReader';",
+        "import type { ISchemaValidator } from '../interfaces/schema/ISchemaValidator';",
+        "import type { IEventValidator } from '../interfaces/validation/IEventValidator';",
+      ].join('\n'),
+    },
   ],
   invalid: [
     {
@@ -132,10 +159,7 @@ ruleTester.run('sort-imports', sortImports, {
         "import a from 'a';\nimport c from 'c';\nimport b from 'b';",
         "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
       ],
-      errors: [
-        { messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } },
-        { messageId: 'unsortedImport', data: { current: 'b', previous: 'c' } },
-      ],
+      errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } }],
     },
     {
       name: 'should report case-insensitive alphabetical violation within external group',
@@ -371,15 +395,6 @@ ruleTester.run('sort-imports', sortImports, {
             previousGroup: 'peer',
           },
         },
-        {
-          messageId: 'wrongGroup',
-          data: {
-            current: 'path',
-            previous: './auth',
-            currentGroup: 'external',
-            previousGroup: 'peer',
-          },
-        },
       ],
     },
     {
@@ -394,15 +409,6 @@ ruleTester.run('sort-imports', sortImports, {
         "import express from 'express';\nimport auth from './auth';\nimport users from './users';",
       ],
       errors: [
-        {
-          messageId: 'wrongGroupAfter',
-          data: {
-            current: './auth',
-            next: 'express',
-            currentGroup: 'peer',
-            nextGroup: 'external',
-          },
-        },
         {
           messageId: 'wrongGroupAfter',
           data: {
@@ -457,6 +463,42 @@ ruleTester.run('sort-imports', sortImports, {
       ],
     },
     {
+      name: 'should report external import placed before builtin import',
+      code: "import express from 'express';\nimport { dirname } from 'node:path';",
+      output: "import { dirname } from 'node:path';\nimport express from 'express';",
+      errors: [
+        {
+          messageId: 'wrongGroupAfter',
+          data: {
+            current: 'express',
+            next: 'node:path',
+            currentGroup: 'external',
+            nextGroup: 'builtin',
+          },
+        },
+        {
+          messageId: 'wrongGroup',
+          data: {
+            current: 'node:path',
+            previous: 'express',
+            currentGroup: 'builtin',
+            previousGroup: 'external',
+          },
+        },
+      ],
+    },
+    {
+      name: 'should report builtin imports out of alphabetical order',
+      code: "import { dirname } from 'node:path';\nimport { readFile } from 'node:fs';",
+      output: "import { readFile } from 'node:fs';\nimport { dirname } from 'node:path';",
+      errors: [
+        {
+          messageId: 'unsortedImport',
+          data: { current: 'node:fs', previous: 'node:path' },
+        },
+      ],
+    },
+    {
       name: 'should report non-side-effect import placed between side-effect imports and external imports',
       code: [
         "import 'reflect-metadata';",
@@ -487,4 +529,4 @@ ruleTester.run('sort-imports', sortImports, {
       ],
     },
   ],
-} as any);
+});

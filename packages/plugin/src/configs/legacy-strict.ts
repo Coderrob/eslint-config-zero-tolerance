@@ -15,8 +15,8 @@
  */
 
 import type { Linter } from 'eslint';
-import { buildRules } from '../rule-map';
 import { PRESET_STRICT } from '../constants';
+import { buildRules } from '../rule-map';
 import { legacyParserOptions } from './legacy-base';
 
 /**

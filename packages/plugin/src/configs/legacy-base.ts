@@ -17,16 +17,15 @@
 import type { Linter } from 'eslint';
 import { PLUGIN_NAMESPACE, TYPESCRIPT_ESLINT_PARSER } from '../constants';
 
+const LEGACY_ECMA_VERSION = 2020;
+
 /**
  * Shared parser options for legacy ESLint config consumers (ESLint <9).
  */
-export const legacyParserOptions: Pick<
-  Linter.LegacyConfig,
-  'parser' | 'parserOptions' | 'plugins'
-> = {
+export const legacyParserOptions: Linter.LegacyConfig = {
   parser: TYPESCRIPT_ESLINT_PARSER,
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: LEGACY_ECMA_VERSION,
     sourceType: 'module',
   },
   plugins: [PLUGIN_NAMESPACE],

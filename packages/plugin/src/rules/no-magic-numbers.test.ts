@@ -1,12 +1,13 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { noMagicNumbers } from './no-magic-numbers';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-magic-numbers', noMagicNumbers, {
   valid: [
@@ -137,4 +138,4 @@ ruleTester.run('no-magic-numbers', noMagicNumbers, {
       ],
     },
   ],
-} as any);
+});

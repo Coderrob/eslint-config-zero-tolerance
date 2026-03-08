@@ -1,6 +1,6 @@
 # no-dynamic-import
 
-Ban `await import()` and `require()` calls outside of test files.
+Ban dynamic `import()` and `require()` calls outside of test files.
 
 ## Rule Details
 
@@ -15,7 +15,7 @@ Ban `await import()` and `require()` calls outside of test files.
 
 Dynamic imports and `require()` calls load modules at runtime rather than at bundle time. This hides dependencies from static analysis tools, prevents tree-shaking, complicates code-splitting strategies, and can introduce subtle load-order bugs. Static `import` declarations at the top of a file are always preferable in application code.
 
-The rule is **automatically skipped** in test files (files matching `*.test.{ts,js,tsx,jsx}` or `*.spec.{ts,js,tsx,jsx}`), where dynamic loading is sometimes required by test utilities.
+The rule is **automatically skipped** in test files (`*.test.*`, `*.spec.*`, `*.e2e.*`, `*.integration.*`, and files under `__tests__/`), where dynamic loading is sometimes required by test utilities.
 
 ## Examples
 
@@ -27,6 +27,7 @@ import { parseConfig } from './config-parser';
 
 // Allowed in test files: mymodule.test.ts
 const module = await import('./module');
+import('./module').then((m) => m.default);
 const pkg = require('./package');
 ```
 
@@ -35,6 +36,7 @@ const pkg = require('./package');
 ```typescript
 // In mymodule.ts
 const module = await import('./heavy-module');
+import('./heavy-module').then((m) => m.default);
 
 const pkg = require('some-package');
 ```

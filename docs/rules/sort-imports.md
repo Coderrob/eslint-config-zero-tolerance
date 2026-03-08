@@ -1,6 +1,6 @@
 # sort-imports
 
-Require import declarations to be grouped and sorted: side-effect → external → parent → peer → index, with alphabetical ordering within each group.
+Require import declarations to be grouped and sorted: side-effect → builtin → external → parent → peer → index, with alphabetical ordering within each group.
 
 ## Rule Details
 
@@ -13,9 +13,11 @@ Require import declarations to be grouped and sorted: side-effect → external �
 
 ## Rationale
 
-Consistent import ordering reduces merge conflicts and makes it immediately clear where a dependency comes from. Imports must appear in five groups in order — side-effect (bare) imports, external packages, parent-directory (`../`) imports, peer (`./`) imports, and the index (`.`) import — with each group sorted alphabetically (case-insensitive).
+Consistent import ordering reduces merge conflicts and makes it immediately clear where a dependency comes from. Imports must appear in six groups in order — side-effect (bare) imports, Node.js built-in modules (`node:` protocol), external packages, parent-directory (`../`) imports, peer (`./`) imports, and the index (`.`) import — with each group sorted alphabetically (case-insensitive).
 
 Side-effect imports (`import 'module'`) have no specifiers and often set up runtime prerequisites such as polyfills or reflection metadata. They must appear before all other imports.
+
+Node.js built-in imports use the `node:` protocol prefix (e.g., `node:path`, `node:fs`) and are placed after side-effect imports but before third-party external packages.
 
 ## Examples
 
@@ -25,20 +27,23 @@ Side-effect imports (`import 'module'`) have no specifiers and often set up runt
 // 1. Side-effect imports — alphabetical
 import 'reflect-metadata';
 
-// 2. External packages — alphabetical
+// 2. Node.js built-in imports — alphabetical
+import { readFile } from 'node:fs';
+import { dirname } from 'node:path';
+
+// 3. External packages — alphabetical
 import express from 'express';
 import { injectable } from 'inversify';
-import path from 'path';
 
-// 3. Parent imports — alphabetical
+// 4. Parent imports — alphabetical
 import { models } from '../models';
 import { utils } from '../utils';
 
-// 4. Peer imports — alphabetical
+// 5. Peer imports — alphabetical
 import { auth } from './auth';
 import { users } from './users';
 
-// 5. Index import
+// 6. Index import
 import self from '.';
 ```
 

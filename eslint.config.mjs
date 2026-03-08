@@ -22,9 +22,6 @@ const TS_JS_FILES = ['**/*.ts', '**/*.tsx', '**/*.mjs'];
 /** File patterns for test files */
 const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts'];
 
-/** File patterns for plugin source files */
-const PLUGIN_SOURCE_FILES = ['packages/plugin/src/**/*.ts'];
-
 /** ECMAScript version for parser options */
 const ECMA_VERSION = 2020;
 
@@ -59,24 +56,6 @@ const IGNORE_PATTERNS = [
   '**/scripts/**',
   'pnpm-lock.yaml',
 ];
-
-/**
- * Generates an object that disables all zero-tolerance rules.
- * Used for plugin source files that intentionally contain patterns the rules prohibit.
- *
- * @param {object} rules - The rules object from the zero-tolerance plugin
- * @returns {object} An object mapping rule names to 'off' values
- */
-const zeroToleranceRulesOff = Object.fromEntries(
-  Object.keys(zeroTolerancePlugin.rules ?? {}).map(
-    /**
-     * Maps a rule name to a disabled rule configuration.
-     * @param {string} ruleName - The name of the rule to disable
-     * @returns {Array<string>} A tuple of [ruleName, 'off']
-     */
-    (ruleName) => [`zero-tolerance/${ruleName}`, 'off'],
-  ),
-);
 
 // ============================================================================
 // Configuration Sections
@@ -114,7 +93,6 @@ const baseConfig = {
     // Documentation and naming
     'zero-tolerance/require-jsdoc-functions': 'error',
     'zero-tolerance/require-test-description-style': 'error',
-    'zero-tolerance/require-zod-schema-description': 'error',
 
     // Type safety and assertions
     'zero-tolerance/no-banned-types': 'error',
@@ -148,18 +126,6 @@ const baseConfig = {
 };
 
 /**
- * Configuration for plugin source files.
- * Disables zero-tolerance rules since the plugin implementation intentionally
- * contains patterns that its own rules prohibit (e.g., AST node type strings).
- */
-const pluginSourceConfig = {
-  files: PLUGIN_SOURCE_FILES,
-  rules: {
-    ...zeroToleranceRulesOff,
-  },
-};
-
-/**
  * Configuration for test files.
  * Adds Jest globals and relaxes some rules appropriate for test code.
  */
@@ -169,9 +135,12 @@ const testConfig = {
     globals: JEST_GLOBALS,
   },
   rules: {
-    // Relax some rules for tests
-    'zero-tolerance/no-dynamic-import': 'off',
+    // Relax production-only constraints for test ergonomics
     complexity: 'off',
+    'zero-tolerance/max-function-lines': 'off',
+    'zero-tolerance/no-dynamic-import': 'off',
+    'zero-tolerance/no-magic-numbers': 'off',
+    'zero-tolerance/no-type-assertion': 'off',
   },
 };
 
@@ -186,10 +155,4 @@ const ignoreConfig = {
 // Export
 // ============================================================================
 
-export default [
-  eslint.configs.recommended,
-  baseConfig,
-  pluginSourceConfig,
-  testConfig,
-  ignoreConfig,
-];
+export default [eslint.configs.recommended, baseConfig, testConfig, ignoreConfig];

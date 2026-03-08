@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { type FunctionNode, isBlockStatementNode } from '../ast-guards';
 import { resolveFunctionName } from '../ast-helpers';
+import { RULE_CREATOR_URL } from '../constants';
+import { isNumber } from '../type-guards';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+const DEFAULT_MAX_FUNCTION_LINES = 30;
 
-/**
- * Returns the configured line limit, defaulting to 30.
- *
- * @param options - The rule options array.
- * @returns The maximum allowed number of lines per function.
- */
-function resolveMax(options: unknown[]): number {
-  const opt = options[0] as { max?: number } | undefined;
-  return opt?.max ?? 30;
-}
+type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>>;
+
+const createRule = ESLintUtils.RuleCreator(resolveRuleDocumentationUrl);
 
 /**
  * Counts the lines occupied by a block-statement function body.
@@ -42,9 +36,116 @@ function countBodyLines(body: TSESTree.BlockStatement): number {
   return body.loc.end.line - body.loc.start.line + 1;
 }
 
+/**
+ * Creates listeners for all function-like nodes.
+ *
+ * @param context - ESLint rule execution context.
+ * @param maxLines - Configured maximum line count.
+ * @returns Rule listeners.
+ */
+function createFunctionListeners(
+  context: MaxFunctionLinesContext,
+  maxLines: number,
+): TSESLint.RuleListener {
+  return {
+    ArrowFunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
+    FunctionDeclaration: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
+    FunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
+  };
+}
+
 /** Returns block body for function nodes, or null for expression-bodied arrows. */
 function getBlockBody(node: FunctionNode): TSESTree.BlockStatement | null {
   return isBlockStatementNode(node.body) ? node.body : null;
+}
+
+/**
+ * Resolves a numeric max value from the first rule option.
+ *
+ * @param options - Raw rule options.
+ * @returns Configured maximum, or the default.
+ */
+function getConfiguredMaxValue(options: unknown[]): number {
+  const firstOption = options[0];
+  const maxValue = getOptionMaxValue(firstOption);
+  return isNumber(maxValue) && maxValue > 0 ? maxValue : DEFAULT_MAX_FUNCTION_LINES;
+}
+
+/**
+ * Reads the `max` property from an option object.
+ *
+ * @param option - First rule option value.
+ * @returns The raw max value when present, otherwise undefined.
+ */
+function getOptionMaxValue(option: unknown): unknown {
+  if (option === null || typeof option !== 'object') {
+    return undefined;
+  }
+  return Reflect.get(option, 'max');
+}
+
+/**
+ * Reports a function-line-count violation.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Function-like node that violated the limit.
+ * @param lineCount - Measured line count.
+ * @param maxLines - Configured maximum line count.
+ */
+function reportFunctionLineViolation(
+  context: MaxFunctionLinesContext,
+  node: FunctionNode,
+  lineCount: number,
+  maxLines: number,
+): void {
+  context.report({
+    node,
+    messageId: 'tooManyLines',
+    data: { name: resolveFunctionName(node), lines: lineCount, max: maxLines },
+  });
+}
+
+/**
+ * Reports when a function's block body exceeds the configured max.
+ *
+ * @param context - ESLint rule execution context.
+ * @param maxLines - Configured maximum line count.
+ * @param node - Function-like node to check.
+ */
+function reportIfFunctionExceedsLimit(
+  context: MaxFunctionLinesContext,
+  maxLines: number,
+  node: FunctionNode,
+): void {
+  const blockBody = getBlockBody(node);
+  if (blockBody === null) {
+    return;
+  }
+  const lineCount = countBodyLines(blockBody);
+  if (lineCount > maxLines) {
+    reportFunctionLineViolation(context, node, lineCount, maxLines);
+  }
+}
+
+/**
+ * Creates listeners for max-function-lines rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function resolveListeners(context: MaxFunctionLinesContext): TSESLint.RuleListener {
+  const maxLines = getConfiguredMaxValue(context.options);
+  return createFunctionListeners(context, maxLines);
+}
+
+/**
+ * Returns the documentation URL for a rule.
+ *
+ * @param name - Rule name.
+ * @returns Full rule documentation URL.
+ */
+function resolveRuleDocumentationUrl(name: string): string {
+  return `${RULE_CREATOR_URL}${name}`;
 }
 
 /**
@@ -70,36 +171,7 @@ export const maxFunctionLines = createRule({
     ],
   },
   defaultOptions: [],
-  create(context) {
-    const max = resolveMax(context.options);
-
-    /**
-     * Checks a function node for line count violations.
-     *
-     * @param node - The function node to check.
-     */
-    function checkFunction(node: FunctionNode): void {
-      const blockBody = getBlockBody(node);
-      if (blockBody === null) {
-        return;
-      }
-      const lines = countBodyLines(blockBody);
-      if (lines <= max) {
-        return;
-      }
-      context.report({
-        node,
-        messageId: 'tooManyLines',
-        data: { name: resolveFunctionName(node), lines, max },
-      });
-    }
-
-    return {
-      FunctionDeclaration: checkFunction,
-      FunctionExpression: checkFunction,
-      ArrowFunctionExpression: checkFunction,
-    };
-  },
+  create: resolveListeners,
 });
 
 export default maxFunctionLines;

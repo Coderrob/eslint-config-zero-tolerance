@@ -14,70 +14,428 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isParentDirectoryImportPath } from '../import-path-helpers';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+const GROUP_SIDE_EFFECT = 0;
+const GROUP_BUILTIN = 1;
+const GROUP_EXTERNAL = 2;
+const GROUP_PARENT = 3;
+const GROUP_PEER = 4;
+const GROUP_INDEX = 5;
+const MIN_IMPORTS_TO_VALIDATE = 2;
+const CURRENT_DIRECTORY_DOT = '.';
+const RELATIVE_PATH_PREFIX = '.';
+const NODE_PROTOCOL_PREFIX = 'node:';
+const INDEX_IMPORT_PATTERN = /^\.\/index(\.\w+)?$/u;
+const GROUP_NAMES: [string, string, string, string, string, string] = [
+  'side-effect',
+  'builtin',
+  'external',
+  'parent',
+  'peer',
+  'index',
+];
 
-const GROUP_NAMES = ['side-effect', 'external', 'parent', 'peer', 'index'] as const;
+type ImportGroup =
+  | typeof GROUP_SIDE_EFFECT
+  | typeof GROUP_BUILTIN
+  | typeof GROUP_EXTERNAL
+  | typeof GROUP_PARENT
+  | typeof GROUP_PEER
+  | typeof GROUP_INDEX;
 
-type ImportEntry = {
+type ImportEntry = Readonly<{
+  group: ImportGroup;
   node: TSESTree.ImportDeclaration;
   value: string;
   valueLower: string;
-  group: number;
-};
+}>;
+
+type SortImportsContext = Readonly<TSESLint.RuleContext<string, []>>;
+type SortImportsState = Readonly<{
+  imports: ImportEntry[];
+  reportedNodes: Set<TSESTree.ImportDeclaration>;
+  sourceCode: Readonly<TSESLint.SourceCode>;
+}>;
 
 /**
- * Returns true when path targets parent directory imports.
- * @param importPath - The import path to check.
- * @returns True if the path targets a parent directory, false otherwise.
- */
-function isParentImportPath(importPath: string): boolean {
-  if (importPath === '..') {
-    return true;
-  }
-  return importPath.startsWith('../');
-}
-
-/**
- * Returns true when path is current-directory index import.
- * @param importPath - The import path to check.
- * @returns True if the path is a current-directory index import, false otherwise.
- */
-function isIndexImportPath(importPath: string): boolean {
-  if (importPath === '.') {
-    return true;
-  }
-  return /^\.\/index(\.\w+)?$/.test(importPath);
-}
-
-/**
- * Returns the group rank for an import path.
- * Groups are ordered: side-effect (0) -> external (1) -> parent (2) -> peer (3) -> index (4).
+ * Adds a normalized import entry to the collection.
  *
- * @param importPath Import source path from an `ImportDeclaration`.
- * @param isSideEffect Whether the import has no specifiers (bare/side-effect import).
- * @returns Numeric group rank used for ordering comparisons.
- * @throws Does not throw.
+ * @param imports - Mutable import entry collection.
+ * @param node - Import declaration node.
  */
-function getImportGroup(importPath: string, isSideEffect: boolean): number {
+function addImportEntry(imports: ImportEntry[], node: TSESTree.ImportDeclaration): void {
+  const importPath = getImportSourceValue(node);
+  imports.push({
+    group: getImportGroup(importPath, node.specifiers.length === 0),
+    node,
+    value: importPath,
+    valueLower: importPath.toLowerCase(),
+  });
+}
+
+/**
+ * Builds a fixer that swaps two import declarations and preserves spacing between them.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param previousImport - Import currently before the misplaced import.
+ * @param currentImport - Import currently after the misplaced import.
+ * @returns ESLint fix callback.
+ */
+function buildSwapFix(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  previousImport: TSESTree.ImportDeclaration,
+  currentImport: TSESTree.ImportDeclaration,
+): TSESLint.ReportFixFunction {
+  return swapImports.bind(undefined, sourceCode, previousImport, currentImport);
+}
+
+/**
+ * Creates Program:exit handler that validates and clears collected imports.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @returns Program exit callback.
+ */
+function createProgramExitHandler(context: SortImportsContext, imports: ImportEntry[]): () => void {
+  return validateImports.bind(undefined, context, imports);
+}
+
+/**
+ * Creates listeners for sort-imports rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createSortImportsListeners(context: SortImportsContext): TSESLint.RuleListener {
+  const imports: ImportEntry[] = [];
+  return {
+    ImportDeclaration: addImportEntry.bind(undefined, imports),
+    'Program:exit': createProgramExitHandler(context, imports),
+  };
+}
+
+/**
+ * Returns an import-group name for a group index.
+ *
+ * @param group - Numeric import group.
+ * @returns Human-readable group name.
+ */
+function getGroupName(group: ImportGroup): string {
+  return GROUP_NAMES[group];
+}
+
+/**
+ * Returns group rank for an import path.
+ *
+ * @param importPath - Import source path.
+ * @param isSideEffect - Whether the import has no specifiers.
+ * @returns Numeric group rank.
+ */
+function getImportGroup(importPath: string, isSideEffect: boolean): ImportGroup {
   if (isSideEffect) {
-    return 0;
+    return GROUP_SIDE_EFFECT;
   }
-  return importPath.startsWith('.') ? getRelativeImportGroup(importPath) : 1;
+  if (importPath.startsWith(RELATIVE_PATH_PREFIX)) {
+    return getRelativeImportGroup(importPath);
+  }
+  return isBuiltinImportPath(importPath) ? GROUP_BUILTIN : GROUP_EXTERNAL;
+}
+
+/**
+ * Returns source path text from an import declaration.
+ *
+ * @param node - Import declaration node.
+ * @returns Import path text.
+ */
+function getImportSourceValue(node: TSESTree.ImportDeclaration): string {
+  return node.source.value;
 }
 
 /**
  * Returns group rank for relative import paths.
- * @param importPath - The relative import path to categorize.
- * @returns The group rank: 2 for parent imports, 4 for index imports, 3 for peer imports.
+ *
+ * @param importPath - Relative import path.
+ * @returns Group rank for parent, index, or peer paths.
  */
-function getRelativeImportGroup(importPath: string): number {
-  if (isParentImportPath(importPath)) {
-    return 2;
+function getRelativeImportGroup(importPath: string): ImportGroup {
+  if (isParentDirectoryImportPath(importPath)) {
+    return GROUP_PARENT;
   }
-  return isIndexImportPath(importPath) ? 4 : 3;
+  return isIndexImportPath(importPath) ? GROUP_INDEX : GROUP_PEER;
+}
+
+/**
+ * Returns true when at least two imports exist.
+ *
+ * @param imports - Collected imports.
+ * @returns True when ordering validation should run.
+ */
+function hasAtLeastTwoImports(imports: ImportEntry[]): boolean {
+  return imports.length >= MIN_IMPORTS_TO_VALIDATE;
+}
+
+/**
+ * Returns true when path uses the node: protocol for Node.js built-in modules.
+ *
+ * @param importPath - Import path to check.
+ * @returns True if the path starts with `node:`.
+ */
+function isBuiltinImportPath(importPath: string): boolean {
+  return importPath.startsWith(NODE_PROTOCOL_PREFIX);
+}
+
+/**
+ * Returns true when path is current-directory index import.
+ *
+ * @param importPath - Import path to check.
+ * @returns True for `.` and `./index` variants.
+ */
+function isIndexImportPath(importPath: string): boolean {
+  if (importPath === CURRENT_DIRECTORY_DOT) {
+    return true;
+  }
+  return INDEX_IMPORT_PATTERN.test(importPath);
+}
+
+/**
+ * Reports alphabetical inversions for imports within the same group.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @param reportedNodes - Nodes already reported.
+ * @param sourceCode - ESLint source code helper.
+ */
+function reportAlphabeticalViolations(context: SortImportsContext, state: SortImportsState): void {
+  for (let index = 1; index < state.imports.length; index += 1) {
+    const previousEntry = state.imports[index - 1];
+    const currentEntry = state.imports[index];
+    reportUnsortedImportIfNeeded(context, state, previousEntry, currentEntry);
+  }
+}
+
+/**
+ * Reports backward group-order violations.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @param reportedNodes - Nodes already reported.
+ * @param sourceCode - ESLint source code helper.
+ */
+function reportBackwardGroupViolations(context: SortImportsContext, state: SortImportsState): void {
+  for (let index = state.imports.length - 1; index > 0; index -= 1) {
+    const currentEntry = state.imports[index - 1];
+    const nextEntry = state.imports[index];
+    reportWrongGroupAfterIfNeeded(context, state, currentEntry, nextEntry);
+  }
+}
+
+/**
+ * Reports forward group-order violations.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @param reportedNodes - Nodes already reported.
+ * @param sourceCode - ESLint source code helper.
+ */
+function reportForwardGroupViolations(context: SortImportsContext, state: SortImportsState): void {
+  for (let index = 1; index < state.imports.length; index += 1) {
+    const previousEntry = state.imports[index - 1];
+    const currentEntry = state.imports[index];
+    reportWrongGroupIfNeeded(context, state, previousEntry, currentEntry);
+  }
+}
+
+/**
+ * Reports unsorted import violation when two entries are out of order in the same group.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @param previousEntry - Previous import entry.
+ * @param currentEntry - Current import entry.
+ * @param reportedNodes - Nodes already reported.
+ * @param sourceCode - ESLint source code helper.
+ */
+function reportUnsortedImportIfNeeded(
+  context: SortImportsContext,
+  state: SortImportsState,
+  previousEntry: ImportEntry,
+  currentEntry: ImportEntry,
+): void {
+  if (state.reportedNodes.has(currentEntry.node) || currentEntry.group !== previousEntry.group) {
+    return;
+  }
+  if (currentEntry.valueLower >= previousEntry.valueLower) {
+    return;
+  }
+  reportUnsortedImportViolation(context, state, previousEntry, currentEntry);
+  state.reportedNodes.add(currentEntry.node);
+}
+
+/**
+ * Reports unsorted-import ESLint diagnostic.
+ *
+ * @param context - ESLint rule execution context.
+ * @param state - Shared sort state.
+ * @param previousEntry - Previous import entry.
+ * @param currentEntry - Current import entry.
+ * @param data - Message payload.
+ */
+function reportUnsortedImportViolation(
+  context: SortImportsContext,
+  state: SortImportsState,
+  previousEntry: ImportEntry,
+  currentEntry: ImportEntry,
+): void {
+  context.report({
+    node: currentEntry.node,
+    messageId: 'unsortedImport',
+    data: { current: currentEntry.value, previous: previousEntry.value },
+    fix: buildSwapFix(state.sourceCode, previousEntry.node, currentEntry.node),
+  });
+}
+
+/**
+ * Reports wrong-group-after violation when current entry should come after next entry.
+ *
+ * @param context - ESLint rule execution context.
+ * @param state - Shared sort state.
+ * @param currentEntry - Current import entry.
+ * @param nextEntry - Next import entry.
+ */
+function reportWrongGroupAfterIfNeeded(
+  context: SortImportsContext,
+  state: SortImportsState,
+  currentEntry: ImportEntry,
+  nextEntry: ImportEntry,
+): void {
+  if (state.reportedNodes.has(currentEntry.node) || currentEntry.group <= nextEntry.group) {
+    return;
+  }
+  reportWrongGroupAfterViolation(context, state, currentEntry, nextEntry);
+  state.reportedNodes.add(currentEntry.node);
+}
+
+/**
+ * Reports wrong-group-after ESLint diagnostic.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ * @param currentEntry - Current import entry.
+ * @param nextEntry - Next import entry.
+ * @param sourceCode - ESLint source code helper.
+ */
+function reportWrongGroupAfterViolation(
+  context: SortImportsContext,
+  state: SortImportsState,
+  currentEntry: ImportEntry,
+  nextEntry: ImportEntry,
+): void {
+  context.report({
+    node: currentEntry.node,
+    messageId: 'wrongGroupAfter',
+    data: {
+      current: currentEntry.value,
+      currentGroup: getGroupName(currentEntry.group),
+      next: nextEntry.value,
+      nextGroup: getGroupName(nextEntry.group),
+    },
+    fix: buildSwapFix(state.sourceCode, currentEntry.node, nextEntry.node),
+  });
+}
+
+/**
+ * Reports wrong-group violation when current entry should come before previous entry.
+ *
+ * @param context - ESLint rule execution context.
+ * @param state - Shared sort state.
+ * @param previousEntry - Previous import entry.
+ * @param currentEntry - Current import entry.
+ */
+function reportWrongGroupIfNeeded(
+  context: SortImportsContext,
+  state: SortImportsState,
+  previousEntry: ImportEntry,
+  currentEntry: ImportEntry,
+): void {
+  if (state.reportedNodes.has(currentEntry.node) || currentEntry.group >= previousEntry.group) {
+    return;
+  }
+  reportWrongGroupViolation(context, state, previousEntry, currentEntry);
+  state.reportedNodes.add(currentEntry.node);
+}
+
+/**
+ * Reports wrong-group ESLint diagnostic.
+ *
+ * @param context - ESLint rule execution context.
+ * @param state - Shared sort state.
+ * @param previousEntry - Previous import entry.
+ * @param currentEntry - Current import entry.
+ */
+function reportWrongGroupViolation(
+  context: SortImportsContext,
+  state: SortImportsState,
+  previousEntry: ImportEntry,
+  currentEntry: ImportEntry,
+): void {
+  context.report({
+    node: currentEntry.node,
+    messageId: 'wrongGroup',
+    data: {
+      current: currentEntry.value,
+      currentGroup: getGroupName(currentEntry.group),
+      previous: previousEntry.value,
+      previousGroup: getGroupName(previousEntry.group),
+    },
+    fix: buildSwapFix(state.sourceCode, previousEntry.node, currentEntry.node),
+  });
+}
+
+/**
+ * Swaps two import declaration ranges.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param previousImport - Previous import declaration.
+ * @param currentImport - Current import declaration.
+ * @param fixer - ESLint fixer.
+ * @returns ESLint text replacement fix.
+ */
+function swapImports(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  previousImport: TSESTree.ImportDeclaration,
+  currentImport: TSESTree.ImportDeclaration,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  const previousText = sourceCode.getText(previousImport);
+  const currentText = sourceCode.getText(currentImport);
+  const betweenText = sourceCode.text.slice(previousImport.range[1], currentImport.range[0]);
+  const replacement = `${currentText}${betweenText}${previousText}`;
+  return fixer.replaceTextRange([previousImport.range[0], currentImport.range[1]], replacement);
+}
+
+/**
+ * Validates import ordering and reports all violations.
+ *
+ * @param context - ESLint rule execution context.
+ * @param imports - Collected imports.
+ */
+function validateImports(context: SortImportsContext, imports: ImportEntry[]): void {
+  if (!hasAtLeastTwoImports(imports)) {
+    imports.length = 0;
+    return;
+  }
+  const state: SortImportsState = {
+    imports,
+    reportedNodes: new Set<TSESTree.ImportDeclaration>(),
+    sourceCode: context.sourceCode,
+  };
+  reportForwardGroupViolations(context, state);
+  reportBackwardGroupViolations(context, state);
+  reportAlphabeticalViolations(context, state);
+  imports.length = 0;
 }
 
 /** Enforces top-level import grouping and alphabetical ordering with adjacent-swap fixes. */
@@ -88,7 +446,7 @@ export const sortImports = createRule({
     fixable: 'code',
     docs: {
       description:
-        'Require import declarations to be grouped (side-effect -> external -> parent -> peer -> index) and sorted alphabetically within each group',
+        'Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group',
     },
     messages: {
       unsortedImport: 'Import "{{current}}" should come before "{{previous}}"',
@@ -100,420 +458,7 @@ export const sortImports = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates stateful visitors that validate import grouping and sorting.
-   *
-   * @param context ESLint rule execution context.
-   * @returns Visitor map consumed by ESLint during traversal.
-   * @throws Does not throw.
-   */
-  create(context) {
-    const sourceCode = context.sourceCode;
-    const imports: ImportEntry[] = [];
-
-    /**
-     * Returns true when two import nodes are consecutive in the collected imports array.
-     * Only adjacent imports are safe to swap without disturbing in-between imports.
-     *
-     * @param a First import declaration node.
-     * @param b Second import declaration node.
-     * @returns True if a and b are adjacent, false otherwise.
-     * @throws Does not throw.
-     */
-    const areAdjacent = (a: TSESTree.ImportDeclaration, b: TSESTree.ImportDeclaration): boolean => {
-      const aIdx = imports.findIndex((e) => e.node === a);
-      const bIdx = imports.findIndex((e) => e.node === b);
-      return Math.abs(bIdx - aIdx) === 1;
-    };
-
-    /**
-     * Builds a fixer that swaps two import declarations while preserving the
-     * exact whitespace/newlines between them.
-     *
-     * @param previousImport Import currently before the misplaced import.
-     * @param currentImport Import currently after the misplaced import.
-     * @returns ESLint fixer callback that swaps two adjacent import blocks.
-     * @throws Does not throw.
-     */
-    const getSwapFix = (
-      previousImport: TSESTree.ImportDeclaration,
-      currentImport: TSESTree.ImportDeclaration,
-    ) => {
-      return (fixer: TSESLint.RuleFixer) => {
-        const previousText = sourceCode.getText(previousImport);
-        const currentText = sourceCode.getText(currentImport);
-        const betweenText = sourceCode.text.slice(previousImport.range[1], currentImport.range[0]);
-        const replacement = `${currentText}${betweenText}${previousText}`;
-
-        return fixer.replaceTextRange(
-          [previousImport.range[0], currentImport.range[1]],
-          replacement,
-        );
-      };
-    };
-
-    /**
-     * Stores each import declaration with normalized metadata used by sorting passes.
-     *
-     * @param node Import declaration currently visited.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const collectImport = (node: TSESTree.ImportDeclaration): void => {
-      const value = node.source.value;
-      const isSideEffect = node.specifiers.length === 0;
-      imports.push({
-        node,
-        value,
-        valueLower: value.toLowerCase(),
-        group: getImportGroup(value, isSideEffect),
-      });
-    };
-
-    /**
-     * Reports an import that appears before a higher-priority group.
-     *
-     * @param entry Current import violating forward group ordering.
-     * @param highestEntry Highest-ranked import observed so far.
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const reportWrongGroup = (
-      entry: ImportEntry,
-      highestEntry: ImportEntry,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): void => {
-      context.report({
-        node: entry.node,
-        messageId: 'wrongGroup',
-        data: {
-          current: entry.value,
-          previous: highestEntry.value,
-          currentGroup: GROUP_NAMES[entry.group],
-          previousGroup: GROUP_NAMES[highestEntry.group],
-        },
-        ...(areAdjacent(highestEntry.node, entry.node)
-          ? { fix: getSwapFix(highestEntry.node, entry.node) }
-          : {}),
-      });
-      reportedNodes.add(entry.node);
-    };
-
-    /**
-     * Reports an import that appears after a lower-priority group when scanning backward.
-     *
-     * @param entry Current import violating backward group ordering.
-     * @param lowestEntry Lowest-ranked import observed from the end of the file.
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const reportWrongGroupAfter = (
-      entry: ImportEntry,
-      lowestEntry: ImportEntry,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): void => {
-      context.report({
-        node: entry.node,
-        messageId: 'wrongGroupAfter',
-        data: {
-          current: entry.value,
-          next: lowestEntry.value,
-          currentGroup: GROUP_NAMES[entry.group],
-          nextGroup: GROUP_NAMES[lowestEntry.group],
-        },
-        ...(areAdjacent(entry.node, lowestEntry.node)
-          ? { fix: getSwapFix(entry.node, lowestEntry.node) }
-          : {}),
-      });
-      reportedNodes.add(entry.node);
-    };
-
-    /**
-     * Reports alphabetical inversions within a single group.
-     *
-     * @param entry Current import that should appear earlier.
-     * @param existing Prior import that should appear later.
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const reportUnsortedImport = (
-      entry: ImportEntry,
-      existing: ImportEntry,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): void => {
-      context.report({
-        node: entry.node,
-        messageId: 'unsortedImport',
-        data: { current: entry.value, previous: existing.value },
-        ...(areAdjacent(existing.node, entry.node)
-          ? { fix: getSwapFix(existing.node, entry.node) }
-          : {}),
-      });
-      reportedNodes.add(entry.node);
-    };
-
-    /**
-     * Forward pass that finds imports placed too early relative to group priority.
-     *
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const runForwardGroupPass = (reportedNodes: Set<TSESTree.ImportDeclaration>): void => {
-      let highestEntry: ImportEntry | null = null;
-      for (const entry of imports) {
-        const violationAnchor = getForwardViolationAnchor(entry, highestEntry, reportedNodes);
-        if (violationAnchor !== null) {
-          reportWrongGroup(entry, violationAnchor, reportedNodes);
-        }
-
-        highestEntry = pickHighestEntry(entry, highestEntry);
-      }
-    };
-
-    /**
-     * Backward pass that finds imports placed too late relative to group priority.
-     *
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const runBackwardGroupPass = (reportedNodes: Set<TSESTree.ImportDeclaration>): void => {
-      let lowestEntry: ImportEntry | null = null;
-      for (let i = imports.length - 1; i >= 0; i--) {
-        const entry = imports[i];
-
-        const violationAnchor = getBackwardViolationAnchor(entry, lowestEntry, reportedNodes);
-        if (violationAnchor !== null) {
-          reportWrongGroupAfter(entry, violationAnchor, reportedNodes);
-        }
-
-        lowestEntry = pickLowestEntry(entry, lowestEntry);
-      }
-    };
-
-    /**
-     * Final per-group alphabetical pass for nodes not already reported by group checks.
-     *
-     * @param reportedNodes Set used to prevent duplicate reports per node.
-     * @returns Nothing.
-     * @throws Does not throw.
-     */
-    const runAlphabeticalPass = (reportedNodes: Set<TSESTree.ImportDeclaration>): void => {
-      const highestByGroup = new Map<number, ImportEntry>();
-      for (const entry of imports) {
-        processAlphabeticalEntry(entry, highestByGroup, reportedNodes);
-      }
-    };
-
-    /**
-     * Processes one import entry during alphabetical validation.
-     * @param entry - The import entry to process.
-     * @param highestByGroup - Map tracking the highest entry per group.
-     * @param reportedNodes - Set of nodes that have already been reported.
-     * @returns Nothing.
-     */
-    const processAlphabeticalEntry = (
-      entry: ImportEntry,
-      highestByGroup: Map<number, ImportEntry>,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): void => {
-      if (reportedNodes.has(entry.node)) {
-        return;
-      }
-      const existing = highestByGroup.get(entry.group);
-      if (isAlphabeticalViolation(entry, existing)) {
-        reportUnsortedImport(entry, existing, reportedNodes);
-        return;
-      }
-      trackHighestInGroup(entry, existing, highestByGroup);
-    };
-
-    /**
-     * Returns higher-group anchor violated by current entry, or null.
-     * @param entry - The current import entry.
-     * @param highestEntry - The highest-ranked entry observed so far.
-     * @param reportedNodes - Set of nodes that have already been reported.
-     * @returns The violating anchor entry, or null if no violation.
-     */
-    const getForwardViolationAnchor = (
-      entry: ImportEntry,
-      highestEntry: ImportEntry | null,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): ImportEntry | null => {
-      if (!canCheckForwardViolation(entry, highestEntry, reportedNodes)) {
-        return null;
-      }
-      return entry.group < highestEntry.group ? highestEntry : null;
-    };
-
-    /**
-     * Returns next highest entry marker used by forward pass.
-     * @param entry - The current import entry.
-     * @param highestEntry - The current highest entry.
-     * @returns The new highest entry.
-     */
-    const pickHighestEntry = (
-      entry: ImportEntry,
-      highestEntry: ImportEntry | null,
-    ): ImportEntry => {
-      if (highestEntry === null || entry.group >= highestEntry.group) {
-        return entry;
-      }
-      return highestEntry;
-    };
-
-    /**
-     * Returns lower-group anchor violated by current entry, or null.
-     * @param entry - The current import entry.
-     * @param lowestEntry - The lowest-ranked entry observed from the end.
-     * @param reportedNodes - Set of nodes that have already been reported.
-     * @returns The violating anchor entry, or null if no violation.
-     */
-    const getBackwardViolationAnchor = (
-      entry: ImportEntry,
-      lowestEntry: ImportEntry | null,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): ImportEntry | null => {
-      if (!canCheckBackwardViolation(entry, lowestEntry, reportedNodes)) {
-        return null;
-      }
-      return entry.group > lowestEntry.group ? lowestEntry : null;
-    };
-
-    /**
-     * Returns next lowest entry marker used by backward pass.
-     * @param entry - The current import entry.
-     * @param lowestEntry - The current lowest entry.
-     * @returns The new lowest entry.
-     */
-    const pickLowestEntry = (entry: ImportEntry, lowestEntry: ImportEntry | null): ImportEntry => {
-      if (lowestEntry === null || entry.group <= lowestEntry.group) {
-        return entry;
-      }
-      return lowestEntry;
-    };
-
-    /**
-     * Returns true when current import should appear before existing one in same group.
-     * @param entry - The current import entry.
-     * @param existing - The existing import entry in the same group.
-     * @returns True if there's an alphabetical violation, false otherwise.
-     */
-    const isAlphabeticalViolation = (
-      entry: ImportEntry,
-      existing: ImportEntry | undefined,
-    ): existing is ImportEntry => {
-      if (existing === undefined) {
-        return false;
-      }
-      return entry.valueLower < existing.valueLower;
-    };
-
-    /**
-     * Returns true when entry should become current max lexical import for its group.
-     * @param entry - The current import entry.
-     * @param existing - The existing highest entry in the group.
-     * @returns True if the entry should be tracked as highest, false otherwise.
-     */
-    const shouldTrackAsHighestInGroup = (
-      entry: ImportEntry,
-      existing: ImportEntry | undefined,
-    ): boolean => {
-      if (existing === undefined) {
-        return true;
-      }
-      return entry.valueLower > existing.valueLower;
-    };
-
-    /**
-     * Updates highest-by-group tracker when current entry becomes the new max.
-     * @param entry - The current import entry.
-     * @param existing - The existing highest entry in the group.
-     * @param highestByGroup - Map tracking the highest entry per group.
-     * @returns Nothing.
-     */
-    const trackHighestInGroup = (
-      entry: ImportEntry,
-      existing: ImportEntry | undefined,
-      highestByGroup: Map<number, ImportEntry>,
-    ): void => {
-      if (shouldTrackAsHighestInGroup(entry, existing)) {
-        highestByGroup.set(entry.group, entry);
-      }
-    };
-
-    /**
-     * Returns true when forward violation comparison can be evaluated safely.
-     * @param entry - The current import entry.
-     * @param highestEntry - The highest-ranked entry observed so far.
-     * @param reportedNodes - Set of nodes that have already been reported.
-     * @returns True if forward violation can be checked, false otherwise.
-     */
-    const canCheckForwardViolation = (
-      entry: ImportEntry,
-      highestEntry: ImportEntry | null,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): highestEntry is ImportEntry => {
-      if (highestEntry === null) {
-        return false;
-      }
-      return !reportedNodes.has(entry.node);
-    };
-
-    /**
-     * Returns true when backward violation comparison can be evaluated safely.
-     * @param entry - The current import entry.
-     * @param lowestEntry - The lowest-ranked entry observed from the end.
-     * @param reportedNodes - Set of nodes that have already been reported.
-     * @returns True if backward violation can be checked, false otherwise.
-     */
-    const canCheckBackwardViolation = (
-      entry: ImportEntry,
-      lowestEntry: ImportEntry | null,
-      reportedNodes: Set<TSESTree.ImportDeclaration>,
-    ): lowestEntry is ImportEntry => {
-      if (lowestEntry === null) {
-        return false;
-      }
-      return !reportedNodes.has(entry.node);
-    };
-
-    return {
-      ImportDeclaration: collectImport,
-      /**
-       * Executes import validation passes after all imports in the file are collected.
-       *
-       * @returns Nothing.
-       * @throws Does not throw.
-       */
-      'Program:exit'() {
-        if (imports.length < 2) {
-          imports.length = 0;
-          return;
-        }
-
-        const reportedNodes = new Set<TSESTree.ImportDeclaration>();
-
-        // Forward pass: report imports that appear too early relative to a
-        // previously seen higher-ranked group.
-        runForwardGroupPass(reportedNodes);
-
-        // Backward pass: report imports that appear too late relative to a
-        // lower-ranked group that should come before them.
-        runBackwardGroupPass(reportedNodes);
-
-        // Within each group, report case-insensitive alphabetical inversions
-        // for nodes not already reported by group-order checks.
-        runAlphabeticalPass(reportedNodes);
-
-        imports.length = 0;
-      },
-    };
-  },
+  create: createSortImportsListeners,
 });
 
 export default sortImports;

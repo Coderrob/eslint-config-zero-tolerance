@@ -14,10 +14,55 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isParentDirectoryImportPath } from '../import-path-helpers';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoReExportContext = Readonly<TSESLint.RuleContext<'noReExport', []>>;
+
+/**
+ * Checks all export declarations for re-exports from parent modules.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Export all declaration node.
+ */
+function checkExportAllDeclaration(
+  context: NoReExportContext,
+  node: TSESTree.ExportAllDeclaration,
+): void {
+  reportIfParentReExport(context, node, node.source.value);
+}
+
+/**
+ * Checks named export declarations for re-exports from parent modules.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Export named declaration node.
+ */
+function checkExportNamedDeclaration(
+  context: NoReExportContext,
+  node: TSESTree.ExportNamedDeclaration,
+): void {
+  if (node.source !== null) {
+    reportIfParentReExport(context, node, node.source.value);
+  }
+}
+
+/**
+ * Creates listeners for no-re-export rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoReExportListeners(context: NoReExportContext): TSESLint.RuleListener {
+  if (isBarrelFile(context.filename)) {
+    return {};
+  }
+  return {
+    ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
+    ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context),
+  };
+}
 
 /**
  * Returns the file name (last path segment) from a file path.
@@ -27,22 +72,37 @@ const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}
  */
 function getFilename(filePath: string): string {
   const parts = filePath.split(/[\\/]/);
-  return parts.at(-1) ?? '';
+  return parts[parts.length - 1];
 }
 
 /**
  * Returns true when the file is a barrel file (index.*).
- * Only single-extension index files (e.g. index.ts, index.js, index.mts) are
- * treated as barrel files. Double-extension files such as index.d.ts,
- * index.test.ts, or index.spec.js are intentionally excluded.
- * Barrel files exist solely to aggregate and re-export; they are exempt
- * from the re-export restrictions enforced by this rule.
  *
  * @param filePath - Path to the current file being linted.
  * @returns True if the file is a barrel index file.
  */
 function isBarrelFile(filePath: string): boolean {
   return /^index\.\w+$/.test(getFilename(filePath));
+}
+
+/**
+ * Reports when an export source traverses to a parent directory.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Export node that owns the source value.
+ * @param importPath - Source value to validate.
+ */
+function reportIfParentReExport(
+  context: NoReExportContext,
+  node: TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration,
+  importPath: string,
+): void {
+  if (isParentDirectoryImportPath(importPath)) {
+    context.report({
+      node,
+      messageId: 'noReExport',
+    });
+  }
 }
 
 /**
@@ -63,46 +123,7 @@ export const noReExport = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    if (isBarrelFile(context.filename)) {
-      return {};
-    }
-
-    return {
-      /**
-       * Checks named export declarations for re-exports from parent modules.
-       *
-       * @param node - The ExportNamedDeclaration node to check.
-       */
-      ExportNamedDeclaration(node) {
-        // Check for re-export with specifiers: export { foo } from './module'
-        if (node.source) {
-          const importPath = node.source.value;
-          if (importPath === '..' || importPath.startsWith('../')) {
-            context.report({
-              node,
-              messageId: 'noReExport',
-            });
-          }
-        }
-      },
-      /**
-       * Checks all export declarations for re-exports from parent modules.
-       *
-       * @param node - The ExportAllDeclaration node to check.
-       */
-      ExportAllDeclaration(node) {
-        // Check for wildcard re-export: export * from './module'
-        const importPath = node.source.value;
-        if (importPath === '..' || importPath.startsWith('../')) {
-          context.report({
-            node,
-            messageId: 'noReExport',
-          });
-        }
-      },
-    };
-  },
+  create: createNoReExportListeners,
 });
 
 export default noReExport;

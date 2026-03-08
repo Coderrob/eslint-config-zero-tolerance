@@ -9,7 +9,7 @@ Enforce a maximum number of lines per function body.
 | **Type**        | `suggestion`      |
 | **Fixable**     | No                |
 | **Recommended** | `warn` (max: 20)  |
-| **Strict**      | `error` (max: 10) |
+| **Strict**      | `error` (max: 15) |
 
 ## Rationale
 
@@ -45,7 +45,7 @@ function doEverything(user: IUser) {
 | ------ | -------- | ------- | ---------------------------------------- |
 | `max`  | `number` | `30`    | Maximum allowed lines in a function body |
 
-The standalone default is **30** lines. The `recommended` preset overrides this to **20** and the `strict` preset to **10**.
+The standalone default is **30** lines. The `recommended` preset overrides this to **20** and the `strict` preset to **15**.
 
 ```js
 // Use the recommended preset value (20 lines)

@@ -13,17 +13,14 @@ Disallow throwing literals, plain objects, or template strings; always throw a `
 
 ## Rationale
 
-Only `Error` instances (and subclasses) include a `stack` trace. Throwing a string, object, number, or template literal discards that diagnostic information, making it impossible to trace where the error originated. Code that catches errors also often assumes it receives an `Error` object, so non-Error throws can cause secondary failures in error-handling paths.
+Only `Error` instances (and subclasses) include a `stack` trace. Throwing a string, object, number, or template literal discards diagnostic information and can break error-handling code that expects an `Error`.
 
-**Allowed throw arguments:**
+By default, this rule only allows:
 
-| Node type          | Example                               |
-| ------------------ | ------------------------------------- |
-| `NewExpression`    | `throw new Error('msg')`              |
-| `Identifier`       | `throw err` (re-throw a caught error) |
-| `MemberExpression` | `throw this.lastError`                |
-| `CallExpression`   | `throw createError('msg')`            |
-| `AwaitExpression`  | `throw await buildError()`            |
+- `throw new ...` expressions (for example `throw new Error(...)`)
+- re-throwing the active catch parameter (for example `catch (err) { throw err; }`)
+
+You can opt into allowing `throw <call>`, `throw <member>`, and `throw await <expr>` with rule options.
 
 ## Examples
 
@@ -59,12 +56,21 @@ throw { message: 'error', code: 500 };
 throw `failed: ${reason}`;
 
 throw condition ? 'error-a' : 'error-b';
+
+throw createError('message');
 ```
 
 ## Configuration
 
-This rule has no options:
+This rule accepts an optional options object:
 
 ```js
-'zero-tolerance/no-throw-literal': 'error'
+'zero-tolerance/no-throw-literal': [
+  'error',
+  {
+    allowThrowingCallExpressions: false,
+    allowThrowingMemberExpressions: false,
+    allowThrowingAwaitExpressions: false,
+  },
+]
 ```

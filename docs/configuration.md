@@ -25,7 +25,7 @@ export default [zeroTolerance.configs.recommended];
 
 ### `strict`
 
-All rules enabled at `error`. Function body limit: **10 lines**. Parameter limit: **4**.
+All rules enabled at `error`. Function body limit: **15 lines**. Parameter limit: **4**.
 
 ```js title="eslint.config.js"
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
@@ -59,7 +59,6 @@ All rules are included in every preset. The only difference between `recommended
 | -------------------------------- | -------------- | --------------- |
 | `require-interface-prefix`       | warn           | error           |
 | `require-test-description-style` | warn           | error           |
-| `require-zod-schema-description` | warn           | error           |
 | `require-jsdoc-functions`        | warn           | error           |
 | `no-magic-numbers`               | warn           | error           |
 | `no-magic-strings`               | warn           | error           |
@@ -67,20 +66,27 @@ All rules are included in every preset. The only difference between `recommended
 | `no-dynamic-import`              | warn           | error           |
 | `no-literal-unions`              | warn           | error           |
 | `no-export-alias`                | warn           | error           |
+| `no-parent-imports`              | warn           | error           |
 | `no-jest-have-been-called`       | warn           | error           |
 | `no-mock-implementation`         | warn           | error           |
 | `no-type-assertion`              | warn           | error           |
 | `no-eslint-disable`              | warn           | error           |
 | `sort-imports`                   | warn           | error           |
 | `sort-functions`                 | warn           | error           |
-| `max-function-lines`             | warn (max: 20) | error (max: 10) |
+| `max-function-lines`             | warn (max: 20) | error (max: 15) |
 | `max-params`                     | warn (max: 4)  | error (max: 4)  |
 | `no-identical-expressions`       | warn           | error           |
+| `no-identical-branches`          | warn           | error           |
 | `no-redundant-boolean`           | warn           | error           |
 | `no-empty-catch`                 | warn           | error           |
 | `no-non-null-assertion`          | warn           | error           |
 | `no-await-in-loop`               | warn           | error           |
 | `no-throw-literal`               | warn           | error           |
+| `no-parameter-reassign`          | warn           | error           |
+| `no-flag-argument`               | warn           | error           |
+| `prefer-guard-clauses`           | warn           | error           |
+| `prefer-shortcut-return`         | warn           | error           |
+| `no-query-side-effects`          | warn           | error           |
 | `no-re-export`                   | warn           | error           |
 | `require-optional-chaining`      | warn           | error           |
 
@@ -96,7 +102,6 @@ export default [
   {
     rules: {
       // Disable rules that don't suit your project
-      'zero-tolerance/require-zod-schema-description': 'off',
       'zero-tolerance/sort-functions': 'off',
     },
   },
@@ -105,7 +110,7 @@ export default [
 
 ## Configuring Rule Options
 
-Two rules accept an options object:
+Multiple rules accept an options object:
 
 ### `max-function-lines`
 
@@ -117,4 +122,32 @@ Two rules accept an options object:
 
 ```js
 'zero-tolerance/max-params': ['error', { max: 3 }]
+```
+
+### `no-magic-strings`
+
+```js
+'zero-tolerance/no-magic-strings': [
+  'error',
+  { checkComparisons: true, checkSwitchCases: true, ignoreValues: ['production'] },
+]
+```
+
+### `require-test-description-style`
+
+```js
+'zero-tolerance/require-test-description-style': ['error', { prefix: 'should', ignoreSkip: true }]
+```
+
+### `no-throw-literal`
+
+```js
+'zero-tolerance/no-throw-literal': [
+  'error',
+  {
+    allowThrowingCallExpressions: false,
+    allowThrowingMemberExpressions: false,
+    allowThrowingAwaitExpressions: false,
+  },
+]
 ```

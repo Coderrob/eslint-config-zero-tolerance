@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-98.49%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.18%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
 
@@ -128,11 +128,10 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 ### Documentation
 
-| Rule                                                                             | Description                                                 |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)               | Require JSDoc comments on all functions (except test files) |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)           | Require optional chaining instead of repeated guard access  |
-| [`require-zod-schema-description`](docs/rules/require-zod-schema-description.md) | Enforce that Zod schemas have `.describe()` called          |
+| Rule                                                                   | Description                                                 |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)     | Require JSDoc comments on all functions (except test files) |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md) | Require optional chaining instead of repeated guard access  |
 
 ### Testing
 
@@ -146,7 +145,7 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 | Rule                                                           | Description                                                 |
 | -------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`no-type-assertion`](docs/rules/no-type-assertion.md)         | Prevent use of TypeScript `as` type assertions              |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)         | Prevent use of TypeScript `as` and angle-bracket assertions |
 | [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md) | Disallow non-null assertions using the `!` postfix operator |
 | [`no-literal-unions`](docs/rules/no-literal-unions.md)         | Ban literal union types in favour of enums                  |
 | [`no-banned-types`](docs/rules/no-banned-types.md)             | Ban `ReturnType` and indexed access types                   |
@@ -171,20 +170,27 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 ### Imports
 
-| Rule                                                   | Description                                             |
-| ------------------------------------------------------ | ------------------------------------------------------- |
-| [`no-re-exports`](docs/rules/no-re-exports.md)         | Ban `../` parent-directory imports and re-exports       |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban `await import()` and `require()` outside test files |
-| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements             |
+| Rule                                                   | Description                                                   |
+| ------------------------------------------------------ | ------------------------------------------------------------- |
+| [`no-parent-imports`](docs/rules/no-parent-imports.md) | Ban `..` and `../*` parent-directory import traversal         |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban dynamic `import()` and `require()` outside test files     |
+| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements                   |
+| [`no-re-export`](docs/rules/no-re-export.md)           | Disallow re-export statements from parent/grandparent modules |
 
 ### Bug Prevention
 
 | Rule                                                                 | Description                                                                  |
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | [`no-identical-expressions`](docs/rules/no-identical-expressions.md) | Disallow identical expressions on both sides of a binary or logical operator |
+| [`no-identical-branches`](docs/rules/no-identical-branches.md)       | Disallow identical branches in if/else and ternary conditionals              |
 | [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)         | Disallow redundant comparisons to boolean literals                           |
 | [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
+| [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)       | Disallow reassigning function parameters                                     |
+| [`no-flag-argument`](docs/rules/no-flag-argument.md)                 | Disallow boolean flag parameters in function signatures                      |
+| [`prefer-guard-clauses`](docs/rules/prefer-guard-clauses.md)         | Prefer guard clauses by removing else blocks after terminating if branches   |
+| [`prefer-shortcut-return`](docs/rules/prefer-shortcut-return.md)     | Prefer shortcut boolean returns over if branches that return true/false      |
+| [`no-query-side-effects`](docs/rules/no-query-side-effects.md)       | Disallow side effects in query-style functions                               |
 
 ## Development
 
@@ -207,6 +213,21 @@ pnpm test
 ```
 
 This also refreshes the coverage badge in `README.md` using coverage output in `packages/plugin/coverage/`.
+
+Coverage gates are enforced in CI with a minimum of **95%** on:
+
+- statements
+- branches
+- functions
+- lines
+
+### Dogfooding
+
+The repository lints itself using its own plugin rules through [`eslint.config.mjs`](eslint.config.mjs).
+
+```bash
+pnpm eslint packages/plugin/src/rules
+```
 
 ### Type Checking
 

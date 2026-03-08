@@ -20,6 +20,8 @@ String literals used in comparisons (`=== 'admin'`) or `switch` cases are magic 
 - `===`, `!==`, `==`, `!=` binary comparisons
 - `switch` case test values
 
+`typeof` comparisons are exempt (for example, `typeof value === 'string'`).
+
 ## Examples
 
 ### ✅ Correct
@@ -55,8 +57,15 @@ switch (user.status) {
 
 ## Configuration
 
-This rule has no options:
+This rule accepts an optional options object:
 
 ```js
-'zero-tolerance/no-magic-strings': 'error'
+'zero-tolerance/no-magic-strings': [
+  'error',
+  {
+    checkComparisons: true,
+    checkSwitchCases: true,
+    ignoreValues: ['production'],
+  },
+]
 ```

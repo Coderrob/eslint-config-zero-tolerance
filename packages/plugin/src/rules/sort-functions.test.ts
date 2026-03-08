@@ -1,12 +1,13 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { sortFunctions } from './sort-functions';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('sort-functions', sortFunctions, {
   valid: [
@@ -75,47 +76,64 @@ ruleTester.run('sort-functions', sortFunctions, {
     {
       name: 'should flag two top-level functions out of order',
       code: 'function beta() {}\nfunction alpha() {}',
+      output: 'function alpha() {}\nfunction beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
       name: 'should flag when the third function is out of order',
       code: 'function alpha() {}\nfunction gamma() {}\nfunction beta() {}',
+      output: 'function alpha() {}\nfunction beta() {}\nfunction gamma() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'beta', previous: 'gamma' } }],
     },
     {
       name: 'should flag when the first function is not alphabetically smallest',
       code: 'function zeta() {}\nfunction alpha() {}',
+      output: 'function alpha() {}\nfunction zeta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'zeta' } }],
     },
     {
       name: 'should flag multiple functions out of order',
       code: 'function gamma() {}\nfunction alpha() {}\nfunction beta() {}',
+      output: [
+        'function alpha() {}\nfunction gamma() {}\nfunction beta() {}',
+        'function alpha() {}\nfunction beta() {}\nfunction gamma() {}',
+      ],
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'gamma' } }],
     },
     {
       name: 'should compare names case-insensitively',
       code: 'function Beta() {}\nfunction alpha() {}',
+      output: 'function alpha() {}\nfunction Beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'Beta' } }],
     },
     {
       name: 'should flag top-level const arrow functions out of order',
       code: 'const beta = () => {};\nconst alpha = () => {};',
+      output: 'const alpha = () => {};\nconst beta = () => {};',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
       name: 'should flag mixed function declarations and arrows out of order',
       code: 'const beta = () => {};\nfunction alpha() {}',
+      output: 'function alpha() {}\nconst beta = () => {};',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
       name: 'should flag exported const arrow functions out of order',
       code: 'export const beta = () => {};\nexport const alpha = () => {};',
+      output: 'export const alpha = () => {};\nexport const beta = () => {};',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
       name: 'should flag top-level const function expressions out of order',
       code: 'const beta = function () {};\nconst alpha = function () {};',
+      output: 'const alpha = function () {};\nconst beta = function () {};',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions in multi-declarator const without fix',
+      code: 'const beta = () => {}, alpha = () => {};',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
   ],
-} as any);
+});
