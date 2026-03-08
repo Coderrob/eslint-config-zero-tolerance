@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isParentDirectoryImportPath } from '../import-path-helpers';
 import { CALLEE_REQUIRE } from '../rule-constants';
 import { createRule } from '../rule-factory';
@@ -126,8 +127,7 @@ function getExternalModuleReference(
  * @returns The first argument, or null when absent.
  */
 function getFirstArgument(node: TSESTree.CallExpression): TSESTree.CallExpressionArgument | null {
-  const firstArgument = node.arguments[0];
-  return firstArgument === undefined ? null : firstArgument;
+  return node.arguments.length === 0 ? null : node.arguments[0];
 }
 
 /**

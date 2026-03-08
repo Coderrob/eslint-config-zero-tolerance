@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isIdentifierNode } from '../ast-guards';
 import { RETURN_TYPE_NAME } from '../rule-constants';
 import { createRule } from '../rule-factory';

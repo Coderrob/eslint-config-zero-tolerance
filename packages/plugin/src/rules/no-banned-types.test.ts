@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noBannedTypes } from './no-banned-types';
 
 const ruleTestConfig: RuleTesterConfig = {

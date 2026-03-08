@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from '../rule-constants';
 import { createRule } from '../rule-factory';
 
@@ -22,6 +23,18 @@ type FixInputs = Readonly<{
   literalValue: boolean;
   nonLiteralSide: TSESTree.Expression;
 }>;
+
+type StrictComparisonExpression = TSESTree.BinaryExpression & {
+  left: TSESTree.Expression;
+  operator: typeof OPERATOR_STRICT_EQ | typeof OPERATOR_STRICT_NEQ;
+  right: TSESTree.Expression;
+};
+
+type RedundantBooleanComparisonExpression = StrictComparisonExpression &
+  (
+    | { left: TSESTree.Literal & { value: boolean } }
+    | { right: TSESTree.Literal & { value: boolean } }
+  );
 
 /** Rule context type for `no-redundant-boolean`. */
 type NoRedundantBooleanContext = Readonly<TSESLint.RuleContext<'redundantBoolean', []>>;
@@ -101,44 +114,29 @@ function createReplacementText(
 }
 
 /** Returns fix inputs for redundant boolean comparisons, or null when not fixable. */
-function getBooleanLiteralValueFromRedundantComparison(node: TSESTree.BinaryExpression): boolean {
-  return isBooleanLiteral(node.left) ? node.left.value : node.right.value;
-}
-
-/**
- * Returns the non-literal side from a known redundant boolean comparison.
- *
- * @param node - The binary expression node.
- * @returns The non-literal side expression.
- */
 function getFixInputs(node: TSESTree.BinaryExpression): FixInputs | null {
   if (!isRedundantBooleanComparison(node)) {
     return null;
   }
+  if (hasBooleanLiteralLeftOperand(node)) {
+    return { literalValue: node.left.value, nonLiteralSide: node.right };
+  }
   return {
-    literalValue: getBooleanLiteralValueFromRedundantComparison(node),
-    nonLiteralSide: getNonLiteralSideFromRedundantComparison(node),
+    literalValue: node.right.value,
+    nonLiteralSide: node.left,
   };
 }
 
 /**
- * Returns the boolean literal value from a known redundant boolean comparison.
+ * Returns true when redundant comparison has a boolean literal on the left side.
  *
- * @param node - The binary expression node.
- * @returns Boolean literal value.
+ * @param node - Redundant boolean comparison expression.
+ * @returns True when left operand is a boolean literal.
  */
-function getNonLiteralSideFromRedundantComparison(
-  node: TSESTree.BinaryExpression,
-): TSESTree.Expression {
-  if (isBooleanLiteral(node.left)) {
-    return node.right;
-  }
-  return getRightLiteralSide(node);
-}
-
-/** Returns left side when right side is the boolean literal in a redundant comparison. */
-function getRightLiteralSide(node: TSESTree.BinaryExpression): TSESTree.Expression {
-  return node.left;
+function hasBooleanLiteralLeftOperand(
+  node: RedundantBooleanComparisonExpression,
+): node is StrictComparisonExpression & { left: TSESTree.Literal & { value: boolean } } {
+  return isBooleanLiteral(node.left);
 }
 
 /**
@@ -147,7 +145,9 @@ function getRightLiteralSide(node: TSESTree.BinaryExpression): TSESTree.Expressi
  * @param node - The binary expression node to check.
  * @returns True if either operand is a boolean literal, false otherwise.
  */
-function hasBooleanLiteralOperand(node: TSESTree.BinaryExpression): boolean {
+function hasBooleanLiteralOperand(
+  node: StrictComparisonExpression,
+): node is RedundantBooleanComparisonExpression {
   if (isBooleanLiteral(node.left)) {
     return true;
   }
@@ -165,11 +165,20 @@ function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { val
 }
 
 /** Returns true when node is strict comparison against at least one boolean literal. */
-function isRedundantBooleanComparison(node: TSESTree.BinaryExpression): boolean {
-  if (!isStrictComparisonOperator(node.operator)) {
+function isRedundantBooleanComparison(
+  node: TSESTree.BinaryExpression,
+): node is RedundantBooleanComparisonExpression {
+  if (!isStrictComparisonExpression(node)) {
     return false;
   }
   return hasBooleanLiteralOperand(node);
+}
+
+/** Returns true when node is a strict comparison expression. */
+function isStrictComparisonExpression(
+  node: TSESTree.BinaryExpression,
+): node is StrictComparisonExpression {
+  return isStrictComparisonOperator(node.operator);
 }
 
 /**

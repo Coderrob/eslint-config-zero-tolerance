@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const CHECKED_BINARY_OPERATORS = new Set([
@@ -76,10 +77,12 @@ function createNoIdenticalExpressionsListeners(
 }
 
 /**
- * Returns true when node is an ESTree expression (not a private identifier).
+ * Returns true when both expression nodes have identical source text.
  *
- * @param node - Candidate node.
- * @returns True when node is an expression.
+ * @param sourceCode - Source code helper.
+ * @param left - Left expression node.
+ * @param right - Right expression node.
+ * @returns True when both sides serialize to the same text.
  */
 function hasIdenticalExpressionText(
   sourceCode: Readonly<TSESLint.SourceCode>,
@@ -92,22 +95,20 @@ function hasIdenticalExpressionText(
 }
 
 /**
- * Returns true when both expression nodes have identical source text.
+ * Returns true when the operator should be checked by this rule.
  *
- * @param sourceCode - Source code helper.
- * @param left - Left expression node.
- * @param right - Right expression node.
- * @returns True when both sides serialize to the same text.
+ * @param operator - Binary or logical operator token.
+ * @returns True when the operator is in the checked set.
  */
 function isCheckedOperator(operator: string): boolean {
   return CHECKED_BINARY_OPERATORS.has(operator);
 }
 
 /**
- * Returns true when the operator should be checked by this rule.
+ * Returns true when node is an ESTree expression (not a private identifier).
  *
- * @param operator - Binary or logical operator token.
- * @returns True when the operator is in the checked set.
+ * @param node - Candidate node.
+ * @returns True when node is an expression.
  */
 function isExpressionNode(node: TSESTree.Node): node is TSESTree.Expression {
   return node.type !== AST_NODE_TYPES.PrivateIdentifier;

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const MESSAGE_ID = 'preferNullish';
@@ -30,6 +31,12 @@ type NullishCheck = Readonly<{
   expression: TSESTree.Expression;
   positiveCheck: boolean;
 }>;
+
+type LooseNullishBinaryExpression = TSESTree.BinaryExpression & {
+  left: TSESTree.Expression;
+  operator: typeof OPERATOR_LOOSE_EQUAL | typeof OPERATOR_LOOSE_NOT_EQUAL;
+  right: TSESTree.Expression;
+};
 
 type PreferNullishCoalescingContext = Readonly<TSESLint.RuleContext<typeof MESSAGE_ID, []>>;
 
@@ -161,14 +168,10 @@ function getNullishCandidate(
  * @returns Nullish-check metadata, or null.
  */
 function getNullishCheck(node: TSESTree.BinaryExpression): NullishCheck | null {
-  if (!isLooseNullishOperator(node.operator)) {
+  if (!isLooseNullishBinaryExpression(node)) {
     return null;
   }
-  const leftExpression = toExpressionOperand(node.left);
-  if (leftExpression === null) {
-    return null;
-  }
-  return resolveNullishCheckFromLeft(node.operator, leftExpression, node.right);
+  return resolveNullishCheckFromLeft(node.operator, node.left, node.right);
 }
 
 /**
@@ -194,23 +197,24 @@ function getNullishExpressionBranch(
 function getRightNullishCheck(
   operator: string,
   leftExpression: TSESTree.Expression,
-  rightOperand: TSESTree.Expression | TSESTree.PrivateIdentifier,
+  rightOperand: TSESTree.Expression,
 ): NullishCheck | null {
-  const rightExpression = toExpressionOperand(rightOperand);
-  if (rightExpression === null || !isNullLiteral(rightExpression)) {
+  if (!isNullLiteral(rightOperand)) {
     return null;
   }
   return { expression: leftExpression, positiveCheck: operator === OPERATOR_LOOSE_NOT_EQUAL };
 }
 
 /**
- * Returns true when the node is the literal `null`.
+ * Returns true when a binary expression uses loose nullish comparison operators.
  *
- * @param node - Expression node.
- * @returns True when node is a null literal.
+ * @param node - Binary expression node.
+ * @returns True when node operator is `==` or `!=`.
  */
-function isLooseNullishOperator(operator: string): boolean {
-  return operator === OPERATOR_LOOSE_NOT_EQUAL || operator === OPERATOR_LOOSE_EQUAL;
+function isLooseNullishBinaryExpression(
+  node: TSESTree.BinaryExpression,
+): node is LooseNullishBinaryExpression {
+  return isLooseNullishOperator(node.operator);
 }
 
 /**
@@ -219,16 +223,20 @@ function isLooseNullishOperator(operator: string): boolean {
  * @param operator - Binary operator token.
  * @returns True when operator is `==` or `!=`.
  */
+function isLooseNullishOperator(operator: string): boolean {
+  return operator === OPERATOR_LOOSE_NOT_EQUAL || operator === OPERATOR_LOOSE_EQUAL;
+}
+
+/**
+ * Returns true when expression node is the literal `null`.
+ *
+ * @param node - Expression node.
+ * @returns True when node is a null literal.
+ */
 function isNullLiteral(node: TSESTree.Expression): node is TSESTree.Literal {
   return node.type === AST_NODE_TYPES.Literal && node.value === null;
 }
 
-/**
- * Returns true when node is a private identifier.
- *
- * @param node - Candidate node.
- * @returns True when node is a private identifier.
- */
 /**
  * Applies nullish-coalescing replacement for a conditional expression.
  *
@@ -258,25 +266,12 @@ function replaceWithCoalesce(
 function resolveNullishCheckFromLeft(
   operator: string,
   leftExpression: TSESTree.Expression,
-  rightOperand: TSESTree.Expression | TSESTree.PrivateIdentifier,
+  rightOperand: TSESTree.Expression,
 ): NullishCheck | null {
   if (!isNullLiteral(leftExpression)) {
     return getRightNullishCheck(operator, leftExpression, rightOperand);
   }
-  const rightExpression = toExpressionOperand(rightOperand);
-  return rightExpression === null ? null : getLeftNullishCheck(operator, rightExpression);
-}
-
-/**
- * Converts a binary operand into an expression when possible.
- *
- * @param operand - Binary expression operand.
- * @returns Expression operand, or null when operand is a private identifier.
- */
-function toExpressionOperand(
-  operand: TSESTree.Expression | TSESTree.PrivateIdentifier,
-): TSESTree.Expression | null {
-  return operand.type === AST_NODE_TYPES.PrivateIdentifier ? null : operand;
+  return getLeftNullishCheck(operator, rightOperand);
 }
 
 /**

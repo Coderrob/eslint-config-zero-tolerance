@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import {
-  isTSEnumMemberNode,
-  isUnaryExpressionNode,
-  isVariableDeclaratorNode,
-} from '../ast-guards';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isTSEnumMemberNode, isUnaryExpressionNode, isVariableDeclaratorNode } from '../ast-guards';
 import { OPERATOR_UNARY_MINUS, VARIABLE_KIND_CONST } from '../rule-constants';
 import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
@@ -81,7 +77,7 @@ function getNumericLiteralText(
   if (isUnaryMinus(node.parent)) {
     return sourceCode.getText(node.parent);
   }
-  return node.raw ?? sourceCode.getText(node);
+  return sourceCode.getText(node);
 }
 
 /**

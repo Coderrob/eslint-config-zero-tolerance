@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isTestFile } from '../ast-guards';
 import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from '../rule-constants';
 import { createRule } from '../rule-factory';

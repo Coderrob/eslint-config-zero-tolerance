@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { type FunctionNode, isBlockStatementNode } from '../ast-guards';
 import { resolveFunctionName } from '../ast-helpers';
-import { RULE_CREATOR_URL } from '../constants';
+import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
 
 const DEFAULT_MAX_FUNCTION_LINES = 30;
 
 type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>>;
-
-const createRule = ESLintUtils.RuleCreator(resolveRuleDocumentationUrl);
 
 /**
  * Counts the lines occupied by a block-statement function body.
@@ -136,16 +134,6 @@ function reportIfFunctionExceedsLimit(
 function resolveListeners(context: MaxFunctionLinesContext): TSESLint.RuleListener {
   const maxLines = getConfiguredMaxValue(context.options);
   return createFunctionListeners(context, maxLines);
-}
-
-/**
- * Returns the documentation URL for a rule.
- *
- * @param name - Rule name.
- * @returns Full rule documentation URL.
- */
-function resolveRuleDocumentationUrl(name: string): string {
-  return `${RULE_CREATOR_URL}${name}`;
 }
 
 /**

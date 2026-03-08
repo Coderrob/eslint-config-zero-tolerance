@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { preferShortcutReturn } from './prefer-shortcut-return';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -34,6 +35,18 @@ ruleTester.run('prefer-shortcut-return', preferShortcutReturn, {
     {
       name: 'should allow if branch returning identifier instead of boolean literal',
       code: 'function f(cond: boolean, result: boolean) { if (cond) return result; return false; }',
+    },
+    {
+      name: 'should allow single-statement block that is not a return statement',
+      code: 'function f(cond: boolean) { if (cond) { sideEffect(); } return false; }',
+    },
+    {
+      name: 'should allow trailing non-boolean return after if statement',
+      code: 'function f(cond: boolean, result: boolean) { if (cond) return true; return result; }',
+    },
+    {
+      name: 'should allow terminal if statement without trailing return',
+      code: 'function f(cond: boolean) { if (cond) return true; }',
     },
   ],
   invalid: [

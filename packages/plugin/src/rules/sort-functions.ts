@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const CONST_VARIABLE_KIND = 'const';
@@ -103,16 +104,6 @@ function createSwapFix(
 }
 
 /**
- * Returns function declaration identifier name when present.
- *
- * @param node - Function declaration node.
- * @returns Identifier name, or null for unnamed declarations.
- */
-function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string | null {
-  return node.id === null ? null : node.id.name;
-}
-
-/**
  * Returns declarator identifier name when declaration is function-valued.
  *
  * @param declaration - The variable declarator to inspect.
@@ -158,10 +149,7 @@ function getVariableDeclaratorStatementNode(
   node: TSESTree.VariableDeclarator,
 ): TSESTree.Node | null {
   const declaration = node.parent;
-  if (
-    declaration.type !== AST_NODE_TYPES.VariableDeclaration ||
-    declaration.declarations.length !== 1
-  ) {
+  if (declaration.declarations.length !== 1) {
     return null;
   }
   return declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration
@@ -241,10 +229,10 @@ function processFunctionDeclaration(
   if (!isTopLevelFunctionDeclaration(node)) {
     return;
   }
-  const name = getFunctionDeclarationName(node);
-  if (name !== null) {
-    functions.push({ name, node });
+  if (node.id === null) {
+    return;
   }
+  functions.push({ name: node.id.name, node });
 }
 
 /**

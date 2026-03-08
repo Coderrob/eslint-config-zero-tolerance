@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { requireOptionalChaining } from './require-optional-chaining';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -109,6 +110,18 @@ ruleTester.run('require-optional-chaining', requireOptionalChaining, {
       name: 'should require optional chaining for numeric literal computed access',
       code: 'const value = arr && arr[0];',
       output: 'const value = arr?.[0];',
+      errors: [{ messageId: 'useOptionalChaining' }],
+    },
+    {
+      name: 'should require optional chaining for identifier computed access',
+      code: 'const value = obj[key] && obj[key].name;',
+      output: 'const value = obj[key]?.name;',
+      errors: [{ messageId: 'useOptionalChaining' }],
+    },
+    {
+      name: 'should require optional chaining for chain-expression guards',
+      code: 'const value = (user?.profile) && user?.profile.name;',
+      output: 'const value = user?.profile?.name;',
       errors: [{ messageId: 'useOptionalChaining' }],
     },
   ],

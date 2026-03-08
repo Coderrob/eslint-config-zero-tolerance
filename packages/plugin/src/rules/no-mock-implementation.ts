@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { getMappedMemberPropertyName } from '../ast-helpers';
 import { createRule } from '../rule-factory';
 

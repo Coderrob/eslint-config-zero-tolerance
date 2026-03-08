@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noParentImports } from './no-parent-imports';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -46,6 +47,10 @@ ruleTester.run('no-parent-imports', noParentImports, {
     {
       name: 'should allow require with non-string literal argument',
       code: 'const feature = require(123);',
+    },
+    {
+      name: 'should allow non-require call expression even with parent-like path',
+      code: "const parent = loader('../parent');",
     },
     {
       name: 'should allow import-equals from non-parent paths',

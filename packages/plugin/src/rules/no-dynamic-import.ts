@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isIdentifierNode, isTestFile } from '../ast-guards';
 import { CALLEE_REQUIRE } from '../rule-constants';
 import { createRule } from '../rule-factory';
@@ -36,19 +36,6 @@ function checkCallExpression(context: NoDynamicImportContext, node: TSESTree.Cal
 }
 
 /**
- * Checks import expressions and reports dynamic imports.
- *
- * @param context - ESLint rule execution context.
- * @param node - Import expression to inspect.
- */
-function checkImportExpression(
-  context: NoDynamicImportContext,
-  node: TSESTree.ImportExpression,
-): void {
-  reportDynamicImport(context, node);
-}
-
-/**
  * Creates listeners for non-test files.
  *
  * @param context - ESLint rule execution context.
@@ -61,7 +48,7 @@ function createNoDynamicImportListeners(context: NoDynamicImportContext): TSESLi
 
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
-    ImportExpression: checkImportExpression.bind(undefined, context),
+    ImportExpression: reportDynamicImport.bind(undefined, context),
   };
 }
 

@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noThrowLiteral } from './no-throw-literal';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -121,6 +122,11 @@ ruleTester.run('no-throw-literal', noThrowLiteral, {
     {
       name: 'should report throwing catch identifier inside nested function scope',
       code: 'try { fn(); } catch (err) { const rethrow = () => { throw err; }; rethrow(); }',
+      errors: [{ messageId: 'noThrowLiteral', data: { type: 'identifier' } }],
+    },
+    {
+      name: 'should report throwing identifier in catch without parameter binding',
+      code: 'try { fn(); } catch { throw err; }',
       errors: [{ messageId: 'noThrowLiteral', data: { type: 'identifier' } }],
     },
   ],

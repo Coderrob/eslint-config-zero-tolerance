@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { preferNullishCoalescing } from './prefer-nullish-coalescing';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -45,6 +46,19 @@ ruleTester.run('prefer-nullish-coalescing', preferNullishCoalescing, {
       name: 'should prefer nullish coalescing for null on the left side',
       code: "const value = null != user ? user : 'guest';",
       output: "const value = user ?? 'guest';",
+      errors: [{ messageId: 'preferNullish' }],
+    },
+    {
+      name: 'should prefer nullish coalescing for identifier computed keys',
+      code: 'const value = obj[key] != null ? obj[key] : fallback;',
+      output: 'const value = obj[key] ?? fallback;',
+      errors: [{ messageId: 'preferNullish' }],
+    },
+    {
+      name: 'should prefer nullish coalescing for private field checks',
+      code: "class Example { #value: string | null = null; read() { const value = this.#value != null ? this.#value : 'guest'; return value; } }",
+      output:
+        "class Example { #value: string | null = null; read() { const value = this.#value ?? 'guest'; return value; } }",
       errors: [{ messageId: 'preferNullish' }],
     },
   ],

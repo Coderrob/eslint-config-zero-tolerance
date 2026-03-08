@@ -30,6 +30,7 @@ import noEmptyCatch from './rules/no-empty-catch';
 import noEslintDisable from './rules/no-eslint-disable';
 import noExportAlias from './rules/no-export-alias';
 import noFlagArgument from './rules/no-flag-argument';
+import noFloatingPromises from './rules/no-floating-promises';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
@@ -80,6 +81,7 @@ const rules: Record<string, unknown> = {
   'no-eslint-disable': noEslintDisable,
   'no-export-alias': noExportAlias,
   'no-flag-argument': noFlagArgument,
+  'no-floating-promises': noFloatingPromises,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
   'no-jest-have-been-called': noJestHaveBeenCalled,

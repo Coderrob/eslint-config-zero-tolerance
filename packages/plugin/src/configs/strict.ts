@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CONFIG_NAME_STRICT, PLUGIN_NAMESPACE, PRESET_STRICT } from '../constants';
+import { CONFIG_NAME_STRICT, PLUGIN_NAMESPACE, Preset } from '../constants';
 import { buildRules } from '../rule-map';
 import type { IPluginFlatConfig } from './recommended';
 
@@ -28,6 +28,6 @@ export function createStrictConfig(plugin: unknown): IPluginFlatConfig {
   return {
     name: CONFIG_NAME_STRICT,
     plugins: { [PLUGIN_NAMESPACE]: plugin },
-    rules: buildRules(PRESET_STRICT),
+    rules: buildRules(Preset.Strict),
   };
 }

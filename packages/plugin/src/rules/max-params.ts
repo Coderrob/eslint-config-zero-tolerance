@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../ast-guards';
 import { resolveFunctionName } from '../ast-helpers';
-import { RULE_CREATOR_URL } from '../constants';
+import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
 
 const MAX_PARAMS_MAX = 4;
@@ -34,18 +34,6 @@ function getOptionMaxValue(option: unknown): unknown {
   }
   return Reflect.get(option, 'max');
 }
-
-/**
- * Returns the documentation URL for a rule.
- *
- * @param name - Rule name.
- * @returns Full rule documentation URL.
- */
-function getRuleDocumentationUrl(name: string): string {
-  return `${RULE_CREATOR_URL}${name}`;
-}
-
-const createRule = ESLintUtils.RuleCreator(getRuleDocumentationUrl);
 
 /**
  * Reports when a function exceeds the configured parameter limit.

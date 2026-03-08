@@ -15,7 +15,7 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, PRESET_STRICT, type Preset } from './constants';
+import { PLUGIN_NAMESPACE, Preset } from './constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
@@ -51,6 +51,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-throw-literal',
   'no-parameter-reassign',
   'no-flag-argument',
+  'no-floating-promises',
   'prefer-guard-clauses',
   'prefer-shortcut-return',
   'prefer-nullish-coalescing',
@@ -140,7 +141,7 @@ function createRuleEntry(
  * @returns The matching rule entry.
  */
 function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEntry {
-  if (preset === PRESET_STRICT) {
+  if (preset === Preset.Strict) {
     return config.strict;
   }
   return config.recommended;

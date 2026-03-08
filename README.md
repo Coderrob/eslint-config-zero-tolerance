@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.18%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.6%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
 
@@ -152,14 +152,15 @@ All rules are included in the `recommended` (`warn`) and `strict` (`error`) pres
 
 ### Code Quality
 
-| Rule                                                     | Description                                                         |
-| -------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`max-function-lines`](docs/rules/max-function-lines.md) | Enforce a maximum number of lines per function body                 |
-| [`max-params`](docs/rules/max-params.md)                 | Enforce a maximum number of function parameters                     |
-| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)     | Disallow magic numbers; use named constants instead                 |
-| [`no-magic-strings`](docs/rules/no-magic-strings.md)     | Disallow magic strings in comparisons and switch cases              |
-| [`sort-imports`](docs/rules/sort-imports.md)             | Require import declarations to be sorted alphabetically             |
-| [`sort-functions`](docs/rules/sort-functions.md)         | Require top-level function declarations to be sorted alphabetically |
+| Rule                                                                   | Description                                                           |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [`max-function-lines`](docs/rules/max-function-lines.md)               | Enforce a maximum number of lines per function body                   |
+| [`max-params`](docs/rules/max-params.md)                               | Enforce a maximum number of function parameters                       |
+| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)                   | Disallow magic numbers; use named constants instead                   |
+| [`no-magic-strings`](docs/rules/no-magic-strings.md)                   | Disallow magic strings in comparisons and switch cases                |
+| [`sort-imports`](docs/rules/sort-imports.md)                           | Require import declarations to be sorted alphabetically               |
+| [`sort-functions`](docs/rules/sort-functions.md)                       | Require top-level function declarations to be sorted alphabetically   |
+| [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md) | Prefer nullish coalescing instead of repeated nullish guard ternaries |
 
 ### Error Handling
 

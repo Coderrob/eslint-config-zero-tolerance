@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noQuerySideEffects } from './no-query-side-effects';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -34,6 +35,10 @@ ruleTester.run('no-query-side-effects', noQuerySideEffects, {
     {
       name: 'should allow non-delete unary expression in query function',
       code: 'function getCount(value: number) { return -value; }',
+    },
+    {
+      name: 'should allow top-level side effect outside any query function scope',
+      code: 'counter = counter + 1;',
     },
   ],
   invalid: [

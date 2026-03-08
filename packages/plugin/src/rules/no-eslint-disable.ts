@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import { ESLINT_DISABLE_PREFIX } from '../rule-constants';
 import { createRule } from '../rule-factory';
 

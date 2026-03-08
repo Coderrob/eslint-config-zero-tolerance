@@ -68,6 +68,7 @@
 | [no-identical-branches](no-identical-branches.md)       | suggestion | Disallow identical conditional branches                                      |
 | [no-redundant-boolean](no-redundant-boolean.md)         | suggestion | Disallow redundant comparisons to boolean literals                           |
 | [no-await-in-loop](no-await-in-loop.md)                 | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |
+| [no-floating-promises](no-floating-promises.md)         | problem    | Disallow unhandled promise expressions; require explicit handling            |
 | [no-eslint-disable](no-eslint-disable.md)               | suggestion | Prevent use of `eslint-disable` comments                                     |
 | [no-parameter-reassign](no-parameter-reassign.md)       | suggestion | Disallow reassigning function parameters                                     |
 | [no-flag-argument](no-flag-argument.md)                 | suggestion | Disallow boolean flag parameters in function signatures                      |

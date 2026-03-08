@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../ast-guards';
 import { getMemberPropertyName, resolveFunctionName } from '../ast-helpers';
 import { createRule } from '../rule-factory';
@@ -123,7 +124,7 @@ function checkUpdateExpression(
 function createAssignmentVisitor(
   context: NoQuerySideEffectsContext,
   functionStack: QueryScopeStack,
-) {
+): (node: TSESTree.AssignmentExpression) => void {
   return checkAssignmentExpression.bind(undefined, context, functionStack);
 }
 
@@ -134,7 +135,10 @@ function createAssignmentVisitor(
  * @param functionStack - Function scope stack.
  * @returns Call expression visitor.
  */
-function createCallVisitor(context: NoQuerySideEffectsContext, functionStack: QueryScopeStack) {
+function createCallVisitor(
+  context: NoQuerySideEffectsContext,
+  functionStack: QueryScopeStack,
+): (node: TSESTree.CallExpression) => void {
   return checkCallExpression.bind(undefined, context, functionStack);
 }
 
@@ -169,7 +173,10 @@ function createNoQuerySideEffectsListeners(
  * @param functionStack - Function scope stack.
  * @returns Unary visitor.
  */
-function createUnaryVisitor(context: NoQuerySideEffectsContext, functionStack: QueryScopeStack) {
+function createUnaryVisitor(
+  context: NoQuerySideEffectsContext,
+  functionStack: QueryScopeStack,
+): (node: TSESTree.UnaryExpression) => void {
   return checkUnaryExpression.bind(undefined, context, functionStack);
 }
 
@@ -180,7 +187,10 @@ function createUnaryVisitor(context: NoQuerySideEffectsContext, functionStack: Q
  * @param functionStack - Function scope stack.
  * @returns Update visitor.
  */
-function createUpdateVisitor(context: NoQuerySideEffectsContext, functionStack: QueryScopeStack) {
+function createUpdateVisitor(
+  context: NoQuerySideEffectsContext,
+  functionStack: QueryScopeStack,
+): (node: TSESTree.UpdateExpression) => void {
   return checkUpdateExpression.bind(undefined, context, functionStack);
 }
 

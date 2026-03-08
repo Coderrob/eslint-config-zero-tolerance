@@ -11,8 +11,7 @@ import {
   CONFIG_NAME_STRICT,
   PLUGIN_NAMESPACE,
   PLUGIN_PACKAGE_NAME,
-  PRESET_RECOMMENDED,
-  PRESET_STRICT,
+  Preset,
   TYPESCRIPT_ESLINT_PARSER,
 } from './constants';
 import { buildRules, ruleMap } from './rule-map';
@@ -26,8 +25,8 @@ const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
 
 describe('plugin wiring', () => {
   it('should build prefixed recommended and strict rule maps', () => {
-    const recommendedRules = buildRules(PRESET_RECOMMENDED);
-    const strictRules = buildRules(PRESET_STRICT);
+    const recommendedRules = buildRules(Preset.Recommended);
+    const strictRules = buildRules(Preset.Strict);
 
     expect(recommendedRules[RULE_NO_EXPORT_ALIAS]).toBe('warn');
     expect(strictRules[RULE_NO_EXPORT_ALIAS]).toBe('error');

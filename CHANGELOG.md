@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- No unreleased changes yet.
+
+## [1.1.0] - 2026-03-08
+
+### Added
+
 - **`no-export-alias` rule**: Prevents the use of aliases in export statements (e.g., `export { foo as bar }`). Ensures exports use their original names directly to maintain clear and consistent module interfaces.
 
 - **`no-re-export` rule**: Disallows re-export statements that target modules outside the current directory (for example, `export { foo } from '../module'` and `export * from '../module'`). Re-exports from the same directory (`./*`) are allowed. Barrel files may only re-export modules; they may not declare or otherwise define functionality within them.
@@ -34,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`no-magic-strings` rule**: Disallows string literals used directly in `===`/`!==` comparisons and `switch`-case clauses. Requires extracting them into named constants.
 
-- **`max-function-lines` rule**: Enforces a maximum line count on function bodies. Default is 30 lines in the recommended preset and 20 lines in the strict preset. Accepts a `{ max: number }` option.
+- **`max-function-lines` rule**: Enforces a maximum line count on function bodies. Default is 20 lines in the recommended preset and 15 lines in the strict preset. Accepts a `{ max: number }` option.
 
 - **`max-params` rule**: Enforces a maximum number of function parameters. Default is 4 in both presets. Accepts a `{ max: number }` option.
 
@@ -48,7 +54,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`no-await-in-loop` rule**: Disallows `await` expressions directly inside loop bodies. Requires refactoring to `Promise.all()` or `Promise.allSettled()` for parallel execution.
 
-- **`no-throw-literal` rule**: Disallows throwing literals, plain objects, numbers, or template strings. Only `NewExpression`, `Identifier` (re-throw), `MemberExpression`, `CallExpression`, and `AwaitExpression` are accepted as throw arguments.
+- **`no-floating-promises` rule**: Disallows unhandled promise expressions. Requires explicit handling with `await`, `void`, `.catch(...)`, or `then(..., onRejected)` for recognized promise-producing patterns.
+
+- **`no-throw-literal` rule**: Disallows throwing literals, plain objects, numbers, or template strings. By default only `throw new ...` and direct catch-parameter rethrows are accepted, with options to allow call/member/await throw expressions.
 
 - **`docs/`**: MkDocs documentation site (Material theme) covering Getting Started, Configuration, and one dedicated page per rule. Published to GitHub Pages via GitHub Actions.
 
@@ -66,7 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- **`eslint.config.mjs`**: Fixed stale rule names (`interface-prefix` → `require-interface-prefix`, `test-description-style` → `require-test-description-style`, `zod-schema-description` → `require-zod-schema-description`) and expanded dogfooding to include all 25 plugin rules.
+- **`eslint.config.mjs`**: Fixed stale rule names (`interface-prefix` -> `require-interface-prefix`, `test-description-style` -> `require-test-description-style`, `zod-schema-description` -> `require-zod-schema-description`) and expanded dogfooding to include all plugin rules.
 
 - **`@coderrob/eslint-plugin-zero-tolerance` index** (`packages/plugin/src/index.ts`): Registered all new rules in the `rules` map and in all four config presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
 

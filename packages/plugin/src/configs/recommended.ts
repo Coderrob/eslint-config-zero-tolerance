@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CONFIG_NAME_RECOMMENDED, PLUGIN_NAMESPACE, PRESET_RECOMMENDED } from '../constants';
+import { CONFIG_NAME_RECOMMENDED, PLUGIN_NAMESPACE, Preset } from '../constants';
 import { buildRules } from '../rule-map';
 
 /** Flat-config shape produced by plugin preset factories. */
@@ -34,6 +34,6 @@ export function createRecommendedConfig(plugin: unknown): IPluginFlatConfig {
   return {
     name: CONFIG_NAME_RECOMMENDED,
     plugins: { [PLUGIN_NAMESPACE]: plugin },
-    rules: buildRules(PRESET_RECOMMENDED),
+    rules: buildRules(Preset.Recommended),
   };
 }

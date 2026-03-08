@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noAwaitInLoop } from './no-await-in-loop';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -30,6 +31,14 @@ ruleTester.run('no-await-in-loop', noAwaitInLoop, {
     {
       name: 'should pass for Promise.allSettled usage',
       code: 'async function main() { await Promise.allSettled(items.map(x => process(x))); }',
+    },
+    {
+      name: 'should pass for top-level await outside any loop',
+      code: 'await fetch(url);',
+      languageOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
     },
   ],
   invalid: [

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
 type NoAwaitInLoopContext = Readonly<TSESLint.RuleContext<'noAwaitInLoop', []>>;
 
@@ -40,18 +41,6 @@ function getBoundaryResult(type: AST_NODE_TYPES): boolean | null {
   }
   return LOOP_TYPES.has(type) ? true : null;
 }
-
-/**
- * Returns the documentation URL for a rule.
- *
- * @param name - Rule name.
- * @returns Full rule documentation URL.
- */
-function getRuleDocumentationUrl(name: string): string {
-  return `${RULE_CREATOR_URL}${name}`;
-}
-
-const createRule = ESLintUtils.RuleCreator(getRuleDocumentationUrl);
 
 /**
  * Walks ancestors from innermost outward and returns true when a loop

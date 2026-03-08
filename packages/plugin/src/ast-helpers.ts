@@ -18,7 +18,7 @@
  * Reusable AST helper functions shared across multiple rule implementations.
  */
 
-import { TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
 import {
   type FunctionNode,
   isFunctionDeclarationNode,
@@ -105,7 +105,7 @@ export function getMappedMemberPropertyName(
     computed: boolean;
     property: { type: string; name?: string; value?: unknown };
   },
-  replacements: Readonly<Record<string, string>>,
+  replacements: Readonly<Record<string, string | undefined>>,
 ): { name: string; replacement: string } | null {
   const name = getMemberPropertyName(node);
   if (name === null) {

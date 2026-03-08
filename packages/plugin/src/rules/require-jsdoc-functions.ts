@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, AST_TOKEN_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
 import {
   type FunctionNode,
   isIdentifierNode,
   isTestFile,
-  isVariableDeclarationNode,
   isVariableDeclaratorNode,
 } from '../ast-guards';
 import { getIdentifierName } from '../ast-helpers';
@@ -138,13 +138,13 @@ function getTargetNode(node: FunctionNode): TSESTree.Node {
 /**
  * Returns parent variable declaration node when declarator is inside one.
  *
- * @param node - The variable declarator node.
- * @returns The parent variable declaration if found, null otherwise.
+ * @param node - Variable declarator node.
+ * @returns Parent declaration, or null.
  */
 function getVariableDeclarationParent(
   node: TSESTree.VariableDeclarator,
-): TSESTree.VariableDeclaration | null {
-  return isVariableDeclarationNode(node.parent) ? node.parent : null;
+): TSESTree.VariableDeclaration {
+  return node.parent;
 }
 
 /**
@@ -184,11 +184,7 @@ function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
-  const declaration = getVariableDeclarationParent(node.parent);
-  if (declaration === null) {
-    return node.parent;
-  }
-  return getVariableDeclarationTarget(node.parent, declaration);
+  return getVariableDeclarationTarget(node.parent, getVariableDeclarationParent(node.parent));
 }
 
 /**

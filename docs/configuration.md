@@ -11,6 +11,15 @@
 | `legacy-recommended` | `warn`   | ESLint 8 `.eslintrc` format                                             |
 | `legacy-strict`      | `error`  | ESLint 8 `.eslintrc` format                                             |
 
+## Preset Enum
+
+Internally, flat-config preset selection is typed with a `Preset` enum:
+
+- `Preset.Recommended` = `'recommended'`
+- `Preset.Strict` = `'strict'`
+
+This enum is used by the shared config/rule builders to avoid stringly-typed preset branching.
+
 ## Flat Config Presets (ESLint 9+)
 
 ### `recommended`
@@ -81,6 +90,7 @@ All rules are included in every preset. The only difference between `recommended
 | `no-empty-catch`                 | warn           | error           |
 | `no-non-null-assertion`          | warn           | error           |
 | `no-await-in-loop`               | warn           | error           |
+| `no-floating-promises`           | warn           | error           |
 | `no-throw-literal`               | warn           | error           |
 | `no-parameter-reassign`          | warn           | error           |
 | `no-flag-argument`               | warn           | error           |

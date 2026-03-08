@@ -87,6 +87,7 @@ nav:
           - no-identical-branches: rules/no-identical-branches.md
           - no-redundant-boolean: rules/no-redundant-boolean.md
           - no-await-in-loop: rules/no-await-in-loop.md
+          - no-floating-promises: rules/no-floating-promises.md
           - no-eslint-disable: rules/no-eslint-disable.md
           - no-parameter-reassign: rules/no-parameter-reassign.md
           - no-flag-argument: rules/no-flag-argument.md

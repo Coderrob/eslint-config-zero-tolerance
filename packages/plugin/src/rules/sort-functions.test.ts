@@ -1,5 +1,6 @@
 import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester, RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { sortFunctions } from './sort-functions';
 
 const ruleTestConfig: RuleTesterConfig = {
@@ -122,6 +123,12 @@ ruleTester.run('sort-functions', sortFunctions, {
       name: 'should flag exported const arrow functions out of order',
       code: 'export const beta = () => {};\nexport const alpha = () => {};',
       output: 'export const alpha = () => {};\nexport const beta = () => {};',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should flag exported function declarations out of order',
+      code: 'export function beta() {}\nexport function alpha() {}',
+      output: 'export function alpha() {}\nexport function beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {

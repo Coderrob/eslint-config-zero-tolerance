@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { FunctionNode } from '../ast-guards';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import type { FunctionNode } from '../ast-guards';
 import { createRule } from '../rule-factory';
 
 type NoParameterReassignContext = Readonly<TSESLint.RuleContext<'noParameterReassign', []>>;

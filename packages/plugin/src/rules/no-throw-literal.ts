@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 interface INoThrowLiteralOptions {
@@ -30,7 +31,7 @@ interface IResolvedNoThrowLiteralOptions {
 }
 
 type NoThrowLiteralContext = Readonly<TSESLint.RuleContext<'noThrowLiteral', RuleOptions>>;
-type RuleOptions = [INoThrowLiteralOptions];
+type RuleOptions = [INoThrowLiteralOptions?];
 
 const DEFAULT_OPTIONS: INoThrowLiteralOptions = {
   allowThrowingAwaitExpressions: false,
@@ -57,7 +58,7 @@ function checkThrowStatement(
   node: TSESTree.ThrowStatement,
 ): void {
   const throwArgument = node.argument;
-  if (throwArgument === null || isAllowedThrowArgument(throwArgument, options)) {
+  if (isAllowedThrowArgument(throwArgument, options)) {
     return;
   }
   context.report({
@@ -114,10 +115,7 @@ function getCatchParameterName(node: TSESTree.Node): string | null {
  * @param identifierName - Identifier being thrown.
  * @returns Boolean decision, or null when walk should continue.
  */
-function getCatchScopeDecision(
-  node: TSESTree.Node,
-  identifierName: string,
-): boolean | null {
+function getCatchScopeDecision(node: TSESTree.Node, identifierName: string): boolean | null {
   if (isFunctionBoundaryNode(node)) {
     return false;
   }
@@ -166,13 +164,13 @@ function isAllowedThrowArgument(
  * @returns True when identifier directly re-throws a catch parameter.
  */
 function isCatchParameterIdentifier(node: TSESTree.Identifier): boolean {
-  let currentNode: TSESTree.Node | null | undefined = node.parent;
-  while (currentNode !== undefined && currentNode !== null) {
+  let currentNode: TSESTree.Node | null = node.parent;
+  while (currentNode !== null) {
     const decision = getCatchScopeDecision(currentNode, node.name);
     if (decision !== null) {
       return decision;
     }
-    currentNode = currentNode.parent;
+    currentNode = currentNode.parent ?? null;
   }
   return false;
 }

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const TERMINATOR_NODE_TYPES = new Set([
@@ -33,15 +34,11 @@ type PreferGuardClausesContext = Readonly<TSESLint.RuleContext<'preferGuardClaus
  * @param node - If statement node.
  */
 function checkIfStatement(context: PreferGuardClausesContext, node: TSESTree.IfStatement): void {
-  if (!shouldReportElseBlock(node)) {
-    return;
-  }
-  const alternate = node.alternate;
-  if (alternate === null) {
+  if (!shouldReportElseBlock(node) || node.alternate === null) {
     return;
   }
   context.report({
-    node: alternate,
+    node: node.alternate,
     messageId: 'preferGuardClauses',
   });
 }
@@ -66,7 +63,9 @@ function consequentEndsWithTerminator(consequent: TSESTree.Statement): boolean {
  * @param context - ESLint rule context.
  * @returns IfStatement visitor callback.
  */
-function createIfStatementChecker(context: PreferGuardClausesContext) {
+function createIfStatementChecker(
+  context: PreferGuardClausesContext,
+): (node: TSESTree.IfStatement) => void {
   return checkIfStatement.bind(null, context);
 }
 

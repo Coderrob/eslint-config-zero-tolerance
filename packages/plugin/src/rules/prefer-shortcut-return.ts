@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const FIRST_ITEM_INDEX = 0;
@@ -230,7 +231,7 @@ function getNextStatementInBlock(
   node: TSESTree.Statement,
 ): TSESTree.Statement | null {
   const index = blockStatement.body.indexOf(node);
-  return index < FIRST_ITEM_INDEX ? null : (blockStatement.body[index + SINGLE_ITEM_COUNT] ?? null);
+  return blockStatement.body[index + SINGLE_ITEM_COUNT] ?? null;
 }
 
 /**
@@ -241,7 +242,7 @@ function getNextStatementInBlock(
  */
 function getParentBlockStatement(node: TSESTree.Statement): TSESTree.BlockStatement | null {
   const parent = node.parent;
-  return parent?.type === AST_NODE_TYPES.BlockStatement ? parent : null;
+  return parent.type === AST_NODE_TYPES.BlockStatement ? parent : null;
 }
 
 /**
@@ -254,7 +255,7 @@ function getReturnStatementFromNonNullStatement(
   statement: TSESTree.Statement,
 ): TSESTree.ReturnStatement | null {
   if (statement.type === AST_NODE_TYPES.ReturnStatement) {
-    return getBooleanReturnFromValue(statement.argument) === null ? null : statement;
+    return statement;
   }
   return statement.type === AST_NODE_TYPES.BlockStatement
     ? getBooleanReturnFromBlock(statement)
