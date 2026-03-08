@@ -78,6 +78,10 @@ function getFilename(filePath: string): string {
 /**
  * Returns true when the file is a barrel file (index.*).
  *
+ * Only single-extension index files (for example, `index.ts`, `index.js`, or
+ * `index.mts`) are treated as barrel files. Double-extension files such as
+ * `index.d.ts`, `index.test.ts`, or `index.spec.js` are intentionally excluded.
+ *
  * @param filePath - Path to the current file being linted.
  * @returns True if the file is a barrel index file.
  */
