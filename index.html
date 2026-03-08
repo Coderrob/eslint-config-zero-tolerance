@@ -784,34 +784,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="rules/require-zod-schema-description/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-zod-schema-description
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1362,6 +1334,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/prefer-nullish-coalescing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-nullish-coalescing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1605,6 +1605,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-parent-imports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-re-export/" class="md-nav__link">
         
   
@@ -1723,6 +1751,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-identical-branches/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-identical-branches
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-redundant-boolean/" class="md-nav__link">
         
   
@@ -1779,6 +1835,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-floating-promises/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-floating-promises
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-eslint-disable/" class="md-nav__link">
         
   
@@ -1787,6 +1871,146 @@
     
   
     no-eslint-disable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-parameter-reassign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parameter-reassign
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-flag-argument/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-flag-argument
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/prefer-guard-clauses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-guard-clauses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/prefer-shortcut-return/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-shortcut-return
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-query-side-effects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-query-side-effects
   
 
     
@@ -1907,13 +2131,13 @@
 <p><code>@coderrob/eslint-plugin-zero-tolerance</code> is a collection of custom ESLint rules designed to enforce a zero-tolerance policy on common TypeScript code quality issues. The rules cover:</p>
 <ul>
 <li><strong>Naming conventions</strong> — prefix interfaces with <code>I</code>, sort imports and functions alphabetically</li>
-<li><strong>Documentation</strong> — require JSDoc on all functions, require <code>.describe()</code> on Zod schemas</li>
+<li><strong>Documentation</strong> — require JSDoc on all functions</li>
 <li><strong>Testing standards</strong> — enforce <code>should</code>-prefixed descriptions, ban imprecise Jest matchers and leaky mocks</li>
 <li><strong>Type safety</strong> — ban <code>as</code> assertions, non-null <code>!</code> operators, literal union types, and banned utility types</li>
 <li><strong>Code quality</strong> — limit function length and parameter count, eliminate magic numbers and strings</li>
 <li><strong>Error handling</strong> — require <code>new Error()</code> in throw statements, disallow empty catch blocks</li>
 <li><strong>Import hygiene</strong> — ban parent-relative imports, dynamic imports, and export aliases</li>
-<li><strong>Bug prevention</strong> — flag identical expressions, redundant boolean comparisons, and <code>await</code> inside loops</li>
+<li><strong>Bug prevention</strong> — flag identical expressions, redundant boolean comparisons, shortcut-return opportunities, and <code>await</code> inside loops</li>
 </ul>
 <h2 id="packages">Packages</h2>
 <p>This monorepo publishes two packages:</p>

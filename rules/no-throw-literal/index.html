@@ -715,34 +715,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../require-zod-schema-description/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-zod-schema-description
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1302,6 +1274,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prefer-nullish-coalescing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-nullish-coalescing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1670,6 +1670,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-parent-imports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-re-export/" class="md-nav__link">
         
   
@@ -1791,6 +1819,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-identical-branches/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-identical-branches
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-redundant-boolean/" class="md-nav__link">
         
   
@@ -1847,6 +1903,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-floating-promises/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-floating-promises
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-eslint-disable/" class="md-nav__link">
         
   
@@ -1855,6 +1939,146 @@
     
   
     no-eslint-disable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-parameter-reassign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parameter-reassign
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-flag-argument/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-flag-argument
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prefer-guard-clauses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-guard-clauses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prefer-shortcut-return/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-shortcut-return
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-query-side-effects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-query-side-effects
   
 
     
@@ -2036,38 +2260,13 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
-<p>Only <code>Error</code> instances (and subclasses) include a <code>stack</code> trace. Throwing a string, object, number, or template literal discards that diagnostic information, making it impossible to trace where the error originated. Code that catches errors also often assumes it receives an <code>Error</code> object, so non-Error throws can cause secondary failures in error-handling paths.</p>
-<p><strong>Allowed throw arguments:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Node type</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>NewExpression</code></td>
-<td><code>throw new Error('msg')</code></td>
-</tr>
-<tr>
-<td><code>Identifier</code></td>
-<td><code>throw err</code> (re-throw a caught error)</td>
-</tr>
-<tr>
-<td><code>MemberExpression</code></td>
-<td><code>throw this.lastError</code></td>
-</tr>
-<tr>
-<td><code>CallExpression</code></td>
-<td><code>throw createError('msg')</code></td>
-</tr>
-<tr>
-<td><code>AwaitExpression</code></td>
-<td><code>throw await buildError()</code></td>
-</tr>
-</tbody>
-</table>
+<p>Only <code>Error</code> instances (and subclasses) include a <code>stack</code> trace. Throwing a string, object, number, or template literal discards diagnostic information and can break error-handling code that expects an <code>Error</code>.</p>
+<p>By default, this rule only allows:</p>
+<ul>
+<li><code>throw new ...</code> expressions (for example <code>throw new Error(...)</code>)</li>
+<li>re-throwing the active catch parameter (for example <code>catch (err) { throw err; }</code>)</li>
+</ul>
+<p>You can opt into allowing <code>throw &lt;call&gt;</code>, <code>throw &lt;member&gt;</code>, and <code>throw await &lt;expr&gt;</code> with rule options.</p>
 <h2 id="examples">Examples</h2>
 <h3 id="correct">✅ Correct</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;something went wrong&#39;</span><span class="p">);</span>
@@ -2096,10 +2295,19 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">throw</span><span class="w"> </span><span class="sb">`failed: </span><span class="si">${</span><span class="nx">reason</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">throw</span><span class="w"> </span><span class="nx">condition</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">&#39;error-a&#39;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error-b&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">throw</span><span class="w"> </span><span class="nx">createError</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="configuration">Configuration</h2>
-<p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/no-throw-literal&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<p>This rule accepts an optional options object:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/no-throw-literal&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nx">allowThrowingCallExpressions</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nx">allowThrowingMemberExpressions</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nx">allowThrowingAwaitExpressions</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">]</span>
 </code></pre></div>
 
 

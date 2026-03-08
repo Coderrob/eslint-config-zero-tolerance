@@ -850,34 +850,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="require-zod-schema-description/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-zod-schema-description
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1437,6 +1409,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prefer-nullish-coalescing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-nullish-coalescing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1686,6 +1686,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-parent-imports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-re-export/" class="md-nav__link">
         
   
@@ -1807,6 +1835,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-identical-branches/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-identical-branches
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-redundant-boolean/" class="md-nav__link">
         
   
@@ -1863,6 +1919,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-floating-promises/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-floating-promises
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-eslint-disable/" class="md-nav__link">
         
   
@@ -1871,6 +1955,146 @@
     
   
     no-eslint-disable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-parameter-reassign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parameter-reassign
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-flag-argument/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-flag-argument
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prefer-guard-clauses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-guard-clauses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prefer-shortcut-return/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-shortcut-return
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-query-side-effects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-query-side-effects
   
 
     
@@ -2039,7 +2263,7 @@
 
 
 <h1 id="rules">Rules</h1>
-<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides a suite of <strong>custom rules</strong> grouped into seven categories.</p>
+<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides a suite of <strong>custom rules</strong> grouped into eight categories.</p>
 <h2 id="naming-conventions">Naming Conventions</h2>
 <table>
 <thead>
@@ -2076,11 +2300,6 @@
 <td><a href="require-optional-chaining/">require-optional-chaining</a></td>
 <td>suggestion</td>
 <td>Require optional chaining instead of repeated guard access</td>
-</tr>
-<tr>
-<td><a href="require-zod-schema-description/">require-zod-schema-description</a></td>
-<td>suggestion</td>
-<td>Enforce that Zod schemas have <code>.describe()</code> called</td>
 </tr>
 </tbody>
 </table>
@@ -2124,7 +2343,7 @@
 <tr>
 <td><a href="no-type-assertion/">no-type-assertion</a></td>
 <td>suggestion</td>
-<td>Prevent use of TypeScript <code>as</code> type assertions</td>
+<td>Prevent use of TypeScript <code>as</code> and angle-bracket assertions</td>
 </tr>
 <tr>
 <td><a href="no-non-null-assertion/">no-non-null-assertion</a></td>
@@ -2183,6 +2402,11 @@
 <td>suggestion</td>
 <td>Require top-level functions and const function expressions to be sorted alphabetically</td>
 </tr>
+<tr>
+<td><a href="prefer-nullish-coalescing/">prefer-nullish-coalescing</a></td>
+<td>suggestion</td>
+<td>Prefer nullish coalescing instead of repeated nullish guard ternaries</td>
+</tr>
 </tbody>
 </table>
 <h2 id="error-handling">Error Handling</h2>
@@ -2220,12 +2444,17 @@
 <tr>
 <td><a href="no-dynamic-import/">no-dynamic-import</a></td>
 <td>problem</td>
-<td>Ban <code>await import()</code> and <code>require()</code> outside test files</td>
+<td>Ban dynamic <code>import()</code> and <code>require()</code> outside test files</td>
 </tr>
 <tr>
 <td><a href="no-export-alias/">no-export-alias</a></td>
 <td>suggestion</td>
 <td>Prevent use of aliases in export statements</td>
+</tr>
+<tr>
+<td><a href="no-parent-imports/">no-parent-imports</a></td>
+<td>suggestion</td>
+<td>Disallow parent-directory traversal in import paths</td>
 </tr>
 <tr>
 <td><a href="no-re-export/">no-re-export</a></td>
@@ -2250,6 +2479,11 @@
 <td>Disallow identical expressions on both sides of a binary or logical operator</td>
 </tr>
 <tr>
+<td><a href="no-identical-branches/">no-identical-branches</a></td>
+<td>suggestion</td>
+<td>Disallow identical conditional branches</td>
+</tr>
+<tr>
 <td><a href="no-redundant-boolean/">no-redundant-boolean</a></td>
 <td>suggestion</td>
 <td>Disallow redundant comparisons to boolean literals</td>
@@ -2260,9 +2494,39 @@
 <td>Disallow <code>await</code> inside loops; use <code>Promise.all()</code> instead</td>
 </tr>
 <tr>
+<td><a href="no-floating-promises/">no-floating-promises</a></td>
+<td>problem</td>
+<td>Disallow unhandled promise expressions; require explicit handling</td>
+</tr>
+<tr>
 <td><a href="no-eslint-disable/">no-eslint-disable</a></td>
 <td>suggestion</td>
 <td>Prevent use of <code>eslint-disable</code> comments</td>
+</tr>
+<tr>
+<td><a href="no-parameter-reassign/">no-parameter-reassign</a></td>
+<td>suggestion</td>
+<td>Disallow reassigning function parameters</td>
+</tr>
+<tr>
+<td><a href="no-flag-argument/">no-flag-argument</a></td>
+<td>suggestion</td>
+<td>Disallow boolean flag parameters in function signatures</td>
+</tr>
+<tr>
+<td><a href="prefer-guard-clauses/">prefer-guard-clauses</a></td>
+<td>suggestion</td>
+<td>Prefer guard clauses by removing else blocks after terminating if branches</td>
+</tr>
+<tr>
+<td><a href="prefer-shortcut-return/">prefer-shortcut-return</a></td>
+<td>suggestion</td>
+<td>Prefer shortcut boolean returns over if branches that return true/false</td>
+</tr>
+<tr>
+<td><a href="no-query-side-effects/">no-query-side-effects</a></td>
+<td>suggestion</td>
+<td>Disallow side effects in query-style functions</td>
 </tr>
 </tbody>
 </table>
