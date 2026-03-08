@@ -1,42 +1,44 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noJestHaveBeenCalled } from './no-jest-have-been-called';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
   valid: [
     {
       code: 'expect(fn).toHaveBeenCalledTimes(1);',
-      name: 'toHaveBeenCalledTimes is allowed',
+      name: 'should allow toHaveBeenCalledTimes',
     },
     {
       code: 'expect(fn).toHaveBeenNthCalledWith(1, "arg");',
-      name: 'toHaveBeenNthCalledWith is allowed',
+      name: 'should allow toHaveBeenNthCalledWith',
     },
     {
       code: 'expect(fn).not.toHaveBeenCalledTimes(0);',
-      name: 'negated toHaveBeenCalledTimes is allowed',
+      name: 'should allow negated toHaveBeenCalledTimes',
     },
     {
       code: 'expect(value).toBe(true);',
-      name: 'unrelated matcher is allowed',
+      name: 'should allow unrelated matcher',
     },
     {
       code: 'expect(result).toEqual({ key: "value" });',
-      name: 'toEqual is allowed',
+      name: 'should allow toEqual',
     },
     {
       code: 'const matcher = "toHaveBeenCalled"; expect(fn)[matcher]();',
-      name: 'computed identifier property is ignored',
+      name: 'should allow computed identifier property',
     },
     {
       code: 'expect(fn)[0]();',
-      name: 'computed numeric property is ignored',
+      name: 'should allow computed numeric property',
     },
   ],
   invalid: [
@@ -225,4 +227,4 @@ ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
       ],
     },
   ],
-} as any);
+});

@@ -14,11 +14,65 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { INTERFACE_REQUIRED_PREFIX } from '../rule-constants';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+const INTERFACE_SECOND_CHARACTER_INDEX = 1;
+const INTERFACE_MINIMUM_LENGTH = 2;
+
+type RequireInterfacePrefixContext = Readonly<TSESLint.RuleContext<'interfacePrefix', []>>;
+
+/**
+ * Checks a TypeScript interface declaration for proper naming.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - The TSInterfaceDeclaration node to check.
+ */
+function checkTSInterfaceDeclaration(
+  context: RequireInterfacePrefixContext,
+  node: TSESTree.TSInterfaceDeclaration,
+): void {
+  const interfaceName = node.id.name;
+  if (isValidInterfaceName(interfaceName)) {
+    return;
+  }
+  context.report({
+    node: node.id,
+    messageId: 'interfacePrefix',
+    data: { name: interfaceName },
+  });
+}
+
+/**
+ * Creates listeners for require-interface-prefix rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createRequireInterfacePrefixListeners(
+  context: RequireInterfacePrefixContext,
+): TSESLint.RuleListener {
+  return {
+    TSInterfaceDeclaration: checkTSInterfaceDeclaration.bind(undefined, context),
+  };
+}
+
+/**
+ * Checks if an interface name follows the required naming convention.
+ *
+ * @param interfaceName - The interface name to validate.
+ * @returns True if the name is valid, false otherwise.
+ */
+function isValidInterfaceName(interfaceName: string): boolean {
+  if (!interfaceName.startsWith(INTERFACE_REQUIRED_PREFIX)) {
+    return false;
+  }
+  if (interfaceName.length < INTERFACE_MINIMUM_LENGTH) {
+    return false;
+  }
+  return /[A-Z]/u.test(interfaceName[INTERFACE_SECOND_CHARACTER_INDEX]);
+}
 
 /**
  * ESLint rule that enforces interface names start with "I".
@@ -36,48 +90,7 @@ export const requireInterfacePrefix = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that enforces interface naming conventions.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks if an interface name follows the required naming convention.
-     *
-     * @param interfaceName - The interface name to validate.
-     * @returns True if the name is valid, false otherwise.
-     */
-    const isValidInterfaceName = (interfaceName: string): boolean => {
-      return (
-        interfaceName.startsWith(INTERFACE_REQUIRED_PREFIX) &&
-        interfaceName.length >= 2 &&
-        /[A-Z]/.test(interfaceName[1])
-      );
-    };
-
-    /**
-     * Checks a TypeScript interface declaration for proper naming.
-     *
-     * @param node - The TSInterfaceDeclaration node to check.
-     */
-    const checkTSInterfaceDeclaration = (node: TSESTree.TSInterfaceDeclaration): void => {
-      const interfaceName = node.id.name;
-
-      if (!isValidInterfaceName(interfaceName)) {
-        context.report({
-          node: node.id,
-          messageId: 'interfacePrefix',
-          data: { name: interfaceName },
-        });
-      }
-    };
-
-    return {
-      TSInterfaceDeclaration: checkTSInterfaceDeclaration,
-    };
-  },
+  create: createRequireInterfacePrefixListeners,
 });
 
 export default requireInterfacePrefix;

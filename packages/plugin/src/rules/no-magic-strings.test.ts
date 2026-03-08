@@ -1,12 +1,14 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noMagicStrings } from './no-magic-strings';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-magic-strings', noMagicStrings, {
   valid: [
@@ -41,6 +43,33 @@ ruleTester.run('no-magic-strings', noMagicStrings, {
     {
       code: 'const n = 123;',
       name: 'should ignore non-string literals',
+    },
+    {
+      code: "if (typeof value === 'string') {}",
+      name: 'should allow typeof comparison with string literal on right side',
+    },
+    {
+      code: "if ('undefined' === typeof value) {}",
+      name: 'should allow typeof comparison with string literal on left side',
+    },
+    {
+      code: "if (typeof value !== 'object') {}",
+      name: 'should allow typeof inequality comparison',
+    },
+    {
+      code: "if (role === 'admin') {}",
+      name: 'should allow configured ignored string value',
+      options: [{ ignoreValues: ['admin'] }],
+    },
+    {
+      code: "switch (status) { case 'pending': break; }",
+      name: 'should allow switch cases when switch checking is disabled',
+      options: [{ checkSwitchCases: false }],
+    },
+    {
+      code: "if (status !== 'active') {}",
+      name: 'should allow comparisons when comparison checking is disabled',
+      options: [{ checkComparisons: false }],
     },
   ],
   invalid: [
@@ -109,4 +138,4 @@ ruleTester.run('no-magic-strings', noMagicStrings, {
       ],
     },
   ],
-} as any);
+});

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
-import { getMemberPropertyName } from '../ast-helpers';
-
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { getMappedMemberPropertyName } from '../ast-helpers';
+import { createRule } from '../rule-factory';
 
 const BANNED_MOCK_METHODS: Record<string, string> = {
   mockImplementation: 'mockImplementationOnce',
@@ -26,6 +24,47 @@ const BANNED_MOCK_METHODS: Record<string, string> = {
   mockResolvedValue: 'mockResolvedValueOnce',
   mockRejectedValue: 'mockRejectedValueOnce',
 };
+
+type NoMockImplementationContext = Readonly<TSESLint.RuleContext<'noMockImplementation', []>>;
+
+/**
+ * Checks member expressions for banned mock methods.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Member expression node to inspect.
+ */
+function checkMemberExpression(
+  context: NoMockImplementationContext,
+  node: TSESTree.MemberExpression,
+): void {
+  const bannedMethod = getMappedMemberPropertyName(node, BANNED_MOCK_METHODS);
+  if (bannedMethod === null) {
+    return;
+  }
+
+  context.report({
+    node: node.property,
+    messageId: 'noMockImplementation',
+    data: {
+      method: bannedMethod.name,
+      replacement: bannedMethod.replacement,
+    },
+  });
+}
+
+/**
+ * Creates listeners for banned mock method usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoMockImplementationListeners(
+  context: NoMockImplementationContext,
+): TSESLint.RuleListener {
+  return {
+    MemberExpression: checkMemberExpression.bind(undefined, context),
+  };
+}
 
 /**
  * ESLint rule that prohibits persistent mock implementations in favor of Once variants.
@@ -45,35 +84,7 @@ export const noMockImplementation = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    return {
-      /**
-       * Checks member expressions for banned mock methods.
-       *
-       * @param node - The member expression node to check.
-       */
-      MemberExpression(node) {
-        const name = getMemberPropertyName(node);
-        if (!name) {
-          return;
-        }
-
-        const replacement = BANNED_MOCK_METHODS[name];
-        if (!replacement) {
-          return;
-        }
-
-        context.report({
-          node: node.property,
-          messageId: 'noMockImplementation',
-          data: {
-            method: name,
-            replacement,
-          },
-        });
-      },
-    };
-  },
+  create: createNoMockImplementationListeners,
 });
 
 export default noMockImplementation;

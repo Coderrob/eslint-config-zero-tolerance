@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-import type { ESLint, Linter } from 'eslint';
+import { CONFIG_NAME_RECOMMENDED, PLUGIN_NAMESPACE, Preset } from '../constants';
 import { buildRules } from '../rule-map';
-import { CONFIG_NAME_RECOMMENDED, PLUGIN_NAMESPACE, PRESET_RECOMMENDED } from '../constants';
+
+/** Flat-config shape produced by plugin preset factories. */
+export interface IPluginFlatConfig {
+  name: string;
+  plugins: Record<string, unknown>;
+  rules: Record<string, unknown>;
+}
 
 /**
  * Creates the recommended flat config preset so the plugin can dogfood itself.
+ *
  * @param plugin - The ESLint plugin instance to include in the config.
  * @returns A complete ESLint flat config with recommended rule settings.
  */
-export const createRecommendedConfig = (plugin: ESLint.Plugin): Linter.Config => ({
-  name: CONFIG_NAME_RECOMMENDED,
-  plugins: { [PLUGIN_NAMESPACE]: plugin },
-  rules: buildRules(PRESET_RECOMMENDED),
-});
+export function createRecommendedConfig(plugin: unknown): IPluginFlatConfig {
+  return {
+    name: CONFIG_NAME_RECOMMENDED,
+    plugins: { [PLUGIN_NAMESPACE]: plugin },
+    rules: buildRules(Preset.Recommended),
+  };
+}

@@ -1,52 +1,54 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noBannedTypes } from './no-banned-types';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-banned-types', noBannedTypes, {
   valid: [
     {
       code: 'type MyType = string;',
-      name: 'simple string type',
+      name: 'should allow simple string type',
     },
     {
       code: 'type MyFunction = (x: number) => number;',
-      name: 'function type',
+      name: 'should allow function type',
     },
     {
       code: 'interface IUser { name: string; }',
-      name: 'interface definition',
+      name: 'should allow interface definition',
     },
     {
       code: 'type Union = string | number;',
-      name: 'union type',
+      name: 'should allow union type',
     },
     {
       code: 'type Intersection = A & B;',
-      name: 'intersection type',
+      name: 'should allow intersection type',
     },
     {
       code: 'type Generic<T> = T[];',
-      name: 'generic type',
+      name: 'should allow generic type',
     },
     {
       code: 'type Tuple = [string, number];',
-      name: 'tuple type',
+      name: 'should allow tuple type',
     },
     {
       code: 'type ObjectType = { [key: string]: string };',
-      name: 'object with index signature',
+      name: 'should allow object with index signature',
     },
   ],
   invalid: [
     {
       code: 'type MyReturnType = ReturnType<typeof myFunction>;',
-      name: 'ReturnType usage',
+      name: 'should report ReturnType usage',
       errors: [
         {
           messageId: 'bannedReturnType',
@@ -55,7 +57,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type Value = MyObject["key"];',
-      name: 'indexed access with string literal',
+      name: 'should report indexed access with string literal',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -64,7 +66,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type Prop = Props["onChange"];',
-      name: 'indexed access for prop type',
+      name: 'should report indexed access for prop type',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -73,7 +75,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type NestedReturn = ReturnType<ReturnType<typeof factory>>;',
-      name: 'nested ReturnType',
+      name: 'should report nested ReturnType usage',
       errors: [
         {
           messageId: 'bannedReturnType',
@@ -85,7 +87,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type ChainedAccess = Obj["prop1"]["prop2"];',
-      name: 'chained indexed access',
+      name: 'should report chained indexed access',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -97,7 +99,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type Combined = ReturnType<typeof fn> | string;',
-      name: 'ReturnType in union',
+      name: 'should report ReturnType in union',
       errors: [
         {
           messageId: 'bannedReturnType',
@@ -106,7 +108,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type ArrayElement = MyArray[number];',
-      name: 'indexed access with number',
+      name: 'should report indexed access with number',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -115,7 +117,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type KeyType = MyObject[keyof MyObject];',
-      name: 'indexed access with keyof',
+      name: 'should report indexed access with keyof',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -124,7 +126,7 @@ ruleTester.run('no-banned-types', noBannedTypes, {
     },
     {
       code: 'type Mapped = { [K in keyof T]: T[K] };',
-      name: 'mapped type with indexed access',
+      name: 'should report mapped type with indexed access',
       errors: [
         {
           messageId: 'bannedIndexedAccess',
@@ -132,4 +134,4 @@ ruleTester.run('no-banned-types', noBannedTypes, {
       ],
     },
   ],
-} as any);
+});

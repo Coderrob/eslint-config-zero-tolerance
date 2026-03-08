@@ -1,66 +1,68 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { requireTestDescriptionStyle } from './require-test-description-style';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
   valid: [
     {
       code: 'it("should test something", () => {});',
-      name: 'it with should prefix',
+      name: 'should allow it with should prefix',
     },
     {
       code: 'test("should work correctly", () => {});',
-      name: 'test with should prefix',
+      name: 'should allow test with should prefix',
     },
     {
       code: 'it("should handle edge cases", function() {});',
-      name: 'function expression with should prefix',
+      name: 'should allow function expression with should prefix',
     },
     {
       code: 'it("should support async tests", async () => {});',
-      name: 'async arrow function with should prefix',
+      name: 'should allow async arrow function with should prefix',
     },
     {
       code: 'test("should accept any callback", function testCallback() {});',
-      name: 'named function expression with should prefix',
+      name: 'should allow named function expression with should prefix',
     },
     {
       code: 'describe("MyComponent", () => { it("should render", () => {}); });',
-      name: 'nested test with should prefix',
+      name: 'should allow nested test with should prefix',
     },
     {
       code: 'it.skip("should be skipped", () => {});',
-      name: 'skipped test with should prefix',
+      name: 'should allow skipped test with should prefix',
     },
     {
       code: 'test.only("should run only", () => {});',
-      name: 'focused test with should prefix',
+      name: 'should allow focused test with should prefix',
     },
     {
       code: 'const notATest = it;',
-      name: 'it as variable reference, not a call',
+      name: 'should allow it as variable reference and not a call',
     },
     {
       code: 'const obj = { test: "value" };',
-      name: 'test as object property',
+      name: 'should allow test as object property',
     },
     {
       code: 'it.skip(123, () => {});',
-      name: 'skipped test with non-string description is ignored',
+      name: 'should allow skipped test with non-string description',
     },
     {
       code: 'it(`should template`, () => {});',
-      name: 'template literal description is ignored',
+      name: 'should allow template literal description',
     },
     {
       code: 'test.only(100, () => {});',
-      name: 'numeric description is ignored',
+      name: 'should allow numeric description',
     },
     {
       code: "it['skip']('should not enforce', () => {});",
@@ -75,18 +77,23 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       name: 'should allow test computed skip with description not starting with should',
     },
     {
+      code: 'it("renders correctly", () => {});',
+      name: 'should allow custom prefix when configured',
+      options: [{ prefix: 'renders' }],
+    },
+    {
       code: 'helper.it("should be ignored", () => {});',
-      name: 'member call on non-test object is ignored',
+      name: 'should allow member call on non-test object',
     },
     {
       code: 'it();',
-      name: 'test call without args is ignored',
+      name: 'should allow test call without args',
     },
   ],
   invalid: [
     {
       code: 'it("tests something", () => {});',
-      name: 'it without should prefix',
+      name: 'should report it without should prefix',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -95,7 +102,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'test("does something", () => {});',
-      name: 'test without should prefix',
+      name: 'should report test without should prefix',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -104,7 +111,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'it("Testing functionality", () => {});',
-      name: 'capitalized but wrong format',
+      name: 'should report capitalized but wrong format',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -113,7 +120,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'it("renders correctly", () => {});',
-      name: 'descriptive but missing should',
+      name: 'should report descriptive text missing should',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -122,7 +129,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'test("validates input", async () => {});',
-      name: 'async test without should prefix',
+      name: 'should report async test without should prefix',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -131,7 +138,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'it("Should be lowercase", () => {});',
-      name: 'Should with capital S',
+      name: 'should report Should with capital S',
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -140,7 +147,17 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     },
     {
       code: 'test("   does something", () => {});',
-      name: 'leading whitespace without should',
+      name: 'should report leading whitespace without should',
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+    },
+    {
+      code: 'it.skip("skipped test", () => {});',
+      name: 'should enforce skip tests when ignoreSkip is false',
+      options: [{ ignoreSkip: false }],
       errors: [
         {
           messageId: 'requireTestDescriptionStyle',
@@ -148,4 +165,4 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       ],
     },
   ],
-} as any);
+});

@@ -14,10 +14,49 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoEmptyCatchContext = Readonly<TSESLint.RuleContext<'emptyCatch', []>>;
+
+/**
+ * Reports empty catch blocks.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Catch clause node to evaluate.
+ */
+function checkCatchClause(context: NoEmptyCatchContext, node: TSESTree.CatchClause): void {
+  if (!hasEmptyCatchBody(node)) {
+    return;
+  }
+
+  context.report({
+    node,
+    messageId: 'emptyCatch',
+  });
+}
+
+/**
+ * Creates listeners for empty catch detection.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoEmptyCatchListeners(context: NoEmptyCatchContext): TSESLint.RuleListener {
+  return {
+    CatchClause: checkCatchClause.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns true when a catch clause body has no statements.
+ *
+ * @param node - Catch clause node to inspect.
+ * @returns True when the catch body is empty.
+ */
+function hasEmptyCatchBody(node: TSESTree.CatchClause): boolean {
+  return node.body.body.length === 0;
+}
 
 /**
  * ESLint rule that disallows empty catch blocks.
@@ -35,28 +74,7 @@ export const noEmptyCatch = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that detects empty catch blocks.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks a catch clause for empty body.
-     *
-     * @param node - The catch clause node to check.
-     */
-    const checkCatchClause = (node: TSESTree.CatchClause): void => {
-      if (node.body.body.length === 0) {
-        context.report({ node, messageId: 'emptyCatch' });
-      }
-    };
-
-    return {
-      CatchClause: checkCatchClause,
-    };
-  },
+  create: createNoEmptyCatchListeners,
 });
 
 export default noEmptyCatch;

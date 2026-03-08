@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
-import { getMemberPropertyName } from '../ast-helpers';
-
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { getMappedMemberPropertyName } from '../ast-helpers';
+import { createRule } from '../rule-factory';
 
 const BANNED_MATCHERS: Record<string, string> = {
   toBeCalled: 'toHaveBeenCalledTimes',
@@ -28,6 +26,47 @@ const BANNED_MATCHERS: Record<string, string> = {
   toHaveBeenLastCalledWith: 'toHaveBeenNthCalledWith',
   toLastCalledWith: 'toHaveBeenNthCalledWith',
 };
+
+type NoJestHaveBeenCalledContext = Readonly<TSESLint.RuleContext<'noHaveBeenCalled', []>>;
+
+/**
+ * Checks member expressions for banned Jest matchers.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Member expression node to inspect.
+ */
+function checkMemberExpression(
+  context: NoJestHaveBeenCalledContext,
+  node: TSESTree.MemberExpression,
+): void {
+  const bannedMatcher = getMappedMemberPropertyName(node, BANNED_MATCHERS);
+  if (bannedMatcher === null) {
+    return;
+  }
+
+  context.report({
+    node: node.property,
+    messageId: 'noHaveBeenCalled',
+    data: {
+      matcher: bannedMatcher.name,
+      replacement: bannedMatcher.replacement,
+    },
+  });
+}
+
+/**
+ * Creates listeners for banned Jest matcher usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createNoJestHaveBeenCalledListeners(
+  context: NoJestHaveBeenCalledContext,
+): TSESLint.RuleListener {
+  return {
+    MemberExpression: checkMemberExpression.bind(undefined, context),
+  };
+}
 
 /**
  * ESLint rule that prohibits deprecated Jest matchers in favor of explicit call count variants.
@@ -47,35 +86,7 @@ export const noJestHaveBeenCalled = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    return {
-      /**
-       * Checks member expressions for banned Jest matchers.
-       *
-       * @param node - The member expression node to check.
-       */
-      MemberExpression(node) {
-        const name = getMemberPropertyName(node);
-        if (!name) {
-          return;
-        }
-
-        const replacement = BANNED_MATCHERS[name];
-        if (!replacement) {
-          return;
-        }
-
-        context.report({
-          node: node.property,
-          messageId: 'noHaveBeenCalled',
-          data: {
-            matcher: name,
-            replacement,
-          },
-        });
-      },
-    };
-  },
+  create: createNoJestHaveBeenCalledListeners,
 });
 
 export default noJestHaveBeenCalled;

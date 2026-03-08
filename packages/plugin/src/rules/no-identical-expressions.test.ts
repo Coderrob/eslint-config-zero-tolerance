@@ -1,12 +1,14 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noIdenticalExpressions } from './no-identical-expressions';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-identical-expressions', noIdenticalExpressions, {
   valid: [
@@ -67,4 +69,4 @@ ruleTester.run('no-identical-expressions', noIdenticalExpressions, {
       errors: [{ messageId: 'identicalExpressions', data: { operator: '===' } }],
     },
   ],
-} as any);
+});

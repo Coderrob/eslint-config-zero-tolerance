@@ -1,5 +1,9 @@
-import eslintPlugin from './index';
-import { buildRules, ruleMap } from './rule-map';
+import {
+  createRecommendedConfig,
+  createStrictConfig,
+  legacyRecommendedConfig,
+  legacyStrictConfig,
+} from './configs';
 import {
   CONFIG_KEY_LEGACY_RECOMMENDED,
   CONFIG_KEY_LEGACY_STRICT,
@@ -7,16 +11,11 @@ import {
   CONFIG_NAME_STRICT,
   PLUGIN_NAMESPACE,
   PLUGIN_PACKAGE_NAME,
-  PRESET_RECOMMENDED,
-  PRESET_STRICT,
+  Preset,
   TYPESCRIPT_ESLINT_PARSER,
 } from './constants';
-import {
-  createRecommendedConfig,
-  createStrictConfig,
-  legacyRecommendedConfig,
-  legacyStrictConfig,
-} from './configs';
+import { buildRules, ruleMap } from './rule-map';
+import eslintPlugin from './index';
 
 const RULE_NO_EXPORT_ALIAS = `${PLUGIN_NAMESPACE}/no-export-alias`;
 const RULE_MAX_FUNCTION_LINES = `${PLUGIN_NAMESPACE}/max-function-lines`;
@@ -26,13 +25,13 @@ const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
 
 describe('plugin wiring', () => {
   it('should build prefixed recommended and strict rule maps', () => {
-    const recommendedRules = buildRules(PRESET_RECOMMENDED);
-    const strictRules = buildRules(PRESET_STRICT);
+    const recommendedRules = buildRules(Preset.Recommended);
+    const strictRules = buildRules(Preset.Strict);
 
     expect(recommendedRules[RULE_NO_EXPORT_ALIAS]).toBe('warn');
     expect(strictRules[RULE_NO_EXPORT_ALIAS]).toBe('error');
     expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual(['warn', { max: 20 }]);
-    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 10 }]);
+    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 15 }]);
     expect(Object.keys(recommendedRules)).toHaveLength(Object.keys(ruleMap).length);
     expect(Object.keys(strictRules)).toHaveLength(Object.keys(ruleMap).length);
   });

@@ -1,12 +1,14 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noMockImplementation } from './no-mock-implementation';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-mock-implementation', noMockImplementation, {
   valid: [
@@ -123,4 +125,4 @@ ruleTester.run('no-mock-implementation', noMockImplementation, {
       ],
     },
   ],
-} as any);
+});

@@ -14,14 +14,65 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../ast-guards';
 import { resolveFunctionName } from '../ast-helpers';
+import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 const MAX_PARAMS_MAX = 4;
+
+/**
+ * Reads the `max` property from an option object.
+ *
+ * @param option - First rule option value.
+ * @returns The raw max value when present, otherwise undefined.
+ */
+function getOptionMaxValue(option: unknown): unknown {
+  if (option === null || typeof option !== 'object') {
+    return undefined;
+  }
+  return Reflect.get(option, 'max');
+}
+
+/**
+ * Reports when a function exceeds the configured parameter limit.
+ *
+ * @param context - ESLint rule execution context.
+ * @param maxParamsCount - Configured maximum parameter count.
+ * @param node - Function-like node to check.
+ */
+function reportIfTooManyParams(
+  context: Readonly<TSESLint.RuleContext<'tooManyParams', []>>,
+  maxParamsCount: number,
+  node: FunctionNode,
+): void {
+  const parameterCount = node.params.length;
+  if (parameterCount > maxParamsCount) {
+    context.report({
+      node,
+      messageId: 'tooManyParams',
+      data: { name: resolveFunctionName(node), count: parameterCount, max: maxParamsCount },
+    });
+  }
+}
+
+/**
+ * Creates listeners for max-params rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function resolveListeners(
+  context: Readonly<TSESLint.RuleContext<'tooManyParams', []>>,
+): TSESLint.RuleListener {
+  const maxParamsCount = resolveMax(context.options);
+  return {
+    ArrowFunctionExpression: reportIfTooManyParams.bind(undefined, context, maxParamsCount),
+    FunctionDeclaration: reportIfTooManyParams.bind(undefined, context, maxParamsCount),
+    FunctionExpression: reportIfTooManyParams.bind(undefined, context, maxParamsCount),
+  };
+}
 
 /**
  * Returns the configured parameter limit, defaulting to 4.
@@ -30,9 +81,8 @@ const MAX_PARAMS_MAX = 4;
  * @returns The maximum allowed number of parameters.
  */
 function resolveMax(options: unknown[]): number {
-  const opt = options[0] as { max?: unknown } | undefined;
-  const max = opt?.max;
-  return isNumber(max) && max > 0 ? max : MAX_PARAMS_MAX;
+  const maxValue = getOptionMaxValue(options[0]);
+  return isNumber(maxValue) && maxValue > 0 ? maxValue : MAX_PARAMS_MAX;
 }
 
 /**
@@ -58,32 +108,7 @@ export const maxParams = createRule({
     ],
   },
   defaultOptions: [],
-  create(context) {
-    const max = resolveMax(context.options);
-
-    /**
-     * Checks a function node for parameter count violations.
-     *
-     * @param node - The function node to check.
-     */
-    function checkFunction(node: FunctionNode): void {
-      const count = node.params.length;
-      if (count <= max) {
-        return;
-      }
-      context.report({
-        node,
-        messageId: 'tooManyParams',
-        data: { name: resolveFunctionName(node), count, max },
-      });
-    }
-
-    return {
-      FunctionDeclaration: checkFunction,
-      FunctionExpression: checkFunction,
-      ArrowFunctionExpression: checkFunction,
-    };
-  },
+  create: resolveListeners,
 });
 
 export default maxParams;

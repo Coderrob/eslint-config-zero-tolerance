@@ -14,102 +14,38 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
 const LOGICAL_AND_OPERATOR = '&&';
 const MEMBER_DOT_PREFIX = '.';
 const MEMBER_COMPUTED_PREFIX = '[';
 const CALL_PREFIX = '(';
+const MEMBER_DOT_PREFIX_LENGTH = 1;
 const SIMPLE_GUARD_NODE_TYPES = new Set([
   AST_NODE_TYPES.Identifier,
   AST_NODE_TYPES.ThisExpression,
   AST_NODE_TYPES.Super,
 ]);
 
+type RequireOptionalChainingContext = Readonly<TSESLint.RuleContext<'useOptionalChaining', []>>;
+
 /**
- * Returns inner expression for supported wrapper node types.
+ * Returns optional-chain replacement when suffix is a supported access/call pattern.
  *
- * @param expression - The expression to inspect.
- * @returns The wrapped inner expression or null when not wrapped.
+ * @param leftText - Source text for the guard expression.
+ * @param suffix - Right-side suffix after removing the guard prefix.
+ * @returns Optional-chain replacement text, or null if unsupported.
  */
-function getWrappedExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
-  if (expression.type === AST_NODE_TYPES.ChainExpression) {
-    return expression.expression;
+function buildOptionalChainFromSuffix(leftText: string, suffix: string): string | null {
+  if (suffix.startsWith(MEMBER_DOT_PREFIX)) {
+    return `${leftText}?.${suffix.slice(MEMBER_DOT_PREFIX_LENGTH)}`;
   }
-  if (expression.type === AST_NODE_TYPES.TSAsExpression) {
-    return expression.expression;
+  if (suffix.startsWith(MEMBER_COMPUTED_PREFIX) || suffix.startsWith(CALL_PREFIX)) {
+    return `${leftText}?.${suffix}`;
   }
   return null;
-}
-
-/**
- * Returns the unwrapped expression for chain/parenthesized wrappers.
- *
- * @param expression - The expression to unwrap.
- * @returns The inner expression when wrapped; otherwise the original node.
- */
-function unwrapExpression(expression: TSESTree.Expression): TSESTree.Expression {
-  const wrappedExpression = getWrappedExpression(expression);
-  if (wrappedExpression !== null) {
-    return unwrapExpression(wrappedExpression);
-  }
-  return expression;
-}
-
-/**
- * Returns true when a computed property key is side-effect-free.
- * Only identifier names and string/number literal values qualify;
- * call expressions or other dynamic keys may produce side effects and
- * must not be auto-fixed. RegExp, BigInt, and boolean literals are
- * excluded as they are not idiomatic computed property keys.
- *
- * @param property - The computed property expression or private identifier.
- * @returns True when the key is safe to use in an auto-fix.
- */
-function isSafeComputedKey(property: TSESTree.Expression | TSESTree.PrivateIdentifier): boolean {
-  if (property.type === AST_NODE_TYPES.Identifier) {
-    return true;
-  }
-  if (property.type === AST_NODE_TYPES.Literal) {
-    return typeof property.value === 'string' || typeof property.value === 'number';
-  }
-  return false;
-}
-
-/**
- * Returns true when a MemberExpression is safe as a guard.
- *
- * @param node - The MemberExpression node.
- * @returns True when safe.
- */
-function isSafeMemberExpression(node: TSESTree.MemberExpression): boolean {
-  let isSafe = true;
-  if (node.computed) {
-    isSafe = isSafeComputedKey(node.property);
-  }
-  if (!isSafe) {
-    return false;
-  }
-  return isSafeGuardExpression(node.object);
-}
-
-/**
- * Returns true when expression kind is safe as an optional-chaining guard.
- *
- * @param expression - The guard expression to validate.
- * @returns True when the expression is a safe guard candidate.
- */
-function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
-  const node = unwrapExpression(expression);
-  if (SIMPLE_GUARD_NODE_TYPES.has(node.type)) {
-    return true;
-  }
-  if (node.type === AST_NODE_TYPES.MemberExpression) {
-    return isSafeMemberExpression(node);
-  }
-  return false;
 }
 
 /**
@@ -127,20 +63,71 @@ function buildOptionalChainReplacement(leftText: string, rightText: string): str
 }
 
 /**
- * Returns optional-chain replacement when suffix is a supported access/call pattern.
+ * Reports logical `&&` guard patterns that can be optional chained.
  *
- * @param leftText - Source text for the guard expression.
- * @param suffix - Right-side suffix after removing the guard prefix.
- * @returns Optional-chain replacement text, or null if unsupported.
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Logical expression node to evaluate.
  */
-function buildOptionalChainFromSuffix(leftText: string, suffix: string): string | null {
-  if (suffix.startsWith(MEMBER_DOT_PREFIX)) {
-    return `${leftText}?.${suffix.slice(1)}`;
+function checkLogicalExpression(
+  context: RequireOptionalChainingContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.LogicalExpression,
+): void {
+  const replacement = getOptionalChainReplacement(node, sourceCode);
+  if (replacement === null) {
+    return;
   }
-  if (suffix.startsWith(MEMBER_COMPUTED_PREFIX) || suffix.startsWith(CALL_PREFIX)) {
-    return `${leftText}?.${suffix}`;
-  }
-  return null;
+  context.report({
+    node,
+    messageId: 'useOptionalChaining',
+    fix: createLogicalExpressionFix(node, replacement),
+  });
+}
+
+/**
+ * Creates a text-replacement fixer for a logical expression.
+ *
+ * @param node - Logical expression node to replace.
+ * @param replacement - Replacement text.
+ * @returns ESLint fix callback.
+ */
+function createLogicalExpressionFix(
+  node: TSESTree.LogicalExpression,
+  replacement: string,
+): TSESLint.ReportFixFunction {
+  return fixLogicalExpression.bind(undefined, node, replacement);
+}
+
+/**
+ * Creates listeners for require-optional-chaining rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function createRequireOptionalChainingListeners(
+  context: RequireOptionalChainingContext,
+): TSESLint.RuleListener {
+  const sourceCode = context.sourceCode;
+  return {
+    LogicalExpression: checkLogicalExpression.bind(undefined, context, sourceCode),
+  };
+}
+
+/**
+ * Applies the autofix to replace a logical expression with optional chaining.
+ *
+ * @param node - Logical expression node to replace.
+ * @param replacement - Replacement text.
+ * @param fixer - ESLint fixer.
+ * @returns The generated fix.
+ */
+function fixLogicalExpression(
+  node: TSESTree.LogicalExpression,
+  replacement: string,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  return fixer.replaceText(node, replacement);
 }
 
 /**
@@ -165,6 +152,90 @@ function getOptionalChainReplacement(
 }
 
 /**
+ * Returns inner expression for supported wrapper node types.
+ *
+ * @param expression - The expression to inspect.
+ * @returns The wrapped inner expression or null when not wrapped.
+ */
+function getWrappedExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
+  if (expression.type === AST_NODE_TYPES.ChainExpression) {
+    return expression.expression;
+  }
+  if (expression.type === AST_NODE_TYPES.TSAsExpression) {
+    return expression.expression;
+  }
+  return null;
+}
+
+/**
+ * Returns true when a computed property key is side-effect-free.
+ *
+ * @param property - The computed property expression or private identifier.
+ * @returns True when the key is safe to use in an auto-fix.
+ */
+function isSafeComputedKey(property: TSESTree.Expression | TSESTree.PrivateIdentifier): boolean {
+  if (property.type === AST_NODE_TYPES.Identifier) {
+    return true;
+  }
+  if (property.type === AST_NODE_TYPES.Literal) {
+    return typeof property.value === 'string' || typeof property.value === 'number';
+  }
+  return false;
+}
+
+/**
+ * Returns true when expression kind is safe as an optional-chaining guard.
+ *
+ * @param expression - The guard expression to validate.
+ * @returns True when the expression is a safe guard candidate.
+ */
+function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
+  const node = unwrapExpression(expression);
+  if (SIMPLE_GUARD_NODE_TYPES.has(node.type)) {
+    return true;
+  }
+  if (node.type === AST_NODE_TYPES.MemberExpression) {
+    return isSafeMemberExpression(node);
+  }
+  return false;
+}
+
+/**
+ * Returns true when a MemberExpression is safe as a guard.
+ *
+ * @param node - The MemberExpression node.
+ * @returns True when safe.
+ */
+function isSafeMemberExpression(node: TSESTree.MemberExpression): boolean {
+  if (node.computed && !isSafeComputedKey(node.property)) {
+    return false;
+  }
+  return isSafeGuardExpression(node.object);
+}
+
+/**
+ * Applies the autofix to replace a logical expression with optional chaining.
+ *
+ * @param node - Logical expression node to replace.
+ * @param replacement - Replacement text.
+ * @param fixer - ESLint fixer.
+ * @returns The generated fix.
+ */
+/**
+ * Returns the unwrapped expression for chain wrappers.
+ *
+ * @param expression - The expression to unwrap.
+ * @returns The inner expression when wrapped; otherwise the original node.
+ */
+function unwrapExpression(expression: TSESTree.Expression): TSESTree.Expression {
+  const wrappedExpression = getWrappedExpression(expression);
+  if (wrappedExpression === null) {
+    return expression;
+  }
+  return unwrapExpression(wrappedExpression);
+}
+
+/**
  * ESLint rule that requires optional chaining for guard-access patterns.
  */
 export const requireOptionalChaining = createRule({
@@ -181,33 +252,7 @@ export const requireOptionalChaining = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    const sourceCode = context.sourceCode;
-
-    /**
-     * Reports logical `&&` guard patterns that can be optional chained.
-     *
-     * @param node - The logical expression node to evaluate.
-     */
-    const checkLogicalExpression = (node: TSESTree.LogicalExpression): void => {
-      const replacement = getOptionalChainReplacement(node, sourceCode);
-      if (replacement === null) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'useOptionalChaining',
-        fix(fixer: TSESLint.RuleFixer) {
-          return fixer.replaceText(node, replacement);
-        },
-      });
-    };
-
-    return {
-      LogicalExpression: checkLogicalExpression,
-    };
-  },
+  create: createRequireOptionalChainingListeners,
 });
 
 export default requireOptionalChaining;

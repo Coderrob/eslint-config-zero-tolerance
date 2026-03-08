@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
-
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
 const CHECKED_BINARY_OPERATORS = new Set([
   '===',
@@ -32,6 +31,105 @@ const CHECKED_BINARY_OPERATORS = new Set([
   '/',
   '%',
 ]);
+
+type NoIdenticalExpressionsContext = Readonly<TSESLint.RuleContext<'identicalExpressions', []>>;
+
+/**
+ * Checks one binary/logical expression for identical operands.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Expression node to inspect.
+ */
+function checkExpression(
+  context: NoIdenticalExpressionsContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.BinaryExpression | TSESTree.LogicalExpression,
+): void {
+  if (!isCheckedOperator(node.operator)) {
+    return;
+  }
+  if (
+    !isExpressionNode(node.left) ||
+    !hasIdenticalExpressionText(sourceCode, node.left, node.right)
+  ) {
+    return;
+  }
+
+  reportIdenticalExpression(context, node);
+}
+
+/**
+ * Creates listeners that detect identical expressions.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoIdenticalExpressionsListeners(
+  context: NoIdenticalExpressionsContext,
+): TSESLint.RuleListener {
+  const sourceCode = context.sourceCode;
+
+  return {
+    BinaryExpression: checkExpression.bind(undefined, context, sourceCode),
+    LogicalExpression: checkExpression.bind(undefined, context, sourceCode),
+  };
+}
+
+/**
+ * Returns true when both expression nodes have identical source text.
+ *
+ * @param sourceCode - Source code helper.
+ * @param left - Left expression node.
+ * @param right - Right expression node.
+ * @returns True when both sides serialize to the same text.
+ */
+function hasIdenticalExpressionText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  left: TSESTree.Expression,
+  right: TSESTree.Expression,
+): boolean {
+  const leftText = sourceCode.getText(left);
+  const rightText = sourceCode.getText(right);
+  return leftText === rightText;
+}
+
+/**
+ * Returns true when the operator should be checked by this rule.
+ *
+ * @param operator - Binary or logical operator token.
+ * @returns True when the operator is in the checked set.
+ */
+function isCheckedOperator(operator: string): boolean {
+  return CHECKED_BINARY_OPERATORS.has(operator);
+}
+
+/**
+ * Returns true when node is an ESTree expression (not a private identifier).
+ *
+ * @param node - Candidate node.
+ * @returns True when node is an expression.
+ */
+function isExpressionNode(node: TSESTree.Node): node is TSESTree.Expression {
+  return node.type !== AST_NODE_TYPES.PrivateIdentifier;
+}
+
+/**
+ * Reports identical-expression violations.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Expression node to report.
+ */
+function reportIdenticalExpression(
+  context: NoIdenticalExpressionsContext,
+  node: TSESTree.BinaryExpression | TSESTree.LogicalExpression,
+): void {
+  context.report({
+    node,
+    messageId: 'identicalExpressions',
+    data: { operator: node.operator },
+  });
+}
 
 /**
  * ESLint rule that detects identical expressions in binary operations.
@@ -51,46 +149,7 @@ export const noIdenticalExpressions = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that detects identical expressions in binary/logical operations.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    const sourceCode = context.sourceCode;
-
-    /**
-     * Checks a binary or logical expression for identical operands.
-     *
-     * @param node - The expression node to check.
-     */
-    const checkExpression = (
-      node: TSESTree.BinaryExpression | TSESTree.LogicalExpression,
-    ): void => {
-      if (!CHECKED_BINARY_OPERATORS.has(node.operator)) {
-        return;
-      }
-
-      const leftText = sourceCode.getText(node.left);
-      const rightText = sourceCode.getText(node.right);
-
-      if (leftText !== rightText) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'identicalExpressions',
-        data: { operator: node.operator },
-      });
-    };
-
-    return {
-      BinaryExpression: checkExpression,
-      LogicalExpression: checkExpression,
-    };
-  },
+  create: createNoIdenticalExpressionsListeners,
 });
 
 export default noIdenticalExpressions;

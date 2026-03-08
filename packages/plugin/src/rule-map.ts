@@ -15,24 +15,22 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, type Preset } from './constants';
+import { PLUGIN_NAMESPACE, Preset } from './constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
-
-// Rule limit constants
 const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 20;
-const MAX_FUNCTION_LINES_STRICT_MAX = 10;
+const MAX_FUNCTION_LINES_STRICT_MAX = 15;
 const MAX_PARAMS_MAX = 4;
 
-const DEFAULT_RULE_NAMES = [
+const DEFAULT_RULE_NAMES: string[] = [
   'require-interface-prefix',
   'require-test-description-style',
-  'require-zod-schema-description',
   'no-banned-types',
   'no-dynamic-import',
   'no-literal-unions',
   'no-export-alias',
+  'no-parent-imports',
   'no-re-export',
   'no-jest-have-been-called',
   'no-mock-implementation',
@@ -45,52 +43,132 @@ const DEFAULT_RULE_NAMES = [
   'no-magic-numbers',
   'no-magic-strings',
   'no-identical-expressions',
+  'no-identical-branches',
   'no-redundant-boolean',
   'no-empty-catch',
   'no-non-null-assertion',
   'no-await-in-loop',
   'no-throw-literal',
-] as const;
+  'no-parameter-reassign',
+  'no-flag-argument',
+  'no-floating-promises',
+  'prefer-guard-clauses',
+  'prefer-shortcut-return',
+  'prefer-nullish-coalescing',
+  'no-query-side-effects',
+];
 
 const MAX_FUNCTION_LINES_RULE = 'max-function-lines';
 const MAX_PARAMS_RULE = 'max-params';
 
-/**
- * Per-rule severity and options for each config preset.
- */
-export interface RuleConfig {
+type RuleEntryTuple = readonly [string, IRuleConfig];
+
+/** Per-rule severity and options for each config preset. */
+export interface IRuleConfig {
   recommended: Linter.RuleEntry;
   strict: Linter.RuleEntry;
 }
 
-type RuleName =
-  | (typeof DEFAULT_RULE_NAMES)[number]
-  | typeof MAX_FUNCTION_LINES_RULE
-  | typeof MAX_PARAMS_RULE;
+/**
+ * Creates a prefixed ESLint rule key.
+ *
+ * @param ruleName - Unprefixed plugin rule name.
+ * @returns Rule key with plugin namespace.
+ */
+function buildPrefixedRuleName(ruleName: string): string {
+  return `${PLUGIN_NAMESPACE}/${ruleName}`;
+}
+
+/**
+ * Builds the canonical rule map object from entry tuples.
+ *
+ * @returns Rule map keyed by unprefixed rule name.
+ */
+function buildRuleMap(): Record<string, IRuleConfig> {
+  const map: Record<string, IRuleConfig> = {};
+  for (const [ruleName, config] of ruleEntries) {
+    map[ruleName] = config;
+  }
+  return map;
+}
+
+/**
+ * Builds prefixed ESLint rules for the requested preset.
+ *
+ * @param preset - Requested preset.
+ * @returns Rules record for ESLint config consumption.
+ */
+export function buildRules(preset: Preset): Linter.RulesRecord {
+  const rules: Linter.RulesRecord = {};
+  for (const [name, config] of Object.entries(ruleMap)) {
+    const [prefixedName, ruleEntry] = mapRuleForPreset(name, config, preset);
+    rules[prefixedName] = ruleEntry;
+  }
+  return rules;
+}
+
+/**
+ * Builds a rule map entry for one default rule name.
+ *
+ * @param ruleName - Rule name.
+ * @returns Canonical rule tuple.
+ */
+function createDefaultRuleEntry(ruleName: string): RuleEntryTuple {
+  return createRuleEntry(ruleName);
+}
 
 /**
  * Creates a canonical rule-map entry with default warn/error severities.
- * @param ruleName - The name of the rule to create an entry for.
- * @param recommended - The rule configuration for the recommended preset.
- * @param strict - The rule configuration for the strict preset.
- * @returns A tuple containing the rule name and its configuration object.
+ *
+ * @param ruleName - Rule name.
+ * @param recommended - Recommended preset configuration.
+ * @param strict - Strict preset configuration.
+ * @returns Rule-entry tuple.
  */
 function createRuleEntry(
-  ruleName: RuleName,
+  ruleName: string,
   recommended: Linter.RuleEntry = WARN_LEVEL,
   strict: Linter.RuleEntry = ERROR_LEVEL,
-): [RuleName, RuleConfig] {
+): RuleEntryTuple {
   return [ruleName, { recommended, strict }];
 }
 
 /**
- * Canonical single source of truth for every rule's recommended and strict
- * configuration. All four config presets (flat and legacy) are derived from
- * this map — adding a rule here is the only change required to register it
- * in every preset simultaneously.
+ * Selects the preset-specific rule configuration.
+ *
+ * @param config - Rule config for all presets.
+ * @param preset - Requested preset.
+ * @returns The matching rule entry.
  */
-const ruleEntries: Array<[RuleName, RuleConfig]> = [
-  ...DEFAULT_RULE_NAMES.map((ruleName) => createRuleEntry(ruleName)),
+function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEntry {
+  if (preset === Preset.Strict) {
+    return config.strict;
+  }
+  return config.recommended;
+}
+
+/**
+ * Converts one rule entry tuple into a prefixed ESLint rules tuple.
+ *
+ * @param ruleName - Rule name.
+ * @param config - Rule config.
+ * @param preset - Requested preset.
+ * @returns Prefixed rule tuple for ESLint rules record construction.
+ */
+function mapRuleForPreset(
+  ruleName: string,
+  config: IRuleConfig,
+  preset: Preset,
+): readonly [string, Linter.RuleEntry] {
+  return [buildPrefixedRuleName(ruleName), getPresetRuleConfig(config, preset)];
+}
+
+/**
+ * Canonical single source of truth for every rule's recommended and strict
+ * configuration.
+ */
+const ruleEntries: RuleEntryTuple[] = [
+  ...DEFAULT_RULE_NAMES.map(createDefaultRuleEntry),
   createRuleEntry(
     MAX_FUNCTION_LINES_RULE,
     [WARN_LEVEL, { max: MAX_FUNCTION_LINES_RECOMMENDED_MAX }],
@@ -103,25 +181,4 @@ const ruleEntries: Array<[RuleName, RuleConfig]> = [
   ),
 ];
 
-export const ruleMap = ruleEntries.reduce<Record<string, RuleConfig>>(
-  (accumulator, [ruleName, config]) => {
-    accumulator[ruleName] = config;
-    return accumulator;
-  },
-  {},
-);
-
-/**
- * Builds a prefixed ESLint rules record for the given preset by reading each
- * rule's configuration from the canonical rule map.
- * @param preset - The preset to build rules for ('recommended' or 'strict').
- * @returns An object containing all rules with their configurations for the specified preset.
- */
-export function buildRules(preset: Preset): Linter.RulesRecord {
-  return Object.fromEntries(
-    Object.entries(ruleMap).map(([name, config]) => [
-      `${PLUGIN_NAMESPACE}/${name}`,
-      config[preset],
-    ]),
-  );
-}
+export const ruleMap = buildRuleMap();

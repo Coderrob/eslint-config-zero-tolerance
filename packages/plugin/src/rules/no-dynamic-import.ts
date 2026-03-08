@@ -14,12 +14,82 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isIdentifierNode, isTestFile } from '../ast-guards';
 import { CALLEE_REQUIRE } from '../rule-constants';
-import { isTestFile } from '../ast-guards';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoDynamicImportContext = Readonly<TSESLint.RuleContext<string, []>>;
+
+/**
+ * Checks call expressions and reports `require()` usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Call expression to inspect.
+ */
+function checkCallExpression(context: NoDynamicImportContext, node: TSESTree.CallExpression): void {
+  if (!isRequireCall(node)) {
+    return;
+  }
+
+  reportRequireCall(context, node);
+}
+
+/**
+ * Creates listeners for non-test files.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoDynamicImportListeners(context: NoDynamicImportContext): TSESLint.RuleListener {
+  if (isTestFile(context.filename)) {
+    return {};
+  }
+
+  return {
+    CallExpression: checkCallExpression.bind(undefined, context),
+    ImportExpression: reportDynamicImport.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns true when a call expression targets the global `require`.
+ *
+ * @param node - Call expression to inspect.
+ * @returns True when the callee is the `require` identifier.
+ */
+function isRequireCall(node: TSESTree.CallExpression): boolean {
+  return isIdentifierNode(node.callee) && node.callee.name === CALLEE_REQUIRE;
+}
+
+/**
+ * Reports a dynamic import expression.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Import expression to report.
+ */
+function reportDynamicImport(
+  context: NoDynamicImportContext,
+  node: TSESTree.ImportExpression,
+): void {
+  context.report({
+    node,
+    messageId: 'noDynamicImport',
+  });
+}
+
+/**
+ * Reports a `require()` call.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Call expression to report.
+ */
+function reportRequireCall(context: NoDynamicImportContext, node: TSESTree.CallExpression): void {
+  context.report({
+    node,
+    messageId: 'noRequire',
+  });
+}
 
 /**
  * ESLint rule that bans dynamic imports and require() calls except in test files.
@@ -32,52 +102,13 @@ export const noDynamicImport = createRule({
       description: 'Ban await import() and require() except in test files',
     },
     messages: {
-      noDynamicImport: 'Dynamic import() with await is not allowed outside of test files',
+      noDynamicImport: 'Dynamic import() is not allowed outside of test files',
       noRequire: 'require() is not allowed outside of test files',
     },
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    const filename = context.filename;
-    const isTest = isTestFile(filename);
-
-    // Skip checking if it's a test file
-    if (isTest) {
-      return {};
-    }
-
-    return {
-      /**
-       * Checks await expressions for dynamic imports.
-       *
-       * @param node - The await expression node to check.
-       */
-      AwaitExpression(node) {
-        // Check if awaiting an import() call
-        if (node.argument.type === AST_NODE_TYPES.ImportExpression) {
-          context.report({
-            node,
-            messageId: 'noDynamicImport',
-          });
-        }
-      },
-      /**
-       * Checks call expressions for require() calls.
-       *
-       * @param node - The call expression node to check.
-       */
-      CallExpression(node) {
-        // Check for require() calls
-        if (node.callee.type === AST_NODE_TYPES.Identifier && node.callee.name === CALLEE_REQUIRE) {
-          context.report({
-            node,
-            messageId: 'noRequire',
-          });
-        }
-      },
-    };
-  },
+  create: createNoDynamicImportListeners,
 });
 
 export default noDynamicImport;

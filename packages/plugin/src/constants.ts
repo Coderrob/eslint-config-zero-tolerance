@@ -26,15 +26,14 @@ export const CONFIG_NAME_RECOMMENDED = `${PLUGIN_NAMESPACE}/recommended`;
 /** Fully-qualified flat config name for the strict preset. */
 export const CONFIG_NAME_STRICT = `${PLUGIN_NAMESPACE}/strict`;
 
-/**
- * ESLint preset identifiers used when selecting rule severities from the
- * canonical rule map.
- */
-export const PRESET_RECOMMENDED = 'recommended' as const;
-export const PRESET_STRICT = 'strict' as const;
+/** Valid preset identifier type used across plugin config builders. */
+export enum Preset {
+  Recommended = 'recommended',
+  Strict = 'strict',
+}
 
-/** Union of all valid preset identifiers. */
-export type Preset = typeof PRESET_RECOMMENDED | typeof PRESET_STRICT;
+/** Canonical ordered list of preset enum values. */
+export const PRESET_VALUES: readonly Preset[] = [Preset.Recommended, Preset.Strict];
 
 /** Parser package name required by legacy (ESLint <9) config consumers. */
 export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';

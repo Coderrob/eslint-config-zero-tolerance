@@ -14,13 +14,98 @@
  * limitations under the License.
  */
 
-import { ESLintUtils } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isIdentifierNode } from '../ast-guards';
-import { RULE_CREATOR_URL } from '../constants';
 import { RETURN_TYPE_NAME } from '../rule-constants';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoBannedTypesContext = Readonly<TSESLint.RuleContext<string, []>>;
 
+/**
+ * Checks indexed access types and reports every occurrence.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Indexed access type node to check.
+ */
+function checkIndexedAccessType(
+  context: NoBannedTypesContext,
+  node: TSESTree.TSIndexedAccessType,
+): void {
+  reportBannedIndexedAccess(context, node);
+}
+
+/**
+ * Checks type references for banned `ReturnType` usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Type reference node to check.
+ */
+function checkTypeReference(context: NoBannedTypesContext, node: TSESTree.TSTypeReference): void {
+  if (!isReturnTypeReference(node)) {
+    return;
+  }
+
+  reportBannedReturnType(context, node);
+}
+
+/**
+ * Creates listeners for banned type constructs.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoBannedTypesListeners(context: NoBannedTypesContext): TSESLint.RuleListener {
+  return {
+    TSTypeReference: checkTypeReference.bind(undefined, context),
+    TSIndexedAccessType: checkIndexedAccessType.bind(undefined, context),
+  };
+}
+
+/**
+ * Returns true when a type reference targets `ReturnType`.
+ *
+ * @param node - Type reference node to inspect.
+ * @returns True when the type name matches `ReturnType`.
+ */
+function isReturnTypeReference(node: TSESTree.TSTypeReference): boolean {
+  return isIdentifierNode(node.typeName) && node.typeName.name === RETURN_TYPE_NAME;
+}
+
+/**
+ * Reports banned indexed access type usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Indexed access type node to report.
+ */
+function reportBannedIndexedAccess(
+  context: NoBannedTypesContext,
+  node: TSESTree.TSIndexedAccessType,
+): void {
+  context.report({
+    node,
+    messageId: 'bannedIndexedAccess',
+  });
+}
+
+/**
+ * Reports banned `ReturnType` usage.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Type reference node to report.
+ */
+function reportBannedReturnType(
+  context: NoBannedTypesContext,
+  node: TSESTree.TSTypeReference,
+): void {
+  context.report({
+    node,
+    messageId: 'bannedReturnType',
+  });
+}
+
+/**
+ * ESLint rule that bans `ReturnType` and indexed access types.
+ */
 export const noBannedTypes = createRule({
   name: 'no-banned-types',
   meta: {
@@ -35,42 +120,7 @@ export const noBannedTypes = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that bans ReturnType and indexed access types.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    return {
-      /**
-       * Checks TypeScript type references for banned types.
-       *
-       * @param node - The TSTypeReference node to check.
-       */
-      TSTypeReference(node) {
-        // Check for ReturnType
-        if (isIdentifierNode(node.typeName) && node.typeName.name === RETURN_TYPE_NAME) {
-          context.report({
-            node,
-            messageId: 'bannedReturnType',
-          });
-        }
-      },
-      /**
-       * Checks TypeScript indexed access types (all are banned).
-       *
-       * @param node - The TSIndexedAccessType node to check.
-       */
-      TSIndexedAccessType(node) {
-        // Ban all indexed access types
-        context.report({
-          node,
-          messageId: 'bannedIndexedAccess',
-        });
-      },
-    };
-  },
+  create: createNoBannedTypesListeners,
 });
 
 export default noBannedTypes;

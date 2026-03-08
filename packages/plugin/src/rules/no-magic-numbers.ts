@@ -14,18 +14,100 @@
  * limitations under the License.
  */
 
-import { ESLintUtils, TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isTSEnumMemberNode, isUnaryExpressionNode, isVariableDeclaratorNode } from '../ast-guards';
 import { OPERATOR_UNARY_MINUS, VARIABLE_KIND_CONST } from '../rule-constants';
+import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
-import {
-  isTSEnumMemberNode,
-  isUnaryExpressionNode,
-  isVariableDeclaratorNode,
-  isVariableDeclarationNode,
-} from '../ast-guards';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoMagicNumbersContext = Readonly<TSESLint.RuleContext<'noMagicNumbers', []>>;
+
+/**
+ * Checks one literal node and reports disallowed numeric values.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Literal node to inspect.
+ */
+function checkLiteral(
+  context: NoMagicNumbersContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Literal,
+): void {
+  if (!isNumber(node.value)) {
+    return;
+  }
+  if (isAllowedNumericLiteral(node)) {
+    return;
+  }
+  const rawValue = getNumericLiteralText(node, sourceCode);
+  context.report({
+    node,
+    messageId: 'noMagicNumbers',
+    data: { value: rawValue },
+  });
+}
+
+/**
+ * Creates listeners for magic-number checks.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoMagicNumbersListeners(context: NoMagicNumbersContext): TSESLint.RuleListener {
+  const sourceCode = context.sourceCode;
+  return {
+    Literal: checkLiteral.bind(undefined, context, sourceCode),
+  };
+}
+
+/** Returns variable declarator directly owning the node, when present. */
+function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDeclarator | null {
+  if (!isVariableDeclaratorNode(node.parent)) {
+    return null;
+  }
+  return node.parent;
+}
+
+/** Returns normalized raw text for numeric literal reporting. */
+function getNumericLiteralText(
+  node: TSESTree.Literal,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): string {
+  if (isUnaryMinus(node.parent)) {
+    return sourceCode.getText(node.parent);
+  }
+  return sourceCode.getText(node);
+}
+
+/**
+ * Returns the owning variable declarator for a literal or unary-minus wrapper.
+ *
+ * @param node - The literal node to find the declarator for.
+ * @returns The variable declarator if found, otherwise null.
+ */
+function getVariableDeclarator(node: TSESTree.Literal): TSESTree.VariableDeclarator | null {
+  if (isUnaryMinus(node.parent)) {
+    return getDirectVariableDeclarator(node.parent);
+  }
+  return getDirectVariableDeclarator(node);
+}
+
+/**
+ * Returns true when a numeric literal is exempt from magic-number reporting.
+ *
+ * @param node - The literal node to check.
+ * @returns True if the literal is allowed, false otherwise.
+ */
+function isAllowedNumericLiteral(node: TSESTree.Literal): boolean {
+  if (isAllowedValue(node)) {
+    return true;
+  }
+  if (isInConstDeclaration(node)) {
+    return true;
+  }
+  return isInEnumMember(node);
+}
 
 /**
  * Returns true when a numeric literal has one of the universally-understood
@@ -35,10 +117,18 @@ const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}
  * @returns True if the value is allowed, false otherwise.
  */
 function isAllowedValue(node: TSESTree.Literal): boolean {
-  if (node.value === 0 || node.value === 1) {
+  if (node.value === 0) {
     return true;
   }
-  return isNegativeOneLiteral(node);
+  if (isNegativeOneLiteral(node)) {
+    return true;
+  }
+  return node.value === 1;
+}
+
+/** Returns true when declaration node is a const variable declaration. */
+function isConstVariableDeclaration(node: TSESTree.VariableDeclaration): boolean {
+  return node.kind === VARIABLE_KIND_CONST;
 }
 
 /**
@@ -68,19 +158,6 @@ function isInEnumMember(node: TSESTree.Literal): boolean {
 }
 
 /**
- * Returns true for unary '-' expression nodes.
- *
- * @param node - The node to check.
- * @returns True if the node is a unary minus expression, false otherwise.
- */
-function isUnaryMinus(node: TSESTree.Node | undefined): node is TSESTree.UnaryExpression {
-  if (!isUnaryExpressionNode(node)) {
-    return false;
-  }
-  return node.operator === OPERATOR_UNARY_MINUS;
-}
-
-/**
  * Returns true when a literal is represented as `-1` in the AST.
  *
  * @param node - The literal node to check.
@@ -94,62 +171,16 @@ function isNegativeOneLiteral(node: TSESTree.Literal): boolean {
 }
 
 /**
- * Returns the owning variable declarator for a literal or unary-minus wrapper.
+ * Returns true for unary '-' expression nodes.
  *
- * @param node - The literal node to find the declarator for.
- * @returns The variable declarator if found, otherwise null.
+ * @param node - The node to check.
+ * @returns True if the node is a unary minus expression, false otherwise.
  */
-function getVariableDeclarator(node: TSESTree.Literal): TSESTree.VariableDeclarator | null {
-  if (isUnaryMinus(node.parent)) {
-    return getDirectVariableDeclarator(node.parent);
-  }
-  return getDirectVariableDeclarator(node);
-}
-
-/** Returns variable declarator directly owning the node, when present. */
-function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDeclarator | null {
-  if (!isVariableDeclaratorNode(node.parent)) {
-    return null;
-  }
-  return node.parent;
-}
-
-/**
- * Returns true when a numeric literal is exempt from magic-number reporting.
- *
- * @param node - The literal node to check.
- * @returns True if the literal is allowed, false otherwise.
- */
-function isAllowedNumericLiteral(node: TSESTree.Literal): boolean {
-  if (isAllowedValue(node)) {
-    return true;
-  }
-  if (isInConstDeclaration(node)) {
-    return true;
-  }
-  return isInEnumMember(node);
-}
-
-/** Returns true when declaration node is a const variable declaration. */
-function isConstVariableDeclaration(node: TSESTree.Node | undefined): boolean {
-  if (!isVariableDeclarationNode(node)) {
+function isUnaryMinus(node: TSESTree.Node | undefined): node is TSESTree.UnaryExpression {
+  if (!isUnaryExpressionNode(node)) {
     return false;
   }
-  return node.kind === VARIABLE_KIND_CONST;
-}
-
-/** Returns normalized raw text for numeric literal reporting. */
-function getNumericLiteralText(
-  node: TSESTree.Literal,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): string {
-  if (isUnaryMinus(node.parent)) {
-    return sourceCode.getText(node.parent);
-  }
-  if (node.raw !== null) {
-    return node.raw;
-  }
-  return sourceCode.getText(node);
+  return node.operator === OPERATOR_UNARY_MINUS;
 }
 
 /**
@@ -168,39 +199,7 @@ export const noMagicNumbers = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that detects magic numbers.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks a literal node for magic numbers.
-     *
-     * @param node - The literal node to check.
-     */
-    const checkLiteral = (node: TSESTree.Literal): void => {
-      if (!isNumber(node.value)) {
-        return;
-      }
-
-      if (isAllowedNumericLiteral(node)) {
-        return;
-      }
-
-      const rawValue = getNumericLiteralText(node, context.sourceCode);
-      context.report({
-        node,
-        messageId: 'noMagicNumbers',
-        data: { value: rawValue },
-      });
-    };
-
-    return {
-      Literal: checkLiteral,
-    };
-  },
+  create: createNoMagicNumbersListeners,
 });
 
 export default noMagicNumbers;

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from '../constants';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { createRule } from '../rule-factory';
 
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+type NoAwaitInLoopContext = Readonly<TSESLint.RuleContext<'noAwaitInLoop', []>>;
 
 const LOOP_TYPES = new Set([
   AST_NODE_TYPES.ForStatement,
@@ -32,6 +33,14 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
   AST_NODE_TYPES.FunctionExpression,
   AST_NODE_TYPES.ArrowFunctionExpression,
 ]);
+
+/** Returns loop-boundary evaluation result for a node type, or null if irrelevant. */
+function getBoundaryResult(type: AST_NODE_TYPES): boolean | null {
+  if (FUNCTION_BOUNDARY_TYPES.has(type)) {
+    return false;
+  }
+  return LOOP_TYPES.has(type) ? true : null;
+}
 
 /**
  * Walks ancestors from innermost outward and returns true when a loop
@@ -51,12 +60,32 @@ function isInsideLoop(ancestors: TSESTree.Node[]): boolean {
   return false;
 }
 
-/** Returns loop-boundary evaluation result for a node type, or null if irrelevant. */
-function getBoundaryResult(type: TSESTree.Node['type']): boolean | null {
-  if (FUNCTION_BOUNDARY_TYPES.has(type)) {
-    return false;
+/**
+ * Reports await-in-loop violations for await expression nodes.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Await expression node to evaluate.
+ */
+function reportAwaitExpressionInLoop(
+  context: NoAwaitInLoopContext,
+  node: TSESTree.AwaitExpression,
+): void {
+  const ancestors = context.sourceCode.getAncestors(node);
+  if (isInsideLoop(ancestors)) {
+    context.report({ node, messageId: 'noAwaitInLoop' });
   }
-  return LOOP_TYPES.has(type) ? true : null;
+}
+
+/**
+ * Creates listeners for no-await-in-loop rule execution.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
+ */
+function resolveListeners(context: NoAwaitInLoopContext): TSESLint.RuleListener {
+  return {
+    AwaitExpression: reportAwaitExpressionInLoop.bind(undefined, context),
+  };
 }
 
 /**
@@ -77,29 +106,7 @@ export const noAwaitInLoop = createRule({
     schema: [],
   },
   defaultOptions: [],
-  /**
-   * Creates an ESLint rule that detects await expressions inside loops.
-   *
-   * @param context - The ESLint rule context.
-   * @returns An object with visitor functions for AST nodes.
-   */
-  create(context) {
-    /**
-     * Checks an await expression for being inside a loop.
-     *
-     * @param node - The await expression node to check.
-     */
-    const checkAwaitExpression = (node: TSESTree.AwaitExpression): void => {
-      const ancestors = context.sourceCode.getAncestors(node);
-      if (isInsideLoop(ancestors)) {
-        context.report({ node, messageId: 'noAwaitInLoop' });
-      }
-    };
-
-    return {
-      AwaitExpression: checkAwaitExpression,
-    };
-  },
+  create: resolveListeners,
 });
 
 export default noAwaitInLoop;

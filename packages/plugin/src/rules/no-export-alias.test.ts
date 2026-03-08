@@ -1,60 +1,62 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noExportAlias } from './no-export-alias';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-export-alias', noExportAlias, {
   valid: [
     {
       code: 'export { foo };',
-      name: 'direct named export without alias',
+      name: 'should allow direct named export without alias',
     },
     {
       code: 'export { foo, bar };',
-      name: 'multiple direct named exports without alias',
+      name: 'should allow multiple direct named exports without alias',
     },
     {
       code: "export { foo } from './module';",
-      name: 're-export without alias',
+      name: 'should allow re-export without alias',
     },
     {
       code: "export { foo, bar } from './module';",
-      name: 'multiple re-exports without alias',
+      name: 'should allow multiple re-exports without alias',
     },
     {
       code: 'export default foo;',
-      name: 'default export',
+      name: 'should allow default export',
     },
     {
       code: 'export const value = 42;',
-      name: 'direct const export',
+      name: 'should allow direct const export',
     },
     {
       code: 'export function myFunction() {}',
-      name: 'direct function export',
+      name: 'should allow direct function export',
     },
     {
       code: "export * from './module';",
-      name: 'wildcard re-export',
+      name: 'should allow wildcard re-export',
     },
     {
       code: 'export { foo as "foo" };',
-      name: 'string literal export name without alias',
+      name: 'should allow string literal export name without alias',
     },
     {
       code: 'export { type Foo };',
-      name: 'type-only export without alias',
+      name: 'should allow type-only export without alias',
     },
   ],
   invalid: [
     {
       code: 'export { foo as bar };',
-      name: 'named export with alias',
+      name: 'should report named export with alias',
       output: 'export { foo };',
       errors: [
         {
@@ -65,7 +67,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: "export { foo as bar } from './module';",
-      name: 're-export with alias',
+      name: 'should report re-export with alias',
       output: "export { foo } from './module';",
       errors: [
         {
@@ -76,7 +78,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: 'export { MyClass as default };',
-      name: 'export aliased as default',
+      name: 'should report export aliased as default',
       output: 'export { MyClass };',
       errors: [
         {
@@ -87,7 +89,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: 'export { foo as bar, baz as qux };',
-      name: 'multiple aliased exports',
+      name: 'should report multiple aliased exports',
       output: 'export { foo, baz };',
       errors: [
         {
@@ -102,7 +104,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: "export { alpha as beta, gamma } from './module';",
-      name: 'mixed aliased and direct re-exports',
+      name: 'should report mixed aliased and direct re-exports',
       output: "export { alpha, gamma } from './module';",
       errors: [
         {
@@ -113,7 +115,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: 'export { foo as "bar" };',
-      name: 'string literal export alias',
+      name: 'should report string literal export alias',
       output: 'export { foo };',
       errors: [
         {
@@ -124,7 +126,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: 'export { type Foo as Bar };',
-      name: 'type-only export with alias preserves type modifier in autofix',
+      name: 'should report type-only export with alias and preserve type modifier in autofix',
       output: 'export { type Foo };',
       errors: [
         {
@@ -135,7 +137,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     },
     {
       code: "export { type Foo as Bar } from './module';",
-      name: 'type-only re-export with alias preserves type modifier in autofix',
+      name: 'should report type-only re-export with alias and preserve type modifier in autofix',
       output: "export { type Foo } from './module';",
       errors: [
         {
@@ -145,4 +147,4 @@ ruleTester.run('no-export-alias', noExportAlias, {
       ],
     },
   ],
-} as any);
+});

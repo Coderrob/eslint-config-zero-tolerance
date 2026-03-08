@@ -14,33 +14,6 @@
  * limitations under the License.
  */
 
-import type { ESLint } from 'eslint';
-import requireInterfacePrefix from './rules/require-interface-prefix';
-import requireTestDescriptionStyle from './rules/require-test-description-style';
-import requireZodSchemaDescription from './rules/require-zod-schema-description';
-import noMagicNumbers from './rules/no-magic-numbers';
-import noMagicStrings from './rules/no-magic-strings';
-import noBannedTypes from './rules/no-banned-types';
-import noDynamicImport from './rules/no-dynamic-import';
-import noLiteralUnions from './rules/no-literal-unions';
-import noExportAlias from './rules/no-export-alias';
-import noReExport from './rules/no-re-export';
-import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
-import noMockImplementation from './rules/no-mock-implementation';
-import requireJsdocFunctions from './rules/require-jsdoc-functions';
-import requireOptionalChaining from './rules/require-optional-chaining';
-import noTypeAssertion from './rules/no-type-assertion';
-import noEslintDisable from './rules/no-eslint-disable';
-import sortImports from './rules/sort-imports';
-import sortFunctions from './rules/sort-functions';
-import maxFunctionLines from './rules/max-function-lines';
-import maxParams from './rules/max-params';
-import noIdenticalExpressions from './rules/no-identical-expressions';
-import noRedundantBoolean from './rules/no-redundant-boolean';
-import noEmptyCatch from './rules/no-empty-catch';
-import noNonNullAssertion from './rules/no-non-null-assertion';
-import noAwaitInLoop from './rules/no-await-in-loop';
-import noThrowLiteral from './rules/no-throw-literal';
 import packageJson from '../package.json';
 import {
   createRecommendedConfig,
@@ -48,53 +21,95 @@ import {
   legacyRecommendedConfig,
   legacyStrictConfig,
 } from './configs';
+import maxFunctionLines from './rules/max-function-lines';
+import maxParams from './rules/max-params';
+import noAwaitInLoop from './rules/no-await-in-loop';
+import noBannedTypes from './rules/no-banned-types';
+import noDynamicImport from './rules/no-dynamic-import';
+import noEmptyCatch from './rules/no-empty-catch';
+import noEslintDisable from './rules/no-eslint-disable';
+import noExportAlias from './rules/no-export-alias';
+import noFlagArgument from './rules/no-flag-argument';
+import noFloatingPromises from './rules/no-floating-promises';
+import noIdenticalBranches from './rules/no-identical-branches';
+import noIdenticalExpressions from './rules/no-identical-expressions';
+import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
+import noLiteralUnions from './rules/no-literal-unions';
+import noMagicNumbers from './rules/no-magic-numbers';
+import noMagicStrings from './rules/no-magic-strings';
+import noMockImplementation from './rules/no-mock-implementation';
+import noNonNullAssertion from './rules/no-non-null-assertion';
+import noParameterReassign from './rules/no-parameter-reassign';
+import noParentImports from './rules/no-parent-imports';
+import noQuerySideEffects from './rules/no-query-side-effects';
+import noReExport from './rules/no-re-export';
+import noRedundantBoolean from './rules/no-redundant-boolean';
+import noThrowLiteral from './rules/no-throw-literal';
+import noTypeAssertion from './rules/no-type-assertion';
+import preferGuardClauses from './rules/prefer-guard-clauses';
+import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
+import preferShortcutReturn from './rules/prefer-shortcut-return';
+import requireInterfacePrefix from './rules/require-interface-prefix';
+import requireJsdocFunctions from './rules/require-jsdoc-functions';
+import requireOptionalChaining from './rules/require-optional-chaining';
+import requireTestDescriptionStyle from './rules/require-test-description-style';
+import sortFunctions from './rules/sort-functions';
+import sortImports from './rules/sort-imports';
 
-type PluginWithConfigs = Omit<ESLint.Plugin, 'configs'> & {
-  configs: {
-    recommended: ReturnType<typeof createRecommendedConfig>;
-    strict: ReturnType<typeof createStrictConfig>;
-    'legacy-recommended': typeof legacyRecommendedConfig;
-    'legacy-strict': typeof legacyStrictConfig;
+interface IBasePlugin {
+  meta: {
+    name: string;
+    version: string;
   };
-};
+  rules: Record<string, unknown>;
+}
+
+interface IPluginExport extends IBasePlugin {
+  configs: Record<string, unknown>;
+}
 
 /**
  * Registry of all rule implementations exposed by the plugin.
- *
- * This object is kept as the canonical runtime source for `plugin.rules`,
- * while preset severity/option mappings live separately in `src/rule-map.ts`.
  */
-const rules = {
-  'require-interface-prefix': requireInterfacePrefix,
-  'require-test-description-style': requireTestDescriptionStyle,
-  'require-zod-schema-description': requireZodSchemaDescription,
-  'no-magic-numbers': noMagicNumbers,
-  'no-magic-strings': noMagicStrings,
-  'no-banned-types': noBannedTypes,
-  'no-dynamic-import': noDynamicImport,
-  'no-literal-unions': noLiteralUnions,
-  'no-export-alias': noExportAlias,
-  'no-re-export': noReExport,
-  'no-jest-have-been-called': noJestHaveBeenCalled,
-  'no-mock-implementation': noMockImplementation,
-  'require-jsdoc-functions': requireJsdocFunctions,
-  'require-optional-chaining': requireOptionalChaining,
-  'no-type-assertion': noTypeAssertion,
-  'no-eslint-disable': noEslintDisable,
-  'sort-imports': sortImports,
-  'sort-functions': sortFunctions,
+const rules: Record<string, unknown> = {
   'max-function-lines': maxFunctionLines,
   'max-params': maxParams,
-  'no-identical-expressions': noIdenticalExpressions,
-  'no-redundant-boolean': noRedundantBoolean,
-  'no-empty-catch': noEmptyCatch,
-  'no-non-null-assertion': noNonNullAssertion,
   'no-await-in-loop': noAwaitInLoop,
+  'no-banned-types': noBannedTypes,
+  'no-dynamic-import': noDynamicImport,
+  'no-empty-catch': noEmptyCatch,
+  'no-eslint-disable': noEslintDisable,
+  'no-export-alias': noExportAlias,
+  'no-flag-argument': noFlagArgument,
+  'no-floating-promises': noFloatingPromises,
+  'no-identical-branches': noIdenticalBranches,
+  'no-identical-expressions': noIdenticalExpressions,
+  'no-jest-have-been-called': noJestHaveBeenCalled,
+  'no-literal-unions': noLiteralUnions,
+  'no-magic-numbers': noMagicNumbers,
+  'no-magic-strings': noMagicStrings,
+  'no-mock-implementation': noMockImplementation,
+  'no-non-null-assertion': noNonNullAssertion,
+  'no-parameter-reassign': noParameterReassign,
+  'no-parent-imports': noParentImports,
+  'no-query-side-effects': noQuerySideEffects,
+  'no-re-export': noReExport,
+  'no-redundant-boolean': noRedundantBoolean,
   'no-throw-literal': noThrowLiteral,
-} as unknown as NonNullable<ESLint.Plugin['rules']>;
+  'no-type-assertion': noTypeAssertion,
+  'prefer-guard-clauses': preferGuardClauses,
+  'prefer-shortcut-return': preferShortcutReturn,
+  'prefer-nullish-coalescing': preferNullishCoalescing,
+  'require-interface-prefix': requireInterfacePrefix,
+  'require-jsdoc-functions': requireJsdocFunctions,
+  'require-optional-chaining': requireOptionalChaining,
+  'require-test-description-style': requireTestDescriptionStyle,
+  'sort-functions': sortFunctions,
+  'sort-imports': sortImports,
+};
 
 /** Base plugin object shared by both flat and legacy config presets. */
-const basePlugin: ESLint.Plugin = {
+const basePlugin: IBasePlugin = {
   meta: {
     name: packageJson.name,
     version: packageJson.version,
@@ -102,22 +117,12 @@ const basePlugin: ESLint.Plugin = {
   rules,
 };
 
-/** Flat config preset with warn-level defaults. */
-const recommendedConfig = createRecommendedConfig(basePlugin);
-/** Flat config preset with error-level defaults. */
-const strictConfig = createStrictConfig(basePlugin);
-
-/**
- * Final plugin export including flat and legacy preset variants.
- *
- * Consumers import this package as the plugin entry point, and then reference
- * `configs.recommended` / `configs.strict` (or legacy variants) as needed.
- */
-const eslintPlugin: PluginWithConfigs = {
+/** Final plugin export including flat and legacy preset variants. */
+const eslintPlugin: IPluginExport = {
   ...basePlugin,
   configs: {
-    recommended: recommendedConfig,
-    strict: strictConfig,
+    recommended: createRecommendedConfig(basePlugin),
+    strict: createStrictConfig(basePlugin),
     'legacy-recommended': legacyRecommendedConfig,
     'legacy-strict': legacyStrictConfig,
   },

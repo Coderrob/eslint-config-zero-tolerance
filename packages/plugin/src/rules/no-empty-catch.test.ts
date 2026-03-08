@@ -1,12 +1,14 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noEmptyCatch } from './no-empty-catch';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-empty-catch', noEmptyCatch, {
   valid: [
@@ -49,4 +51,4 @@ ruleTester.run('no-empty-catch', noEmptyCatch, {
       errors: [{ messageId: 'emptyCatch' }, { messageId: 'emptyCatch' }],
     },
   ],
-} as any);
+});

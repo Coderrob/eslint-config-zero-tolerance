@@ -57,7 +57,6 @@ nav:
       - Documentation:
           - require-jsdoc-functions: rules/require-jsdoc-functions.md
           - require-optional-chaining: rules/require-optional-chaining.md
-          - require-zod-schema-description: rules/require-zod-schema-description.md
       - Testing:
           - require-test-description-style: rules/require-test-description-style.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
@@ -74,15 +73,24 @@ nav:
           - no-magic-strings: rules/no-magic-strings.md
           - sort-imports: rules/sort-imports.md
           - sort-functions: rules/sort-functions.md
+          - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md
       - Imports:
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
+          - no-parent-imports: rules/no-parent-imports.md
           - no-re-export: rules/no-re-export.md
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md
+          - no-identical-branches: rules/no-identical-branches.md
           - no-redundant-boolean: rules/no-redundant-boolean.md
           - no-await-in-loop: rules/no-await-in-loop.md
+          - no-floating-promises: rules/no-floating-promises.md
           - no-eslint-disable: rules/no-eslint-disable.md
+          - no-parameter-reassign: rules/no-parameter-reassign.md
+          - no-flag-argument: rules/no-flag-argument.md
+          - prefer-guard-clauses: rules/prefer-guard-clauses.md
+          - prefer-shortcut-return: rules/prefer-shortcut-return.md
+          - no-query-side-effects: rules/no-query-side-effects.md

@@ -10,20 +10,19 @@
 import eslint from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 
 // ============================================================================
 // Constants
 // ============================================================================
 
-/** File patterns for TypeScript and JavaScript files */
-const TS_JS_FILES = ['**/*.ts', '**/*.tsx', '**/*.mjs'];
+/** File patterns for TypeScript source files */
+const TS_JS_FILES = ['**/*.ts', '**/*.tsx'];
 
 /** File patterns for test files */
 const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts'];
-
-/** File patterns for plugin source files */
-const PLUGIN_SOURCE_FILES = ['packages/plugin/src/**/*.ts'];
 
 /** ECMAScript version for parser options */
 const ECMA_VERSION = 2020;
@@ -36,6 +35,12 @@ const MAX_FUNCTION_LINES = 15;
 
 /** Maximum parameters allowed */
 const MAX_PARAMS = 4;
+
+/** Maximum nesting depth allowed */
+const MAX_DEPTH = 3;
+
+/** Root directory for type-aware parser resolution */
+const ROOT_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 /** Jest global variables for test files */
 const JEST_GLOBALS = {
@@ -60,24 +65,6 @@ const IGNORE_PATTERNS = [
   'pnpm-lock.yaml',
 ];
 
-/**
- * Generates an object that disables all zero-tolerance rules.
- * Used for plugin source files that intentionally contain patterns the rules prohibit.
- *
- * @param {object} rules - The rules object from the zero-tolerance plugin
- * @returns {object} An object mapping rule names to 'off' values
- */
-const zeroToleranceRulesOff = Object.fromEntries(
-  Object.keys(zeroTolerancePlugin.rules ?? {}).map(
-    /**
-     * Maps a rule name to a disabled rule configuration.
-     * @param {string} ruleName - The name of the rule to disable
-     * @returns {Array<string>} A tuple of [ruleName, 'off']
-     */
-    (ruleName) => [`zero-tolerance/${ruleName}`, 'off'],
-  ),
-);
-
 // ============================================================================
 // Configuration Sections
 // ============================================================================
@@ -92,7 +79,9 @@ const baseConfig = {
     parser: tsParser,
     parserOptions: {
       ecmaVersion: ECMA_VERSION,
+      projectService: true,
       sourceType: 'module',
+      tsconfigRootDir: ROOT_DIR,
     },
   },
   plugins: {
@@ -101,9 +90,43 @@ const baseConfig = {
   },
   rules: {
     // TypeScript ESLint recommended rules
+    'no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'off', // We use any for type workarounds
+    '@typescript-eslint/await-thenable': 'error',
+    '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
+    '@typescript-eslint/explicit-function-return-type': [
+      'warn',
+      {
+        allowExpressions: true,
+        allowHigherOrderFunctions: true,
+        allowTypedFunctionExpressions: true,
+      },
+    ],
+    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/no-misused-promises': [
+      'error',
+      { checksConditionals: true, checksSpreads: true, checksVoidReturn: true },
+    ],
+    '@typescript-eslint/no-unnecessary-condition': 'warn',
+    '@typescript-eslint/return-await': ['error', 'always'],
+    '@typescript-eslint/strict-boolean-expressions': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     complexity: ['error', { max: MAX_COMPLEXITY }],
+    'max-depth': ['error', MAX_DEPTH],
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    'no-restricted-syntax': [
+      'error',
+      {
+        message: 'Avoid nested ternaries; use explicit conditionals for readability.',
+        selector: 'ConditionalExpression ConditionalExpression',
+      },
+      {
+        message: 'Avoid forEach(async ...); use for...of with await or Promise.all with map.',
+        selector:
+          "CallExpression[callee.type='MemberExpression'][callee.property.name='forEach'] > :matches(FunctionExpression, ArrowFunctionExpression)[async=true]",
+      },
+    ],
+    'no-warning-comments': ['error', { terms: ['TODO', 'FIXME', 'XXX'], location: 'start' }],
 
     // Zero-tolerance plugin rules (dogfooding)
     // Code quality and style
@@ -114,7 +137,6 @@ const baseConfig = {
     // Documentation and naming
     'zero-tolerance/require-jsdoc-functions': 'error',
     'zero-tolerance/require-test-description-style': 'error',
-    'zero-tolerance/require-zod-schema-description': 'error',
 
     // Type safety and assertions
     'zero-tolerance/no-banned-types': 'error',
@@ -133,6 +155,7 @@ const baseConfig = {
 
     // Control flow and async
     'zero-tolerance/no-await-in-loop': 'error',
+    'zero-tolerance/no-floating-promises': 'error',
 
     // Code analysis
     'zero-tolerance/no-identical-expressions': 'error',
@@ -148,18 +171,6 @@ const baseConfig = {
 };
 
 /**
- * Configuration for plugin source files.
- * Disables zero-tolerance rules since the plugin implementation intentionally
- * contains patterns that its own rules prohibit (e.g., AST node type strings).
- */
-const pluginSourceConfig = {
-  files: PLUGIN_SOURCE_FILES,
-  rules: {
-    ...zeroToleranceRulesOff,
-  },
-};
-
-/**
  * Configuration for test files.
  * Adds Jest globals and relaxes some rules appropriate for test code.
  */
@@ -167,11 +178,26 @@ const testConfig = {
   files: TEST_FILES,
   languageOptions: {
     globals: JEST_GLOBALS,
+    parserOptions: {
+      projectService: false,
+    },
   },
   rules: {
-    // Relax some rules for tests
-    'zero-tolerance/no-dynamic-import': 'off',
+    // Relax production-only constraints for test ergonomics
+    '@typescript-eslint/await-thenable': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/no-unnecessary-condition': 'off',
+    '@typescript-eslint/return-await': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
     complexity: 'off',
+    'max-depth': 'off',
+    'no-warning-comments': 'off',
+    'zero-tolerance/max-function-lines': 'off',
+    'zero-tolerance/no-dynamic-import': 'off',
+    'zero-tolerance/no-magic-numbers': 'off',
+    'zero-tolerance/no-type-assertion': 'off',
   },
 };
 
@@ -186,10 +212,4 @@ const ignoreConfig = {
 // Export
 // ============================================================================
 
-export default [
-  eslint.configs.recommended,
-  baseConfig,
-  pluginSourceConfig,
-  testConfig,
-  ignoreConfig,
-];
+export default [eslint.configs.recommended, baseConfig, testConfig, ignoreConfig];

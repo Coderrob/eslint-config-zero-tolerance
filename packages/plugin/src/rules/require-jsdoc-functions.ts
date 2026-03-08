@@ -14,58 +14,65 @@
  * limitations under the License.
  */
 
-import {
-  AST_NODE_TYPES,
-  AST_TOKEN_TYPES,
-  ESLintUtils,
-  TSESLint,
-  TSESTree,
-} from '@typescript-eslint/utils';
-import { ANONYMOUS_FUNCTION_NAME, RULE_CREATOR_URL } from '../constants';
-import { JSDOC_BLOCK_MARKER } from '../rule-constants';
-import { isDefined } from '../type-guards';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
 import {
   type FunctionNode,
   isIdentifierNode,
   isTestFile,
   isVariableDeclaratorNode,
-  isVariableDeclarationNode,
 } from '../ast-guards';
 import { getIdentifierName } from '../ast-helpers';
-
-const createRule = ESLintUtils.RuleCreator((name) => `${RULE_CREATOR_URL}${name}`);
+import { ANONYMOUS_FUNCTION_NAME } from '../constants';
+import { JSDOC_BLOCK_MARKER } from '../rule-constants';
+import { createRule } from '../rule-factory';
 
 const NAMED_KEY_PARENT_TYPES = new Set([
   AST_NODE_TYPES.MethodDefinition,
   AST_NODE_TYPES.PropertyDefinition,
   AST_NODE_TYPES.Property,
 ]);
+const PARENT_OWNED_TARGET_TYPES = new Set([
+  AST_NODE_TYPES.ExportDefaultDeclaration,
+  AST_NODE_TYPES.ExportNamedDeclaration,
+  AST_NODE_TYPES.MethodDefinition,
+  AST_NODE_TYPES.PropertyDefinition,
+  AST_NODE_TYPES.Property,
+]);
+
+type RequireJsdocFunctionsContext = Readonly<TSESLint.RuleContext<'missingJsdoc', []>>;
 
 /**
- * Returns true when a parent node can expose a function name from `key.name`.
+ * Creates listeners for require-jsdoc-functions rule execution.
  *
- * @param parent - The parent node to check.
- * @returns True if the parent has an identifier key, false otherwise.
+ * @param context - ESLint rule execution context.
+ * @returns Rule listeners.
  */
-function hasIdentifierKey(
-  parent: TSESTree.Node | null | undefined,
-): parent is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
-  if (!isNamedKeyParentNode(parent)) {
-    return false;
+function createRequireJsdocFunctionsListeners(
+  context: RequireJsdocFunctionsContext,
+): TSESLint.RuleListener {
+  if (isTestFile(context.filename)) {
+    return {};
   }
-  return isIdentifierNode(parent.key);
+  const sourceCode = context.sourceCode;
+  return {
+    ArrowFunctionExpression: reportMissingJsdoc.bind(undefined, context, sourceCode),
+    FunctionDeclaration: reportMissingJsdoc.bind(undefined, context, sourceCode),
+    FunctionExpression: reportMissingJsdoc.bind(undefined, context, sourceCode),
+  };
 }
 
 /**
- * Returns true when node can expose an identifier key.
+ * Returns declaration identifier name for function declarations.
  *
- * @param node - The node to check.
- * @returns True if the node can have a named key, false otherwise.
+ * @param node - The function node to check.
+ * @returns The declaration name if available, otherwise null.
  */
-function isNamedKeyParentNode(
-  node: TSESTree.Node | null | undefined,
-): node is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
-  return isDefined(node) && NAMED_KEY_PARENT_TYPES.has(node.type);
+function getDeclarationFunctionName(node: FunctionNode): string | null {
+  if (node.type !== AST_NODE_TYPES.FunctionDeclaration) {
+    return null;
+  }
+  return getIdentifierName(node.id);
 }
 
 /**
@@ -86,46 +93,6 @@ function getFunctionName(node: FunctionNode): string {
     }
   }
   return ANONYMOUS_FUNCTION_NAME;
-}
-
-/**
- * Returns the node that should own the JSDoc comment for the function.
- *
- * @param node - The function node.
- * @returns The target node for JSDoc placement.
- */
-function getTargetNode(node: FunctionNode): TSESTree.Node {
-  const parentOwnedNode = getParentOwnedTargetNode(node);
-  if (parentOwnedNode !== null) {
-    return parentOwnedNode;
-  }
-  return getVariableOwnedTargetNode(node) ?? node;
-}
-
-/**
- * Returns declaration identifier name for function declarations.
- *
- * @param node - The function node to check.
- * @returns The declaration name if available, otherwise null.
- */
-function getDeclarationFunctionName(node: FunctionNode): string | null {
-  if (node.type !== AST_NODE_TYPES.FunctionDeclaration) {
-    return null;
-  }
-  return getIdentifierName(node.id);
-}
-
-/**
- * Returns variable declarator identifier name for assigned functions.
- *
- * @param node - The function node to check.
- * @returns The variable name if available, otherwise null.
- */
-function getVariableFunctionName(node: FunctionNode): string | null {
-  if (!isVariableDeclaratorNode(node.parent)) {
-    return null;
-  }
-  return getIdentifierName(node.parent.id);
 }
 
 /**
@@ -155,24 +122,34 @@ function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
 }
 
 /**
- * Returns variable-related target node for JSDoc ownership when applicable.
+ * Returns the node that should own the JSDoc comment for the function.
+ *
  * @param node - The function node.
- * @returns The target node for JSDoc ownership, or null.
+ * @returns The target node for JSDoc placement.
  */
-function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
-  const parent = node.parent;
-  if (!isVariableDeclaratorNode(parent)) {
-    return null;
+function getTargetNode(node: FunctionNode): TSESTree.Node {
+  const parentOwnedNode = getParentOwnedTargetNode(node);
+  if (parentOwnedNode !== null) {
+    return parentOwnedNode;
   }
-  const declaration = getVariableDeclarationParent(parent);
-  if (declaration === null) {
-    return parent;
-  }
-  return getVariableDeclarationTarget(parent, declaration);
+  return getVariableOwnedTargetNode(node) ?? node;
+}
+
+/**
+ * Returns parent variable declaration node when declarator is inside one.
+ *
+ * @param node - Variable declarator node.
+ * @returns Parent declaration, or null.
+ */
+function getVariableDeclarationParent(
+  node: TSESTree.VariableDeclarator,
+): TSESTree.VariableDeclaration {
+  return node.parent;
 }
 
 /**
  * Returns the final JSDoc target for variable declarations with function initializers.
+ *
  * @param declarator - The variable declarator node.
  * @param declaration - The variable declaration node.
  * @returns The appropriate target node for JSDoc placement.
@@ -185,44 +162,108 @@ function getVariableDeclarationTarget(
 }
 
 /**
- * Returns parent variable declaration node when declarator is inside one.
- * @param node - The variable declarator node.
- * @returns The parent variable declaration if found, null otherwise.
+ * Returns variable declarator identifier name for assigned functions.
+ *
+ * @param node - The function node to check.
+ * @returns The variable name if available, otherwise null.
  */
-function getVariableDeclarationParent(
-  node: TSESTree.VariableDeclarator,
-): TSESTree.VariableDeclaration | null {
-  if (!isVariableDeclarationNode(node.parent)) {
+function getVariableFunctionName(node: FunctionNode): string | null {
+  if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
-  return node.parent;
+  return getIdentifierName(node.parent.id);
 }
 
 /**
- * Returns true when parent node type owns JSDoc placement for enclosed function.
- * @param type - The node type to check.
- * @returns True if the type owns JSDoc placement, false otherwise.
+ * Returns variable-related target node for JSDoc ownership when applicable.
+ *
+ * @param node - The function node.
+ * @returns The target node for JSDoc ownership, or null.
  */
-function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
-  return (
-    type === AST_NODE_TYPES.MethodDefinition ||
-    type === AST_NODE_TYPES.PropertyDefinition ||
-    type === AST_NODE_TYPES.Property
-  );
+function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
+  if (!isVariableDeclaratorNode(node.parent)) {
+    return null;
+  }
+  return getVariableDeclarationTarget(node.parent, getVariableDeclarationParent(node.parent));
+}
+
+/**
+ * Returns true when a parent node can expose a function name from `key.name`.
+ *
+ * @param parent - The parent node to check.
+ * @returns True if the parent has an identifier key, false otherwise.
+ */
+function hasIdentifierKey(
+  parent: TSESTree.Node | null | undefined,
+): parent is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+  return isNamedKeyParentNode(parent) && isIdentifierNode(parent.key);
 }
 
 /**
  * Returns true when a JSDoc block appears directly before the node.
- * @param context - The ESLint rule context.
+ *
+ * @param sourceCode - ESLint source code helper.
  * @param node - The node to check for JSDoc comments.
  * @returns True if a JSDoc comment is found before the node, false otherwise.
  */
 function hasJsdocComment(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
   const comments = sourceCode.getCommentsBefore(node);
-  return comments.some(
-    (comment: TSESTree.Comment) =>
-      comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith(JSDOC_BLOCK_MARKER),
-  );
+  return comments.some(isJsdocBlockComment);
+}
+
+/**
+ * Returns true when a comment token is a JSDoc block.
+ *
+ * @param comment - Comment token to inspect.
+ * @returns True when token is a JSDoc block comment.
+ */
+function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
+  return comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith(JSDOC_BLOCK_MARKER);
+}
+
+/**
+ * Returns true when node can expose an identifier key.
+ *
+ * @param node - The node to check.
+ * @returns True if the node can have a named key, false otherwise.
+ */
+function isNamedKeyParentNode(
+  node: TSESTree.Node | null | undefined,
+): node is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+  return node !== null && node !== undefined && NAMED_KEY_PARENT_TYPES.has(node.type);
+}
+
+/**
+ * Returns true when parent node type owns JSDoc placement for enclosed function.
+ *
+ * @param type - The node type to check.
+ * @returns True if the type owns JSDoc placement, false otherwise.
+ */
+function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
+  return PARENT_OWNED_TARGET_TYPES.has(type);
+}
+
+/**
+ * Reports missing JSDoc on a function-like construct.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Function-like AST node.
+ */
+function reportMissingJsdoc(
+  context: RequireJsdocFunctionsContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: FunctionNode,
+): void {
+  const targetNode = getTargetNode(node);
+  if (hasJsdocComment(sourceCode, targetNode)) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'missingJsdoc',
+    data: { name: getFunctionName(node) },
+  });
 }
 
 /** Requires JSDoc for function-like constructs in non-test source files. */
@@ -239,31 +280,7 @@ export const requireJsdocFunctions = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create(context) {
-    const sourceCode = context.sourceCode;
-
-    if (isTestFile(context.filename)) {
-      return {};
-    }
-
-    const checkFunction = (node: FunctionNode): void => {
-      const targetNode = getTargetNode(node);
-      if (hasJsdocComment(sourceCode, targetNode)) {
-        return;
-      }
-      context.report({
-        node,
-        messageId: 'missingJsdoc',
-        data: { name: getFunctionName(node) },
-      });
-    };
-
-    return {
-      FunctionDeclaration: checkFunction,
-      FunctionExpression: checkFunction,
-      ArrowFunctionExpression: checkFunction,
-    };
-  },
+  create: createRequireJsdocFunctionsListeners,
 });
 
 export default requireJsdocFunctions;

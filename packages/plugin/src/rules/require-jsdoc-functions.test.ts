@@ -1,70 +1,72 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { requireJsdocFunctions } from './require-jsdoc-functions';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
   valid: [
     {
       code: '/** Does something. */\nfunction doSomething() {}',
-      name: 'function declaration with JSDoc',
+      name: 'should allow function declaration with JSDoc',
       filename: 'src/utils.ts',
     },
     {
       code: '/** Arrow function. */\nconst doThing = () => {};',
-      name: 'arrow function with JSDoc on variable declaration',
+      name: 'should allow arrow function with JSDoc on variable declaration',
       filename: 'src/utils.ts',
     },
     {
       code: 'class MyClass {\n  /** Method JSDoc. */\n  doWork() {}\n}',
-      name: 'class method with JSDoc',
+      name: 'should allow class method with JSDoc',
       filename: 'src/utils.ts',
     },
     {
       code: 'class MyClass {\n  /** Field JSDoc. */\n  handler = () => {};\n}',
-      name: 'class field arrow function with JSDoc on PropertyDefinition',
+      name: 'should allow class field arrow function with JSDoc on PropertyDefinition',
       filename: 'src/utils.ts',
     },
     {
       code: 'const obj = {\n  /** Method JSDoc. */\n  doWork() {},\n};',
-      name: 'object literal shorthand method with JSDoc',
+      name: 'should allow object literal shorthand method with JSDoc',
       filename: 'src/utils.ts',
     },
     {
       code: 'const obj = {\n  /** Method JSDoc. */\n  doWork: () => {},\n};',
-      name: 'object literal arrow function property with JSDoc',
+      name: 'should allow object literal arrow function property with JSDoc',
       filename: 'src/utils.ts',
     },
     {
       code: 'function doSomething() {}',
-      name: 'function without JSDoc in test file is skipped',
+      name: 'should allow function without JSDoc in test file',
       filename: 'src/utils.test.ts',
     },
     {
       code: 'const fn = () => {};',
-      name: 'arrow function without JSDoc in spec file is skipped',
+      name: 'should allow arrow function without JSDoc in spec file',
       filename: 'src/utils.spec.ts',
     },
     {
       code: 'function doSomething() {}',
-      name: 'function without JSDoc in test file (.js) is skipped',
+      name: 'should allow function without JSDoc in .test.js file',
       filename: 'utils.test.js',
     },
     {
       code: 'class C {\n  /** Named computed method. */\n  ["x"]() {}\n}',
-      name: 'computed class method with JSDoc is allowed',
+      name: 'should allow computed class method with JSDoc',
       filename: 'src/utils.ts',
     },
   ],
   invalid: [
     {
       code: '/** Outer function */\nfunction outer() {\n  function inner() {}\n}',
-      name: 'nested inner function without JSDoc',
+      name: 'should report nested inner function without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -75,7 +77,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'function doSomething() {}',
-      name: 'function declaration without JSDoc',
+      name: 'should report function declaration without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -86,7 +88,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'const doThing = () => {};',
-      name: 'arrow function without JSDoc',
+      name: 'should report arrow function without JSDoc',
       filename: 'src/helpers.ts',
       errors: [
         {
@@ -97,7 +99,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'const doThing = function namedFn() {};',
-      name: 'function expression without JSDoc',
+      name: 'should report function expression without JSDoc',
       filename: 'src/helpers.ts',
       errors: [
         {
@@ -108,7 +110,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'class MyClass {\n  doWork() {}\n}',
-      name: 'class method without JSDoc',
+      name: 'should report class method without JSDoc',
       filename: 'src/my-class.ts',
       errors: [
         {
@@ -119,7 +121,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'class MyClass {\n  handler = () => {};\n}',
-      name: 'class field arrow function without JSDoc',
+      name: 'should report class field arrow function without JSDoc',
       filename: 'src/my-class.ts',
       errors: [
         {
@@ -130,7 +132,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'const obj = {\n  doWork() {},\n};',
-      name: 'object literal shorthand method without JSDoc',
+      name: 'should report object literal shorthand method without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -141,7 +143,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'const obj = {\n  doWork: () => {},\n};',
-      name: 'object literal arrow function property without JSDoc',
+      name: 'should report object literal arrow function property without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -152,7 +154,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: '/** Only one JSDoc */\nconst a = () => {}, b = () => {};',
-      name: 'multi-declarator const with single JSDoc reports undocumented declarators',
+      name: 'should report multi-declarator const with single JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -167,7 +169,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: '// Regular comment\nfunction doSomething() {}',
-      name: 'function with line comment but no JSDoc',
+      name: 'should report function with line comment but no JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -178,7 +180,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: '/* Not a JSDoc */\nfunction doSomething() {}',
-      name: 'function with block comment but no JSDoc star',
+      name: 'should report function with block comment but no JSDoc star',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -189,7 +191,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'export default function () {}',
-      name: 'anonymous default export function without JSDoc',
+      name: 'should report anonymous default export function without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -200,7 +202,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     },
     {
       code: 'class C { ["x"]() {} }',
-      name: 'computed class method key without JSDoc uses anonymous fallback',
+      name: 'should report computed class method key without JSDoc',
       filename: 'src/utils.ts',
       errors: [
         {
@@ -210,4 +212,4 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       ],
     },
   ],
-} as any);
+});

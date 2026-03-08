@@ -15,12 +15,11 @@
  */
 
 import zeroTolerancePlugin from '@coderrob/eslint-plugin-zero-tolerance';
-import type { Linter } from 'eslint';
 
 /**
  * Recommended config preset (warn severity).
  * Rules are derived from the canonical rule map in @coderrob/eslint-plugin-zero-tolerance.
  */
-const recommendedConfig: Linter.Config = zeroTolerancePlugin.configs.recommended;
+const recommendedConfig = zeroTolerancePlugin.configs.recommended;
 
 export default recommendedConfig;

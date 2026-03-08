@@ -1,60 +1,62 @@
-import { RuleTester } from '@typescript-eslint/rule-tester';
 import * as tsParser from '@typescript-eslint/parser';
+import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noLiteralUnions } from './no-literal-unions';
 
-const ruleTester = new RuleTester({
+const ruleTestConfig: RuleTesterConfig = {
   languageOptions: {
     parser: tsParser,
   },
-} as any);
+};
+const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-literal-unions', noLiteralUnions, {
   valid: [
     {
       code: 'type Numbers = number | string;',
-      name: 'non-literal union types',
+      name: 'should allow non-literal union types',
     },
     {
       code: 'type Mixed = boolean | null | undefined;',
-      name: 'boolean and null/undefined union',
+      name: 'should allow boolean and null/undefined union',
     },
     {
       code: 'enum Status { Active = "active", Inactive = "inactive" }',
-      name: 'enum definition',
+      name: 'should allow enum definition',
     },
     {
       code: 'type MyType = string;',
-      name: 'simple type alias',
+      name: 'should allow simple type alias',
     },
     {
       code: 'type UserType = User | Admin;',
-      name: 'union of custom types',
+      name: 'should allow union of custom types',
     },
     {
       code: 'type Intersection = A & B;',
-      name: 'intersection type',
+      name: 'should allow intersection type',
     },
     {
       code: 'type Generic<T> = T | null;',
-      name: 'generic with null',
+      name: 'should allow generic with null',
     },
     {
       code: 'type ArrayType = string[] | number[];',
-      name: 'array type union',
+      name: 'should allow array type union',
     },
     {
       code: 'type Flags = true | false;',
-      name: 'boolean literal union',
+      name: 'should allow boolean literal union',
     },
     {
       code: 'type T = `foo`;',
-      name: 'single template literal type is allowed',
+      name: 'should allow single template literal type',
     },
   ],
   invalid: [
     {
       code: 'type Status = "active" | "inactive";',
-      name: 'string literal union',
+      name: 'should report string literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -63,7 +65,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Size = "small" | "medium" | "large";',
-      name: 'multiple string literals',
+      name: 'should report multiple string literals',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -72,7 +74,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Count = 1 | 2 | 3;',
-      name: 'number literal union',
+      name: 'should report number literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -81,7 +83,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Mixed = "yes" | "no" | boolean;',
-      name: 'mixed literal and non-literal union',
+      name: 'should report mixed literal and non-literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -90,7 +92,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type MixedBooleanLiteral = true | "yes";',
-      name: 'boolean literal mixed with string literal union',
+      name: 'should report boolean literal mixed with string literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -99,7 +101,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Complex = "a" | "b" | string;',
-      name: 'literal union with type widening',
+      name: 'should report literal union with type widening',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -108,7 +110,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";',
-      name: 'HTTP method literals',
+      name: 'should report HTTP method literals',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -117,7 +119,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Version = 1 | 2 | 3 | 4;',
-      name: 'version number literals',
+      name: 'should report version number literals',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -126,7 +128,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Direction = "up" | "down" | "left" | "right";',
-      name: 'direction literals',
+      name: 'should report direction literals',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -135,7 +137,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     },
     {
       code: 'type Slug = `a-${string}` | "fixed";',
-      name: 'template literal union is disallowed',
+      name: 'should report template literal union',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -143,4 +145,4 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
   ],
-} as any);
+});
