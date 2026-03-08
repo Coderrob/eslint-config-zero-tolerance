@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - No unreleased changes yet.
 
+## [1.1.1] - 2026-03-08
+
+### Changed
+
+- **Preset policy update**: `no-parent-imports` is now opt-in and no longer enabled by default in `recommended`, `strict`, `legacy-recommended`, or `legacy-strict`. Parent imports are allowed by default; parent re-export restrictions remain enforced via `no-re-export`.
+- **Documentation sync**: Updated preset and rule docs to reflect that `no-parent-imports` remains available but is not enabled by default.
+
 ## [1.1.0] - 2026-03-08
 
 ### Added

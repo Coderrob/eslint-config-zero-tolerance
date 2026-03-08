@@ -8,12 +8,14 @@ Disallow parent-directory traversal in all import patterns.
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `off`        |
+| **Strict**      | `off`        |
 
 ## Rationale
 
 Parent-directory imports (`..` and `../*`) create tight coupling to folder layout and make modules harder to move safely. Enforcing project-rooted, package, or same-directory imports keeps boundaries explicit and prevents upward traversal through the tree.
+
+This rule is available as an opt-in rule and is not enabled by default in plugin presets.
 
 This rule applies to all import patterns:
 

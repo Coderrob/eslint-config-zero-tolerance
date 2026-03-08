@@ -30,7 +30,6 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-dynamic-import',
   'no-literal-unions',
   'no-export-alias',
-  'no-parent-imports',
   'no-re-export',
   'no-jest-have-been-called',
   'no-mock-implementation',
