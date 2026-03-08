@@ -2229,16 +2229,17 @@
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
-<td><code>warn</code></td>
+<td><code>off</code></td>
 </tr>
 <tr>
 <td><strong>Strict</strong></td>
-<td><code>error</code></td>
+<td><code>off</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
 <p>Parent-directory imports (<code>..</code> and <code>../*</code>) create tight coupling to folder layout and make modules harder to move safely. Enforcing project-rooted, package, or same-directory imports keeps boundaries explicit and prevents upward traversal through the tree.</p>
+<p>This rule is available as an opt-in rule and is not enabled by default in plugin presets.</p>
 <p>This rule applies to all import patterns:</p>
 <ul>
 <li><code>import ... from '...'</code></li>
