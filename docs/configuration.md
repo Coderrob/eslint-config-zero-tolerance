@@ -62,7 +62,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-All rules are included in every preset. The only difference between `recommended` and `strict` is the severity level and the tighter limits for configurable rules.
+All core rules are included in every preset. The only difference between `recommended` and `strict` is the severity level and the tighter limits for configurable rules.
 
 | Rule                             | Recommended    | Strict          |
 | -------------------------------- | -------------- | --------------- |
@@ -75,7 +75,6 @@ All rules are included in every preset. The only difference between `recommended
 | `no-dynamic-import`              | warn           | error           |
 | `no-literal-unions`              | warn           | error           |
 | `no-export-alias`                | warn           | error           |
-| `no-parent-imports`              | warn           | error           |
 | `no-jest-have-been-called`       | warn           | error           |
 | `no-mock-implementation`         | warn           | error           |
 | `no-type-assertion`              | warn           | error           |
@@ -99,6 +98,8 @@ All rules are included in every preset. The only difference between `recommended
 | `no-query-side-effects`          | warn           | error           |
 | `no-re-export`                   | warn           | error           |
 | `require-optional-chaining`      | warn           | error           |
+
+`no-parent-imports` is available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 

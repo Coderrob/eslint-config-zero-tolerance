@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-All rules are included in the `recommended` (`warn`) and `strict` (`error`) presets.
+All core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `no-parent-imports` remains available as an opt-in rule.
 
 ### Naming Conventions
 
