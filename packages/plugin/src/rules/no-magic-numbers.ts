@@ -61,7 +61,12 @@ function createNoMagicNumbersListeners(context: NoMagicNumbersContext): TSESLint
   };
 }
 
-/** Returns variable declarator directly owning the node, when present. */
+/**
+ * Returns variable declarator directly owning the node, when present.
+ *
+ * @param node - Candidate node whose parent may be a variable declarator.
+ * @returns Owning variable declarator, or null.
+ */
 function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDeclarator | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
@@ -69,7 +74,13 @@ function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDecl
   return node.parent;
 }
 
-/** Returns normalized raw text for numeric literal reporting. */
+/**
+ * Returns normalized raw text for numeric literal reporting.
+ *
+ * @param node - Numeric literal node.
+ * @param sourceCode - Source code helper.
+ * @returns Raw literal text.
+ */
 function getNumericLiteralText(
   node: TSESTree.Literal,
   sourceCode: Readonly<TSESLint.SourceCode>,
@@ -126,7 +137,12 @@ function isAllowedValue(node: TSESTree.Literal): boolean {
   return node.value === 1;
 }
 
-/** Returns true when declaration node is a const variable declaration. */
+/**
+ * Returns true when declaration node is a const variable declaration.
+ *
+ * @param node - Variable declaration node.
+ * @returns True when declaration uses const.
+ */
 function isConstVariableDeclaration(node: TSESTree.VariableDeclaration): boolean {
   return node.kind === VARIABLE_KIND_CONST;
 }

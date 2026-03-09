@@ -53,8 +53,9 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-flag-argument',
   'no-floating-promises',
   'prefer-guard-clauses',
-  'prefer-shortcut-return',
   'prefer-nullish-coalescing',
+  'prefer-shortcut-return',
+  'prefer-string-raw',
   'no-query-side-effects',
 ];
 

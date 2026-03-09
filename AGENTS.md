@@ -146,3 +146,14 @@ export default myRuleName;
 6. Run `pnpm test` and confirm all tests pass.
 7. Run `pnpm build` to validate the TypeScript compilation.
 8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+
+---
+
+## Definition of Done
+
+Before considering any rule or behavior change complete:
+
+1. Run `pnpm lint` and ensure it passes.
+2. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
+3. Update `CHANGELOG.md` under `[Unreleased]`.
+4. Update documentation (`docs/` and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.

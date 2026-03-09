@@ -33,6 +33,7 @@ type SortableFunctions = SortableFunction[];
  *
  * @param context - ESLint rule execution context.
  * @param functions - Function declarations in source order.
+ * @param sourceCode - ESLint source code helper.
  */
 function checkFunctionOrdering(
   context: SortFunctionsContext,

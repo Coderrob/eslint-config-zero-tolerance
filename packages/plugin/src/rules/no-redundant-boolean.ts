@@ -113,7 +113,12 @@ function createReplacementText(
   return `!(${expressionText})`;
 }
 
-/** Returns fix inputs for redundant boolean comparisons, or null when not fixable. */
+/**
+ * Returns fix inputs for redundant boolean comparisons, or null when not fixable.
+ *
+ * @param node - Binary expression to inspect.
+ * @returns Fix inputs when expression is redundant, otherwise null.
+ */
 function getFixInputs(node: TSESTree.BinaryExpression): FixInputs | null {
   if (!isRedundantBooleanComparison(node)) {
     return null;
@@ -164,7 +169,12 @@ function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { val
   return node.type === AST_NODE_TYPES.Literal && typeof node.value === 'boolean';
 }
 
-/** Returns true when node is strict comparison against at least one boolean literal. */
+/**
+ * Returns true when node is strict comparison against at least one boolean literal.
+ *
+ * @param node - Binary expression to inspect.
+ * @returns True when expression compares against a boolean literal.
+ */
 function isRedundantBooleanComparison(
   node: TSESTree.BinaryExpression,
 ): node is RedundantBooleanComparisonExpression {
@@ -174,7 +184,12 @@ function isRedundantBooleanComparison(
   return hasBooleanLiteralOperand(node);
 }
 
-/** Returns true when node is a strict comparison expression. */
+/**
+ * Returns true when node is a strict comparison expression.
+ *
+ * @param node - Binary expression to inspect.
+ * @returns True when operator is strict equality/inequality.
+ */
 function isStrictComparisonExpression(
   node: TSESTree.BinaryExpression,
 ): node is StrictComparisonExpression {

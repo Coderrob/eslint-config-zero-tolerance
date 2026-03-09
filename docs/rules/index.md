@@ -43,6 +43,7 @@
 | [sort-imports](sort-imports.md)                           | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
 | [sort-functions](sort-functions.md)                       | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
 | [prefer-nullish-coalescing](prefer-nullish-coalescing.md) | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| [prefer-string-raw](prefer-string-raw.md)                | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
 
 ## Error Handling
 

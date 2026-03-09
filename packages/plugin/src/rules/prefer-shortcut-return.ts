@@ -320,8 +320,9 @@ function reportIfShortcutReturn(
 /**
  * Returns extracted boolean pair for an `if (...) return ...; else return ...;` pattern.
  *
+ * @param sourceCode - ESLint source code helper.
  * @param node - If statement node.
- * @returns Boolean pair data, or null when pattern does not match.
+ * @returns Replacement plan, or null when pattern does not match.
  */
 function resolveReplacement(
   sourceCode: Readonly<TSESLint.SourceCode>,

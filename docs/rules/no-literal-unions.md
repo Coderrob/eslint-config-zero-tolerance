@@ -7,7 +7,7 @@ Ban literal union types in favour of enums.
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | No           |
+| **Fixable**     | Yes (limited) |
 | **Recommended** | `warn`       |
 | **Strict**      | `error`      |
 
@@ -51,6 +51,24 @@ Pure boolean unions (`true | false`) are exempt because they represent the full 
 // ✅ Allowed — exhaustive boolean union
 type Toggle = true | false;
 ```
+
+## Autofix Behavior
+
+This rule can auto-convert simple string-literal union type aliases to enums.
+
+### Auto-fixable
+
+```typescript
+type Status = 'active' | 'inactive';
+// becomes:
+enum Status { Active = 'active', Inactive = 'inactive' }
+```
+
+### Not auto-fixable
+
+- Generic aliases (for example `type Status<T> = 'active' | 'inactive'`)
+- Non-alias unions (for example function parameter unions)
+- Mixed unions that are not pure string-literal unions
 
 ## Configuration
 

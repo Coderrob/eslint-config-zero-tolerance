@@ -74,6 +74,7 @@ nav:
           - sort-imports: rules/sort-imports.md
           - sort-functions: rules/sort-functions.md
           - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
+          - prefer-string-raw: rules/prefer-string-raw.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md

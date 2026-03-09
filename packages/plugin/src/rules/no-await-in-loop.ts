@@ -34,7 +34,12 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
   AST_NODE_TYPES.ArrowFunctionExpression,
 ]);
 
-/** Returns loop-boundary evaluation result for a node type, or null if irrelevant. */
+/**
+ * Returns loop-boundary evaluation result for a node type, or null if irrelevant.
+ *
+ * @param type - AST node type to evaluate.
+ * @returns True for loop boundary, false for function boundary, null otherwise.
+ */
 function getBoundaryResult(type: AST_NODE_TYPES): boolean | null {
   if (FUNCTION_BOUNDARY_TYPES.has(type)) {
     return false;

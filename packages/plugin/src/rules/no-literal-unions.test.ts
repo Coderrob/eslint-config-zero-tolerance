@@ -57,6 +57,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type Status = "active" | "inactive";',
       name: 'should report string literal union',
+      output: 'enum Status { Active = "active", Inactive = "inactive" }',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -66,6 +67,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type Size = "small" | "medium" | "large";',
       name: 'should report multiple string literals',
+      output: 'enum Size { Small = "small", Medium = "medium", Large = "large" }',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -111,6 +113,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";',
       name: 'should report HTTP method literals',
+      output: 'enum HttpMethod { GET = "GET", POST = "POST", PUT = "PUT", DELETE = "DELETE" }',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -129,6 +132,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type Direction = "up" | "down" | "left" | "right";',
       name: 'should report direction literals',
+      output: 'enum Direction { Up = "up", Down = "down", Left = "left", Right = "right" }',
       errors: [
         {
           messageId: 'noLiteralUnions',
@@ -138,6 +142,75 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'type Slug = `a-${string}` | "fixed";',
       name: 'should report template literal union',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'export type RequireJsdocFunctionsMessageId = "missingJsdoc" | "missingJsdocParam";',
+      name: 'should autofix exported string literal union type aliases to exported enums',
+      output:
+        'export enum RequireJsdocFunctionsMessageId { MissingJsdoc = "missingJsdoc", MissingJsdocParam = "missingJsdocParam" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type Duplicates = "a-b" | "a b";',
+      name: 'should autofix duplicate enum member names by appending numeric suffixes',
+      output: 'enum Duplicates { AB = "a-b", AB2 = "a b" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type EmptyLiteral = "" | "active";',
+      name: 'should autofix empty string literal union members using fallback enum member names',
+      output: 'enum EmptyLiteral { Value1 = "", Active = "active" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type AuthMode = "2fa" | "password";',
+      name: 'should autofix numeric-leading string literals with prefixed enum member names',
+      output: 'enum AuthMode { Value2fa = "2fa", Password = "password" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'declare type Stage = "dev" | "prod";',
+      name: 'should preserve declare modifier when autofixing type aliases',
+      output: 'declare enum Stage { Dev = "dev", Prod = "prod" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type GenericStatus<T> = "active" | "inactive";',
+      name: 'should report generic type aliases without offering enum autofix',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'function run(mode: "fast" | "safe") {}',
+      name: 'should report non-alias literal unions without offering enum autofix',
       errors: [
         {
           messageId: 'noLiteralUnions',

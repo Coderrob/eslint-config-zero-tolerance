@@ -20,6 +20,20 @@ import { createRule } from '../rule-factory';
 type NoInlineTypeImportContext = Readonly<TSESLint.RuleContext<'noInlineTypeImport', []>>;
 
 /**
+ * Creates listeners that ban inline TypeScript `import("...")` type queries.
+ *
+ * @param context - ESLint rule execution context.
+ * @returns Listener map for the rule.
+ */
+function createNoInlineTypeImportListeners(
+  context: NoInlineTypeImportContext,
+): TSESLint.RuleListener {
+  return {
+    TSImportType: reportInlineTypeImport.bind(undefined, context),
+  };
+}
+
+/**
  * Reports TypeScript inline `import("...")` type queries.
  *
  * @param context - ESLint rule execution context.
@@ -33,20 +47,6 @@ function reportInlineTypeImport(
     node,
     messageId: 'noInlineTypeImport',
   });
-}
-
-/**
- * Creates listeners that ban inline TypeScript `import("...")` type queries.
- *
- * @param context - ESLint rule execution context.
- * @returns Listener map for the rule.
- */
-function createNoInlineTypeImportListeners(
-  context: NoInlineTypeImportContext,
-): TSESLint.RuleListener {
-  return {
-    TSImportType: reportInlineTypeImport.bind(undefined, context),
-  };
 }
 
 /**

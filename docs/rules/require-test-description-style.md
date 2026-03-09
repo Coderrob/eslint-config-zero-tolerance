@@ -4,12 +4,12 @@ Enforce that `it()` and `test()` descriptions start with the word `should`.
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
-| **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `suggestion`  |
+| **Fixable**     | Yes (`--fix`) |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 
@@ -52,3 +52,7 @@ This rule accepts an optional options object:
   },
 ]
 ```
+
+## Autofix Notes
+
+Autofix updates string-literal test descriptions by prepending the configured `prefix` (default `should`) and normalizing leading whitespace.
