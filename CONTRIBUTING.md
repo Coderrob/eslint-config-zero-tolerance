@@ -208,4 +208,3 @@ mkdocs build --strict
 ## Release Process
 
 See the [Release Process](AGENTS.md#release-process) section of `AGENTS.md` for the full versioned release workflow.
-

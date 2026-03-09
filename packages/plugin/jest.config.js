@@ -73,9 +73,7 @@ function getSpecialCoverageGlobs(arg) {
  */
 function resolveSourceFileFromTestArg(arg) {
   const normalizedArg = arg.replaceAll('\\', '/');
-  const withSrcPrefix = normalizedArg.startsWith('src/')
-    ? normalizedArg
-    : `src/${normalizedArg}`;
+  const withSrcPrefix = normalizedArg.startsWith('src/') ? normalizedArg : `src/${normalizedArg}`;
   const directCandidate = withSrcPrefix.replace('.test.ts', '.ts');
   if (fs.existsSync(path.join(__dirname, directCandidate))) {
     return directCandidate;

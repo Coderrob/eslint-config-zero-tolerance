@@ -85,6 +85,22 @@ Each new ESLint rule must follow this structure:
 4. **Registration**: Import and register in `packages/plugin/src/index.ts` under both `rules` and all config presets (`recommendedConfig`, `strictConfig`, `legacyRecommendedConfig`, `legacyStrictConfig`).
 5. **Config sync**: Add the rule to `packages/config/src/index.ts`, `recommended.ts`, and `strict.ts`.
 
+### Required Rule Change Checks
+
+These checks are mandatory whenever a rule is **added**, **updated**, or **removed**:
+
+1. Keep documentation in sync:
+   - Update the rule page in `docs/rules/` (or remove it if the rule is removed).
+   - Update rule indexes/tables in `docs/rules/index.md`, `docs/index.md`, `README.md`, and `packages/plugin/README.md`.
+   - Update `mkdocs.yml` navigation entries when rule pages are added/removed/renamed.
+2. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
+3. Run required validations and ensure they all pass:
+   - `pnpm lint`
+   - `pnpm test`
+   - `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`
+   - `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`
+   - `pnpm build`
+
 ### Rule Template
 
 ```typescript
@@ -155,5 +171,7 @@ Before considering any rule or behavior change complete:
 
 1. Run `pnpm lint` and ensure it passes.
 2. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
-3. Update `CHANGELOG.md` under `[Unreleased]`.
-4. Update documentation (`docs/` and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
+3. Run type checks for plugin and config packages and ensure they pass.
+4. Run `pnpm build` and ensure it passes.
+5. Update `CHANGELOG.md` under `[Unreleased]`.
+6. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
