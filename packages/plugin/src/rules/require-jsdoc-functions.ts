@@ -16,6 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
+import { visitorKeys } from '@typescript-eslint/visitor-keys';
 import {
   type FunctionNode,
   isIdentifierNode,
@@ -29,6 +30,13 @@ import { createRule } from '../rule-factory';
 
 const COMMENT_PREFIX_LENGTH = 3;
 const COMMENT_SUFFIX_LENGTH = 2;
+const NESTED_CONTROL_FLOW_BOUNDARY_TYPES = new Set([
+  AST_NODE_TYPES.ArrowFunctionExpression,
+  AST_NODE_TYPES.ClassDeclaration,
+  AST_NODE_TYPES.ClassExpression,
+  AST_NODE_TYPES.FunctionDeclaration,
+  AST_NODE_TYPES.FunctionExpression,
+]);
 const NAMED_KEY_PARENT_TYPES = new Set([
   AST_NODE_TYPES.MethodDefinition,
   AST_NODE_TYPES.PropertyDefinition,
@@ -327,7 +335,7 @@ function getMissingTagLines(
   for (const name of missingParams) {
     missingTags.push(`@${JsdocTagName.Param} ${name} ${PARAM_DESCRIPTION_PLACEHOLDER}`);
   }
-  if (isMissingReturnsTag(node, sourceCode, jsdocComment)) {
+  if (isMissingReturnsTag(node, jsdocComment)) {
     missingTags.push(`@${JsdocTagName.Returns} ${RETURNS_DESCRIPTION_PLACEHOLDER}`);
   }
   if (isMissingThrowsTag(node, sourceCode, jsdocComment)) {
@@ -429,6 +437,33 @@ function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
 }
 
 /**
+ * Returns direct child nodes for an AST node using visitor keys.
+ *
+ * @param node - Node whose children should be collected.
+ * @returns Child nodes for traversal.
+ */
+function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
+  if (Array.isArray(value)) {
+    return value.filter(isNodeLike);
+  }
+  return isNodeLike(value) ? [value] : [];
+}
+
+/**
+ * Returns direct child nodes for an AST node using visitor keys.
+ *
+ * @param node - Node whose children should be collected.
+ * @returns Child nodes for traversal.
+ */
+function getVisitorChildNodes(node: TSESTree.Node): ReadonlyArray<TSESTree.Node> {
+  const childNodes: TSESTree.Node[] = [];
+  for (const key of visitorKeys[node.type] ?? []) {
+    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
+  }
+  return childNodes;
+}
+
+/**
  * Returns true when a parent node can expose a function name from `key.name`.
  *
  * @param parent - Parent node to inspect.
@@ -462,51 +497,61 @@ function hasReturnJsdocTag(comment: TSESTree.Comment): boolean {
 }
 
 /**
- * Returns true when block text appears to include a return with value.
+ * Returns true when a function has at least one return statement with a value.
  *
- * @param sourceCode - ESLint source code helper.
- * @param body - Function block body.
- * @returns True when a return-with-value token pattern exists.
+ * @param node - Function node to inspect.
+ * @returns True when function returns a value.
  */
-function hasReturnValueByText(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  body: TSESTree.BlockStatement,
-): boolean {
-  return /\breturn\s+[^\s;]/u.test(sourceCode.getText(body));
+function hasReturnWithValue(node: FunctionNode): boolean {
+  const body = node.body;
+  return (
+    isExpressionBodiedArrowFunction(node) ||
+    (body.type === AST_NODE_TYPES.BlockStatement && hasReturnWithValueInBlock(body))
+  );
 }
 
 /**
- * Returns true when a block body contains an inline return with value.
+ * Returns true when a block contains a return statement with an argument.
+ *
+ * Nested function and class boundaries are intentionally skipped so their
+ * control flow does not affect the containing function's JSDoc requirements.
  *
  * @param body - Function block body.
- * @returns True when return-with-value exists.
+ * @returns True when the block contains a return-with-value.
  */
-function hasReturnValueInBlock(body: TSESTree.BlockStatement): boolean {
-  for (const statement of body.body) {
-    if (isReturnWithValueStatement(statement)) {
+function hasReturnWithValueInBlock(body: TSESTree.BlockStatement): boolean {
+  return hasReturnWithValueInNodes(body.body);
+}
+
+/**
+ * Returns true when a node contains a return statement with a value.
+ *
+ * @param node - Node to inspect.
+ * @returns True when the node or its traversable children return a value.
+ */
+function hasReturnWithValueInNode(node: TSESTree.Node): boolean {
+  if (isReturnWithValueNode(node)) {
+    return true;
+  }
+  if (isNestedControlFlowBoundaryNode(node)) {
+    return false;
+  }
+  return hasReturnWithValueInNodes(getVisitorChildNodes(node));
+}
+
+/**
+ * Returns true when a node tree contains a return statement with a value.
+ *
+ * @param nodes - Root nodes to inspect.
+ * @returns True when a return-with-value is found.
+ */
+function hasReturnWithValueInNodes(nodes: ReadonlyArray<TSESTree.Node>): boolean {
+  for (const node of nodes) {
+    if (hasReturnWithValueInNode(node)) {
       return true;
     }
   }
   return false;
-}
-
-/**
- * Returns true when a function has at least one return statement with a value.
- *
- * @param node - Function node to inspect.
- * @param sourceCode - ESLint source code helper.
- * @returns True when function returns a value.
- */
-function hasReturnWithValue(
-  node: FunctionNode,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  const body = node.body;
-  return (
-    isExpressionBodiedArrowFunction(node) ||
-    (body.type === AST_NODE_TYPES.BlockStatement &&
-      (hasReturnValueInBlock(body) || hasReturnValueByText(sourceCode, body)))
-  );
 }
 
 /**
@@ -579,16 +624,14 @@ function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
  * Returns true when generated JSDoc must include a @returns tag.
  *
  * @param node - Function node to inspect.
- * @param sourceCode - ESLint source code helper.
  * @param jsdocComment - Existing JSDoc block comment, or null.
  * @returns True when @returns is required and currently missing.
  */
 function isMissingReturnsTag(
   node: FunctionNode,
-  sourceCode: Readonly<TSESLint.SourceCode>,
   jsdocComment: TSESTree.Comment | null,
 ): boolean {
-  if (!hasReturnWithValue(node, sourceCode)) {
+  if (!hasReturnWithValue(node)) {
     return false;
   }
   return jsdocComment === null || !hasReturnJsdocTag(jsdocComment);
@@ -664,6 +707,31 @@ function isNamedParamRestElement(
 }
 
 /**
+ * Returns true when a node should stop return-statement traversal.
+ *
+ * @param node - AST node to inspect.
+ * @returns True when the node is a nested function or class boundary.
+ */
+function isNestedControlFlowBoundaryNode(node: TSESTree.Node): boolean {
+  return NESTED_CONTROL_FLOW_BOUNDARY_TYPES.has(node.type);
+}
+
+/**
+ * Returns true when an unknown value is an AST node.
+ *
+ * @param value - Value to inspect.
+ * @returns True when value has a node-like `type` property.
+ */
+function isNodeLike(value: unknown): value is TSESTree.Node {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'type' in value &&
+    typeof value.type === 'string'
+  );
+}
+
+/**
  * Returns true when a parent node type owns JSDoc placement for enclosed functions.
  *
  * @param type - Node type to inspect.
@@ -674,13 +742,13 @@ function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
 }
 
 /**
- * Returns true when a statement is `return` with a non-null argument.
+ * Returns true when a node is `return` with a non-null argument.
  *
- * @param statement - Statement node to inspect.
- * @returns True when statement returns a value.
+ * @param node - Node to inspect.
+ * @returns True when node returns a value.
  */
-function isReturnWithValueStatement(statement: TSESTree.Statement): boolean {
-  return statement.type === AST_NODE_TYPES.ReturnStatement && statement.argument !== null;
+function isReturnWithValueNode(node: TSESTree.Node): node is TSESTree.ReturnStatement {
+  return node.type === AST_NODE_TYPES.ReturnStatement && node.argument !== null;
 }
 
 /**
@@ -777,7 +845,7 @@ function reportMissingJsdocReturns(
   node: FunctionNode,
   jsdocComment: TSESTree.Comment,
 ): void {
-  if (!hasReturnWithValue(node, sourceCode)) {
+  if (!hasReturnWithValue(node)) {
     return;
   }
   if (hasReturnJsdocTag(jsdocComment)) {

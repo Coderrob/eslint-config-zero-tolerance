@@ -96,7 +96,7 @@ function createEnumMembersFromUnion(unionNode: TSESTree.TSUnionType): string[] {
   for (const unionMember of literalMembers) {
     const value = unionMember.literal.value;
     const memberName = createUniqueEnumMemberName(value, names, index);
-    members.push(`${memberName} = "${value}"`);
+    members.push(`${memberName} = ${JSON.stringify(value)}`);
     index += 1;
   }
   return members;

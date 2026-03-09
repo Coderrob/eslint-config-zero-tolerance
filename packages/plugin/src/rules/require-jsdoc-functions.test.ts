@@ -77,6 +77,16 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       name: 'should not require parent @returns or @throws tags based on nested function behavior',
       filename: 'src/utils.ts',
     },
+    {
+      code: '/** Wrapper function. */\nfunction wrapper() { /** Nested function.\n   * @returns one\n   */ function nested(): number { return 1; } return; }',
+      name: 'should not require parent @returns tag for nested function return statements',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: '/** Wrapper function. */\nfunction wrapper() { class Inner {\n    /** Gets a value.\n     * @returns value\n     */\n    getValue(): number { return 1; }\n  }\n  const text = "return value";\n  // return 123\n  return;\n}',
+      name: 'should not require parent @returns tag for nested class returns or return-like text',
+      filename: 'src/utils.ts',
+    },
   ],
   invalid: [
     {

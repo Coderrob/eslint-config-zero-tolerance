@@ -190,6 +190,16 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
     {
+      code: String.raw`type Escapes = "\"" | "\\" | "\n";`,
+      name: 'should autofix escaped literals using safe enum initializer serialization',
+      output: String.raw`enum Escapes { Value1 = "\"", Value2 = "\\", Value3 = "\n" }`,
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
       code: 'declare type Stage = "dev" | "prod";',
       name: 'should preserve declare modifier when autofixing type aliases',
       output: 'declare enum Stage { Dev = "dev", Prod = "prod" }',
