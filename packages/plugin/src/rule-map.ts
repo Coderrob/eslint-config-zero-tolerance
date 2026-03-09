@@ -32,6 +32,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-export-alias',
   'no-re-export',
   'no-jest-have-been-called',
+  'no-inline-type-import',
   'no-mock-implementation',
   'require-jsdoc-functions',
   'require-optional-chaining',

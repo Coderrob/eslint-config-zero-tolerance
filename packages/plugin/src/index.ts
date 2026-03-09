@@ -33,6 +33,7 @@ import noFlagArgument from './rules/no-flag-argument';
 import noFloatingPromises from './rules/no-floating-promises';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
+import noInlineTypeImport from './rules/no-inline-type-import';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noLiteralUnions from './rules/no-literal-unions';
 import noMagicNumbers from './rules/no-magic-numbers';
@@ -84,6 +85,7 @@ const rules: Record<string, unknown> = {
   'no-floating-promises': noFloatingPromises,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
+  'no-inline-type-import': noInlineTypeImport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-literal-unions': noLiteralUnions,
   'no-magic-numbers': noMagicNumbers,

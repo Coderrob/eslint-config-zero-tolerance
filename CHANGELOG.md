@@ -12,6 +12,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - No unreleased changes yet.
 
+## [1.1.2] - 2026-03-09
+
+### Added
+
+- **`no-inline-type-import` rule**: Disallows TypeScript inline type import queries like `import("module").Type`. This blocks patterns such as inline `import("typescript").Program` in exported types and interfaces, requiring top-level `import type` declarations instead.
+
 ## [1.1.1] - 2026-03-08
 
 ### Changed
