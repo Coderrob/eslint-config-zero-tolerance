@@ -1124,6 +1124,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofix-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix Behavior
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Autofix Behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-fixable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-fixable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-auto-fixable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not auto-fixable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1158,6 +1197,34 @@
     
   
     no-banned-types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-inline-type-import/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-inline-type-import
   
 
     
@@ -1419,6 +1486,34 @@
     
   
     prefer-nullish-coalescing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prefer-string-raw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-string-raw
   
 
     
@@ -2217,6 +2312,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofix-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix Behavior
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Autofix Behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-fixable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-fixable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-auto-fixable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not auto-fixable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2269,7 +2403,7 @@
 </tr>
 <tr>
 <td><strong>Fixable</strong></td>
-<td>No</td>
+<td>Yes (limited)</td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
@@ -2309,9 +2443,25 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// ✅ Allowed — exhaustive boolean union</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Toggle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
 </code></pre></div>
+<h2 id="autofix-behavior">Autofix Behavior</h2>
+<p>This rule can auto-convert simple string-literal union type aliases to enums.</p>
+<h3 id="auto-fixable">Auto-fixable</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">// becomes:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kd">enum</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">Active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">Inactive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="not-auto-fixable">Not auto-fixable</h3>
+<ul>
+<li>Generic aliases (for example <code>type Status&lt;T&gt; = 'active' | 'inactive'</code>)</li>
+<li>Non-alias unions (for example function parameter unions)</li>
+<li>Mixed unions that are not pure string-literal unions</li>
+</ul>
 <h2 id="configuration">Configuration</h2>
 <p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s1">&#39;zero-tolerance/no-literal-unions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s1">&#39;zero-tolerance/no-literal-unions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
 </code></pre></div>
 
 
