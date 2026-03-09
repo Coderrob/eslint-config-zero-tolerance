@@ -43,4 +43,4 @@ This rule has no options:
 
 ## Autofix Notes
 
-Autofix rewrites eligible string literals to `String.raw\`\`` form. It intentionally skips unsafe cases such as literals containing template interpolation markers (for example, `${...}`) or backticks.
+Autofix rewrites eligible string literals to `String.raw\`\``form. It intentionally skips unsafe cases such as literals containing template interpolation markers (for example,`${...}`) or backticks.

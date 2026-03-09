@@ -184,7 +184,10 @@ function isUncomputedMemberExpression(
  * @param context - ESLint rule execution context.
  * @param node - String literal node to report.
  */
-function reportPreferStringRaw(context: PreferStringRawContext, node: TSESTree.StringLiteral): void {
+function reportPreferStringRaw(
+  context: PreferStringRawContext,
+  node: TSESTree.StringLiteral,
+): void {
   context.report({
     node,
     messageId: 'preferStringRaw',

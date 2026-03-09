@@ -4,12 +4,12 @@ Ban literal union types in favour of enums.
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `suggestion`  |
 | **Fixable**     | Yes (limited) |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 
@@ -61,7 +61,10 @@ This rule can auto-convert simple string-literal union type aliases to enums.
 ```typescript
 type Status = 'active' | 'inactive';
 // becomes:
-enum Status { Active = 'active', Inactive = 'inactive' }
+enum Status {
+  Active = 'active',
+  Inactive = 'inactive',
+}
 ```
 
 ### Not auto-fixable

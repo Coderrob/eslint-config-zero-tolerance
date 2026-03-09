@@ -77,7 +77,9 @@ function createEnumMemberNameBase(value: string, index: number): string {
   if (pascalValue === '') {
     return `${ENUM_MEMBER_FALLBACK_PREFIX}${index}`;
   }
-  return startsWithDigit(pascalValue) ? `${ENUM_MEMBER_FALLBACK_PREFIX}${pascalValue}` : pascalValue;
+  return startsWithDigit(pascalValue)
+    ? `${ENUM_MEMBER_FALLBACK_PREFIX}${pascalValue}`
+    : pascalValue;
 }
 
 /**
@@ -191,7 +193,10 @@ function getEnumDeclarationPrefix(
  */
 function getTypeAliasReplacementNode(alias: TSESTree.TSTypeAliasDeclaration): TSESTree.Node {
   const parentNode = alias.parent;
-  if (parentNode.type === AST_NODE_TYPES.ExportNamedDeclaration && parentNode.declaration === alias) {
+  if (
+    parentNode.type === AST_NODE_TYPES.ExportNamedDeclaration &&
+    parentNode.declaration === alias
+  ) {
     return parentNode;
   }
   return alias;
