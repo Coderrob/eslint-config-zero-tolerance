@@ -185,7 +185,7 @@ function createMissingJsdocFix(
  * @param node - Function node being reported.
  * @param jsdocComment - Existing JSDoc block comment.
  * @param fixer - ESLint fixer helper.
- * @returns Rule fix for updating JSDoc tags, or null when no tags are missing.
+ * @returns Rule fix that updates the existing JSDoc block with generated tags.
  */
 function createMissingJsdocTagFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
@@ -574,28 +574,49 @@ function hasReturnWithValueInNodes(
 }
 
 /**
- * Returns true when block text appears to include a throw statement.
+ * Returns true when a block contains a throw statement.
  *
- * @param sourceCode - ESLint source code helper.
  * @param body - Function block body.
- * @returns True when a throw token pattern exists.
+ * @param sourceCode - ESLint source code helper.
+ * @returns True when throw exists.
  */
-function hasThrowByText(
-  sourceCode: Readonly<TSESLint.SourceCode>,
+function hasThrowInBlock(
   body: TSESTree.BlockStatement,
+  sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
-  return /\bthrow\s+/u.test(sourceCode.getText(body));
+  return hasThrowInNodes(body.body, sourceCode);
 }
 
 /**
- * Returns true when block body contains an inline throw statement.
+ * Returns true when a node contains a throw statement.
  *
- * @param body - Function block body.
- * @returns True when throw exists.
+ * @param node - Node to inspect.
+ * @param sourceCode - ESLint source code helper.
+ * @returns True when the node or its traversable children contain a throw statement.
  */
-function hasThrowInBlock(body: TSESTree.BlockStatement): boolean {
-  for (const statement of body.body) {
-    if (isThrowStatementNode(statement)) {
+function hasThrowInNode(node: TSESTree.Node, sourceCode: Readonly<TSESLint.SourceCode>): boolean {
+  if (isThrowStatementNode(node)) {
+    return true;
+  }
+  if (isNestedControlFlowBoundaryNode(node)) {
+    return false;
+  }
+  return hasThrowInNodes(getVisitorChildNodes(node, sourceCode), sourceCode);
+}
+
+/**
+ * Returns true when a node tree contains a throw statement.
+ *
+ * @param nodes - Root nodes to inspect.
+ * @param sourceCode - ESLint source code helper.
+ * @returns True when a throw statement is found.
+ */
+function hasThrowInNodes(
+  nodes: ReadonlyArray<TSESTree.Node>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): boolean {
+  for (const node of nodes) {
+    if (hasThrowInNode(node, sourceCode)) {
       return true;
     }
   }
@@ -613,7 +634,7 @@ function hasThrowStatement(node: FunctionNode, sourceCode: Readonly<TSESLint.Sou
   if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
     return false;
   }
-  return hasThrowInBlock(node.body) || hasThrowByText(sourceCode, node.body);
+  return hasThrowInBlock(node.body, sourceCode);
 }
 
 /**
@@ -788,11 +809,11 @@ function isStandaloneLineTarget(
 /**
  * Returns true when a statement is `throw`.
  *
- * @param statement - Statement node to inspect.
- * @returns True when statement is a throw statement.
+ * @param node - Node to inspect.
+ * @returns True when node is a throw statement.
  */
-function isThrowStatementNode(statement: TSESTree.Statement): boolean {
-  return statement.type === AST_NODE_TYPES.ThrowStatement;
+function isThrowStatementNode(node: TSESTree.Node): boolean {
+  return node.type === AST_NODE_TYPES.ThrowStatement;
 }
 
 /**

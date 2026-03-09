@@ -87,6 +87,11 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       name: 'should not require parent @returns tag for nested class returns or return-like text',
       filename: 'src/utils.ts',
     },
+    {
+      code: '/** Wrapper function. */\nfunction wrapper() { const text = "throw error";\n  // throw new Error("boom")\n  /** Nested throws.\n   * @throws {Error} nested\n   */\n  function nested(): never { throw new Error("nested"); }\n  class Inner {\n    /** Inner throws.\n     * @throws {Error} inner\n     */\n    run(): never { throw new Error("inner"); }\n  }\n  return;\n}',
+      name: 'should not require parent @throws tag for nested throws or throw-like text',
+      filename: 'src/utils.ts',
+    },
   ],
   invalid: [
     {

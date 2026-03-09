@@ -17,7 +17,7 @@ JSDoc comments are essential for self-documenting code and support IDE tooling, 
 
 ## Examples
 
-### ✅ Correct
+### Correct
 
 ```typescript
 /**
@@ -33,7 +33,7 @@ async function fetchUser(id: string): Promise<IUser> {
 const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
 ```
 
-### ❌ Incorrect
+### Incorrect
 
 ```typescript
 async function fetchUser(id: string): Promise<IUser> {

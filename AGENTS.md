@@ -61,7 +61,7 @@ eslint-config-zero-tolerance/
 - Use `strict` TypeScript (`"strict": true` in `tsconfig.json`).
 - Prefer explicit types over inferred ones on public function signatures.
 - Never use `any` except where required by ESLint's internal APIs (e.g., rule tester casts, plugin registration).
-- Use `ESLintUtils.RuleCreator` from `@typescript-eslint/utils` for all custom rules.
+- Use the shared `createRule` helper from `packages/plugin/src/rule-factory.ts` for all custom rules.
 
 ### JSDoc
 
@@ -82,8 +82,8 @@ Each new ESLint rule must follow this structure:
 1. **File**: `packages/plugin/src/rules/<rule-name>.ts`
 2. **Test file**: `packages/plugin/src/rules/<rule-name>.test.ts`
 3. **Export**: Named export of the rule constant plus a default export.
-4. **Registration**: Import and register in `packages/plugin/src/index.ts` under both `rules` and all config presets (`recommendedConfig`, `strictConfig`, `legacyRecommendedConfig`, `legacyStrictConfig`).
-5. **Config sync**: Add the rule to `packages/config/src/index.ts`, `recommended.ts`, and `strict.ts`.
+4. **Registration**: Import and register in `packages/plugin/src/index.ts` under `rules` and ensure it is included by the exported presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
+5. **Config sync note**: `packages/config` re-exports plugin configs; no manual rule sync is required there.
 
 ### Required Rule Change Checks
 
@@ -104,11 +104,7 @@ These checks are mandatory whenever a rule is **added**, **updated**, or **remov
 ### Rule Template
 
 ```typescript
-import { ESLintUtils } from '@typescript-eslint/utils';
-
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`,
-);
+import { createRule } from '../rule-factory';
 
 export const myRuleName = createRule({
   name: 'my-rule-name',
@@ -156,12 +152,11 @@ export default myRuleName;
 
 1. Implement the rule and its tests in `packages/plugin/src/rules/`.
 2. Register the rule in `packages/plugin/src/index.ts` and all config presets.
-3. Sync the rule to `packages/config/src/`.
-4. Add a doc page in `docs/rules/<rule-name>.md` and register it in `mkdocs.yml`.
-5. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
-6. Run `pnpm test` and confirm all tests pass.
-7. Run `pnpm build` to validate the TypeScript compilation.
-8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+3. Add a doc page in `docs/rules/<rule-name>.md` and register it in `mkdocs.yml`.
+4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
+5. Run `pnpm test` and confirm all tests pass.
+6. Run `pnpm build` to validate the TypeScript compilation.
+7. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
 
 ---
 

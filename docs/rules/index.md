@@ -31,6 +31,7 @@
 | [no-non-null-assertion](no-non-null-assertion.md) | problem    | Disallow non-null assertions using the `!` postfix operator |
 | [no-literal-unions](no-literal-unions.md)         | suggestion | Ban literal union types in favour of enums                  |
 | [no-banned-types](no-banned-types.md)             | problem    | Ban `ReturnType` and indexed access types                   |
+| [no-inline-type-import](no-inline-type-import.md) | problem    | Disallow inline `import("...")` type annotations            |
 
 ## Code Quality
 
