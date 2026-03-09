@@ -39,6 +39,9 @@ pnpm test
 
 # Run tests for the plugin only (in watch mode during development)
 pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- --watch
+
+# Run a single plugin test file with focused coverage
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- sort-imports.test.ts
 ```
 
 ## Coding Standards
@@ -53,7 +56,7 @@ Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md
 
 - Interface names must start with `I` (`require-interface-prefix`)
 - All non-test functions must have a JSDoc comment (`require-jsdoc-functions`)
-- Import declarations must be ordered by group (external → parent → peer → index) and alphabetically within each group (`sort-imports`)
+- Import declarations must be ordered by group (side-effect -> builtin -> external -> parent -> peer -> index) and alphabetically within each group (`sort-imports`)
 - No parent-relative re-exports (`no-re-export`)
 - No `eslint-disable` comments — fix the underlying issue (`no-eslint-disable`)
 
@@ -205,3 +208,4 @@ mkdocs build --strict
 ## Release Process
 
 See the [Release Process](AGENTS.md#release-process) section of `AGENTS.md` for the full versioned release workflow.
+
