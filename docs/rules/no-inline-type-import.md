@@ -4,12 +4,12 @@ Disallow TypeScript inline type imports using `import("...")`.
 
 ## Rule Details
 
-| Property        | Value       |
-| --------------- | ----------- |
-| **Type**        | `problem`   |
-| **Fixable**     | No          |
-| **Recommended** | `warn`      |
-| **Strict**      | `error`     |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
