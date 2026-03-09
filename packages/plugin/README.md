@@ -1,22 +1,22 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-Strict, opinionated ESLint plugin for TypeScript — enforcing type safety, code quality, testing standards, and maintainable patterns with zero exceptions.
+Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns with zero exceptions.
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 
 ## Features
 
-- 32 custom ESLint rules covering type safety, code quality, testing, imports, and more
-- **Recommended** preset (all rules at `warn`) and **Strict** preset (all rules at `error`)
-- ESLint 9 Flat Config and ESLint 8.x legacy config support
-- Built with `@typescript-eslint/utils` for full TypeScript AST support
+- 36 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- `recommended` preset (all enabled rules at `warn`) and `strict` preset (all enabled rules at `error`)
+- ESLint 9 flat config and ESLint 8.x legacy config support
+- Built with `@typescript-eslint/utils` for TypeScript AST support
 
 ## Requirements
 
 - Node.js >= 18
 - ESLint 8.57.0+ or 9.x
-- TypeScript-ESLint Parser 8.x
+- `@typescript-eslint/parser` 8.x
 - TypeScript 5.x
 
 ## Installation
@@ -33,9 +33,7 @@ npm install --save-dev @coderrob/eslint-plugin-zero-tolerance @typescript-eslint
 // eslint.config.js
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
-export default [
-  zeroTolerance.configs.recommended, // or zeroTolerance.configs.strict
-];
+export default [zeroTolerance.configs.recommended];
 ```
 
 ### ESLint 8.x (Legacy Config)
@@ -45,7 +43,6 @@ export default [
 module.exports = {
   plugins: ['zero-tolerance'],
   extends: ['plugin:zero-tolerance/legacy-recommended'],
-  // or: extends: ['plugin:zero-tolerance/legacy-strict'],
 };
 ```
 
@@ -95,11 +92,11 @@ export default [
 
 ### Testing
 
-| Rule                             | Description                                                                                         |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `require-test-description-style` | Enforce that test descriptions start with `should`                                                  |
-| `no-jest-have-been-called`       | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` / `toHaveBeenNthCalledWith` |
-| `no-mock-implementation`         | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                        |
+| Rule                             | Description                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `require-test-description-style` | Enforce that test descriptions start with `should`                                                            |
+| `no-jest-have-been-called`       | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
+| `no-mock-implementation`         | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
 
 ### Type Safety
 
@@ -109,17 +106,20 @@ export default [
 | `no-non-null-assertion` | Disallow non-null assertions using the `!` postfix operator |
 | `no-literal-unions`     | Ban literal union types in favour of enums                  |
 | `no-banned-types`       | Ban `ReturnType` and indexed access types                   |
+| `no-inline-type-import` | Disallow inline `import("...").Type` annotations            |
 
 ### Code Quality
 
-| Rule                 | Description                                                         |
-| -------------------- | ------------------------------------------------------------------- |
-| `max-function-lines` | Enforce a maximum number of lines per function body                 |
-| `max-params`         | Enforce a maximum number of function parameters                     |
-| `no-magic-numbers`   | Disallow magic numbers; use named constants instead                 |
-| `no-magic-strings`   | Disallow magic strings in comparisons and switch cases              |
-| `sort-imports`       | Require import declarations to be sorted alphabetically             |
-| `sort-functions`     | Require top-level function declarations to be sorted alphabetically |
+| Rule                        | Description                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `max-function-lines`        | Enforce a maximum number of lines per function body                                     |
+| `max-params`                | Enforce a maximum number of function parameters                                         |
+| `no-magic-numbers`          | Disallow magic numbers; use named constants instead                                     |
+| `no-magic-strings`          | Disallow magic strings in comparisons and switch cases                                  |
+| `sort-imports`              | Require import declarations to be ordered by group and alphabetically within each group |
+| `sort-functions`            | Require top-level functions and const function expressions to be sorted alphabetically  |
+| `prefer-nullish-coalescing` | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| `prefer-string-raw`         | Prefer `String.raw` for strings containing escaped backslashes                          |
 
 ### Error Handling
 
@@ -132,7 +132,7 @@ export default [
 
 | Rule                | Description                                                   |
 | ------------------- | ------------------------------------------------------------- |
-| `no-parent-imports` | Ban `..` and `../*` parent-directory import traversal         |
+| `no-parent-imports` | Disallow parent-directory traversal in import paths           |
 | `no-dynamic-import` | Ban dynamic `import()` and `require()` outside test files     |
 | `no-export-alias`   | Prevent use of aliases in export statements                   |
 | `no-re-export`      | Disallow re-export statements from parent/grandparent modules |
@@ -142,9 +142,10 @@ export default [
 | Rule                       | Description                                                                  |
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `no-identical-expressions` | Disallow identical expressions on both sides of a binary or logical operator |
-| `no-identical-branches`    | Disallow identical branches in if/else and ternary conditionals              |
+| `no-identical-branches`    | Disallow identical conditional branches                                      |
 | `no-redundant-boolean`     | Disallow redundant comparisons to boolean literals                           |
 | `no-await-in-loop`         | Disallow `await` inside loops; use `Promise.all()` instead                   |
+| `no-floating-promises`     | Disallow unhandled promise expressions; require explicit handling            |
 | `no-eslint-disable`        | Prevent use of `eslint-disable` comments                                     |
 | `no-parameter-reassign`    | Disallow reassigning function parameters                                     |
 | `no-flag-argument`         | Disallow boolean flag parameters in function signatures                      |
@@ -160,4 +161,4 @@ Full rule documentation with examples is available at:
 
 ## License
 
-[Apache 2.0](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE) — Copyright Robert Lindley
+[Apache 2.0](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE) Copyright Robert Lindley

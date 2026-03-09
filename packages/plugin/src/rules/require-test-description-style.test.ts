@@ -99,6 +99,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'it("should tests something", () => {});',
     },
     {
       code: 'test("does something", () => {});',
@@ -108,6 +109,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'test("should does something", () => {});',
     },
     {
       code: 'it("Testing functionality", () => {});',
@@ -117,6 +119,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'it("should Testing functionality", () => {});',
     },
     {
       code: 'it("renders correctly", () => {});',
@@ -126,6 +129,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'it("should renders correctly", () => {});',
     },
     {
       code: 'test("validates input", async () => {});',
@@ -135,6 +139,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'test("should validates input", async () => {});',
     },
     {
       code: 'it("Should be lowercase", () => {});',
@@ -144,6 +149,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'it("should Should be lowercase", () => {});',
     },
     {
       code: 'test("   does something", () => {});',
@@ -153,6 +159,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'test("should does something", () => {});',
     },
     {
       code: 'it.skip("skipped test", () => {});',
@@ -163,6 +170,18 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
+      output: 'it.skip("should skipped test", () => {});',
+    },
+    {
+      code: 'it("handles correctly", () => {});',
+      name: 'should autofix using configured custom prefix',
+      options: [{ prefix: 'renders' }],
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: 'it("renders handles correctly", () => {});',
     },
   ],
 });

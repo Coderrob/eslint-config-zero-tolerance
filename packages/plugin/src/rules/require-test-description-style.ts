@@ -72,7 +72,26 @@ function checkCallExpression(
   context.report({
     node: invalidDescription,
     messageId: 'requireTestDescriptionStyle',
+    fix: createRequireTestDescriptionStyleFix.bind(undefined, invalidDescription, options.prefix),
   });
+}
+
+/**
+ * Creates a fixer for descriptions that do not satisfy prefix requirements.
+ *
+ * @param node - Invalid description literal node.
+ * @param prefix - Required description prefix.
+ * @param fixer - ESLint fixer helper.
+ * @returns Rule fix for replacing the description text.
+ */
+function createRequireTestDescriptionStyleFix(
+  node: TSESTree.Literal,
+  prefix: string,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  const description = String(node.value);
+  const replacement = JSON.stringify(getPrefixedDescription(description, prefix));
+  return fixer.replaceText(node, replacement);
 }
 
 /**
@@ -110,7 +129,7 @@ function getDescriptionArgument(node: TSESTree.CallExpression): TSESTree.Literal
  * @returns Configured ignore-skip value or default.
  */
 function getIgnoreSkipOption(option: RuleOption | null): boolean {
-  if (option === null || option.ignoreSkip === undefined) {
+  if (option?.ignoreSkip === undefined) {
     return true;
   }
   return option.ignoreSkip;
@@ -155,13 +174,28 @@ function getInvalidDescriptionForEnforcedTest(
 }
 
 /**
+ * Returns prefixed description text using normalized spacing.
+ *
+ * @param description - Current test description text.
+ * @param prefix - Required description prefix.
+ * @returns Updated description text with required prefix.
+ */
+function getPrefixedDescription(description: string, prefix: string): string {
+  const trimmedDescription = description.trim();
+  if (trimmedDescription.length === 0 || prefix.endsWith(' ')) {
+    return `${prefix}${trimmedDescription}`;
+  }
+  return `${prefix} ${trimmedDescription}`;
+}
+
+/**
  * Returns normalized `prefix` option value.
  *
  * @param option - Parsed rule option.
  * @returns Configured prefix value or default.
  */
 function getPrefixOption(option: RuleOption | null): string {
-  if (option === null || option.prefix === undefined) {
+  if (option?.prefix === undefined) {
     return TEST_DESCRIPTION_PREFIX;
   }
   return option.prefix;
@@ -196,7 +230,7 @@ function hasMemberExpressionCallee(
  * Returns true when test description conforms to expected prefix.
  *
  * @param node - The literal node containing the test description.
- * @param prefix - Required test description prefix.
+ * @param prefix - Required description prefix.
  * @returns True if the description has the required prefix, false otherwise.
  */
 function hasRequiredDescriptionPrefix(node: TSESTree.Literal, prefix: string): boolean {
@@ -347,6 +381,7 @@ export const requireTestDescriptionStyle = createRule({
   name: 'require-test-description-style',
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description: 'Enforce that test descriptions start with "should"',
     },

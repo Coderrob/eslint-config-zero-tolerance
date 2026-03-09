@@ -66,6 +66,7 @@ nav:
           - no-non-null-assertion: rules/no-non-null-assertion.md
           - no-literal-unions: rules/no-literal-unions.md
           - no-banned-types: rules/no-banned-types.md
+          - no-inline-type-import: rules/no-inline-type-import.md
       - Code Quality:
           - max-function-lines: rules/max-function-lines.md
           - max-params: rules/max-params.md
@@ -74,6 +75,7 @@ nav:
           - sort-imports: rules/sort-imports.md
           - sort-functions: rules/sort-functions.md
           - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
+          - prefer-string-raw: rules/prefer-string-raw.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md

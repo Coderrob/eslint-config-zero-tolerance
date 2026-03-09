@@ -8,9 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-03-09
+
 ### Added
 
-- No unreleased changes yet.
+- **`no-inline-type-import` rule**: Disallows TypeScript inline type import queries like `import("module").Type`. This blocks patterns such as inline `import("typescript").Program` in exported types and interfaces, requiring top-level `import type` declarations instead.
+- **`prefer-string-raw` rule**: Flags string literals containing escaped backslashes and recommends `String.raw` to avoid manual backslash escaping (Sonar `typescript:S7780`).
+
+### Changed
+
+- **`require-jsdoc-functions` rule**: Expanded enforcement to require `@param` tags when functions have parameters, `@returns` (or `@return`) when functions return values, and `@throws` when functions throw.
+- **`no-literal-unions` rule**: Added a limited autofix for pure string-literal union type aliases, converting them into enums with generated member names.
+- **Autofix expansion**:
+  - `prefer-string-raw` now auto-rewrites eligible escaped-backslash string literals to `String.raw` tagged templates.
+  - `require-test-description-style` now auto-prefixes non-compliant string test descriptions.
+  - `require-jsdoc-functions` now auto-inserts missing JSDoc blocks and appends missing `@param`, `@returns`, and `@throws` tags for safe targets.
+- **Single-test coverage stability**: Updated plugin Jest coverage behavior to focus `collectCoverageFrom` on explicitly targeted test files (including special handling for `plugin-wiring.test.ts`), and expanded `ast-guards` tests to keep single-file coverage above thresholds.
+- **Documentation updates**: Added `prefer-string-raw` rule docs and navigation entries; updated configuration and `no-literal-unions` docs to reflect current behavior.
 
 ## [1.1.1] - 2026-03-08
 

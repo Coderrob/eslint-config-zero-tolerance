@@ -31,6 +31,7 @@
 | [no-non-null-assertion](no-non-null-assertion.md) | problem    | Disallow non-null assertions using the `!` postfix operator |
 | [no-literal-unions](no-literal-unions.md)         | suggestion | Ban literal union types in favour of enums                  |
 | [no-banned-types](no-banned-types.md)             | problem    | Ban `ReturnType` and indexed access types                   |
+| [no-inline-type-import](no-inline-type-import.md) | problem    | Disallow inline `import("...")` type annotations            |
 
 ## Code Quality
 
@@ -43,6 +44,7 @@
 | [sort-imports](sort-imports.md)                           | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
 | [sort-functions](sort-functions.md)                       | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
 | [prefer-nullish-coalescing](prefer-nullish-coalescing.md) | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| [prefer-string-raw](prefer-string-raw.md)                 | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
 
 ## Error Handling
 

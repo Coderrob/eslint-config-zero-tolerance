@@ -52,7 +52,12 @@ function createFunctionListeners(
   };
 }
 
-/** Returns block body for function nodes, or null for expression-bodied arrows. */
+/**
+ * Returns block body for function nodes, or null for expression-bodied arrows.
+ *
+ * @param node - Function node to inspect.
+ * @returns Block body when present, otherwise null.
+ */
 function getBlockBody(node: FunctionNode): TSESTree.BlockStatement | null {
   return isBlockStatementNode(node.body) ? node.body : null;
 }

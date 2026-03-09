@@ -78,6 +78,7 @@ All core rules are included in every preset. The only difference between `recomm
 | `no-jest-have-been-called`       | warn           | error           |
 | `no-mock-implementation`         | warn           | error           |
 | `no-type-assertion`              | warn           | error           |
+| `no-inline-type-import`          | warn           | error           |
 | `no-eslint-disable`              | warn           | error           |
 | `sort-imports`                   | warn           | error           |
 | `sort-functions`                 | warn           | error           |
@@ -95,6 +96,7 @@ All core rules are included in every preset. The only difference between `recomm
 | `no-flag-argument`               | warn           | error           |
 | `prefer-guard-clauses`           | warn           | error           |
 | `prefer-shortcut-return`         | warn           | error           |
+| `prefer-string-raw`              | warn           | error           |
 | `no-query-side-effects`          | warn           | error           |
 | `no-re-export`                   | warn           | error           |
 | `require-optional-chaining`      | warn           | error           |

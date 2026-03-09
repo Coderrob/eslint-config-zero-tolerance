@@ -107,6 +107,7 @@ function isComparableBinaryExpression(
  * comparison expression.
  *
  * @param node - The literal node to check.
+ * @param options - Resolved rule options.
  * @returns True if the literal is in a comparison expression, false otherwise.
  */
 function isComparisonContextEnabled(

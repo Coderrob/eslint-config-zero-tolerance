@@ -61,7 +61,7 @@ eslint-config-zero-tolerance/
 - Use `strict` TypeScript (`"strict": true` in `tsconfig.json`).
 - Prefer explicit types over inferred ones on public function signatures.
 - Never use `any` except where required by ESLint's internal APIs (e.g., rule tester casts, plugin registration).
-- Use `ESLintUtils.RuleCreator` from `@typescript-eslint/utils` for all custom rules.
+- Use the shared `createRule` helper from `packages/plugin/src/rule-factory.ts` for all custom rules.
 
 ### JSDoc
 
@@ -82,17 +82,29 @@ Each new ESLint rule must follow this structure:
 1. **File**: `packages/plugin/src/rules/<rule-name>.ts`
 2. **Test file**: `packages/plugin/src/rules/<rule-name>.test.ts`
 3. **Export**: Named export of the rule constant plus a default export.
-4. **Registration**: Import and register in `packages/plugin/src/index.ts` under both `rules` and all config presets (`recommendedConfig`, `strictConfig`, `legacyRecommendedConfig`, `legacyStrictConfig`).
-5. **Config sync**: Add the rule to `packages/config/src/index.ts`, `recommended.ts`, and `strict.ts`.
+4. **Registration**: Import and register in `packages/plugin/src/index.ts` under `rules` and ensure it is included by the exported presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
+5. **Config sync note**: `packages/config` re-exports plugin configs; no manual rule sync is required there.
+
+### Required Rule Change Checks
+
+These checks are mandatory whenever a rule is **added**, **updated**, or **removed**:
+
+1. Keep documentation in sync:
+   - Update the rule page in `docs/rules/` (or remove it if the rule is removed).
+   - Update rule indexes/tables in `docs/rules/index.md`, `docs/index.md`, `README.md`, and `packages/plugin/README.md`.
+   - Update `mkdocs.yml` navigation entries when rule pages are added/removed/renamed.
+2. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
+3. Run required validations and ensure they all pass:
+   - `pnpm lint`
+   - `pnpm test`
+   - `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`
+   - `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`
+   - `pnpm build`
 
 ### Rule Template
 
 ```typescript
-import { ESLintUtils } from '@typescript-eslint/utils';
-
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/Coderrob/eslint-config-zero-tolerance#${name}`,
-);
+import { createRule } from '../rule-factory';
 
 export const myRuleName = createRule({
   name: 'my-rule-name',
@@ -140,9 +152,21 @@ export default myRuleName;
 
 1. Implement the rule and its tests in `packages/plugin/src/rules/`.
 2. Register the rule in `packages/plugin/src/index.ts` and all config presets.
-3. Sync the rule to `packages/config/src/`.
-4. Add a doc page in `docs/rules/<rule-name>.md` and register it in `mkdocs.yml`.
-5. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
-6. Run `pnpm test` and confirm all tests pass.
-7. Run `pnpm build` to validate the TypeScript compilation.
-8. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+3. Add a doc page in `docs/rules/<rule-name>.md` and register it in `mkdocs.yml`.
+4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
+5. Run `pnpm test` and confirm all tests pass.
+6. Run `pnpm build` to validate the TypeScript compilation.
+7. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+
+---
+
+## Definition of Done
+
+Before considering any rule or behavior change complete:
+
+1. Run `pnpm lint` and ensure it passes.
+2. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
+3. Run type checks for plugin and config packages and ensure they pass.
+4. Run `pnpm build` and ensure it passes.
+5. Update `CHANGELOG.md` under `[Unreleased]`.
+6. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.

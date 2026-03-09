@@ -4,12 +4,12 @@ Require JSDoc documentation comments on all function declarations, function expr
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
-| **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `suggestion`  |
+| **Fixable**     | Yes (`--fix`) |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 
@@ -17,7 +17,7 @@ JSDoc comments are essential for self-documenting code and support IDE tooling, 
 
 ## Examples
 
-### ✅ Correct
+### Correct
 
 ```typescript
 /**
@@ -33,7 +33,7 @@ async function fetchUser(id: string): Promise<IUser> {
 const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
 ```
 
-### ❌ Incorrect
+### Incorrect
 
 ```typescript
 async function fetchUser(id: string): Promise<IUser> {
@@ -50,6 +50,15 @@ This rule has no options:
 ```js
 'zero-tolerance/require-jsdoc-functions': 'error'
 ```
+
+## Autofix Notes
+
+Autofix can:
+
+- insert a missing JSDoc block for standalone function declarations/expressions and members
+- append missing `@param`, `@returns`, and `@throws` tags to existing JSDoc blocks
+
+Autofix intentionally skips unsafe insertion targets such as inline declarations and multi-declarator variable statements.
 
 ### Test files are exempt
 

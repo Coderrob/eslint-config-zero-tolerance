@@ -191,7 +191,9 @@ function getNullishExpressionBranch(
 /**
  * Returns right-side nullish-check metadata.
  *
- * @param node - Binary expression node.
+ * @param operator - Binary expression operator.
+ * @param leftExpression - Left-side expression.
+ * @param rightOperand - Right-side operand.
  * @returns Nullish-check metadata, or null.
  */
 function getRightNullishCheck(

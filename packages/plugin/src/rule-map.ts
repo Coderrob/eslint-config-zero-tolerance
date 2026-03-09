@@ -32,6 +32,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-export-alias',
   'no-re-export',
   'no-jest-have-been-called',
+  'no-inline-type-import',
   'no-mock-implementation',
   'require-jsdoc-functions',
   'require-optional-chaining',
@@ -52,8 +53,9 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-flag-argument',
   'no-floating-promises',
   'prefer-guard-clauses',
-  'prefer-shortcut-return',
   'prefer-nullish-coalescing',
+  'prefer-shortcut-return',
+  'prefer-string-raw',
   'no-query-side-effects',
 ];
 

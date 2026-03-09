@@ -33,6 +33,7 @@ import noFlagArgument from './rules/no-flag-argument';
 import noFloatingPromises from './rules/no-floating-promises';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
+import noInlineTypeImport from './rules/no-inline-type-import';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noLiteralUnions from './rules/no-literal-unions';
 import noMagicNumbers from './rules/no-magic-numbers';
@@ -49,6 +50,7 @@ import noTypeAssertion from './rules/no-type-assertion';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
+import preferStringRaw from './rules/prefer-string-raw';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
 import requireOptionalChaining from './rules/require-optional-chaining';
@@ -84,6 +86,7 @@ const rules: Record<string, unknown> = {
   'no-floating-promises': noFloatingPromises,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
+  'no-inline-type-import': noInlineTypeImport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-literal-unions': noLiteralUnions,
   'no-magic-numbers': noMagicNumbers,
@@ -98,8 +101,9 @@ const rules: Record<string, unknown> = {
   'no-throw-literal': noThrowLiteral,
   'no-type-assertion': noTypeAssertion,
   'prefer-guard-clauses': preferGuardClauses,
-  'prefer-shortcut-return': preferShortcutReturn,
   'prefer-nullish-coalescing': preferNullishCoalescing,
+  'prefer-shortcut-return': preferShortcutReturn,
+  'prefer-string-raw': preferStringRaw,
   'require-interface-prefix': requireInterfacePrefix,
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-optional-chaining': requireOptionalChaining,
