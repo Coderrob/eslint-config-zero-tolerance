@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.73%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.74%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
 
@@ -187,6 +187,9 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 | [`no-identical-expressions`](docs/rules/no-identical-expressions.md) | Disallow identical expressions on both sides of a binary or logical operator |
 | [`no-identical-branches`](docs/rules/no-identical-branches.md)       | Disallow identical branches in if/else and ternary conditionals              |
 | [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)         | Disallow redundant comparisons to boolean literals                           |
+| [`no-for-in`](docs/rules/no-for-in.md)                               | Disallow `for..in` loops                                                     |
+| [`no-labels`](docs/rules/no-labels.md)                               | Disallow labeled statements                                                   |
+| [`no-with`](docs/rules/no-with.md)                                   | Disallow `with` statements                                                    |
 | [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
 | [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)       | Disallow reassigning function parameters                                     |

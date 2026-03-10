@@ -31,10 +31,12 @@ import noEslintDisable from './rules/no-eslint-disable';
 import noExportAlias from './rules/no-export-alias';
 import noFlagArgument from './rules/no-flag-argument';
 import noFloatingPromises from './rules/no-floating-promises';
+import noForIn from './rules/no-for-in';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
 import noInlineTypeImport from './rules/no-inline-type-import';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
+import noLabels from './rules/no-labels';
 import noLiteralUnions from './rules/no-literal-unions';
 import noMagicNumbers from './rules/no-magic-numbers';
 import noMagicStrings from './rules/no-magic-strings';
@@ -47,6 +49,7 @@ import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
 import noThrowLiteral from './rules/no-throw-literal';
 import noTypeAssertion from './rules/no-type-assertion';
+import noWith from './rules/no-with';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
@@ -84,10 +87,12 @@ const rules: Record<string, unknown> = {
   'no-export-alias': noExportAlias,
   'no-flag-argument': noFlagArgument,
   'no-floating-promises': noFloatingPromises,
+  'no-for-in': noForIn,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
   'no-inline-type-import': noInlineTypeImport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
+  'no-labels': noLabels,
   'no-literal-unions': noLiteralUnions,
   'no-magic-numbers': noMagicNumbers,
   'no-magic-strings': noMagicStrings,
@@ -100,6 +105,7 @@ const rules: Record<string, unknown> = {
   'no-redundant-boolean': noRedundantBoolean,
   'no-throw-literal': noThrowLiteral,
   'no-type-assertion': noTypeAssertion,
+  'no-with': noWith,
   'prefer-guard-clauses': preferGuardClauses,
   'prefer-nullish-coalescing': preferNullishCoalescing,
   'prefer-shortcut-return': preferShortcutReturn,

@@ -88,6 +88,9 @@ nav:
           - no-identical-expressions: rules/no-identical-expressions.md
           - no-identical-branches: rules/no-identical-branches.md
           - no-redundant-boolean: rules/no-redundant-boolean.md
+          - no-for-in: rules/no-for-in.md
+          - no-labels: rules/no-labels.md
+          - no-with: rules/no-with.md
           - no-await-in-loop: rules/no-await-in-loop.md
           - no-floating-promises: rules/no-floating-promises.md
           - no-eslint-disable: rules/no-eslint-disable.md

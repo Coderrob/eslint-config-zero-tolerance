@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-03-09
+
+### Added
+
+- **Standalone syntax rules**: Added `no-for-in`, `no-labels`, and `no-with` as first-class plugin rules to ban prototype-chain `for..in` loops, labeled statements, and `with` statements.
+
+### Changed
+
+- **Preset enforcement architecture**: Replaced temporary preset-level `no-restricted-syntax` wiring with dedicated plugin rules so syntax restrictions remain discoverable, testable, and versioned as standalone rules.
+- **`no-for-in` rule**: Added autofix support to rewrite `for..in` loops into `for..of Object.keys(...)` loops.
+
 ## [1.1.2] - 2026-03-09
 
 ### Added

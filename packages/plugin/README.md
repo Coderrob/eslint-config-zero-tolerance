@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 36 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 39 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (all enabled rules at `warn`) and `strict` preset (all enabled rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -144,6 +144,9 @@ export default [
 | `no-identical-expressions` | Disallow identical expressions on both sides of a binary or logical operator |
 | `no-identical-branches`    | Disallow identical conditional branches                                      |
 | `no-redundant-boolean`     | Disallow redundant comparisons to boolean literals                           |
+| `no-for-in`                | Disallow `for..in` loops                                                     |
+| `no-labels`                | Disallow labeled statements                                                   |
+| `no-with`                  | Disallow `with` statements                                                    |
 | `no-await-in-loop`         | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | `no-floating-promises`     | Disallow unhandled promise expressions; require explicit handling            |
 | `no-eslint-disable`        | Prevent use of `eslint-disable` comments                                     |
