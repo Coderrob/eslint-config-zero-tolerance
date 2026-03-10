@@ -89,6 +89,9 @@ All core rules are included in every preset. The only difference between `recomm
 | `no-redundant-boolean`           | warn           | error           |
 | `no-empty-catch`                 | warn           | error           |
 | `no-non-null-assertion`          | warn           | error           |
+| `no-for-in`                      | warn           | error           |
+| `no-labels`                      | warn           | error           |
+| `no-with`                        | warn           | error           |
 | `no-await-in-loop`               | warn           | error           |
 | `no-floating-promises`           | warn           | error           |
 | `no-throw-literal`               | warn           | error           |
