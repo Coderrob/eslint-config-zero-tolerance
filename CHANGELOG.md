@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-03-09
+
 ### Added
 
 - **Standalone syntax rules**: Added `no-for-in`, `no-labels`, and `no-with` as first-class plugin rules to ban prototype-chain `for..in` loops, labeled statements, and `with` statements.
