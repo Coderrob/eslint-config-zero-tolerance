@@ -105,6 +105,7 @@ All core rules are included in every preset. The only difference between `recomm
 | `no-parameter-reassign`          | warn           | error           |
 | `no-flag-argument`               | warn           | error           |
 | `prefer-guard-clauses`           | warn           | error           |
+| `prefer-nullish-coalescing`      | warn           | error           |
 | `prefer-shortcut-return`         | warn           | error           |
 | `prefer-string-raw`              | warn           | error           |
 | `no-query-side-effects`          | warn           | error           |

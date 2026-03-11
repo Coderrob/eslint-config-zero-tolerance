@@ -198,6 +198,7 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 | [`no-labels`](docs/rules/no-labels.md)                               | Disallow labeled statements                                                  |
 | [`no-with`](docs/rules/no-with.md)                                   | Disallow `with` statements                                                   |
 | [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
+| [`no-floating-promises`](docs/rules/no-floating-promises.md)         | Disallow unhandled promise expressions; require explicit handling            |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
 | [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)       | Disallow reassigning function parameters                                     |
 | [`no-flag-argument`](docs/rules/no-flag-argument.md)                 | Disallow boolean flag parameters in function signatures                      |
