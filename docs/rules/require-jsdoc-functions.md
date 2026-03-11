@@ -31,6 +31,11 @@ async function fetchUser(id: string): Promise<IUser> {
  * Validates that the given email address is well-formed.
  */
 const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
+
+/**
+ * Returns a normalized display label.
+ */
+export const getLabel = (input: string): string => input.trim();
 ```
 
 ### Incorrect

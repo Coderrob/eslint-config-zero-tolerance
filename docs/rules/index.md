@@ -70,8 +70,8 @@
 | [no-identical-branches](no-identical-branches.md)       | suggestion | Disallow identical conditional branches                                      |
 | [no-redundant-boolean](no-redundant-boolean.md)         | suggestion | Disallow redundant comparisons to boolean literals                           |
 | [no-for-in](no-for-in.md)                               | problem    | Disallow `for..in` loops                                                     |
-| [no-labels](no-labels.md)                               | problem    | Disallow labeled statements                                                   |
-| [no-with](no-with.md)                                   | problem    | Disallow `with` statements                                                    |
+| [no-labels](no-labels.md)                               | problem    | Disallow labeled statements                                                  |
+| [no-with](no-with.md)                                   | problem    | Disallow `with` statements                                                   |
 | [no-await-in-loop](no-await-in-loop.md)                 | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [no-floating-promises](no-floating-promises.md)         | problem    | Disallow unhandled promise expressions; require explicit handling            |
 | [no-eslint-disable](no-eslint-disable.md)               | suggestion | Prevent use of `eslint-disable` comments                                     |

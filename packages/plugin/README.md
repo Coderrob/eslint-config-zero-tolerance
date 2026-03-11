@@ -145,8 +145,8 @@ export default [
 | `no-identical-branches`    | Disallow identical conditional branches                                      |
 | `no-redundant-boolean`     | Disallow redundant comparisons to boolean literals                           |
 | `no-for-in`                | Disallow `for..in` loops                                                     |
-| `no-labels`                | Disallow labeled statements                                                   |
-| `no-with`                  | Disallow `with` statements                                                    |
+| `no-labels`                | Disallow labeled statements                                                  |
+| `no-with`                  | Disallow `with` statements                                                   |
 | `no-await-in-loop`         | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | `no-floating-promises`     | Disallow unhandled promise expressions; require explicit handling            |
 | `no-eslint-disable`        | Prevent use of `eslint-disable` comments                                     |

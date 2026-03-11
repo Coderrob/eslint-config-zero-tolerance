@@ -4,12 +4,12 @@ Disallow `for..in` loops.
 
 ## Rule Details
 
-| Property        | Value     |
-| --------------- | --------- |
-| **Type**        | `problem` |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `problem`     |
 | **Fixable**     | Yes (`--fix`) |
-| **Recommended** | `warn`    |
-| **Strict**      | `error`   |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 

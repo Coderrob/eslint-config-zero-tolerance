@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-03-11
+
+### Fixed
+
+- **`require-jsdoc-functions`**: Fixed JSDoc ownership for exported variable functions so comments placed above `export const ... = () => {}` are recognized, and missing-JSDoc autofix now inserts above the export declaration.
+
 ## [1.1.3] - 2026-03-09
 
 ### Added
