@@ -188,8 +188,8 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 | [`no-identical-branches`](docs/rules/no-identical-branches.md)       | Disallow identical branches in if/else and ternary conditionals              |
 | [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)         | Disallow redundant comparisons to boolean literals                           |
 | [`no-for-in`](docs/rules/no-for-in.md)                               | Disallow `for..in` loops                                                     |
-| [`no-labels`](docs/rules/no-labels.md)                               | Disallow labeled statements                                                   |
-| [`no-with`](docs/rules/no-with.md)                                   | Disallow `with` statements                                                    |
+| [`no-labels`](docs/rules/no-labels.md)                               | Disallow labeled statements                                                  |
+| [`no-with`](docs/rules/no-with.md)                                   | Disallow `with` statements                                                   |
 | [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
 | [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)       | Disallow reassigning function parameters                                     |

@@ -432,7 +432,13 @@ function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
-  return node.parent.parent.declarations.length === 1 ? node.parent.parent : node.parent;
+  const declaration = node.parent.parent;
+  if (declaration.declarations.length !== 1) {
+    return node.parent;
+  }
+  return declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration
+    ? declaration.parent
+    : declaration;
 }
 
 /**

@@ -23,6 +23,11 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
+      code: '/** Exported arrow function. */\nexport const doThing = () => {};',
+      name: 'should allow exported arrow function with JSDoc above export declaration',
+      filename: 'src/utils.ts',
+    },
+    {
       code: 'class MyClass {\n  /** Method JSDoc. */\n  doWork() {}\n}',
       name: 'should allow class method with JSDoc',
       filename: 'src/utils.ts',
@@ -130,6 +135,18 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
         },
       ],
       output: '/**\n * doThing TODO: describe\n */\nconst doThing = () => {};',
+    },
+    {
+      code: 'export const doThing = () => {};',
+      name: 'should report exported arrow function without JSDoc',
+      filename: 'src/helpers.ts',
+      errors: [
+        {
+          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
+          data: { name: 'doThing' },
+        },
+      ],
+      output: '/**\n * doThing TODO: describe\n */\nexport const doThing = () => {};',
     },
     {
       code: 'const doThing = function namedFn() {};',
