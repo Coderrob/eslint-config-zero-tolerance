@@ -50,8 +50,26 @@ function getCoverageThreshold() {
   }
   return {
     global: DEFAULT_THRESHOLD,
-    'src/rules/*.ts': DEFAULT_THRESHOLD,
+    ...getPerRuleCoverageThresholds(),
   };
+}
+
+/**
+ * Returns per-file coverage thresholds for each rule implementation file.
+ *
+ * @returns {Record<string, {branches:number,functions:number,lines:number,statements:number}>} Per-rule thresholds.
+ */
+function getPerRuleCoverageThresholds() {
+  const rulesDirectory = path.join(__dirname, 'src', 'rules');
+  const entries = fs.readdirSync(rulesDirectory, { withFileTypes: true });
+  const threshold = {};
+  for (const entry of entries) {
+    if (entry.isDirectory() || entry.name.endsWith(TEST_FILE_SUFFIX) || !entry.name.endsWith('.ts')) {
+      continue;
+    }
+    threshold[`src/rules/${entry.name}`] = DEFAULT_THRESHOLD;
+  }
+  return threshold;
 }
 
 /**

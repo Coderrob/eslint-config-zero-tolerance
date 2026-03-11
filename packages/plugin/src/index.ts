@@ -23,8 +23,11 @@ import {
 } from './configs';
 import maxFunctionLines from './rules/max-function-lines';
 import maxParams from './rules/max-params';
+import noArrayMutation from './rules/no-array-mutation';
 import noAwaitInLoop from './rules/no-await-in-loop';
 import noBannedTypes from './rules/no-banned-types';
+import noBooleanReturnTrap from './rules/no-boolean-return-trap';
+import noDateNow from './rules/no-date-now';
 import noDynamicImport from './rules/no-dynamic-import';
 import noEmptyCatch from './rules/no-empty-catch';
 import noEslintDisable from './rules/no-eslint-disable';
@@ -42,6 +45,7 @@ import noMagicNumbers from './rules/no-magic-numbers';
 import noMagicStrings from './rules/no-magic-strings';
 import noMockImplementation from './rules/no-mock-implementation';
 import noNonNullAssertion from './rules/no-non-null-assertion';
+import noObjectMutation from './rules/no-object-mutation';
 import noParameterReassign from './rules/no-parameter-reassign';
 import noParentImports from './rules/no-parent-imports';
 import noQuerySideEffects from './rules/no-query-side-effects';
@@ -52,11 +56,14 @@ import noTypeAssertion from './rules/no-type-assertion';
 import noWith from './rules/no-with';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
+import preferReadonlyParameters from './rules/prefer-readonly-parameters';
+import preferResultReturn from './rules/prefer-result-return';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
 import preferStringRaw from './rules/prefer-string-raw';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
 import requireOptionalChaining from './rules/require-optional-chaining';
+import requireReadonlyProps from './rules/require-readonly-props';
 import requireTestDescriptionStyle from './rules/require-test-description-style';
 import sortFunctions from './rules/sort-functions';
 import sortImports from './rules/sort-imports';
@@ -79,8 +86,11 @@ interface IPluginExport extends IBasePlugin {
 const rules: Record<string, unknown> = {
   'max-function-lines': maxFunctionLines,
   'max-params': maxParams,
+  'no-array-mutation': noArrayMutation,
   'no-await-in-loop': noAwaitInLoop,
   'no-banned-types': noBannedTypes,
+  'no-boolean-return-trap': noBooleanReturnTrap,
+  'no-date-now': noDateNow,
   'no-dynamic-import': noDynamicImport,
   'no-empty-catch': noEmptyCatch,
   'no-eslint-disable': noEslintDisable,
@@ -99,6 +109,7 @@ const rules: Record<string, unknown> = {
   'no-mock-implementation': noMockImplementation,
   'no-non-null-assertion': noNonNullAssertion,
   'no-parameter-reassign': noParameterReassign,
+  'no-object-mutation': noObjectMutation,
   'no-parent-imports': noParentImports,
   'no-query-side-effects': noQuerySideEffects,
   'no-re-export': noReExport,
@@ -108,11 +119,14 @@ const rules: Record<string, unknown> = {
   'no-with': noWith,
   'prefer-guard-clauses': preferGuardClauses,
   'prefer-nullish-coalescing': preferNullishCoalescing,
+  'prefer-readonly-parameters': preferReadonlyParameters,
+  'prefer-result-return': preferResultReturn,
   'prefer-shortcut-return': preferShortcutReturn,
   'prefer-string-raw': preferStringRaw,
   'require-interface-prefix': requireInterfacePrefix,
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-optional-chaining': requireOptionalChaining,
+  'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,
   'sort-functions': sortFunctions,
   'sort-imports': sortImports,

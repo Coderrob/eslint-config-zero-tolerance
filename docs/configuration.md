@@ -69,8 +69,14 @@ All core rules are included in every preset. The only difference between `recomm
 | `require-interface-prefix`       | warn           | error           |
 | `require-test-description-style` | warn           | error           |
 | `require-jsdoc-functions`        | warn           | error           |
+| `require-readonly-props`         | warn           | error           |
+| `prefer-readonly-parameters`     | warn           | error           |
+| `prefer-result-return`           | warn           | error           |
 | `no-magic-numbers`               | warn           | error           |
 | `no-magic-strings`               | warn           | error           |
+| `no-array-mutation`              | warn           | error           |
+| `no-date-now`                    | warn           | error           |
+| `no-object-mutation`             | warn           | error           |
 | `no-banned-types`                | warn           | error           |
 | `no-dynamic-import`              | warn           | error           |
 | `no-literal-unions`              | warn           | error           |
@@ -86,6 +92,7 @@ All core rules are included in every preset. The only difference between `recomm
 | `max-params`                     | warn (max: 4)  | error (max: 4)  |
 | `no-identical-expressions`       | warn           | error           |
 | `no-identical-branches`          | warn           | error           |
+| `no-boolean-return-trap`         | warn           | error           |
 | `no-redundant-boolean`           | warn           | error           |
 | `no-empty-catch`                 | warn           | error           |
 | `no-non-null-assertion`          | warn           | error           |

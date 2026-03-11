@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.5] - 2026-03-11
+
+### Added
+
+- **`require-readonly-props` rule**: Enforces readonly typing for JSX component props. Component props must be declared as `Readonly<Props>` or as an inline type literal with `readonly` members.
+- **`prefer-readonly-parameters` rule**: Prefers readonly typing for object and array-like function parameters to reduce accidental input mutation.
+- **`no-array-mutation` rule**: Disallows mutating array methods such as `push`, `splice`, `sort`, `reverse`, and related in-place operations.
+- **`no-object-mutation` rule**: Disallows direct object-property mutation via assignment, update operators, and `delete`.
+- **`prefer-result-return` rule**: Prefers returning Result-style values over throwing in non-test code to keep error flows explicit.
+- **`no-date-now` rule**: Disallows `Date.now()` and no-argument `new Date()` usage to encourage injected clocks and deterministic tests.
+- **`no-boolean-return-trap` rule**: Disallows ambiguous boolean-return APIs unless they follow predicate naming conventions (`is*`, `has*`, `can*`, `should*`).
+
 ## [1.1.4] - 2026-03-11
 
 ### Fixed
