@@ -139,6 +139,19 @@ function getParameterTypeAnnotation(param: TSESTree.Parameter): TSESTree.TSTypeA
 }
 
 /**
+ * Returns wrapped expression for TypeScript satisfies wrapper nodes around JSX.
+ *
+ * @param expression - Candidate expression.
+ * @returns Wrapped expression when satisfies is used.
+ */
+function getSatisfiesWrappedExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
+  if (expression.type === AST_NODE_TYPES.TSSatisfiesExpression) {
+    return expression.expression;
+  }
+  return null;
+}
+
+/**
  * Returns variable-assigned component name for function expressions and arrows.
  *
  * @param node - Function-like node.
@@ -171,6 +184,10 @@ function getVariableDeclaratorName(identifier: TSESTree.Identifier): string {
  * @returns Wrapped expression when wrapper is supported.
  */
 function getWrappedJsxExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
+  const satisfiesExpression = getSatisfiesWrappedExpression(expression);
+  if (satisfiesExpression !== null) {
+    return satisfiesExpression;
+  }
   if (expression.type === AST_NODE_TYPES.TSAsExpression) {
     return expression.expression;
   }

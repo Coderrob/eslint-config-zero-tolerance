@@ -99,6 +99,14 @@ ruleTester.run('require-readonly-props', requireReadonlyProps, {
       `,
     },
     {
+      name: 'should allow component returning jsx wrapped in satisfies expression',
+      code: `
+        type Props = { name: string };
+        const Greeting = (props: Readonly<Props>) =>
+          (<div>{props.name}</div> satisfies JSX.Element);
+      `,
+    },
+    {
       name: 'should allow component with empty return branch and readonly props',
       code: `
         type Props = { name: string };
@@ -191,6 +199,15 @@ ruleTester.run('require-readonly-props', requireReadonlyProps, {
       name: 'should disallow assignment-pattern identifier props without annotation',
       code: `
         const Greeting = (props = { name: 'A' }) => <div>{props.name}</div>;
+      `,
+      errors: [{ messageId: 'requireReadonlyProps' }],
+    },
+    {
+      name: 'should disallow mutable props when jsx return is wrapped in satisfies expression',
+      code: `
+        type Props = { name: string };
+        const Greeting = (props: Props) =>
+          (<div>{props.name}</div> satisfies JSX.Element);
       `,
       errors: [{ messageId: 'requireReadonlyProps' }],
     },
