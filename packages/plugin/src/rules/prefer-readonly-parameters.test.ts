@@ -44,6 +44,26 @@ ruleTester.run('prefer-readonly-parameters', preferReadonlyParameters, {
       name: 'should allow assignment parameter without type annotation',
       code: 'function format(user = defaultUser) { return user; }',
     },
+    {
+      name: 'should allow readonly constructor parameter property with Readonly type',
+      code: 'class Service { constructor(private readonly user: Readonly<User>) {} }',
+    },
+    {
+      name: 'should allow readonly constructor parameter property with ReadonlyArray type',
+      code: 'class Service { constructor(private readonly items: ReadonlyArray<string>) {} }',
+    },
+    {
+      name: 'should allow constructor parameter property with primitive type',
+      code: 'class Service { constructor(private count: number) {} }',
+    },
+    {
+      name: 'should allow constructor parameter property without type annotation',
+      code: 'class Service { constructor(private user) {} }',
+    },
+    {
+      name: 'should allow readonly constructor parameter property with Readonly type and default value',
+      code: 'class Service { constructor(private readonly user: Readonly<User> = {}) {} }',
+    },
   ],
   invalid: [
     {
@@ -94,6 +114,26 @@ ruleTester.run('prefer-readonly-parameters', preferReadonlyParameters, {
         }
         function format(user: Api.Input<User>) { return user.name; }
       `,
+      errors: [{ messageId: 'preferReadonlyParameter', data: { name: 'user' } }],
+    },
+    {
+      name: 'should disallow mutable constructor parameter property with type reference',
+      code: 'class Service { constructor(private user: User) {} }',
+      errors: [{ messageId: 'preferReadonlyParameter', data: { name: 'user' } }],
+    },
+    {
+      name: 'should disallow mutable constructor parameter property with array type',
+      code: 'class Service { constructor(public items: string[]) {} }',
+      errors: [{ messageId: 'preferReadonlyParameter', data: { name: 'items' } }],
+    },
+    {
+      name: 'should disallow mutable constructor parameter property with inline type literal',
+      code: 'class Service { constructor(protected config: { host: string }) {} }',
+      errors: [{ messageId: 'preferReadonlyParameter', data: { name: 'config' } }],
+    },
+    {
+      name: 'should disallow mutable constructor parameter property with type reference and default value',
+      code: 'class Service { constructor(private user: User = defaultUser) {} }',
       errors: [{ messageId: 'preferReadonlyParameter', data: { name: 'user' } }],
     },
   ],
