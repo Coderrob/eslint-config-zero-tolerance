@@ -87,6 +87,9 @@ function getAssignmentPatternTypeNode(param: TSESTree.AssignmentPattern): TSESTr
  * @returns Parameter display name.
  */
 function getParameterName(param: TSESTree.Parameter): string {
+  if (param.type === AST_NODE_TYPES.TSParameterProperty) {
+    return getTSParameterPropertyName(param);
+  }
   const simpleName = getSimpleParameterName(param);
   if (simpleName !== null) {
     return simpleName;
@@ -104,6 +107,9 @@ function getParameterName(param: TSESTree.Parameter): string {
  * @returns Type node when present.
  */
 function getParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
+  if (param.type === AST_NODE_TYPES.TSParameterProperty) {
+    return getTSParameterPropertyTypeNode(param);
+  }
   if (param.type === AST_NODE_TYPES.AssignmentPattern) {
     return getAssignmentPatternTypeNode(param);
   }
@@ -144,6 +150,36 @@ function getSimpleParameterName(
     return param.argument.name;
   }
   return null;
+}
+
+/**
+ * Returns parameter display name for constructor parameter property.
+ *
+ * @param param - TSParameterProperty node.
+ * @returns Parameter display name.
+ */
+function getTSParameterPropertyName(param: TSESTree.TSParameterProperty): string {
+  const inner = param.parameter;
+  if (inner.type === AST_NODE_TYPES.AssignmentPattern) {
+    return getAssignmentPatternParameterName(inner);
+  }
+  return inner.name;
+}
+
+/**
+ * Returns type annotation node for constructor parameter property.
+ *
+ * @param param - TSParameterProperty node.
+ * @returns Type node when present.
+ */
+function getTSParameterPropertyTypeNode(
+  param: TSESTree.TSParameterProperty,
+): TSESTree.TypeNode | null {
+  const inner = param.parameter;
+  if (inner.type === AST_NODE_TYPES.AssignmentPattern) {
+    return getAssignmentPatternTypeNode(inner);
+  }
+  return inner.typeAnnotation?.typeAnnotation ?? null;
 }
 
 /**
