@@ -21,7 +21,8 @@ import { createRule } from '../rule-factory';
 const DATE_IDENTIFIER = 'Date';
 const NOW_IDENTIFIER = 'now';
 
-type NoDateNowContext = Readonly<TSESLint.RuleContext<string, []>>;
+type NoDateNowMessageId = 'noDateNow' | 'noNewDateNow';
+type NoDateNowContext = Readonly<TSESLint.RuleContext<NoDateNowMessageId, []>>;
 
 /**
  * Checks call expressions for Date.now usage.
