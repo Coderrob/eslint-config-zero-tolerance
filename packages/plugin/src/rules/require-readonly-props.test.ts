@@ -118,6 +118,23 @@ ruleTester.run('require-readonly-props', requireReadonlyProps, {
         }
       `,
     },
+    {
+      name: 'should allow component with explicit this parameter followed by readonly props',
+      code: `
+        type Props = { name: string };
+        function Greeting(this: void, props: Readonly<Props>) {
+          return <div>{props.name}</div>;
+        }
+      `,
+    },
+    {
+      name: 'should allow component with explicit this parameter and no props',
+      code: `
+        function Empty(this: void) {
+          return <div />;
+        }
+      `,
+    },
   ],
   invalid: [
     {
@@ -215,6 +232,16 @@ ruleTester.run('require-readonly-props', requireReadonlyProps, {
       name: 'should disallow non-reference props annotation',
       code: `
         const Greeting = (props: string) => <div>{props}</div>;
+      `,
+      errors: [{ messageId: 'requireReadonlyProps' }],
+    },
+    {
+      name: 'should disallow mutable props following explicit this parameter',
+      code: `
+        type Props = { name: string };
+        function Greeting(this: void, props: Props) {
+          return <div>{props.name}</div>;
+        }
       `,
       errors: [{ messageId: 'requireReadonlyProps' }],
     },

@@ -21,7 +21,11 @@ import { createRule } from '../rule-factory';
 const DATE_IDENTIFIER = 'Date';
 const NOW_IDENTIFIER = 'now';
 
-type NoDateNowMessageId = 'noDateNow' | 'noNewDateNow';
+enum NoDateNowMessageId {
+  NoDateNow = 'noDateNow',
+  NoNewDateNow = 'noNewDateNow',
+}
+
 type NoDateNowContext = Readonly<TSESLint.RuleContext<NoDateNowMessageId, []>>;
 
 /**
@@ -36,7 +40,7 @@ function checkCallExpression(context: NoDateNowContext, node: TSESTree.CallExpre
   }
   context.report({
     node,
-    messageId: 'noDateNow',
+    messageId: NoDateNowMessageId.NoDateNow,
   });
 }
 
@@ -52,7 +56,7 @@ function checkNewExpression(context: NoDateNowContext, node: TSESTree.NewExpress
   }
   context.report({
     node,
-    messageId: 'noNewDateNow',
+    messageId: NoDateNowMessageId.NoNewDateNow,
   });
 }
 
