@@ -49,7 +49,7 @@ function buildFunctionState(node: FunctionNode): IFunctionState {
     node.type === AST_NODE_TYPES.ArrowFunctionExpression &&
     node.body.type !== AST_NODE_TYPES.BlockStatement &&
     isJsxExpression(node.body);
-  return { node, hasJsxReturn: isJsxArrowBody, propsNode: getMutablePropsNode(node.params[0]) };
+  return { node, hasJsxReturn: isJsxArrowBody, propsNode: getMutablePropsNode(getFirstPropsParam(node.params)) };
 }
 
 /**
@@ -107,6 +107,20 @@ function getComponentName(node: FunctionNode): string | null {
  */
 function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string | null {
   return node.id?.name ?? null;
+}
+
+/**
+ * Returns the first non-`this` parameter from a function parameter list.
+ * TypeScript allows an explicit `this:` pseudo-parameter as the first entry;
+ * the actual props parameter follows it.
+ *
+ * @param params - Function parameter list.
+ * @returns First non-`this` parameter, or undefined when none exists.
+ */
+function getFirstPropsParam(params: TSESTree.Parameter[]): TSESTree.Parameter | undefined {
+  return params.find(
+    (param) => !(param.type === AST_NODE_TYPES.Identifier && param.name === 'this'),
+  );
 }
 
 /**
