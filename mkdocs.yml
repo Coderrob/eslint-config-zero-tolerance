@@ -57,6 +57,7 @@ nav:
       - Documentation:
           - require-jsdoc-functions: rules/require-jsdoc-functions.md
           - require-optional-chaining: rules/require-optional-chaining.md
+          - require-readonly-props: rules/require-readonly-props.md
       - Testing:
           - require-test-description-style: rules/require-test-description-style.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
@@ -70,15 +71,20 @@ nav:
       - Code Quality:
           - max-function-lines: rules/max-function-lines.md
           - max-params: rules/max-params.md
+          - no-array-mutation: rules/no-array-mutation.md
+          - no-date-now: rules/no-date-now.md
           - no-magic-numbers: rules/no-magic-numbers.md
           - no-magic-strings: rules/no-magic-strings.md
+          - no-object-mutation: rules/no-object-mutation.md
           - sort-imports: rules/sort-imports.md
           - sort-functions: rules/sort-functions.md
           - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
+          - prefer-readonly-parameters: rules/prefer-readonly-parameters.md
           - prefer-string-raw: rules/prefer-string-raw.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md
+          - prefer-result-return: rules/prefer-result-return.md
       - Imports:
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
@@ -87,6 +93,7 @@ nav:
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md
           - no-identical-branches: rules/no-identical-branches.md
+          - no-boolean-return-trap: rules/no-boolean-return-trap.md
           - no-redundant-boolean: rules/no-redundant-boolean.md
           - no-for-in: rules/no-for-in.md
           - no-labels: rules/no-labels.md

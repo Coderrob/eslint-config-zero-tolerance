@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 39 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 46 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (all enabled rules at `warn`) and `strict` preset (all enabled rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -89,6 +89,7 @@ export default [
 | --------------------------- | ----------------------------------------------------------- |
 | `require-jsdoc-functions`   | Require JSDoc comments on all functions (except test files) |
 | `require-optional-chaining` | Require optional chaining instead of repeated guard access  |
+| `require-readonly-props`    | Require JSX component props to be typed as readonly         |
 
 ### Testing
 
@@ -114,11 +115,15 @@ export default [
 | --------------------------- | --------------------------------------------------------------------------------------- |
 | `max-function-lines`        | Enforce a maximum number of lines per function body                                     |
 | `max-params`                | Enforce a maximum number of function parameters                                         |
+| `no-array-mutation`         | Disallow mutating array methods                                                         |
+| `no-date-now`               | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
 | `no-magic-numbers`          | Disallow magic numbers; use named constants instead                                     |
 | `no-magic-strings`          | Disallow magic strings in comparisons and switch cases                                  |
+| `no-object-mutation`        | Disallow direct object-property mutation                                                 |
 | `sort-imports`              | Require import declarations to be ordered by group and alphabetically within each group |
 | `sort-functions`            | Require top-level functions and const function expressions to be sorted alphabetically  |
 | `prefer-nullish-coalescing` | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| `prefer-readonly-parameters`| Prefer readonly typing for object and array-like parameters                             |
 | `prefer-string-raw`         | Prefer `String.raw` for strings containing escaped backslashes                          |
 
 ### Error Handling
@@ -127,6 +132,7 @@ export default [
 | ------------------ | -------------------------------------------------------------------------------------- |
 | `no-empty-catch`   | Disallow empty catch blocks that silently swallow errors                               |
 | `no-throw-literal` | Disallow throwing literals, objects, or templates; always throw a new `Error` instance |
+| `prefer-result-return` | Prefer returning Result-style values instead of throwing                          |
 
 ### Imports
 
@@ -143,6 +149,7 @@ export default [
 | -------------------------- | ---------------------------------------------------------------------------- |
 | `no-identical-expressions` | Disallow identical expressions on both sides of a binary or logical operator |
 | `no-identical-branches`    | Disallow identical conditional branches                                      |
+| `no-boolean-return-trap`   | Disallow ambiguous boolean-return APIs outside predicate naming               |
 | `no-redundant-boolean`     | Disallow redundant comparisons to boolean literals                           |
 | `no-for-in`                | Disallow `for..in` loops                                                     |
 | `no-labels`                | Disallow labeled statements                                                  |

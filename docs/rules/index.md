@@ -14,6 +14,7 @@
 | --------------------------------------------------------- | ---------- | ----------------------------------------------------------- |
 | [require-jsdoc-functions](require-jsdoc-functions.md)     | suggestion | Require JSDoc comments on all functions (except test files) |
 | [require-optional-chaining](require-optional-chaining.md) | suggestion | Require optional chaining instead of repeated guard access  |
+| [require-readonly-props](require-readonly-props.md)       | suggestion | Require JSX component props to be typed as readonly         |
 
 ## Testing
 
@@ -39,11 +40,15 @@
 | --------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
 | [max-function-lines](max-function-lines.md)               | suggestion | Enforce a maximum number of lines per function body                                     |
 | [max-params](max-params.md)                               | suggestion | Enforce a maximum number of function parameters                                         |
+| [no-array-mutation](no-array-mutation.md)                 | suggestion | Disallow mutating array methods                                                         |
+| [no-date-now](no-date-now.md)                             | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
 | [no-magic-numbers](no-magic-numbers.md)                   | suggestion | Disallow magic numbers; use named constants instead                                     |
 | [no-magic-strings](no-magic-strings.md)                   | suggestion | Disallow magic strings in comparisons and switch cases                                  |
+| [no-object-mutation](no-object-mutation.md)               | suggestion | Disallow direct object-property mutation                                                 |
 | [sort-imports](sort-imports.md)                           | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
 | [sort-functions](sort-functions.md)                       | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
 | [prefer-nullish-coalescing](prefer-nullish-coalescing.md) | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| [prefer-readonly-parameters](prefer-readonly-parameters.md) | suggestion | Prefer readonly typing for object and array-like parameters                             |
 | [prefer-string-raw](prefer-string-raw.md)                 | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
 
 ## Error Handling
@@ -52,6 +57,7 @@
 | --------------------------------------- | ------- | ------------------------------------------------------------------------------------ |
 | [no-empty-catch](no-empty-catch.md)     | problem | Disallow empty catch blocks that silently swallow errors                             |
 | [no-throw-literal](no-throw-literal.md) | problem | Disallow throwing literals, objects, or templates; always throw a new Error instance |
+| [prefer-result-return](prefer-result-return.md) | suggestion | Prefer returning Result-style values instead of throwing                              |
 
 ## Imports
 
@@ -68,6 +74,7 @@
 | ------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------- |
 | [no-identical-expressions](no-identical-expressions.md) | problem    | Disallow identical expressions on both sides of a binary or logical operator |
 | [no-identical-branches](no-identical-branches.md)       | suggestion | Disallow identical conditional branches                                      |
+| [no-boolean-return-trap](no-boolean-return-trap.md)     | suggestion | Disallow ambiguous boolean-return APIs outside predicate naming               |
 | [no-redundant-boolean](no-redundant-boolean.md)         | suggestion | Disallow redundant comparisons to boolean literals                           |
 | [no-for-in](no-for-in.md)                               | problem    | Disallow `for..in` loops                                                     |
 | [no-labels](no-labels.md)                               | problem    | Disallow labeled statements                                                  |
