@@ -35,7 +35,7 @@ type NoBooleanReturnTrapContext = Readonly<TSESLint.RuleContext<'noBooleanReturn
 function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNode): void {
   const functionName = resolveFunctionName(node);
   const returnTypeNode = node.returnType?.typeAnnotation;
-  if (!isTrapCandidate(functionName, returnTypeNode) || node.returnType === undefined) {
+  if (!isTrapCandidate(functionName, returnTypeNode)) {
     return;
   }
   context.report({
