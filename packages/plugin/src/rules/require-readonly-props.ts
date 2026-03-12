@@ -33,6 +33,7 @@ interface IFunctionState {
 
 const PASCAL_CASE_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
 const READONLY_TYPE_NAME = 'Readonly';
+const THIS_PARAMETER_NAME = 'this';
 
 /**
  * Builds tracked state for one function-like node.
@@ -100,16 +101,6 @@ function getComponentName(node: FunctionNode): string | null {
 }
 
 /**
- * Returns function declaration identifier name when present.
- *
- * @param node - Function declaration node.
- * @returns Declared name, or null.
- */
-function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string | null {
-  return node.id?.name ?? null;
-}
-
-/**
  * Returns the first non-`this` parameter from a function parameter list.
  * TypeScript allows an explicit `this:` pseudo-parameter as the first entry;
  * the actual props parameter follows it.
@@ -118,9 +109,17 @@ function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string 
  * @returns First non-`this` parameter, or undefined when none exists.
  */
 function getFirstPropsParam(params: TSESTree.Parameter[]): TSESTree.Parameter | undefined {
-  return params.find(
-    (param) => !(param.type === AST_NODE_TYPES.Identifier && param.name === 'this'),
-  );
+  return params.find(isNotThisParameter);
+}
+
+/**
+ * Returns function declaration identifier name when present.
+ *
+ * @param node - Function declaration node.
+ * @returns Declared name, or null.
+ */
+function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string | null {
+  return node.id?.name ?? null;
 }
 
 /**
@@ -281,6 +280,16 @@ function isMutablePropsParameter(param: TSESTree.Parameter): boolean {
     return true;
   }
   return !isReadonlyPropsType(typeAnnotation.typeAnnotation);
+}
+
+/**
+ * Returns true when a parameter is not a TypeScript `this` pseudo-parameter.
+ *
+ * @param param - Function parameter.
+ * @returns True when the parameter is not the `this` pseudo-parameter.
+ */
+function isNotThisParameter(param: TSESTree.Parameter): boolean {
+  return !(param.type === AST_NODE_TYPES.Identifier && param.name === THIS_PARAMETER_NAME);
 }
 
 /**
