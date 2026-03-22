@@ -199,11 +199,57 @@ function getOwnedTrailingComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: TSESTree.Node,
 ): ReadonlyArray<TSESTree.Comment> {
-  const trailingComment = sourceCode.getCommentsAfter(node).at(0);
-  if (!isOwnedTrailingComment(sourceCode, node, trailingComment)) {
+  const allTrailingComments = sourceCode.getCommentsAfter(node);
+
+  if (!allTrailingComments.length) {
     return [];
   }
-  return [trailingComment];
+
+  const nodeEndLine = node.loc?.end.line;
+  if (nodeEndLine == null) {
+    return [];
+  }
+
+  // Find the first owned same-line trailing comment.
+  let startIndex = -1;
+  for (let i = 0; i < allTrailingComments.length; i += 1) {
+    const comment = allTrailingComments[i];
+    if (!isOwnedTrailingComment(sourceCode, node, comment)) {
+      continue;
+    }
+    if (comment.loc?.start.line !== nodeEndLine) {
+      continue;
+    }
+    startIndex = i;
+    break;
+  }
+
+  if (startIndex === -1) {
+    return [];
+  }
+
+  const owned: TSESTree.Comment[] = [];
+  owned.push(allTrailingComments[startIndex]);
+
+  // Collect immediately-adjacent same-line trailing comments while there is
+  // only whitespace between them.
+  for (let i = startIndex + 1; i < allTrailingComments.length; i += 1) {
+    const prev = owned[owned.length - 1];
+    const current = allTrailingComments[i];
+
+    if (current.loc?.start.line !== nodeEndLine) {
+      break;
+    }
+
+    const betweenText = sourceCode.text.slice(prev.range[1], current.range[0]);
+    if (/[^\s]/u.test(betweenText)) {
+      break;
+    }
+
+    owned.push(current);
+  }
+
+  return owned;
 }
 
 /**
