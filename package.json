@@ -48,5 +48,5 @@
     "test": "pnpm -r --if-present test && pnpm coverage:update-badge",
     "validate:bdd": "node scripts/validate-bdd-specs.mjs"
   },
-  "version": "1.0.0"
+  "version": "1.1.6"
 }
