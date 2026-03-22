@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-identical-branches.ts",
+  "module": {
+    "name": "no-identical-branches",
+    "description": "Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments.",
+    "exports": ["noIdenticalBranches"]
+  },
+  "specifications": [
+    {
+      "feature": "Distinct conditional branches",
+      "scenarios": [
+        {
+          "name": "should allow an if/else with different branch bodies",
+          "given": "an if statement whose consequent and alternate have different statements",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a ternary whose true and false branches differ",
+          "given": "a conditional expression condition ? a : b where a !== b textually",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Identical conditional branches",
+      "scenarios": [
+        {
+          "name": "should report an if/else where both branches contain the same code",
+          "given": "an if statement where consequent and alternate are textually identical blocks",
+          "when": "the rule evaluates the code",
+          "then": "a noIdenticalBranches violation is reported"
+        },
+        {
+          "name": "should report a ternary where both branches are the same expression",
+          "given": "a conditional expression condition ? x : x",
+          "when": "the rule evaluates the code",
+          "then": "a noIdenticalBranches violation is reported"
+        }
+      ]
+    }
+  ]
+}

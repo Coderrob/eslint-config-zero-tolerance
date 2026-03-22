@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-date-now.ts",
+  "module": {
+    "name": "no-date-now",
+    "description": "Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior.",
+    "exports": ["noDateNow"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted date access patterns",
+      "scenarios": [
+        {
+          "name": "should allow reading an injected Date variable",
+          "given": "a function that accepts a Date parameter and reads its methods",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Banned date access patterns",
+      "scenarios": [
+        {
+          "name": "should report Date.now() calls",
+          "given": "a call expression Date.now()",
+          "when": "the rule evaluates the code",
+          "then": "a noDateNow violation is reported"
+        },
+        {
+          "name": "should report new Date() instantiation",
+          "given": "a new Date() expression",
+          "when": "the rule evaluates the code",
+          "then": "a noDateNow violation is reported"
+        },
+        {
+          "name": "should report new Date(arg) with an argument",
+          "given": "a new Date(timestamp) expression",
+          "when": "the rule evaluates the code",
+          "then": "a noDateNow violation is reported"
+        }
+      ]
+    }
+  ]
+}

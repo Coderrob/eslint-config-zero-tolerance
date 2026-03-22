@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rule-map.ts",
+  "module": {
+    "name": "rule-map",
+    "description": "Builds the canonical plugin rule map and exports preset-aware rule configurations for consumption by flat and legacy config builders.",
+    "exports": ["IRuleConfig", "buildRules", "ruleMap"]
+  },
+  "specifications": [
+    {
+      "feature": "buildRules",
+      "scenarios": [
+        {
+          "name": "should return warn-level entries for the Recommended preset",
+          "given": "Preset.Recommended is passed to buildRules",
+          "when": "buildRules is called",
+          "then": "returns a rules record where every entry is set to 'warn' severity"
+        },
+        {
+          "name": "should return error-level entries for the Strict preset",
+          "given": "Preset.Strict is passed to buildRules",
+          "when": "buildRules is called",
+          "then": "returns a rules record where every entry is set to 'error' severity"
+        },
+        {
+          "name": "should prefix every rule key with the plugin namespace",
+          "given": "any preset is passed to buildRules",
+          "when": "Object.keys of the result is inspected",
+          "then": "every key starts with 'zero-tolerance/'"
+        },
+        {
+          "name": "should include max-function-lines with parameterised severity",
+          "given": "buildRules is called with Preset.Recommended",
+          "when": "the 'zero-tolerance/max-function-lines' entry is read",
+          "then": "returns an array entry with 'warn' and the recommended max-lines option"
+        }
+      ]
+    }
+  ]
+}

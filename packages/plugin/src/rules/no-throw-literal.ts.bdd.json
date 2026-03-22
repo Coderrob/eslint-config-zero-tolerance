@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-throw-literal.ts",
+  "module": {
+    "name": "no-throw-literal",
+    "description": "Disallow throwing literals, objects, or templates; always throw a new Error instance.",
+    "exports": ["noThrowLiteral"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted throw statements",
+      "scenarios": [
+        {
+          "name": "should allow throwing a new Error instance",
+          "given": "throw new Error('message')",
+          "when": "the rule evaluates the throw statement",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow throwing a new custom Error subclass",
+          "given": "throw new ValidationError('invalid input')",
+          "when": "the rule evaluates the throw statement",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Throwing non-Error values",
+      "scenarios": [
+        {
+          "name": "should report throwing a string literal",
+          "given": "throw 'something went wrong'",
+          "when": "the rule evaluates the throw statement",
+          "then": "a noThrowLiteral violation is reported"
+        },
+        {
+          "name": "should report throwing a plain object literal",
+          "given": "throw { message: 'error' }",
+          "when": "the rule evaluates the throw statement",
+          "then": "a noThrowLiteral violation is reported"
+        },
+        {
+          "name": "should report throwing a template literal",
+          "given": "throw `error: ${details}`",
+          "when": "the rule evaluates the throw statement",
+          "then": "a noThrowLiteral violation is reported"
+        },
+        {
+          "name": "should report throwing a numeric literal",
+          "given": "throw 42",
+          "when": "the rule evaluates the throw statement",
+          "then": "a noThrowLiteral violation is reported"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-literal-unions.ts",
+  "module": {
+    "name": "no-literal-unions",
+    "description": "Ban literal unions in favor of enums.",
+    "exports": ["noLiteralUnions"]
+  },
+  "specifications": [
+    {
+      "feature": "Enum-based discriminated types",
+      "scenarios": [
+        {
+          "name": "should allow a type alias that references an enum",
+          "given": "type Status = MyEnum.Active | MyEnum.Inactive",
+          "when": "the rule evaluates the type alias",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a union of non-literal types",
+          "given": "type Value = string | number",
+          "when": "the rule evaluates the type alias",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Literal string or number unions",
+      "scenarios": [
+        {
+          "name": "should report a union of string literals",
+          "given": "type Direction = 'left' | 'right' | 'up' | 'down'",
+          "when": "the rule evaluates the type alias",
+          "then": "a noLiteralUnions violation is reported"
+        },
+        {
+          "name": "should report a union of numeric literals",
+          "given": "type Status = 0 | 1 | 2",
+          "when": "the rule evaluates the type alias",
+          "then": "a noLiteralUnions violation is reported"
+        }
+      ]
+    }
+  ]
+}

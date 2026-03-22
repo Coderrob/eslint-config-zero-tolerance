@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-empty-catch.ts",
+  "module": {
+    "name": "no-empty-catch",
+    "description": "Disallow empty catch blocks that silently swallow errors.",
+    "exports": ["noEmptyCatch"]
+  },
+  "specifications": [
+    {
+      "feature": "Catch blocks with handling",
+      "scenarios": [
+        {
+          "name": "should allow a catch block that re-throws the error",
+          "given": "a try-catch where the catch rethrows the error",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a catch block that logs the error",
+          "given": "a try-catch where the catch body calls console.error(e)",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Empty catch blocks",
+      "scenarios": [
+        {
+          "name": "should report a completely empty catch block",
+          "given": "a try-catch where the catch body is an empty block {}",
+          "when": "the rule evaluates the code",
+          "then": "a noEmptyCatch violation is reported on the catch clause"
+        }
+      ]
+    }
+  ]
+}

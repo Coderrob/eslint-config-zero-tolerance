@@ -1,0 +1,107 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rule-constants.ts",
+  "module": {
+    "name": "rule-constants",
+    "description": "Domain-specific string constants used within individual rule implementations, kept separate from plugin-level constants.",
+    "exports": [
+      "OPERATOR_UNARY_MINUS",
+      "OPERATOR_STRICT_EQ",
+      "OPERATOR_STRICT_NEQ",
+      "VARIABLE_KIND_CONST",
+      "CALLEE_REQUIRE",
+      "TEST_FUNCTION_IT",
+      "TEST_FUNCTION_TEST",
+      "TEST_METHOD_SKIP",
+      "RETURN_TYPE_NAME",
+      "INTERFACE_REQUIRED_PREFIX",
+      "JSDOC_BLOCK_MARKER",
+      "TYPE_ASSERTION_ALLOWED_IN_TESTS",
+      "ESLINT_DISABLE_PREFIX",
+      "TEST_DESCRIPTION_PREFIX"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Operator constants",
+      "scenarios": [
+        {
+          "name": "should export OPERATOR_UNARY_MINUS as '-'",
+          "given": "the rule-constants module is imported",
+          "when": "OPERATOR_UNARY_MINUS is read",
+          "then": "its value is the string '-'"
+        },
+        {
+          "name": "should export OPERATOR_STRICT_EQ as '==='",
+          "given": "the rule-constants module is imported",
+          "when": "OPERATOR_STRICT_EQ is read",
+          "then": "its value is the string '==='"
+        },
+        {
+          "name": "should export OPERATOR_STRICT_NEQ as '!=='",
+          "given": "the rule-constants module is imported",
+          "when": "OPERATOR_STRICT_NEQ is read",
+          "then": "its value is the string '!=='"
+        }
+      ]
+    },
+    {
+      "feature": "Variable kind constants",
+      "scenarios": [
+        {
+          "name": "should export VARIABLE_KIND_CONST as 'const'",
+          "given": "the rule-constants module is imported",
+          "when": "VARIABLE_KIND_CONST is read",
+          "then": "its value is the string 'const'"
+        }
+      ]
+    },
+    {
+      "feature": "Well-known callee and identifier constants",
+      "scenarios": [
+        {
+          "name": "should export CALLEE_REQUIRE as 'require'",
+          "given": "the rule-constants module is imported",
+          "when": "CALLEE_REQUIRE is read",
+          "then": "its value is the string 'require'"
+        },
+        {
+          "name": "should export TEST_FUNCTION_IT and TEST_FUNCTION_TEST",
+          "given": "the rule-constants module is imported",
+          "when": "TEST_FUNCTION_IT and TEST_FUNCTION_TEST are read",
+          "then": "their values are 'it' and 'test' respectively"
+        },
+        {
+          "name": "should export TEST_METHOD_SKIP as 'skip'",
+          "given": "the rule-constants module is imported",
+          "when": "TEST_METHOD_SKIP is read",
+          "then": "its value is the string 'skip'"
+        }
+      ]
+    },
+    {
+      "feature": "Rule-specific string constants",
+      "scenarios": [
+        {
+          "name": "should export INTERFACE_REQUIRED_PREFIX as 'I'",
+          "given": "the rule-constants module is imported",
+          "when": "INTERFACE_REQUIRED_PREFIX is read",
+          "then": "its value is the string 'I'"
+        },
+        {
+          "name": "should export TEST_DESCRIPTION_PREFIX as 'should'",
+          "given": "the rule-constants module is imported",
+          "when": "TEST_DESCRIPTION_PREFIX is read",
+          "then": "its value is the string 'should'"
+        },
+        {
+          "name": "should export ESLINT_DISABLE_PREFIX as 'eslint-disable'",
+          "given": "the rule-constants module is imported",
+          "when": "ESLINT_DISABLE_PREFIX is read",
+          "then": "its value is the string 'eslint-disable'"
+        }
+      ]
+    }
+  ]
+}

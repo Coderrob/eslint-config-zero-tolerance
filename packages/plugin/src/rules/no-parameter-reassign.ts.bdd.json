@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-parameter-reassign.ts",
+  "module": {
+    "name": "no-parameter-reassign",
+    "description": "Disallow assignments and updates to function parameters; use a new local variable instead.",
+    "exports": ["noParameterReassign"]
+  },
+  "specifications": [
+    {
+      "feature": "Safe parameter usage",
+      "scenarios": [
+        {
+          "name": "should allow reading a parameter without reassigning it",
+          "given": "a function that reads but never reassigns its parameter",
+          "when": "the rule evaluates the function body",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow assigning a new local variable derived from a parameter",
+          "given": "const local = param + 1 inside a function body",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter reassignment",
+      "scenarios": [
+        {
+          "name": "should report direct assignment to a parameter",
+          "given": "a function body that executes param = newValue",
+          "when": "the rule evaluates the assignment",
+          "then": "a noParameterReassign violation is reported"
+        },
+        {
+          "name": "should report an update expression on a parameter",
+          "given": "a function body that executes param++",
+          "when": "the rule evaluates the update expression",
+          "then": "a noParameterReassign violation is reported"
+        },
+        {
+          "name": "should report compound assignment to a parameter",
+          "given": "a function body that executes param += 1",
+          "when": "the rule evaluates the compound assignment",
+          "then": "a noParameterReassign violation is reported"
+        }
+      ]
+    }
+  ]
+}

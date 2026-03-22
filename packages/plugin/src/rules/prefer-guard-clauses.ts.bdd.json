@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-guard-clauses.ts",
+  "module": {
+    "name": "prefer-guard-clauses",
+    "description": "Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow.",
+    "exports": ["preferGuardClauses"]
+  },
+  "specifications": [
+    {
+      "feature": "Guard clause patterns",
+      "scenarios": [
+        {
+          "name": "should allow an if statement with no else when the if branch returns early",
+          "given": "if (condition) { return; } doWork();",
+          "when": "the rule evaluates the if statement",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow an if/else where the if branch does not terminate",
+          "given": "if (a) { doA(); } else { doB(); }",
+          "when": "the rule evaluates the if statement",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Unnecessary else after terminating if branch",
+      "scenarios": [
+        {
+          "name": "should report an else block when the if branch returns",
+          "given": "if (error) { return null; } else { return result; }",
+          "when": "the rule evaluates the if statement",
+          "then": "a preferGuardClauses violation is reported on the else clause"
+        },
+        {
+          "name": "should report an else block when the if branch throws",
+          "given": "if (!valid) { throw new Error(); } else { processData(); }",
+          "when": "the rule evaluates the if statement",
+          "then": "a preferGuardClauses violation is reported on the else clause"
+        }
+      ]
+    }
+  ]
+}

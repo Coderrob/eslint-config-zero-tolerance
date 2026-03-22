@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-type-assertion.ts",
+  "module": {
+    "name": "no-type-assertion",
+    "description": "Prevent use of TypeScript \"as\" type assertions.",
+    "exports": ["noTypeAssertion"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted type narrowing patterns",
+      "scenarios": [
+        {
+          "name": "should allow as unknown in test files",
+          "given": "a type assertion value as unknown inside a .test.ts file",
+          "when": "the rule evaluates the assertion",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow const assertions (as const)",
+          "given": "an expression const items = ['a', 'b'] as const",
+          "when": "the rule evaluates the assertion",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Type assertion operator usage",
+      "scenarios": [
+        {
+          "name": "should report an 'as' type assertion in a non-test source file",
+          "given": "value as SomeType in a regular .ts source file",
+          "when": "the rule evaluates the TSAsExpression",
+          "then": "a noTypeAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

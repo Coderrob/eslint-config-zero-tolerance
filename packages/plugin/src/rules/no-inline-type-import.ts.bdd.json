@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-inline-type-import.ts",
+  "module": {
+    "name": "no-inline-type-import",
+    "description": "Disallow TypeScript inline type imports using import(\"...\").",
+    "exports": ["noInlineTypeImport"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted import patterns",
+      "scenarios": [
+        {
+          "name": "should allow a top-level import type statement",
+          "given": "import type { Foo } from './foo'",
+          "when": "the rule evaluates the import",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a standard runtime import",
+          "given": "import { Foo } from './foo'",
+          "when": "the rule evaluates the import",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Inline type import expressions",
+      "scenarios": [
+        {
+          "name": "should report an inline type annotation using import(\"...\")",
+          "given": "a type annotation typed as import('./module').SomeType",
+          "when": "the rule evaluates the code",
+          "then": "a noInlineTypeImport violation is reported"
+        }
+      ]
+    }
+  ]
+}

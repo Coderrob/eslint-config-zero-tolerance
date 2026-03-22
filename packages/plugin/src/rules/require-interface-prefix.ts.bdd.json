@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-interface-prefix.ts",
+  "module": {
+    "name": "require-interface-prefix",
+    "description": "Enforce that interface names start with \"I\".",
+    "exports": ["requireInterfacePrefix"]
+  },
+  "specifications": [
+    {
+      "feature": "Correctly prefixed interfaces",
+      "scenarios": [
+        {
+          "name": "should allow an interface whose name starts with 'I'",
+          "given": "interface IUser { name: string }",
+          "when": "the rule evaluates the interface declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a type alias that is not an interface",
+          "given": "type UserId = string",
+          "when": "the rule evaluates the type alias",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Interfaces missing the 'I' prefix",
+      "scenarios": [
+        {
+          "name": "should report an interface whose name does not start with 'I'",
+          "given": "interface User { name: string }",
+          "when": "the rule evaluates the interface declaration",
+          "then": "a requireInterfacePrefix violation is reported"
+        },
+        {
+          "name": "should report an interface whose name starts with a lowercase letter",
+          "given": "interface config { host: string }",
+          "when": "the rule evaluates the interface declaration",
+          "then": "a requireInterfacePrefix violation is reported"
+        }
+      ]
+    }
+  ]
+}

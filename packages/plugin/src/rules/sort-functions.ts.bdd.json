@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/sort-functions.ts",
+  "module": {
+    "name": "sort-functions",
+    "description": "Require top-level functions to be sorted alphabetically.",
+    "exports": ["sortFunctions"]
+  },
+  "specifications": [
+    {
+      "feature": "Alphabetically sorted top-level functions",
+      "scenarios": [
+        {
+          "name": "should allow top-level functions declared in alphabetical order",
+          "given": "a module with function alpha() before function beta() before function gamma()",
+          "when": "the rule evaluates the Program",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a single top-level function",
+          "given": "a module containing only one function declaration",
+          "when": "the rule evaluates the Program",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Out-of-order top-level functions",
+      "scenarios": [
+        {
+          "name": "should report functions declared out of alphabetical order",
+          "given": "a module where function zebra() is declared before function apple()",
+          "when": "the rule evaluates the Program",
+          "then": "a sortFunctions violation is reported on the out-of-order function"
+        }
+      ]
+    }
+  ]
+}

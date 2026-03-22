@@ -8,7 +8,7 @@ This repository is a monorepo containing an ESLint plugin (`@coderrob/eslint-plu
 
 ## Repository Structure
 
-```
+```text
 eslint-config-zero-tolerance/
 ├── .github/
 │   └── workflows/
@@ -24,14 +24,16 @@ eslint-config-zero-tolerance/
 │   │   └── src/
 │   │       ├── index.ts          # Plugin entry point; registers all rules and config presets
 │   │       └── rules/
-│   │           ├── <rule-name>.ts        # Rule implementation
-│   │           └── <rule-name>.test.ts   # Rule unit tests
+│   │           ├── <rule-name>.ts            # Rule implementation
+│   │           ├── <rule-name>.test.ts       # Rule unit tests
+│   │           └── <rule-name>.ts.bdd.json  # BDD specification metadata
 │   └── config/           # eslint-config-zero-tolerance
 │       └── src/
 │           ├── index.ts          # Re-exports all config presets
 │           ├── recommended.ts    # Recommended config (warn severity)
 │           └── strict.ts         # Strict config (error severity)
 ├── scripts/              # Release and workspace utility scripts
+├── bdd-spec.schema.json  # JSON Schema for BDD specification files
 ├── AGENTS.md             # This file
 ├── CHANGELOG.md          # Audit trail of all changes
 ├── CONTRIBUTING.md       # Contributor guide
@@ -53,6 +55,7 @@ eslint-config-zero-tolerance/
 - **Consistent naming conventions**:
   - Rule files: `kebab-case` (e.g., `no-export-alias.ts`)
   - Rule test files: `kebab-case` with `.test.ts` suffix (e.g., `no-export-alias.test.ts`)
+  - BDD spec files: source file name with `.bdd.json` appended (e.g., `no-export-alias.ts.bdd.json`)
   - Exported rule constants: `camelCase` matching the rule name (e.g., `noExportAlias`)
   - Config files: `kebab-case` descriptive name (e.g., `recommended.ts`, `strict.ts`)
 
@@ -81,9 +84,10 @@ Each new ESLint rule must follow this structure:
 
 1. **File**: `packages/plugin/src/rules/<rule-name>.ts`
 2. **Test file**: `packages/plugin/src/rules/<rule-name>.test.ts`
-3. **Export**: Named export of the rule constant plus a default export.
-4. **Registration**: Import and register in `packages/plugin/src/index.ts` under `rules` and ensure it is included by the exported presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
-5. **Config sync note**: `packages/config` re-exports plugin configs; no manual rule sync is required there.
+3. **BDD spec file**: `packages/plugin/src/rules/<rule-name>.ts.bdd.json` — must be created alongside the rule and kept in sync with any behavioural changes. See [BDD Specification Guidelines](#bdd-specification-guidelines).
+4. **Export**: Named export of the rule constant plus a default export.
+5. **Registration**: Import and register in `packages/plugin/src/index.ts` under `rules` and ensure it is included by the exported presets (`recommended`, `strict`, `legacy-recommended`, `legacy-strict`).
+6. **Config sync note**: `packages/config` re-exports plugin configs; no manual rule sync is required there.
 
 ### Required Rule Change Checks
 
@@ -93,13 +97,14 @@ These checks are mandatory whenever a rule is **added**, **updated**, or **remov
    - Update the rule page in `docs/rules/` (or remove it if the rule is removed).
    - Update rule indexes/tables in `docs/rules/index.md`, `docs/index.md`, `README.md`, and `packages/plugin/README.md`.
    - Update `mkdocs.yml` navigation entries when rule pages are added/removed/renamed.
-2. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
-3. Run required validations and ensure they all pass:
-   - `pnpm lint`
-   - `pnpm test`
-   - `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`
-   - `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`
-   - `pnpm build`
+2. Keep the BDD spec file in sync:
+   - Update `packages/plugin/src/rules/<rule-name>.ts.bdd.json` to reflect any new, changed, or removed behaviours.
+   - Add new scenarios for any new code paths or edge cases introduced.
+   - Remove scenarios for any behaviours that are deleted.
+   - The `module.exports` array must match the current named exports of the rule file.
+3. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
+
+4. Run required validations and ensure they all pass: `pnpm validate:bdd`, `pnpm lint`, `pnpm test`, `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`, `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`, and `pnpm build`.
 
 ### Rule Template
 
@@ -140,6 +145,45 @@ export default myRuleName;
 
 ---
 
+## BDD Specification Guidelines
+
+Every non-test `.ts` source file under `packages/plugin/src/` must have a sibling `.ts.bdd.json` file that describes its behaviour in BDD (Given/When/Then) format. These files conform to the `bdd-spec.schema.json` schema at the workspace root.
+
+### Required fields
+
+| Field            | Description                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `$schema`        | Relative path to `bdd-spec.schema.json` from the spec file's location                                   |
+| `schemaVersion`  | Must be `"1.0.0"`                                                                                       |
+| `sourceFile`     | Workspace-relative path to the `.ts` source file (e.g., `packages/plugin/src/rules/no-export-alias.ts`) |
+| `module`         | Object with `name`, `description`, and `exports` array                                                  |
+| `specifications` | Array of feature objects, each with a `feature` name and `scenarios` array                              |
+
+### `$schema` relative path depth
+
+- Files in `src/` → `../../../bdd-spec.schema.json`
+- Files in `src/configs/` or `src/rules/` → `../../../../bdd-spec.schema.json`
+
+### Scenario structure
+
+Each scenario must have:
+
+- `name` — starts with `"should"`, describes the expected outcome
+- `given` — precondition or context
+- `when` — the action or trigger
+- `then` — the observable result
+
+### When to update BDD spec files
+
+- **Adding a rule**: Create a new `.ts.bdd.json` for the rule file, covering all valid and invalid code paths as separate scenarios.
+- **Changing rule behaviour**: Update the relevant scenarios in the existing `.ts.bdd.json`; add new scenarios for new code paths; remove scenarios for deleted behaviours.
+- **Removing a rule**: Delete the corresponding `.ts.bdd.json`.
+- **Changing any non-test utility file** (`ast-guards.ts`, `rule-factory.ts`, etc.): Update the sibling `.ts.bdd.json` to reflect the changed exports or behaviours.
+
+BDD spec files are **not** compiled or executed — they are living documentation. Keeping them accurate is part of the Definition of Done.
+
+---
+
 ## Mock and Test Guidelines
 
 - **Never use** `mockImplementation`, `mockReturnValue`, `mockResolvedValue`, or `mockRejectedValue` in tests. Use their `Once` variants to prevent state from leaking between tests.
@@ -164,9 +208,11 @@ export default myRuleName;
 
 Before considering any rule or behavior change complete:
 
-1. Run `pnpm lint` and ensure it passes.
-2. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
-3. Run type checks for plugin and config packages and ensure they pass.
-4. Run `pnpm build` and ensure it passes.
-5. Update `CHANGELOG.md` under `[Unreleased]`.
-6. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
+1. Run `pnpm validate:bdd` and ensure it passes.
+2. Run `pnpm lint` and ensure it passes.
+3. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
+4. Run type checks for plugin and config packages and ensure they pass.
+5. Run `pnpm build` and ensure it passes.
+6. Update `CHANGELOG.md` under `[Unreleased]`.
+7. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
+8. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.

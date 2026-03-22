@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-non-null-assertion.ts",
+  "module": {
+    "name": "no-non-null-assertion",
+    "description": "Disallow non-null assertions using the \"!\" postfix operator.",
+    "exports": ["noNonNullAssertion"]
+  },
+  "specifications": [
+    {
+      "feature": "Safe null-safety patterns",
+      "scenarios": [
+        {
+          "name": "should allow optional chaining as an alternative to non-null assertion",
+          "given": "a member access using optional chaining obj?.prop",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow nullish coalescing as a safe fallback",
+          "given": "an expression value ?? defaultValue",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Non-null assertion operator",
+      "scenarios": [
+        {
+          "name": "should report a non-null assertion on a member expression",
+          "given": "an expression obj!.property",
+          "when": "the rule evaluates the TSNonNullExpression",
+          "then": "a noNonNullAssertion violation is reported"
+        },
+        {
+          "name": "should report a non-null assertion on a call expression result",
+          "given": "an expression getItem()!.name",
+          "when": "the rule evaluates the TSNonNullExpression",
+          "then": "a noNonNullAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

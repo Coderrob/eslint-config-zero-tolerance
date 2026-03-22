@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-mock-implementation.ts",
+  "module": {
+    "name": "no-mock-implementation",
+    "description": "Prohibit persistent mock implementations; use the Once variants to avoid test bleeds.",
+    "exports": ["noMockImplementation"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted mock setup calls",
+      "scenarios": [
+        {
+          "name": "should allow mockImplementationOnce",
+          "given": "a test that calls jest.fn().mockImplementationOnce(fn)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow mockReturnValueOnce",
+          "given": "a test that calls jest.fn().mockReturnValueOnce(value)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow mockResolvedValueOnce",
+          "given": "a test that calls jest.fn().mockResolvedValueOnce(value)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow mockRejectedValueOnce",
+          "given": "a test that calls jest.fn().mockRejectedValueOnce(error)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Persistent mock implementation calls",
+      "scenarios": [
+        {
+          "name": "should report mockImplementation (non-Once variant)",
+          "given": "a test that calls jest.fn().mockImplementation(fn)",
+          "when": "the rule evaluates the call",
+          "then": "a noMockImplementation violation is reported"
+        },
+        {
+          "name": "should report mockReturnValue (non-Once variant)",
+          "given": "a test that calls jest.fn().mockReturnValue(value)",
+          "when": "the rule evaluates the call",
+          "then": "a noMockImplementation violation is reported"
+        },
+        {
+          "name": "should report mockResolvedValue (non-Once variant)",
+          "given": "a test that calls jest.fn().mockResolvedValue(value)",
+          "when": "the rule evaluates the call",
+          "then": "a noMockImplementation violation is reported"
+        },
+        {
+          "name": "should report mockRejectedValue (non-Once variant)",
+          "given": "a test that calls jest.fn().mockRejectedValue(error)",
+          "when": "the rule evaluates the call",
+          "then": "a noMockImplementation violation is reported"
+        }
+      ]
+    }
+  ]
+}

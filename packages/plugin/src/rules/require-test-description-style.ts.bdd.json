@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-test-description-style.ts",
+  "module": {
+    "name": "require-test-description-style",
+    "description": "Enforce that test descriptions start with \"should\".",
+    "exports": ["requireTestDescriptionStyle"]
+  },
+  "specifications": [
+    {
+      "feature": "Correctly prefixed test descriptions",
+      "scenarios": [
+        {
+          "name": "should allow a test description starting with 'should'",
+          "given": "it('should return a value', () => {})",
+          "when": "the rule evaluates the it call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a test block description starting with 'should'",
+          "given": "test('should handle the error case', () => {})",
+          "when": "the rule evaluates the test call",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Test descriptions missing the 'should' prefix",
+      "scenarios": [
+        {
+          "name": "should report an it() description not starting with 'should'",
+          "given": "it('returns the correct value', () => {})",
+          "when": "the rule evaluates the it call",
+          "then": "a requireTestDescriptionStyle violation is reported"
+        },
+        {
+          "name": "should report a test() description not starting with 'should'",
+          "given": "test('handles the error case', () => {})",
+          "when": "the rule evaluates the test call",
+          "then": "a requireTestDescriptionStyle violation is reported"
+        }
+      ]
+    }
+  ]
+}

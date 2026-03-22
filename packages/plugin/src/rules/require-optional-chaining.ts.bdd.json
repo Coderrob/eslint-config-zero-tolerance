@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-optional-chaining.ts",
+  "module": {
+    "name": "require-optional-chaining",
+    "description": "Require optional chaining instead of repeated logical guard access.",
+    "exports": ["requireOptionalChaining"]
+  },
+  "specifications": [
+    {
+      "feature": "Optional chaining usage",
+      "scenarios": [
+        {
+          "name": "should allow optional chaining for nullable member access",
+          "given": "const name = user?.profile?.name",
+          "when": "the rule evaluates the member expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a simple non-guarded property access when nullability is not involved",
+          "given": "const x = obj.prop",
+          "when": "the rule evaluates the member expression",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Repeated logical null guard chains",
+      "scenarios": [
+        {
+          "name": "should report a && a.b style guard access",
+          "given": "const name = user && user.profile && user.profile.name",
+          "when": "the rule evaluates the logical expression",
+          "then": "a requireOptionalChaining violation is reported"
+        },
+        {
+          "name": "should report a ternary null-check that can be replaced with optional chaining",
+          "given": "const name = user !== null ? user.name : undefined",
+          "when": "the rule evaluates the conditional expression",
+          "then": "a requireOptionalChaining violation is reported"
+        }
+      ]
+    }
+  ]
+}

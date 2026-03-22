@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-identical-expressions.ts",
+  "module": {
+    "name": "no-identical-expressions",
+    "description": "Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764).",
+    "exports": ["noIdenticalExpressions"]
+  },
+  "specifications": [
+    {
+      "feature": "Binary expressions with distinct operands",
+      "scenarios": [
+        {
+          "name": "should allow a binary expression with different left and right operands",
+          "given": "the expression a === b",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a logical expression with different operands",
+          "given": "the expression a && b",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Identical operands on both sides",
+      "scenarios": [
+        {
+          "name": "should report a binary expression where both operands are identical",
+          "given": "the expression a === a",
+          "when": "the rule evaluates the binary expression",
+          "then": "a noIdenticalExpressions violation is reported"
+        },
+        {
+          "name": "should report a logical expression where both operands are identical",
+          "given": "the expression a && a",
+          "when": "the rule evaluates the logical expression",
+          "then": "a noIdenticalExpressions violation is reported"
+        }
+      ]
+    }
+  ]
+}

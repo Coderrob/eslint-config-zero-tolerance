@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rule-factory.ts",
+  "module": {
+    "name": "rule-factory",
+    "description": "Shared ESLint RuleCreator factory used by all plugin rules to produce consistently documented rule instances.",
+    "exports": ["createRule"]
+  },
+  "specifications": [
+    {
+      "feature": "createRule",
+      "scenarios": [
+        {
+          "name": "should return a callable rule creator",
+          "given": "the rule-factory module is imported",
+          "when": "createRule is called with a rule definition object",
+          "then": "returns a fully constructed ESLint rule object"
+        },
+        {
+          "name": "should embed a documentation URL derived from the rule name",
+          "given": "a rule is created with name 'my-rule'",
+          "when": "the rule's meta.docs.url is read",
+          "then": "equals the RULE_CREATOR_URL concatenated with 'my-rule'"
+        }
+      ]
+    }
+  ]
+}

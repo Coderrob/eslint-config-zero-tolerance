@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-await-in-loop.ts",
+  "module": {
+    "name": "no-await-in-loop",
+    "description": "Disallow await expressions inside loops; use Promise.all() for parallel execution.",
+    "exports": ["noAwaitInLoop"]
+  },
+  "specifications": [
+    {
+      "feature": "Await outside loops",
+      "scenarios": [
+        {
+          "name": "should allow await at the top level of an async function",
+          "given": "an await expression that is not inside any loop",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Promise.all() inside a loop",
+          "given": "a for..of loop that awaits Promise.all()",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Await inside loop constructs",
+      "scenarios": [
+        {
+          "name": "should report an await expression inside a for loop",
+          "given": "an await expression nested inside a for() loop body",
+          "when": "the rule evaluates the code",
+          "then": "a noAwaitInLoop violation is reported"
+        },
+        {
+          "name": "should report an await expression inside a for..of loop",
+          "given": "an await expression nested inside a for..of loop body",
+          "when": "the rule evaluates the code",
+          "then": "a noAwaitInLoop violation is reported"
+        },
+        {
+          "name": "should report an await expression inside a while loop",
+          "given": "an await expression nested inside a while loop body",
+          "when": "the rule evaluates the code",
+          "then": "a noAwaitInLoop violation is reported"
+        }
+      ]
+    }
+  ]
+}

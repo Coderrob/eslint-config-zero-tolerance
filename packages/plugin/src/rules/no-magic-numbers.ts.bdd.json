@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-magic-numbers.ts",
+  "module": {
+    "name": "no-magic-numbers",
+    "description": "Disallow magic numbers; use named constants instead of raw numeric literals.",
+    "exports": ["noMagicNumbers"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted numeric literals",
+      "scenarios": [
+        {
+          "name": "should allow the numeric literal 0 as a common base case",
+          "given": "a comparison arr.length > 0",
+          "when": "the rule evaluates the literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow -1 as the sentinel not-found value",
+          "given": "a comparison result === -1",
+          "when": "the rule evaluates the literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow numeric literals used as enum initializers",
+          "given": "an enum member declared as Foo = 42",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Magic number literals",
+      "scenarios": [
+        {
+          "name": "should report an unexplained numeric literal in an expression",
+          "given": "a binary expression using the literal 86400",
+          "when": "the rule evaluates the literal",
+          "then": "a noMagicNumbers violation is reported"
+        },
+        {
+          "name": "should report a magic number used as a function argument",
+          "given": "a call expression setTimeout(fn, 3000)",
+          "when": "the rule evaluates the argument",
+          "then": "a noMagicNumbers violation is reported"
+        }
+      ]
+    }
+  ]
+}

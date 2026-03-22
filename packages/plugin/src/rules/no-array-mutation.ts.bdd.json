@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-array-mutation.ts",
+  "module": {
+    "name": "no-array-mutation",
+    "description": "Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted.",
+    "exports": ["noArrayMutation"]
+  },
+  "specifications": [
+    {
+      "feature": "Non-mutating array operations",
+      "scenarios": [
+        {
+          "name": "should allow non-mutating array methods such as map, filter, and slice",
+          "given": "a call to array.map() inside any function",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow spread-based array construction",
+          "given": "a spread expression [...arr, newItem]",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Mutating array method calls",
+      "scenarios": [
+        {
+          "name": "should report a call to Array.push()",
+          "given": "a call expression arr.push(value)",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        },
+        {
+          "name": "should report a call to Array.pop()",
+          "given": "a call expression arr.pop()",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        },
+        {
+          "name": "should report a call to Array.splice()",
+          "given": "a call expression arr.splice(0, 1)",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        },
+        {
+          "name": "should report a call to Array.sort()",
+          "given": "a call expression arr.sort(compareFn)",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        },
+        {
+          "name": "should report a call to Array.reverse()",
+          "given": "a call expression arr.reverse()",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        },
+        {
+          "name": "should report a call to Array.fill()",
+          "given": "a call expression arr.fill(0)",
+          "when": "the rule evaluates the call",
+          "then": "a noArrayMutation violation is reported"
+        }
+      ]
+    }
+  ]
+}

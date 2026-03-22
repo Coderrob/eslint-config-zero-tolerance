@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-re-export.ts",
+  "module": {
+    "name": "no-re-export",
+    "description": "Disallow re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction.",
+    "exports": ["noReExport"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted re-exports",
+      "scenarios": [
+        {
+          "name": "should allow re-exports in a barrel index file",
+          "given": "export { foo } from './foo' inside an index.ts barrel file",
+          "when": "the rule evaluates the export declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow re-exports from a same-level sibling module in a non-barrel file",
+          "given": "export { foo } from './foo' in a regular source file",
+          "when": "the rule evaluates the export declaration",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Forbidden re-exports from parent directories",
+      "scenarios": [
+        {
+          "name": "should report a re-export from a parent module in a non-barrel file",
+          "given": "export { bar } from '../bar' in a non-index source file",
+          "when": "the rule evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        }
+      ]
+    }
+  ]
+}

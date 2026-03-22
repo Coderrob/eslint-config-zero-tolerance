@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/sort-imports.ts",
+  "module": {
+    "name": "sort-imports",
+    "description": "Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group.",
+    "exports": ["sortImports"]
+  },
+  "specifications": [
+    {
+      "feature": "Correctly grouped and sorted imports",
+      "scenarios": [
+        {
+          "name": "should allow imports ordered side-effect, then builtin, then external, then local",
+          "given": "a module with 'reflect-metadata' then 'node:path' then 'lodash' then './local' imports",
+          "when": "the rule evaluates the import declarations",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow alphabetically sorted imports within the same group",
+          "given": "two external imports 'axios' then 'lodash' in the same group",
+          "when": "the rule evaluates the import declarations",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Imports in the wrong group order",
+      "scenarios": [
+        {
+          "name": "should report an external import placed before a builtin import",
+          "given": "import 'lodash' appears before import 'node:path' in the source",
+          "when": "the rule evaluates the import declarations",
+          "then": "a sortImports violation is reported"
+        },
+        {
+          "name": "should report imports within the same group that are not alphabetically sorted",
+          "given": "import 'lodash' appears before import 'axios' in the external group",
+          "when": "the rule evaluates the import declarations",
+          "then": "a sortImports violation is reported"
+        },
+        {
+          "name": "should report a local import placed before an external import",
+          "given": "import './local' appears before import 'lodash' in the source",
+          "when": "the rule evaluates the import declarations",
+          "then": "a sortImports violation is reported"
+        }
+      ]
+    }
+  ]
+}

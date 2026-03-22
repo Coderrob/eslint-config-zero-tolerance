@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-readonly-props.ts",
+  "module": {
+    "name": "require-readonly-props",
+    "description": "Require readonly typing for JSX component props.",
+    "exports": ["requireReadonlyProps"]
+  },
+  "specifications": [
+    {
+      "feature": "Readonly JSX props",
+      "scenarios": [
+        {
+          "name": "should allow a props interface where all properties are readonly",
+          "given": "interface IProps { readonly name: string; readonly age: number }",
+          "when": "the rule evaluates the props interface used by a JSX component",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a non-JSX interface without readonly requirements",
+          "given": "interface IConfig { timeout: number } used with no JSX component",
+          "when": "the rule evaluates the interface",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Mutable JSX props",
+      "scenarios": [
+        {
+          "name": "should report a props interface property missing the readonly modifier",
+          "given": "interface IProps { name: string } passed to a React component",
+          "when": "the rule evaluates the props interface",
+          "then": "a requireReadonlyProps violation is reported on the mutable property"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-nullish-coalescing.ts",
+  "module": {
+    "name": "prefer-nullish-coalescing",
+    "description": "Prefer nullish coalescing instead of a nullish guard ternary.",
+    "exports": ["preferNullishCoalescing"]
+  },
+  "specifications": [
+    {
+      "feature": "Nullish coalescing usage",
+      "scenarios": [
+        {
+          "name": "should allow explicit nullish coalescing operator",
+          "given": "const result = value ?? defaultValue",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Nullish guard ternary patterns",
+      "scenarios": [
+        {
+          "name": "should report a null-check ternary that can be replaced with ??",
+          "given": "const result = value !== null ? value : defaultValue",
+          "when": "the rule evaluates the conditional expression",
+          "then": "a preferNullishCoalescing violation is reported"
+        },
+        {
+          "name": "should report an undefined-check ternary that can be replaced with ??",
+          "given": "const result = value !== undefined ? value : defaultValue",
+          "when": "the rule evaluates the conditional expression",
+          "then": "a preferNullishCoalescing violation is reported"
+        },
+        {
+          "name": "should report a nullish guard using == null that can be replaced with ??",
+          "given": "const result = value == null ? defaultValue : value",
+          "when": "the rule evaluates the conditional expression",
+          "then": "a preferNullishCoalescing violation is reported"
+        }
+      ]
+    }
+  ]
+}
