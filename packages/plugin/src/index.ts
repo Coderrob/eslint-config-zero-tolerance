@@ -60,6 +60,7 @@ import preferReadonlyParameters from './rules/prefer-readonly-parameters';
 import preferResultReturn from './rules/prefer-result-return';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
 import preferStringRaw from './rules/prefer-string-raw';
+import requireBddSpec from './rules/require-bdd-spec';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
 import requireOptionalChaining from './rules/require-optional-chaining';
@@ -124,6 +125,7 @@ const rules: Record<string, unknown> = {
   'prefer-shortcut-return': preferShortcutReturn,
   'prefer-string-raw': preferStringRaw,
   'require-interface-prefix': requireInterfacePrefix,
+  'require-bdd-spec': requireBddSpec,
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,

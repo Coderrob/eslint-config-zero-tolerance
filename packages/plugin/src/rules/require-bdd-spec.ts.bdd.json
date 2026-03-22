@@ -1,0 +1,201 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-bdd-spec.ts",
+  "module": {
+    "name": "require-bdd-spec",
+    "description": "ESLint rule that enforces the presence and semantic validity of sibling .ts.bdd.json BDD specification files for every TypeScript source file.",
+    "exports": ["RequireBddSpecMessageId", "requireBddSpec"]
+  },
+  "specifications": [
+    {
+      "feature": "Test file skipping",
+      "scenarios": [
+        {
+          "name": "should skip files ending with .test.ts",
+          "given": "a TypeScript file whose name ends with .test.ts",
+          "when": "the rule's Program visitor is invoked",
+          "then": "no ESLint report is made regardless of BDD spec presence"
+        }
+      ]
+    },
+    {
+      "feature": "Missing BDD spec detection",
+      "scenarios": [
+        {
+          "name": "should report missingBddSpec when no sibling .ts.bdd.json file exists",
+          "given": "a non-test TypeScript source file with no sibling .ts.bdd.json",
+          "when": "the rule's Program visitor is invoked",
+          "then": "a missingBddSpec violation is reported with the expected spec path"
+        }
+      ]
+    },
+    {
+      "feature": "JSON parse error handling",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when the BDD spec file contains malformed JSON",
+          "given": "a non-test TypeScript source file with a sibling .ts.bdd.json that is not valid JSON",
+          "when": "the rule's Program visitor is invoked",
+          "then": "an invalidBddSpec violation is reported containing the parse error message"
+        }
+      ]
+    },
+    {
+      "feature": "Top-level field validation",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when required top-level fields are absent",
+          "given": "a BDD spec file missing one or more of $schema, schemaVersion, sourceFile, module, specifications",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation lists all missing required field names"
+        },
+        {
+          "name": "should report invalidBddSpec when $schema is not a string",
+          "given": "a BDD spec file where $schema is not a string value",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation reports the type mismatch for $schema"
+        },
+        {
+          "name": "should report invalidBddSpec when schemaVersion does not equal 1.0.0",
+          "given": "a BDD spec file where schemaVersion is not exactly the string \"1.0.0\"",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation reports the incorrect schemaVersion value"
+        },
+        {
+          "name": "should report invalidBddSpec when sourceFile is not a string",
+          "given": "a BDD spec file where sourceFile is not a string value",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation reports the type mismatch for sourceFile"
+        },
+        {
+          "name": "should report invalidBddSpec when module is not a plain object",
+          "given": "a BDD spec file where module is an array or primitive",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation reports that module must be an object"
+        },
+        {
+          "name": "should report invalidBddSpec when specifications is not an array",
+          "given": "a BDD spec file where specifications is a non-array value",
+          "when": "the rule validates the parsed spec object",
+          "then": "an invalidBddSpec violation reports that specifications must be an array"
+        }
+      ]
+    },
+    {
+      "feature": "sourceFile field validation",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when sourceFile points to a non-existent file",
+          "given": "a BDD spec where sourceFile contains a path to a file that does not exist on disk",
+          "when": "the rule validates the sourceFile field",
+          "then": "an invalidBddSpec violation reports the non-existent path"
+        }
+      ]
+    },
+    {
+      "feature": "Module object validation",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when module.name is empty or not a string",
+          "given": "a BDD spec where module.name is absent, empty, or not a string",
+          "when": "the rule validates the module object",
+          "then": "an invalidBddSpec violation reports that module.name must be a non-empty string"
+        },
+        {
+          "name": "should report invalidBddSpec when module.description is empty or not a string",
+          "given": "a BDD spec where module.description is absent, empty, or not a string",
+          "when": "the rule validates the module object",
+          "then": "an invalidBddSpec violation reports that module.description must be a non-empty string"
+        },
+        {
+          "name": "should report invalidBddSpec when module.exports is not an array",
+          "given": "a BDD spec where module.exports is a string, number, or object instead of an array",
+          "when": "the rule validates the module object",
+          "then": "an invalidBddSpec violation reports that module.exports must be an array"
+        },
+        {
+          "name": "should report invalidBddSpec when a module.exports entry is not a non-empty string",
+          "given": "a BDD spec where module.exports contains a non-string or empty-string entry",
+          "when": "the rule validates the module object",
+          "then": "an invalidBddSpec violation identifies the offending index"
+        }
+      ]
+    },
+    {
+      "feature": "Specifications array validation",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when specifications array is empty",
+          "given": "a BDD spec with a specifications array that has zero entries",
+          "when": "the rule validates the specifications field",
+          "then": "an invalidBddSpec violation reports that specifications must not be empty"
+        },
+        {
+          "name": "should report invalidBddSpec when a feature entry is not an object",
+          "given": "a BDD spec where a specifications entry is null, a string, or a primitive",
+          "when": "the rule validates each feature",
+          "then": "an invalidBddSpec violation identifies the invalid feature entry"
+        },
+        {
+          "name": "should report invalidBddSpec when a feature is missing the feature name",
+          "given": "a BDD spec where a feature object has no \"feature\" string property",
+          "when": "the rule validates the feature object",
+          "then": "an invalidBddSpec violation reports the missing feature name"
+        },
+        {
+          "name": "should report invalidBddSpec when a feature has an empty scenarios array",
+          "given": "a BDD spec where a feature's scenarios array is present but empty",
+          "when": "the rule validates the feature object",
+          "then": "an invalidBddSpec violation reports that scenarios must not be empty"
+        },
+        {
+          "name": "should report invalidBddSpec when a scenario is missing a required field",
+          "given": "a BDD spec where a scenario object lacks name, given, when, or then",
+          "when": "the rule validates each scenario",
+          "then": "an invalidBddSpec violation identifies the missing field and its location"
+        },
+        {
+          "name": "should report invalidBddSpec when a scenario name does not start with should",
+          "given": "a BDD spec where a scenario's name property does not begin with the word \"should\"",
+          "when": "the rule validates the scenario name",
+          "then": "an invalidBddSpec violation reports the non-conforming scenario name"
+        }
+      ]
+    },
+    {
+      "feature": "Export parity validation",
+      "scenarios": [
+        {
+          "name": "should report invalidBddSpec when module.exports lists a name not exported by the source",
+          "given": "a BDD spec whose module.exports contains an identifier that is not a named export of the companion TypeScript source",
+          "when": "the rule compares the declared exports to the actual source exports",
+          "then": "an invalidBddSpec violation names the undeclared export"
+        },
+        {
+          "name": "should report invalidBddSpec when the source exports a name absent from module.exports",
+          "given": "a TypeScript source file that exports an identifier not listed in the BDD spec's module.exports",
+          "when": "the rule compares the declared exports to the actual source exports",
+          "then": "an invalidBddSpec violation names the missing export"
+        },
+        {
+          "name": "should pass when module.exports exactly matches all named exports of the source",
+          "given": "a BDD spec whose module.exports is exactly the set of named exports in the TypeScript source",
+          "when": "the rule compares the declared exports to the actual source exports",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Aggregated error reporting",
+      "scenarios": [
+        {
+          "name": "should aggregate all validation errors into a single invalidBddSpec report",
+          "given": "a BDD spec file that has multiple distinct validation failures",
+          "when": "the rule validates the spec",
+          "then": "a single invalidBddSpec violation is reported containing all error messages joined by newlines"
+        }
+      ]
+    }
+  ]
+}

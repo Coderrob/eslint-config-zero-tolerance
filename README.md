@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.72%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.75%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
 
@@ -128,11 +128,12 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 
 ### Documentation
 
-| Rule                                                                   | Description                                                 |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)     | Require JSDoc comments on all functions (except test files) |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md) | Require optional chaining instead of repeated guard access  |
-| [`require-readonly-props`](docs/rules/require-readonly-props.md)       | Require JSX component props to be typed as readonly         |
+| Rule                                                                   | Description                                                                         |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)     | Require JSDoc comments on all functions (except test files)                         |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md) | Require optional chaining instead of repeated guard access                          |
+| [`require-readonly-props`](docs/rules/require-readonly-props.md)       | Require JSX component props to be typed as readonly                                 |
 
 ### Testing
 
@@ -154,28 +155,28 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 
 ### Code Quality
 
-| Rule                                                                   | Description                                                           |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| [`max-function-lines`](docs/rules/max-function-lines.md)               | Enforce a maximum number of lines per function body                   |
-| [`max-params`](docs/rules/max-params.md)                               | Enforce a maximum number of function parameters                       |
-| [`no-array-mutation`](docs/rules/no-array-mutation.md)                 | Disallow mutating array methods                                       |
-| [`no-date-now`](docs/rules/no-date-now.md)                             | Disallow `Date.now()` and no-arg `new Date()` usage                  |
-| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)                   | Disallow magic numbers; use named constants instead                   |
-| [`no-magic-strings`](docs/rules/no-magic-strings.md)                   | Disallow magic strings in comparisons and switch cases                |
-| [`no-object-mutation`](docs/rules/no-object-mutation.md)               | Disallow direct object-property mutation                              |
-| [`sort-imports`](docs/rules/sort-imports.md)                           | Require import declarations to be grouped and alphabetized            |
-| [`sort-functions`](docs/rules/sort-functions.md)                       | Require top-level function declarations to be sorted alphabetically   |
-| [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md) | Prefer nullish coalescing instead of repeated nullish guard ternaries |
-| [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters         |
-| [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                 | Prefer `String.raw` for strings containing escaped backslashes        |
+| Rule                                                                     | Description                                                           |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [`max-function-lines`](docs/rules/max-function-lines.md)                 | Enforce a maximum number of lines per function body                   |
+| [`max-params`](docs/rules/max-params.md)                                 | Enforce a maximum number of function parameters                       |
+| [`no-array-mutation`](docs/rules/no-array-mutation.md)                   | Disallow mutating array methods                                       |
+| [`no-date-now`](docs/rules/no-date-now.md)                               | Disallow `Date.now()` and no-arg `new Date()` usage                   |
+| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)                     | Disallow magic numbers; use named constants instead                   |
+| [`no-magic-strings`](docs/rules/no-magic-strings.md)                     | Disallow magic strings in comparisons and switch cases                |
+| [`no-object-mutation`](docs/rules/no-object-mutation.md)                 | Disallow direct object-property mutation                              |
+| [`sort-imports`](docs/rules/sort-imports.md)                             | Require import declarations to be grouped and alphabetized            |
+| [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level function declarations to be sorted alphabetically   |
+| [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)   | Prefer nullish coalescing instead of repeated nullish guard ternaries |
+| [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters           |
+| [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                   | Prefer `String.raw` for strings containing escaped backslashes        |
 
 ### Error Handling
 
-| Rule                                                 | Description                                                                          |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`no-empty-catch`](docs/rules/no-empty-catch.md)     | Disallow empty catch blocks that silently swallow errors                             |
-| [`no-throw-literal`](docs/rules/no-throw-literal.md) | Disallow throwing literals, objects, or templates; always throw a new Error instance |
-| [`prefer-result-return`](docs/rules/prefer-result-return.md) | Prefer returning Result-style values instead of throwing                 |
+| Rule                                                         | Description                                                                          |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| [`no-empty-catch`](docs/rules/no-empty-catch.md)             | Disallow empty catch blocks that silently swallow errors                             |
+| [`no-throw-literal`](docs/rules/no-throw-literal.md)         | Disallow throwing literals, objects, or templates; always throw a new Error instance |
+| [`prefer-result-return`](docs/rules/prefer-result-return.md) | Prefer returning Result-style values instead of throwing                             |
 
 ### Imports
 
@@ -192,7 +193,7 @@ All core rules are included in the `recommended` (`warn`) and `strict` (`error`)
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | [`no-identical-expressions`](docs/rules/no-identical-expressions.md) | Disallow identical expressions on both sides of a binary or logical operator |
 | [`no-identical-branches`](docs/rules/no-identical-branches.md)       | Disallow identical branches in if/else and ternary conditionals              |
-| [`no-boolean-return-trap`](docs/rules/no-boolean-return-trap.md)     | Disallow ambiguous boolean-return APIs outside predicate naming               |
+| [`no-boolean-return-trap`](docs/rules/no-boolean-return-trap.md)     | Disallow ambiguous boolean-return APIs outside predicate naming              |
 | [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)         | Disallow redundant comparisons to boolean literals                           |
 | [`no-for-in`](docs/rules/no-for-in.md)                               | Disallow `for..in` loops                                                     |
 | [`no-labels`](docs/rules/no-labels.md)                               | Disallow labeled statements                                                  |

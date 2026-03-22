@@ -34,12 +34,15 @@ type NoBooleanReturnTrapContext = Readonly<TSESLint.RuleContext<'noBooleanReturn
  */
 function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNode): void {
   const functionName = resolveFunctionName(node);
-  const returnTypeNode = node.returnType?.typeAnnotation;
-  if (!isTrapCandidate(functionName, returnTypeNode)) {
+  const returnTypeAnnotation = node.returnType;
+  if (
+    returnTypeAnnotation === undefined ||
+    !isTrapCandidate(functionName, returnTypeAnnotation.typeAnnotation)
+  ) {
     return;
   }
   context.report({
-    node: node.returnType,
+    node: returnTypeAnnotation,
     messageId: 'noBooleanReturnTrap',
     data: { name: functionName },
   });
@@ -51,7 +54,9 @@ function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNo
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoBooleanReturnTrapListeners(context: NoBooleanReturnTrapContext): TSESLint.RuleListener {
+function createNoBooleanReturnTrapListeners(
+  context: NoBooleanReturnTrapContext,
+): TSESLint.RuleListener {
   return {
     ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
     FunctionDeclaration: checkFunctionNode.bind(undefined, context),
@@ -129,7 +134,10 @@ function isPromiseTypeName(node: TSESTree.EntityName): boolean {
  * @param returnTypeNode - Return type node, when present.
  * @returns True when this is a boolean-return trap.
  */
-function isTrapCandidate(functionName: string, returnTypeNode: TSESTree.TypeNode | undefined): boolean {
+function isTrapCandidate(
+  functionName: string,
+  returnTypeNode: TSESTree.TypeNode | undefined,
+): boolean {
   if (
     returnTypeNode === undefined ||
     functionName === ANONYMOUS_FUNCTION_NAME ||
