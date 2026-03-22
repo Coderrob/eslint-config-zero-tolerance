@@ -18,6 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
+const BLOCK_COMMENT_TYPE = 'Block';
 const CONST_VARIABLE_KIND = 'const';
 
 type SortableFunctionNode = TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator;
@@ -25,8 +26,33 @@ type SortableFunction = Readonly<{
   name: string;
   node: SortableFunctionNode;
 }>;
+type SortableBlock = Readonly<{
+  end: number;
+  start: number;
+  text: string;
+}>;
 type SortFunctionsContext = Readonly<TSESLint.RuleContext<'unsortedFunction', []>>;
 type SortableFunctions = SortableFunction[];
+
+/**
+ * Builds a sortable block from a declaration and its owned comments.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Declaration node.
+ * @param leadingComments - Owned leading comments.
+ * @param trailingComments - Owned trailing comments.
+ * @returns Sortable text block.
+ */
+function buildSortableBlock(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+  leadingComments: ReadonlyArray<TSESTree.Comment>,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+): SortableBlock {
+  const start = getSortableBlockStart(node, leadingComments);
+  const end = getSortableBlockEnd(node, trailingComments);
+  return { start, end, text: sourceCode.text.slice(start, end) };
+}
 
 /**
  * Checks the collected functions for alphabetical ordering.
@@ -68,6 +94,34 @@ function collectFunctionDeclarators(
 }
 
 /**
+ * Collects owned leading comments from a leading-comment list.
+ *
+ * @param comments - Candidate leading comments.
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node that may own the comments.
+ * @returns Leading comments that should move with the declaration.
+ */
+function collectOwnedLeadingComments(
+  comments: ReadonlyArray<TSESTree.Comment>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+): ReadonlyArray<TSESTree.Comment> {
+  const ownedComments: TSESTree.Comment[] = [];
+  let nextStart = node.range[0];
+  let nextStartLine = node.loc.start.line;
+  for (let index = comments.length - 1; index >= 0; index -= 1) {
+    const comment = comments[index];
+    if (!isAttachedLeadingComment(sourceCode, comment, nextStart, nextStartLine)) {
+      break;
+    }
+    ownedComments.unshift(comment);
+    nextStart = comment.range[0];
+    nextStartLine = comment.loc.start.line;
+  }
+  return ownedComments;
+}
+
+/**
  * Creates listeners for sort-functions rule execution.
  *
  * @param context - ESLint rule execution context.
@@ -96,12 +150,15 @@ function createSwapFix(
   previousFunction: SortableFunction,
   currentFunction: SortableFunction,
 ): TSESLint.ReportFixFunction | null {
-  const previousNode = getSwappableNode(previousFunction.node);
-  const currentNode = getSwappableNode(currentFunction.node);
-  if (previousNode === null || currentNode === null) {
+  const sortableBlocks = getSortableBlocks(sourceCode, previousFunction, currentFunction);
+  if (sortableBlocks === null) {
     return null;
   }
-  return swapSortableFunctionNodes.bind(undefined, sourceCode, previousNode, currentNode);
+  const [previousBlock, currentBlock] = sortableBlocks;
+  if (hasCommentBetweenBlocks(sourceCode, previousBlock, currentBlock)) {
+    return null;
+  }
+  return swapSortableFunctionBlocks.bind(undefined, sourceCode, previousBlock, currentBlock);
 }
 
 /**
@@ -115,6 +172,118 @@ function getFunctionDeclaratorName(declaration: TSESTree.VariableDeclarator): st
     return null;
   }
   return declaration.id.name;
+}
+
+/**
+ * Returns owned leading comments for a declaration block.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node to inspect.
+ * @returns Leading comments that should move with the declaration.
+ */
+function getOwnedLeadingComments(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+): ReadonlyArray<TSESTree.Comment> {
+  return collectOwnedLeadingComments(sourceCode.getCommentsBefore(node), sourceCode, node);
+}
+
+/**
+ * Returns owned trailing comments for a declaration block.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node to inspect.
+ * @returns Same-line trailing comments that should move with the declaration.
+ */
+function getOwnedTrailingComments(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+): ReadonlyArray<TSESTree.Comment> {
+  const trailingComment = sourceCode.getCommentsAfter(node).at(0);
+  if (!isOwnedTrailingComment(sourceCode, node, trailingComment)) {
+    return [];
+  }
+  return [trailingComment];
+}
+
+/**
+ * Returns the sortable text block for a swappable declaration, including owned comments.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Swappable declaration node.
+ * @returns Sortable text block, or null when comment ownership is unsafe.
+ */
+function getSortableBlock(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+): SortableBlock | null {
+  const leadingComments = getOwnedLeadingComments(sourceCode, node);
+  const trailingComments = getOwnedTrailingComments(sourceCode, node);
+  if (hasUnsafeOwnedComments(leadingComments, trailingComments)) {
+    return null;
+  }
+  return buildSortableBlock(sourceCode, node, leadingComments, trailingComments);
+}
+
+/**
+ * Returns the end offset for a sortable declaration block.
+ *
+ * @param node - Declaration node.
+ * @param trailingComments - Owned trailing comments.
+ * @returns End offset for the block.
+ */
+function getSortableBlockEnd(
+  node: TSESTree.Node,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+): number {
+  return trailingComments.at(-1)?.range[1] ?? node.range[1];
+}
+
+/**
+ * Returns swappable comment-aware blocks for two sortable functions.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param previousFunction - Previous sortable function.
+ * @param currentFunction - Current sortable function.
+ * @returns Pair of sortable blocks, or null when swap ownership is unsafe.
+ */
+function getSortableBlocks(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  previousFunction: SortableFunction,
+  currentFunction: SortableFunction,
+): readonly [SortableBlock, SortableBlock] | null {
+  const previousBlock = getSwappableBlock(sourceCode, previousFunction);
+  const currentBlock = getSwappableBlock(sourceCode, currentFunction);
+  return previousBlock === null || currentBlock === null ? null : [previousBlock, currentBlock];
+}
+
+/**
+ * Returns the start offset for a sortable declaration block.
+ *
+ * @param node - Declaration node.
+ * @param leadingComments - Owned leading comments.
+ * @returns Start offset for the block.
+ */
+function getSortableBlockStart(
+  node: TSESTree.Node,
+  leadingComments: ReadonlyArray<TSESTree.Comment>,
+): number {
+  return leadingComments.at(0)?.range[0] ?? node.range[0];
+}
+
+/**
+ * Returns the swappable text block for one sortable function.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param sortableFunction - Sortable function metadata.
+ * @returns Sortable block, or null when the function cannot be swapped safely.
+ */
+function getSwappableBlock(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  sortableFunction: SortableFunction,
+): SortableBlock | null {
+  const swappableNode = getSwappableNode(sortableFunction.node);
+  return swappableNode === null ? null : getSortableBlock(sourceCode, swappableNode);
 }
 
 /**
@@ -159,6 +328,111 @@ function getVariableDeclaratorStatementNode(
 }
 
 /**
+ * Returns true when non-whitespace text between declaration blocks contains comments.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param previousBlock - Earlier sortable block.
+ * @param currentBlock - Later sortable block.
+ * @returns True when inter-block text contains comments.
+ */
+function hasCommentBetweenBlocks(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  previousBlock: SortableBlock,
+  currentBlock: SortableBlock,
+): boolean {
+  const betweenText = sourceCode.text.slice(previousBlock.end, currentBlock.start);
+  return betweenText.includes('//') || betweenText.includes('/*');
+}
+
+/**
+ * Returns true when comment text contains directive-style markers that must not move.
+ *
+ * @param comments - Comments to inspect.
+ * @returns True when any comment likely affects linting or compilation behavior.
+ */
+function hasDirectiveComment(comments: ReadonlyArray<TSESTree.Comment>): boolean {
+  for (const comment of comments) {
+    if (isDirectiveComment(comment)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns true when only indentation appears before a comment on its line.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate comment.
+ * @returns True when the comment starts on its own line.
+ */
+function hasOnlyWhitespaceBeforeComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+): boolean {
+  const lineText = sourceCode.lines[comment.loc.start.line - 1] ?? '';
+  return lineText.slice(0, comment.loc.start.column).trim().length === 0;
+}
+
+/**
+ * Returns true when owned comments make block extraction unsafe.
+ *
+ * @param leadingComments - Owned leading comments.
+ * @param trailingComments - Owned trailing comments.
+ * @returns True when directive comments are present.
+ */
+function hasUnsafeOwnedComments(
+  leadingComments: ReadonlyArray<TSESTree.Comment>,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+): boolean {
+  return hasDirectiveComment(leadingComments) || hasDirectiveComment(trailingComments);
+}
+
+/**
+ * Returns true when a comment is attached to the following node with no blank-line break.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate comment.
+ * @param nextStart - Start offset of the following owned span.
+ * @param nextStartLine - Start line of the following owned span.
+ * @returns True when the comment should move with the following declaration.
+ */
+function isAttachedLeadingComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+  nextStart: number,
+  nextStartLine: number,
+): boolean {
+  return (
+    isOwnLineBlockComment(sourceCode, comment) &&
+    nextStartLine - comment.loc.end.line <= 1 &&
+    sourceCode.text.slice(comment.range[1], nextStart).trim().length === 0
+  );
+}
+
+/**
+ * Returns true when a comment is a block comment token.
+ *
+ * @param comment - Candidate comment.
+ * @returns True when comment.type is Block.
+ */
+function isBlockComment(comment: TSESTree.Comment): boolean {
+  return comment.type === BLOCK_COMMENT_TYPE;
+}
+
+/**
+ * Returns true when a comment likely acts as a directive.
+ *
+ * @param comment - Comment to inspect.
+ * @returns True when comment content should not be moved.
+ */
+function isDirectiveComment(comment: TSESTree.Comment): boolean {
+  return /eslint-(disable|enable)|@ts-(ignore|expect-error|nocheck|check)|istanbul ignore/iu.test(
+    comment.value,
+  );
+}
+
+/**
  * Checks if a variable declarator contains a function expression or arrow function.
  *
  * @param declaration - The variable declarator to check.
@@ -187,6 +461,40 @@ function isFunctionInitializer(init: TSESTree.Expression): boolean {
     init.type === AST_NODE_TYPES.ArrowFunctionExpression ||
     init.type === AST_NODE_TYPES.FunctionExpression
   );
+}
+
+/**
+ * Returns true when a comment is a same-line trailing comment owned by the node.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node that may own the comment.
+ * @param comment - Candidate trailing comment.
+ * @returns True when the comment should move with the node.
+ */
+function isOwnedTrailingComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+  comment: TSESTree.Comment | undefined,
+): comment is TSESTree.Comment {
+  return (
+    comment !== undefined &&
+    comment.loc.start.line === node.loc.end.line &&
+    sourceCode.text.slice(node.range[1], comment.range[0]).trim().length === 0
+  );
+}
+
+/**
+ * Returns true when a comment is a block comment that starts on its own line.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate comment.
+ * @returns True when the comment can be treated as an owned leading block.
+ */
+function isOwnLineBlockComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+): boolean {
+  return isBlockComment(comment) && hasOnlyWhitespaceBeforeComment(sourceCode, comment);
 }
 
 /**
@@ -283,18 +591,16 @@ function reportUnsortedFunction(
  * @param fixer - ESLint fixer.
  * @returns Text-range replacement fix.
  */
-function swapSortableFunctionNodes(
+function swapSortableFunctionBlocks(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  previousNode: TSESTree.Node,
-  currentNode: TSESTree.Node,
+  previousBlock: SortableBlock,
+  currentBlock: SortableBlock,
   fixer: TSESLint.RuleFixer,
 ): TSESLint.RuleFix {
-  const previousText = sourceCode.getText(previousNode);
-  const currentText = sourceCode.getText(currentNode);
-  const betweenText = sourceCode.text.slice(previousNode.range[1], currentNode.range[0]);
+  const betweenText = sourceCode.text.slice(previousBlock.end, currentBlock.start);
   return fixer.replaceTextRange(
-    [previousNode.range[0], currentNode.range[1]],
-    `${currentText}${betweenText}${previousText}`,
+    [previousBlock.start, currentBlock.end],
+    `${currentBlock.text}${betweenText}${previousBlock.text}`,
   );
 }
 

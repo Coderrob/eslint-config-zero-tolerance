@@ -62,7 +62,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-All core rules are included in every preset. The only difference between `recommended` and `strict` is the severity level and the tighter limits for configurable rules.
+Nearly all core rules are included in every preset. `require-bdd-spec` is available as an opt-in rule and is disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
 
 | Rule                             | Recommended    | Strict          |
 | -------------------------------- | -------------- | --------------- |
@@ -111,8 +111,9 @@ All core rules are included in every preset. The only difference between `recomm
 | `no-query-side-effects`          | warn           | error           |
 | `no-re-export`                   | warn           | error           |
 | `require-optional-chaining`      | warn           | error           |
+| `require-bdd-spec`               | off            | off             |
 
-`no-parent-imports` is available but intentionally not enabled by default in presets.
+`no-parent-imports` and `require-bdd-spec` are available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 

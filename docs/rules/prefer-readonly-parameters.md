@@ -7,7 +7,7 @@ Prefer readonly typing for object and array-like function parameters.
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | No           |
+| **Fixable**     | Yes (`--fix`) |
 | **Recommended** | `warn`       |
 | **Strict**      | `error`      |
 
@@ -23,6 +23,10 @@ Function parameters are inputs. Treating object and array parameters as readonly
 function format(user: Readonly<User>): string {
   return user.name;
 }
+
+class Service {
+  constructor(private items: readonly string[]) {}
+}
 ```
 
 ### Incorrect
@@ -31,6 +35,10 @@ function format(user: Readonly<User>): string {
 function format(user: User): string {
   return user.name;
 }
+
+class Service {
+  constructor(private items: string[]) {}
+}
 ```
 
 ## Configuration
@@ -38,3 +46,13 @@ function format(user: User): string {
 ```js
 'zero-tolerance/prefer-readonly-parameters': 'error'
 ```
+
+## Autofix Notes
+
+Autofix can safely:
+
+- wrap mutable type references as `Readonly<T>`
+- rewrite mutable array and tuple annotations to `readonly ...`
+- apply those rewrites to constructor parameter properties as well
+
+Autofix intentionally skips structural rewrites such as mutable inline object type literals.

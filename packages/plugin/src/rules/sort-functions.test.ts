@@ -142,5 +142,32 @@ ruleTester.run('sort-functions', sortFunctions, {
       code: 'const beta = () => {}, alpha = () => {};',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
+    {
+      name: 'should move attached leading comments with the sorted function',
+      code:
+        '/** Beta docs. */\nfunction beta() {}\n\n/** Alpha docs. */\nfunction alpha() {}',
+      output:
+        '/** Alpha docs. */\nfunction alpha() {}\n\n/** Beta docs. */\nfunction beta() {}',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should move same-line trailing comments with the sorted function',
+      code: 'function beta() {} // beta details\nfunction alpha() {}',
+      output: 'function alpha() {}\nfunction beta() {} // beta details',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions with interstitial comments without fix',
+      code: 'function beta() {}\n\n// section break\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions with directive comments without fix',
+      code:
+        '/* istanbul ignore next */\nfunction beta() {}\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
   ],
 });

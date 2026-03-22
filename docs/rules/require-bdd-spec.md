@@ -8,14 +8,16 @@ Enforce that every TypeScript source file has a valid sibling `.ts.bdd.json` BDD
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `off`        |
+| **Strict**      | `off`        |
 
 ## Rationale
 
 Every non-test TypeScript source file in the plugin must be accompanied by a sibling `.ts.bdd.json` file that documents its behaviour in BDD (Given/When/Then) format. This rule validates that the file exists and that its content is semantically valid: required fields are present, types are correct, the `specifications` array is non-empty, all scenario names start with `"should"`, and the `module.exports` list exactly matches the named exports in the source file.
 
 Violations are reported as an aggregated list of errors so all problems are visible in a single ESLint run.
+
+This rule is intentionally **opt-in** and is disabled by default in the built-in `recommended` and `strict` presets. Enable it explicitly for repositories that require BDD spec files.
 
 ## Examples
 

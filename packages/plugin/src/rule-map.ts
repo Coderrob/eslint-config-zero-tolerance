@@ -19,6 +19,7 @@ import { PLUGIN_NAMESPACE, Preset } from './constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
+const OFF_LEVEL = 'off';
 const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 20;
 const MAX_FUNCTION_LINES_STRICT_MAX = 15;
 const MAX_PARAMS_MAX = 4;
@@ -67,7 +68,6 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
-  'require-bdd-spec',
 ];
 
 const MAX_FUNCTION_LINES_RULE = 'max-function-lines';
@@ -191,6 +191,7 @@ const ruleEntries: RuleEntryTuple[] = [
     [WARN_LEVEL, { max: MAX_PARAMS_MAX }],
     [ERROR_LEVEL, { max: MAX_PARAMS_MAX }],
   ),
+  createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 
 export const ruleMap = buildRuleMap();

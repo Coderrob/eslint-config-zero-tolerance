@@ -57,6 +57,30 @@ function createPreferReadonlyParametersListeners(
 }
 
 /**
+ * Creates an autofix for mutable parameter typing when a safe textual rewrite is available.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param param - Function parameter node.
+ * @param fixer - ESLint fixer helper.
+ * @returns Rule fix for the parameter type, or null when no safe rewrite exists.
+ */
+function createReadonlyParameterFix(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  param: TSESTree.Parameter,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix | null {
+  const typeNode = getParameterTypeNode(param);
+  if (typeNode === null) {
+    return null;
+  }
+  const replacementType = getReadonlyReplacementTypeText(sourceCode, typeNode);
+  if (replacementType === null) {
+    return null;
+  }
+  return fixer.replaceText(typeNode, replacementType);
+}
+
+/**
  * Returns parameter name for assignment-pattern shapes.
  *
  * @param param - Assignment-pattern parameter.
@@ -114,6 +138,40 @@ function getParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | nu
     return getAssignmentPatternTypeNode(param);
   }
   return getSimpleAnnotatedParameterTypeNode(param);
+}
+
+/**
+ * Returns readonly-prefixed text for tuple and array types.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Array-like type node.
+ * @returns Readonly replacement text.
+ */
+function getReadonlyArrayLikeTypeText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.TSArrayType | TSESTree.TSTupleType,
+): string {
+  return `${READONLY_OPERATOR} ${sourceCode.getText(node)}`;
+}
+
+/**
+ * Returns replacement text for mutable parameter typing when a safe rewrite exists.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Mutable parameter type node.
+ * @returns Replacement type text, or null when autofix is unsafe.
+ */
+function getReadonlyReplacementTypeText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.TypeNode,
+): string | null {
+  if (node.type === AST_NODE_TYPES.TSArrayType || node.type === AST_NODE_TYPES.TSTupleType) {
+    return getReadonlyArrayLikeTypeText(sourceCode, node);
+  }
+  if (node.type === AST_NODE_TYPES.TSTypeReference) {
+    return `${READONLY_TYPE_NAME}<${sourceCode.getText(node)}>`;
+  }
+  return null;
 }
 
 /**
@@ -279,6 +337,7 @@ function reportIfMutableParameter(
     node: param,
     messageId: 'preferReadonlyParameter',
     data: { name: getParameterName(param) },
+    fix: createReadonlyParameterFix.bind(undefined, context.sourceCode, param),
   });
 }
 
@@ -287,6 +346,7 @@ export const preferReadonlyParameters = createRule({
   name: 'prefer-readonly-parameters',
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description:
         'Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs',

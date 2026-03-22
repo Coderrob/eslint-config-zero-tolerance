@@ -1,6 +1,6 @@
 # require-jsdoc-functions
 
-Require JSDoc documentation comments on all function declarations, function expressions, and arrow functions outside of test files.
+Require JSDoc documentation comments on all function-like constructs outside of test files, including declarations, function expressions, arrow functions, class methods, static methods, class field functions, and object methods.
 
 ## Rule Details
 
@@ -36,6 +36,15 @@ const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
  * Returns a normalized display label.
  */
 export const getLabel = (input: string): string => input.trim();
+
+class DedupeFactory {
+  /**
+   * Creates the dedupe service instance.
+   */
+  static createDedupeService(): DedupeService {
+    return new DedupeService();
+  }
+}
 ```
 
 ### Incorrect
@@ -46,6 +55,12 @@ async function fetchUser(id: string): Promise<IUser> {
 }
 
 const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
+
+class DedupeFactory {
+  static createDedupeService(): DedupeService {
+    return new DedupeService();
+  }
+}
 ```
 
 ## Configuration

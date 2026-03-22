@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.75%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.71%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 9 with Flat Config**
 
@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-All core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `no-parent-imports` remains available as an opt-in rule.
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `no-parent-imports` and `require-bdd-spec` remain available as opt-in rules.
 
 ### Naming Conventions
 

@@ -12,16 +12,16 @@
       "feature": "buildRules",
       "scenarios": [
         {
-          "name": "should return warn-level entries for the Recommended preset",
+          "name": "should return preset-specific entries for the Recommended preset",
           "given": "Preset.Recommended is passed to buildRules",
           "when": "buildRules is called",
-          "then": "returns a rules record where every entry is set to 'warn' severity"
+          "then": "returns a rules record where default preset rules use their configured recommended entries"
         },
         {
-          "name": "should return error-level entries for the Strict preset",
+          "name": "should return preset-specific entries for the Strict preset",
           "given": "Preset.Strict is passed to buildRules",
           "when": "buildRules is called",
-          "then": "returns a rules record where every entry is set to 'error' severity"
+          "then": "returns a rules record where default preset rules use their configured strict entries"
         },
         {
           "name": "should prefix every rule key with the plugin namespace",
@@ -34,6 +34,12 @@
           "given": "buildRules is called with Preset.Recommended",
           "when": "the 'zero-tolerance/max-function-lines' entry is read",
           "then": "returns an array entry with 'warn' and the recommended max-lines option"
+        },
+        {
+          "name": "should keep require-bdd-spec disabled in both built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-bdd-spec' entries are read",
+          "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
         }
       ]
     }
