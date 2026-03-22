@@ -15,7 +15,7 @@ Require top-level function declarations to be sorted alphabetically by name.
 
 Alphabetically ordered top-level functions make a module's API easy to navigate and reduce the chance of duplicate function definitions. The check is case-insensitive and applies to both `function` declarations and `const` variable declarations that initialise arrow functions or function expressions at the top level of the program. Methods, nested functions, and non-const variable declarations are not checked.
 
-Autofix reorders whole declaration blocks when it is safe to do so, including owned leading comments and same-line trailing comments. If directive comments or ambiguous interstitial comments are present, the rule still reports the issue but skips autofix to avoid mangling results.
+Autofix reorders whole declaration blocks when it is safe to do so. It preserves and moves own-line block comments that immediately precede a declaration, as well as same-line trailing comments. Line comments and other ambiguous interstitial comments between declarations are not moved and may cause the rule to report without applying `--fix` to avoid mangling results.
 
 ## Examples
 
