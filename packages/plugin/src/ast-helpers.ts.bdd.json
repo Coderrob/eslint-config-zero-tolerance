@@ -1,0 +1,175 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/ast-helpers.ts",
+  "module": {
+    "name": "ast-helpers",
+    "description": "Reusable AST helper functions shared across multiple rule implementations.",
+    "exports": [
+      "getFunctionDeclarationName",
+      "getFunctionMethodName",
+      "getFunctionVariableName",
+      "getIdentifierName",
+      "getMappedMemberPropertyName",
+      "getMemberPropertyName",
+      "resolveFunctionName"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "getFunctionDeclarationName",
+      "scenarios": [
+        {
+          "name": "should return the declaration identifier name for a FunctionDeclaration",
+          "given": "a FunctionDeclaration node with an id identifier",
+          "when": "getFunctionDeclarationName is called",
+          "then": "returns the function's declared name as a string"
+        },
+        {
+          "name": "should return null for a FunctionExpression",
+          "given": "a FunctionExpression node",
+          "when": "getFunctionDeclarationName is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for an ArrowFunctionExpression",
+          "given": "an ArrowFunctionExpression node",
+          "when": "getFunctionDeclarationName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getFunctionMethodName",
+      "scenarios": [
+        {
+          "name": "should return the method key name when a function is inside a MethodDefinition",
+          "given": "a FunctionExpression whose parent is a MethodDefinition with an Identifier key",
+          "when": "getFunctionMethodName is called",
+          "then": "returns the method's identifier name"
+        },
+        {
+          "name": "should return null when the parent is not a MethodDefinition",
+          "given": "a FunctionDeclaration whose parent is a Program node",
+          "when": "getFunctionMethodName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getFunctionVariableName",
+      "scenarios": [
+        {
+          "name": "should return the variable name when a function is the initializer of a VariableDeclarator",
+          "given": "an ArrowFunctionExpression whose parent is a VariableDeclarator",
+          "when": "getFunctionVariableName is called",
+          "then": "returns the declarator id name"
+        },
+        {
+          "name": "should return null when the parent is not a VariableDeclarator",
+          "given": "a FunctionDeclaration with a Program parent",
+          "when": "getFunctionVariableName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getIdentifierName",
+      "scenarios": [
+        {
+          "name": "should return the name of an Identifier node",
+          "given": "an Identifier AST node",
+          "when": "getIdentifierName is called",
+          "then": "returns the identifier's name string"
+        },
+        {
+          "name": "should return null for a non-Identifier node",
+          "given": "a Literal AST node",
+          "when": "getIdentifierName is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for null or undefined",
+          "given": "null or undefined",
+          "when": "getIdentifierName is called",
+          "then": "returns null without throwing"
+        }
+      ]
+    },
+    {
+      "feature": "getMemberPropertyName",
+      "scenarios": [
+        {
+          "name": "should return the property name for dot-notation access",
+          "given": "a non-computed MemberExpression with an Identifier property",
+          "when": "getMemberPropertyName is called",
+          "then": "returns the property identifier name"
+        },
+        {
+          "name": "should return the string value for computed string-literal access",
+          "given": "a computed MemberExpression with a string Literal property",
+          "when": "getMemberPropertyName is called",
+          "then": "returns the literal string value"
+        },
+        {
+          "name": "should return null for computed non-string access",
+          "given": "a computed MemberExpression with a non-string property",
+          "when": "getMemberPropertyName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getMappedMemberPropertyName",
+      "scenarios": [
+        {
+          "name": "should return name and replacement when the property is in the replacement map",
+          "given": "a MemberExpression whose property name exists in the replacement map",
+          "when": "getMappedMemberPropertyName is called",
+          "then": "returns an object with name and replacement fields"
+        },
+        {
+          "name": "should return null when the property is not in the replacement map",
+          "given": "a MemberExpression whose property name is absent from the map",
+          "when": "getMappedMemberPropertyName is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null when getMemberPropertyName returns null",
+          "given": "a computed MemberExpression with a non-string property",
+          "when": "getMappedMemberPropertyName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "resolveFunctionName",
+      "scenarios": [
+        {
+          "name": "should return the declaration name for a FunctionDeclaration",
+          "given": "a named FunctionDeclaration node",
+          "when": "resolveFunctionName is called",
+          "then": "returns the declared identifier name"
+        },
+        {
+          "name": "should return the variable name for an arrow function assigned to a const",
+          "given": "an ArrowFunctionExpression whose parent is a VariableDeclarator",
+          "when": "resolveFunctionName is called",
+          "then": "returns the variable identifier name"
+        },
+        {
+          "name": "should return the method name for a class method",
+          "given": "a FunctionExpression inside a MethodDefinition",
+          "when": "resolveFunctionName is called",
+          "then": "returns the method key name"
+        },
+        {
+          "name": "should return the anonymous sentinel when no name can be resolved",
+          "given": "an immediately-invoked arrow function with no reachable identifier",
+          "when": "resolveFunctionName is called",
+          "then": "returns the ANONYMOUS_FUNCTION_NAME constant"
+        }
+      ]
+    }
+  ]
+}

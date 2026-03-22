@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-with.ts",
+  "module": {
+    "name": "no-with",
+    "description": "Disallow with statements because they make scope resolution unpredictable.",
+    "exports": ["noWith"]
+  },
+  "specifications": [
+    {
+      "feature": "Scope-safe code patterns",
+      "scenarios": [
+        {
+          "name": "should allow regular block statements and property access",
+          "given": "a function that accesses object properties via normal dot notation",
+          "when": "the rule evaluates the function body",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "with statement usage",
+      "scenarios": [
+        {
+          "name": "should report a with statement",
+          "given": "a with (obj) { ... } statement in source code",
+          "when": "the rule evaluates the WithStatement node",
+          "then": "a noWith violation is reported"
+        }
+      ]
+    }
+  ]
+}

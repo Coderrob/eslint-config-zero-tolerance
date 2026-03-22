@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-export-alias.ts",
+  "module": {
+    "name": "no-export-alias",
+    "description": "Prevent use of alias in export statements.",
+    "exports": ["noExportAlias"]
+  },
+  "specifications": [
+    {
+      "feature": "Direct exports without aliasing",
+      "scenarios": [
+        {
+          "name": "should allow exporting a binding by its own name",
+          "given": "export { foo } from './module'",
+          "when": "the rule evaluates the export declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow default exports",
+          "given": "export default expression",
+          "when": "the rule evaluates the export",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Aliased exports",
+      "scenarios": [
+        {
+          "name": "should report an aliased named export",
+          "given": "export { foo as bar } from './module'",
+          "when": "the rule evaluates the export specifier",
+          "then": "a noExportAlias violation is reported on the specifier"
+        },
+        {
+          "name": "should report a local aliased named export",
+          "given": "const foo = 1; export { foo as myFoo }",
+          "when": "the rule evaluates the export specifier",
+          "then": "a noExportAlias violation is reported"
+        }
+      ]
+    }
+  ]
+}

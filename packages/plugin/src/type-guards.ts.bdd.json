@@ -1,0 +1,139 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/type-guards.ts",
+  "module": {
+    "name": "type-guards",
+    "description": "Primitive runtime type-guard functions shared across rule implementations and AST helpers.",
+    "exports": ["isBoolean", "isDefined", "isNullOrUndefined", "isNumber", "isString"]
+  },
+  "specifications": [
+    {
+      "feature": "isBoolean",
+      "scenarios": [
+        {
+          "name": "should return true for boolean true",
+          "given": "the value true",
+          "when": "isBoolean is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for boolean false",
+          "given": "the value false",
+          "when": "isBoolean is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a string",
+          "given": "the string 'true'",
+          "when": "isBoolean is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a number",
+          "given": "the number 1",
+          "when": "isBoolean is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isDefined",
+      "scenarios": [
+        {
+          "name": "should return true for a non-null, non-undefined value",
+          "given": "the string 'hello'",
+          "when": "isDefined is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for null",
+          "given": "the value null",
+          "when": "isDefined is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for undefined",
+          "given": "the value undefined",
+          "when": "isDefined is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isNullOrUndefined",
+      "scenarios": [
+        {
+          "name": "should return true for null",
+          "given": "the value null",
+          "when": "isNullOrUndefined is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for undefined",
+          "given": "the value undefined",
+          "when": "isNullOrUndefined is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a defined value",
+          "given": "the number 0",
+          "when": "isNullOrUndefined is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isNumber",
+      "scenarios": [
+        {
+          "name": "should return true for a numeric value",
+          "given": "the number 42",
+          "when": "isNumber is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for NaN (runtime typeof is 'number')",
+          "given": "the value NaN",
+          "when": "isNumber is called",
+          "then": "returns true because typeof NaN is 'number'"
+        },
+        {
+          "name": "should return false for a string that looks like a number",
+          "given": "the string '42'",
+          "when": "isNumber is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isString",
+      "scenarios": [
+        {
+          "name": "should return true for a string value",
+          "given": "the string 'hello'",
+          "when": "isString is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for an empty string",
+          "given": "an empty string ''",
+          "when": "isString is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a number",
+          "given": "the number 0",
+          "when": "isString is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for null",
+          "given": "null",
+          "when": "isString is called",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

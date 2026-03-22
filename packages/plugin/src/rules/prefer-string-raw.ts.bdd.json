@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-string-raw.ts",
+  "module": {
+    "name": "prefer-string-raw",
+    "description": "Prefer String.raw for string literals containing escaped backslashes (Sonar S7780).",
+    "exports": ["preferStringRaw"]
+  },
+  "specifications": [
+    {
+      "feature": "String literals without escaped backslashes",
+      "scenarios": [
+        {
+          "name": "should allow a string literal with no backslash escapes",
+          "given": "const msg = 'hello world'",
+          "when": "the rule evaluates the string literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a String.raw tagged template literal",
+          "given": "const path = String.raw`C:\\Users\\name`",
+          "when": "the rule evaluates the tagged template",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "String literals with escaped backslashes",
+      "scenarios": [
+        {
+          "name": "should report a string literal containing an escaped backslash",
+          "given": "const path = 'C:\\\\Users\\\\name'",
+          "when": "the rule evaluates the string literal",
+          "then": "a preferStringRaw violation is reported"
+        },
+        {
+          "name": "should report a regular expression-like string with escape sequences",
+          "given": "const pattern = '\\\\d+'",
+          "when": "the rule evaluates the string literal",
+          "then": "a preferStringRaw violation is reported"
+        }
+      ]
+    }
+  ]
+}

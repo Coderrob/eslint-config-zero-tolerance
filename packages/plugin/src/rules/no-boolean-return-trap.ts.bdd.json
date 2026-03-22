@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-boolean-return-trap.ts",
+  "module": {
+    "name": "no-boolean-return-trap",
+    "description": "Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites.",
+    "exports": ["noBooleanReturnTrap"]
+  },
+  "specifications": [
+    {
+      "feature": "Unambiguous boolean-returning functions",
+      "scenarios": [
+        {
+          "name": "should allow a predicate function whose name starts with 'is', 'has', or 'can'",
+          "given": "a function named isValid that returns a boolean",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a non-boolean return from an arbitrarily named function",
+          "given": "a function named process that returns a string",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Ambiguous boolean-returning APIs",
+      "scenarios": [
+        {
+          "name": "should report a function that returns boolean without a predicate-style name",
+          "given": "a function named execute that returns boolean",
+          "when": "the rule evaluates the function",
+          "then": "a noBooleanReturnTrap violation is reported"
+        },
+        {
+          "name": "should report an arrow function with a non-predicate name that returns boolean",
+          "given": "a const-assigned arrow function named process returning true or false",
+          "when": "the rule evaluates the arrow function",
+          "then": "a noBooleanReturnTrap violation is reported"
+        }
+      ]
+    }
+  ]
+}

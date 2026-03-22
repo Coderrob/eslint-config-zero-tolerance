@@ -138,7 +138,8 @@ export const noDateNow = createRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior',
+      description:
+        'Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior',
     },
     messages: {
       noDateNow: 'Avoid Date.now(); inject a clock or time provider instead.',

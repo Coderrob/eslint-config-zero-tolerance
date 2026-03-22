@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-object-mutation.ts",
+  "module": {
+    "name": "no-object-mutation",
+    "description": "Disallow direct object-property mutation; prefer creating new objects with immutable update patterns.",
+    "exports": ["noObjectMutation"]
+  },
+  "specifications": [
+    {
+      "feature": "Immutable object update patterns",
+      "scenarios": [
+        {
+          "name": "should allow object spread to create an updated copy",
+          "given": "const updated = { ...obj, key: newValue }",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Object.assign into a fresh object literal",
+          "given": "Object.assign({}, obj, { key: newValue })",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Direct object property assignment",
+      "scenarios": [
+        {
+          "name": "should report assigning to an object property via dot notation",
+          "given": "obj.key = value",
+          "when": "the rule evaluates the assignment expression",
+          "then": "a noObjectMutation violation is reported"
+        },
+        {
+          "name": "should report assigning to an object property via bracket notation",
+          "given": "obj['key'] = value",
+          "when": "the rule evaluates the assignment expression",
+          "then": "a noObjectMutation violation is reported"
+        },
+        {
+          "name": "should report a delete operation on an object property",
+          "given": "delete obj.key",
+          "when": "the rule evaluates the unary expression",
+          "then": "a noObjectMutation violation is reported"
+        }
+      ]
+    }
+  ]
+}

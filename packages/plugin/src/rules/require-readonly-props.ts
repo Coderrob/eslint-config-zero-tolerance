@@ -50,7 +50,11 @@ function buildFunctionState(node: FunctionNode): IFunctionState {
     node.type === AST_NODE_TYPES.ArrowFunctionExpression &&
     node.body.type !== AST_NODE_TYPES.BlockStatement &&
     isJsxExpression(node.body);
-  return { node, hasJsxReturn: isJsxArrowBody, propsNode: getMutablePropsNode(getFirstPropsParam(node.params)) };
+  return {
+    node,
+    hasJsxReturn: isJsxArrowBody,
+    propsNode: getMutablePropsNode(getFirstPropsParam(node.params)),
+  };
 }
 
 /**
@@ -59,7 +63,9 @@ function buildFunctionState(node: FunctionNode): IFunctionState {
  * @param context - ESLint rule execution context.
  * @returns Listener map for rule traversal.
  */
-function createRequireReadonlyPropsListeners(context: RequireReadonlyPropsContext): TSESLint.RuleListener {
+function createRequireReadonlyPropsListeners(
+  context: RequireReadonlyPropsContext,
+): TSESLint.RuleListener {
   const stateStack: IFunctionState[] = [];
   return {
     ArrowFunctionExpression: onArrowFunctionEnter.bind(undefined, stateStack),
@@ -128,7 +134,9 @@ function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string 
  * @param firstParam - First function parameter.
  * @returns Parameter node when mutable; otherwise null.
  */
-function getMutablePropsNode(firstParam: TSESTree.Parameter | undefined): TSESTree.Parameter | null {
+function getMutablePropsNode(
+  firstParam: TSESTree.Parameter | undefined,
+): TSESTree.Parameter | null {
   if (firstParam === undefined) {
     return null;
   }
@@ -157,7 +165,9 @@ function getParameterTypeAnnotation(param: TSESTree.Parameter): TSESTree.TSTypeA
  * @param expression - Candidate expression.
  * @returns Wrapped expression when satisfies is used.
  */
-function getSatisfiesWrappedExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
+function getSatisfiesWrappedExpression(
+  expression: TSESTree.Expression,
+): TSESTree.Expression | null {
   if (expression.type === AST_NODE_TYPES.TSSatisfiesExpression) {
     return expression.expression;
   }
@@ -258,7 +268,10 @@ function isDirectlyTypedParameter(
  * @returns True when expression is JSX.
  */
 function isJsxExpression(expression: TSESTree.Expression): boolean {
-  if (expression.type === AST_NODE_TYPES.JSXElement || expression.type === AST_NODE_TYPES.JSXFragment) {
+  if (
+    expression.type === AST_NODE_TYPES.JSXElement ||
+    expression.type === AST_NODE_TYPES.JSXFragment
+  ) {
     return true;
   }
   const wrappedExpression = getWrappedJsxExpression(expression);
@@ -356,7 +369,10 @@ function markJsxReturn(stateStack: IFunctionState[], node: TSESTree.ReturnStatem
  * @param stateStack - Active function-state stack.
  * @param node - Arrow function node.
  */
-function onArrowFunctionEnter(stateStack: IFunctionState[], node: TSESTree.ArrowFunctionExpression): void {
+function onArrowFunctionEnter(
+  stateStack: IFunctionState[],
+  node: TSESTree.ArrowFunctionExpression,
+): void {
   stateStack.push(buildFunctionState(node));
 }
 

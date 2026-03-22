@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/configs/legacy-base.ts",
+  "module": {
+    "name": "configs/legacy-base",
+    "description": "Shared legacy ESLint config base containing parser and plugin registration for ESLint <9 consumers.",
+    "exports": ["legacyParserOptions"]
+  },
+  "specifications": [
+    {
+      "feature": "legacyParserOptions",
+      "scenarios": [
+        {
+          "name": "should specify the @typescript-eslint/parser as the legacy parser",
+          "given": "legacyParserOptions is imported",
+          "when": "legacyParserOptions.parser is read",
+          "then": "its value is '@typescript-eslint/parser'"
+        },
+        {
+          "name": "should set ecmaVersion to 2020",
+          "given": "legacyParserOptions is imported",
+          "when": "legacyParserOptions.parserOptions.ecmaVersion is read",
+          "then": "its value is 2020"
+        },
+        {
+          "name": "should set sourceType to module",
+          "given": "legacyParserOptions is imported",
+          "when": "legacyParserOptions.parserOptions.sourceType is read",
+          "then": "its value is 'module'"
+        },
+        {
+          "name": "should register the zero-tolerance plugin",
+          "given": "legacyParserOptions is imported",
+          "when": "legacyParserOptions.plugins is read",
+          "then": "the plugins array contains 'zero-tolerance'"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-labels.ts",
+  "module": {
+    "name": "no-labels",
+    "description": "Disallow labels because they make control flow harder to reason about.",
+    "exports": ["noLabels"]
+  },
+  "specifications": [
+    {
+      "feature": "Label-free control flow",
+      "scenarios": [
+        {
+          "name": "should allow break without a label inside a loop",
+          "given": "a for loop containing a plain break statement",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow continue without a label inside a loop",
+          "given": "a while loop containing a plain continue statement",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Labelled statements",
+      "scenarios": [
+        {
+          "name": "should report a labelled statement",
+          "given": "a labelled loop such as outer: for(...) {}",
+          "when": "the rule evaluates the code",
+          "then": "a noLabels violation is reported on the LabeledStatement"
+        },
+        {
+          "name": "should report a break targeting a label",
+          "given": "a break outer; statement referencing a label",
+          "when": "the rule evaluates the code",
+          "then": "a noLabels violation is reported"
+        }
+      ]
+    }
+  ]
+}

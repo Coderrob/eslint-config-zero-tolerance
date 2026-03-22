@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["$schema", "schemaVersion", "sourceFile", "module", "specifications"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "sourceFile": {
+      "type": "string"
+    },
+    "module": {
+      "type": "object"
+    },
+    "specifications": {
+      "type": "array"
+    }
+  }
+}

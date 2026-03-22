@@ -1,0 +1,79 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/constants.ts",
+  "module": {
+    "name": "constants",
+    "description": "Plugin-level string constants and enumerations used across the plugin entry point and config builders.",
+    "exports": [
+      "PLUGIN_NAMESPACE",
+      "CONFIG_NAME_RECOMMENDED",
+      "CONFIG_NAME_STRICT",
+      "Preset",
+      "PRESET_VALUES",
+      "TYPESCRIPT_ESLINT_PARSER",
+      "PLUGIN_PACKAGE_NAME",
+      "CONFIG_KEY_LEGACY_RECOMMENDED",
+      "CONFIG_KEY_LEGACY_STRICT",
+      "RULE_CREATOR_URL",
+      "ANONYMOUS_FUNCTION_NAME"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "PLUGIN_NAMESPACE",
+      "scenarios": [
+        {
+          "name": "should export the canonical plugin namespace string",
+          "given": "the constants module is imported",
+          "when": "PLUGIN_NAMESPACE is read",
+          "then": "its value is 'zero-tolerance'"
+        }
+      ]
+    },
+    {
+      "feature": "CONFIG_NAME_RECOMMENDED",
+      "scenarios": [
+        {
+          "name": "should compose the recommended config name from the plugin namespace",
+          "given": "the constants module is imported",
+          "when": "CONFIG_NAME_RECOMMENDED is read",
+          "then": "its value is 'zero-tolerance/recommended'"
+        }
+      ]
+    },
+    {
+      "feature": "CONFIG_NAME_STRICT",
+      "scenarios": [
+        {
+          "name": "should compose the strict config name from the plugin namespace",
+          "given": "the constants module is imported",
+          "when": "CONFIG_NAME_STRICT is read",
+          "then": "its value is 'zero-tolerance/strict'"
+        }
+      ]
+    },
+    {
+      "feature": "Preset enum",
+      "scenarios": [
+        {
+          "name": "should expose Recommended and Strict members",
+          "given": "the Preset enum is imported",
+          "when": "Preset.Recommended and Preset.Strict are read",
+          "then": "their string values are 'recommended' and 'strict' respectively"
+        }
+      ]
+    },
+    {
+      "feature": "ANONYMOUS_FUNCTION_NAME",
+      "scenarios": [
+        {
+          "name": "should provide the fallback display name for anonymous functions",
+          "given": "the constants module is imported",
+          "when": "ANONYMOUS_FUNCTION_NAME is read",
+          "then": "its value is '<anonymous>'"
+        }
+      ]
+    }
+  ]
+}

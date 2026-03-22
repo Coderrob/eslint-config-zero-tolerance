@@ -44,7 +44,10 @@ function checkAssignmentExpression(
  * @param context - ESLint rule execution context.
  * @param node - Unary expression node.
  */
-function checkUnaryExpression(context: NoObjectMutationContext, node: TSESTree.UnaryExpression): void {
+function checkUnaryExpression(
+  context: NoObjectMutationContext,
+  node: TSESTree.UnaryExpression,
+): void {
   if (node.operator !== DELETE_OPERATOR || !isMemberExpressionNode(node.argument)) {
     return;
   }

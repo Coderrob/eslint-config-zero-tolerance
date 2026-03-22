@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-redundant-boolean.ts",
+  "module": {
+    "name": "no-redundant-boolean",
+    "description": "Disallow redundant comparisons to boolean literals (Sonar S1125).",
+    "exports": ["noRedundantBoolean"]
+  },
+  "specifications": [
+    {
+      "feature": "Non-redundant boolean expressions",
+      "scenarios": [
+        {
+          "name": "should allow using a condition directly without comparing to true",
+          "given": "if (enabled) { ... }",
+          "when": "the rule evaluates the if condition",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a negated condition without comparing to false",
+          "given": "if (!enabled) { ... }",
+          "when": "the rule evaluates the if condition",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Redundant comparisons to boolean literals",
+      "scenarios": [
+        {
+          "name": "should report a strict equality comparison to true",
+          "given": "if (enabled === true) { ... }",
+          "when": "the rule evaluates the binary expression",
+          "then": "a noRedundantBoolean violation is reported"
+        },
+        {
+          "name": "should report a strict equality comparison to false",
+          "given": "if (enabled === false) { ... }",
+          "when": "the rule evaluates the binary expression",
+          "then": "a noRedundantBoolean violation is reported"
+        },
+        {
+          "name": "should report a strict inequality comparison to true",
+          "given": "if (enabled !== true) { ... }",
+          "when": "the rule evaluates the binary expression",
+          "then": "a noRedundantBoolean violation is reported"
+        }
+      ]
+    }
+  ]
+}

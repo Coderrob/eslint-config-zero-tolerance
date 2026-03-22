@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-shortcut-return.ts",
+  "module": {
+    "name": "prefer-shortcut-return",
+    "description": "Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions.",
+    "exports": ["preferShortcutReturn"]
+  },
+  "specifications": [
+    {
+      "feature": "Direct boolean return expressions",
+      "scenarios": [
+        {
+          "name": "should allow directly returning the condition expression",
+          "given": "return condition as the final statement of a function",
+          "when": "the rule evaluates the return statement",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow an if with a non-boolean return in the consequent",
+          "given": "if (x) { return 'yes'; } return 'no';",
+          "when": "the rule evaluates the if statement",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "if/return true-false shortcuts",
+      "scenarios": [
+        {
+          "name": "should report if (cond) return true; return false;",
+          "given": "an if statement whose consequent returns true and whose implicit alternative returns false",
+          "when": "the rule evaluates the if statement",
+          "then": "a preferShortcutReturn violation is reported"
+        },
+        {
+          "name": "should report if (cond) return false; return true;",
+          "given": "an if statement whose consequent returns false and the fallthrough returns true",
+          "when": "the rule evaluates the if statement",
+          "then": "a preferShortcutReturn violation is reported"
+        }
+      ]
+    }
+  ]
+}

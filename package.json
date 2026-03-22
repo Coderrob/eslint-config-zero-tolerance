@@ -39,13 +39,14 @@
     "deps:graph": "madge --extensions ts packages/plugin/src",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "pnpm build && eslint .",
+    "lint": "pnpm build && eslint . && pnpm validate:bdd",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
     "publish:config": "pnpm --filter @coderrob/eslint-config-zero-tolerance publish",
     "publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance publish",
     "release:prepare": "node scripts/prepare-publish.mjs",
     "release:restore-workspace": "node scripts/restore-workspace.mjs",
-    "test": "pnpm -r --if-present test && pnpm coverage:update-badge"
+    "test": "pnpm -r --if-present test && pnpm coverage:update-badge",
+    "validate:bdd": "node scripts/validate-bdd-specs.mjs"
   },
   "version": "1.0.0"
 }

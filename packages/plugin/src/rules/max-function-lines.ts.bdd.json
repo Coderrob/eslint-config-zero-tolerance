@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/max-function-lines.ts",
+  "module": {
+    "name": "max-function-lines",
+    "description": "Enforce a maximum number of lines per function body.",
+    "exports": ["maxFunctionLines"]
+  },
+  "specifications": [
+    {
+      "feature": "Valid function sizes",
+      "scenarios": [
+        {
+          "name": "should allow a function whose body is within the configured line limit",
+          "given": "a function whose body has fewer lines than the configured maximum",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow an empty function body",
+          "given": "a function with an empty block body",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Oversized function body",
+      "scenarios": [
+        {
+          "name": "should report when a function body exceeds the configured maximum",
+          "given": "a function whose body has more lines than the configured maximum",
+          "when": "the rule evaluates the function",
+          "then": "a maxFunctionLines violation is reported on the function node"
+        },
+        {
+          "name": "should report for arrow functions that exceed the limit",
+          "given": "an arrow function whose body exceeds the maximum line count",
+          "when": "the rule evaluates the arrow function",
+          "then": "a maxFunctionLines violation is reported"
+        }
+      ]
+    }
+  ]
+}

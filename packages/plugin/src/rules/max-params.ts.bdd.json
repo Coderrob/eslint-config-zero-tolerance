@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/max-params.ts",
+  "module": {
+    "name": "max-params",
+    "description": "Enforce a maximum number of function parameters.",
+    "exports": ["maxParams"]
+  },
+  "specifications": [
+    {
+      "feature": "Valid parameter counts",
+      "scenarios": [
+        {
+          "name": "should allow a function with fewer parameters than the configured maximum",
+          "given": "a function declaration with two parameters and a max of four",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a function with exactly the allowed maximum number of parameters",
+          "given": "a function with exactly max parameters",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a function with no parameters",
+          "given": "a parameterless function",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Excess parameter count",
+      "scenarios": [
+        {
+          "name": "should report when a function has more parameters than the configured maximum",
+          "given": "a function with more parameters than the configured max",
+          "when": "the rule evaluates the function",
+          "then": "a maxParams violation is reported on the function node"
+        },
+        {
+          "name": "should report for arrow functions exceeding the parameter limit",
+          "given": "an arrow function with excess parameters",
+          "when": "the rule evaluates the arrow function",
+          "then": "a maxParams violation is reported"
+        }
+      ]
+    }
+  ]
+}

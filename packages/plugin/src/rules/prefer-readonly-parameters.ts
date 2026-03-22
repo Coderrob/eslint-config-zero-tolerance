@@ -146,7 +146,10 @@ function getSimpleParameterName(
   if (param.type === AST_NODE_TYPES.Identifier) {
     return param.name;
   }
-  if (param.type === AST_NODE_TYPES.RestElement && param.argument.type === AST_NODE_TYPES.Identifier) {
+  if (
+    param.type === AST_NODE_TYPES.RestElement &&
+    param.argument.type === AST_NODE_TYPES.Identifier
+  ) {
     return param.argument.name;
   }
   return null;
@@ -239,7 +242,10 @@ function isMutableTypeReference(node: TSESTree.TSTypeReference): boolean {
   if (node.typeName.type !== AST_NODE_TYPES.Identifier) {
     return true;
   }
-  if (node.typeName.name === READONLY_ARRAY_TYPE_NAME || node.typeName.name === READONLY_TYPE_NAME) {
+  if (
+    node.typeName.name === READONLY_ARRAY_TYPE_NAME ||
+    node.typeName.name === READONLY_TYPE_NAME
+  ) {
     return false;
   }
   return true;

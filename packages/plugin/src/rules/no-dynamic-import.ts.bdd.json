@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-dynamic-import.ts",
+  "module": {
+    "name": "no-dynamic-import",
+    "description": "Ban await import() and require() except in test files.",
+    "exports": ["noDynamicImport"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted dynamic imports",
+      "scenarios": [
+        {
+          "name": "should allow dynamic import() inside a test file",
+          "given": "a dynamic import() expression in a .test.ts file",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow static import declarations in any file",
+          "given": "a static import statement",
+          "when": "the rule evaluates the statement",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Banned dynamic imports in source files",
+      "scenarios": [
+        {
+          "name": "should report await import() in a non-test source file",
+          "given": "an await import('module') expression in a regular .ts file",
+          "when": "the rule evaluates the expression",
+          "then": "a noDynamicImport violation is reported"
+        },
+        {
+          "name": "should report require() in a non-test source file",
+          "given": "a require('module') call expression in a regular .ts file",
+          "when": "the rule evaluates the expression",
+          "then": "a noDynamicImport violation is reported"
+        }
+      ]
+    }
+  ]
+}

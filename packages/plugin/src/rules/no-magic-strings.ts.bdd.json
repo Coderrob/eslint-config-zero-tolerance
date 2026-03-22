@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-magic-strings.ts",
+  "module": {
+    "name": "no-magic-strings",
+    "description": "Disallow magic strings in comparisons and switch cases; use named constants instead.",
+    "exports": ["noMagicStrings"]
+  },
+  "specifications": [
+    {
+      "feature": "Named constant string usage",
+      "scenarios": [
+        {
+          "name": "should allow a comparison against a named constant",
+          "given": "a comparison status === STATUS_ACTIVE where STATUS_ACTIVE is a const",
+          "when": "the rule evaluates the comparison",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a string literal in a variable initializer",
+          "given": "const label = 'hello'",
+          "when": "the rule evaluates the declaration",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Magic string literals",
+      "scenarios": [
+        {
+          "name": "should report a raw string literal used in a comparison",
+          "given": "a strict equality check status === 'active'",
+          "when": "the rule evaluates the binary expression",
+          "then": "a noMagicStrings violation is reported on the string literal"
+        },
+        {
+          "name": "should report a raw string literal used as a switch case value",
+          "given": "a switch case clause case 'active':",
+          "when": "the rule evaluates the SwitchCase test",
+          "then": "a noMagicStrings violation is reported"
+        }
+      ]
+    }
+  ]
+}

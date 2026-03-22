@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-eslint-disable.ts",
+  "module": {
+    "name": "no-eslint-disable",
+    "description": "Prevent use of eslint-disable comments.",
+    "exports": ["noEslintDisable"]
+  },
+  "specifications": [
+    {
+      "feature": "Non-suppression comments",
+      "scenarios": [
+        {
+          "name": "should allow regular inline comments",
+          "given": "a source file with a standard // comment",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "ESLint disable comments",
+      "scenarios": [
+        {
+          "name": "should report an eslint-disable block comment",
+          "given": "a /* eslint-disable */ comment in the source",
+          "when": "the rule evaluates the comment",
+          "then": "a noEslintDisable violation is reported"
+        },
+        {
+          "name": "should report an eslint-disable-next-line comment",
+          "given": "a // eslint-disable-next-line rule-name comment",
+          "when": "the rule evaluates the comment",
+          "then": "a noEslintDisable violation is reported"
+        },
+        {
+          "name": "should report an eslint-disable-line comment",
+          "given": "a // eslint-disable-line comment at end of a line",
+          "when": "the rule evaluates the comment",
+          "then": "a noEslintDisable violation is reported"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/index.ts",
+  "module": {
+    "name": "index",
+    "description": "Plugin entry point that assembles all rule implementations, flat config presets, and legacy config presets into the published @coderrob/eslint-plugin-zero-tolerance package.",
+    "exports": []
+  },
+  "specifications": [
+    {
+      "feature": "Plugin meta",
+      "scenarios": [
+        {
+          "name": "should expose a meta object containing the package name and version",
+          "given": "the plugin default export is imported",
+          "when": "plugin.meta is read",
+          "then": "contains a name equal to the package name and a version string"
+        }
+      ]
+    },
+    {
+      "feature": "Plugin rules registry",
+      "scenarios": [
+        {
+          "name": "should register all plugin rules keyed by their unprefixed names",
+          "given": "the plugin default export is imported",
+          "when": "Object.keys(plugin.rules) is evaluated",
+          "then": "contains every rule name defined in the plugin"
+        }
+      ]
+    },
+    {
+      "feature": "Flat config presets",
+      "scenarios": [
+        {
+          "name": "should expose a recommended flat config preset",
+          "given": "the plugin default export is imported",
+          "when": "plugin.configs['zero-tolerance/recommended'] is read",
+          "then": "returns an ESLint flat config object with name, plugins, and rules"
+        },
+        {
+          "name": "should expose a strict flat config preset",
+          "given": "the plugin default export is imported",
+          "when": "plugin.configs['zero-tolerance/strict'] is read",
+          "then": "returns an ESLint flat config object with name, plugins, and rules set to error severity"
+        }
+      ]
+    },
+    {
+      "feature": "Legacy config presets",
+      "scenarios": [
+        {
+          "name": "should expose a legacy recommended config preset",
+          "given": "the plugin default export is imported",
+          "when": "plugin.configs['legacy-recommended'] is read",
+          "then": "returns a legacy ESLint config object with parser and rules"
+        },
+        {
+          "name": "should expose a legacy strict config preset",
+          "given": "the plugin default export is imported",
+          "when": "plugin.configs['legacy-strict'] is read",
+          "then": "returns a legacy ESLint config object with parser and rules set to error severity"
+        }
+      ]
+    }
+  ]
+}

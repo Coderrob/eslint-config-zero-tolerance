@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/configs/legacy-strict.ts",
+  "module": {
+    "name": "configs/legacy-strict",
+    "description": "Legacy ESLint config preset aligning with the strict flat config for ESLint <9 consumers.",
+    "exports": ["legacyStrictConfig"]
+  },
+  "specifications": [
+    {
+      "feature": "legacyStrictConfig",
+      "scenarios": [
+        {
+          "name": "should spread legacyParserOptions into the config",
+          "given": "legacyStrictConfig is imported",
+          "when": "legacyStrictConfig.parser is read",
+          "then": "its value is '@typescript-eslint/parser'"
+        },
+        {
+          "name": "should include error-level rules matching the flat strict preset",
+          "given": "legacyStrictConfig is imported",
+          "when": "a rule entry from legacyStrictConfig.rules is read",
+          "then": "the severity is 'error'"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/configs/strict.ts",
+  "module": {
+    "name": "configs/strict",
+    "description": "Factory that creates the strict flat ESLint config preset with error-level rule enforcement.",
+    "exports": ["createStrictConfig"]
+  },
+  "specifications": [
+    {
+      "feature": "createStrictConfig",
+      "scenarios": [
+        {
+          "name": "should return a flat config with the correct name",
+          "given": "a plugin instance is passed to createStrictConfig",
+          "when": "createStrictConfig is called",
+          "then": "the returned config has name 'zero-tolerance/strict'"
+        },
+        {
+          "name": "should register the supplied plugin under the zero-tolerance namespace",
+          "given": "a plugin instance is passed to createStrictConfig",
+          "when": "the returned config's plugins record is inspected",
+          "then": "it contains the plugin under the key 'zero-tolerance'"
+        },
+        {
+          "name": "should include error-level rules from the strict preset",
+          "given": "a plugin instance is passed to createStrictConfig",
+          "when": "the returned config's rules record is inspected",
+          "then": "all rule entries have 'error' severity"
+        }
+      ]
+    }
+  ]
+}

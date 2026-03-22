@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-jsdoc-functions.ts",
+  "module": {
+    "name": "require-jsdoc-functions",
+    "description": "Require JSDoc comments on all functions and require @param/@returns/@throws tags when applicable (except in test files).",
+    "exports": ["RequireJsdocFunctionsMessageId", "requireJsdocFunctions"]
+  },
+  "specifications": [
+    {
+      "feature": "Functions with adequate JSDoc coverage",
+      "scenarios": [
+        {
+          "name": "should allow a function with a complete JSDoc block",
+          "given": "a function preceded by a /** ... */ JSDoc comment covering its description, @param, and @returns",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow functions in test files without JSDoc",
+          "given": "a function defined inside a .test.ts file with no JSDoc",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a parameterless function with only a description JSDoc comment",
+          "given": "a parameterless function with a /** Description */ comment",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Functions missing JSDoc",
+      "scenarios": [
+        {
+          "name": "should report a function with no JSDoc comment",
+          "given": "an exported function in a source file with no preceding JSDoc block",
+          "when": "the rule evaluates the function",
+          "then": "a requireJsdocFunctions violation is reported"
+        },
+        {
+          "name": "should report a function with a JSDoc comment missing @param for a parameter",
+          "given": "a function with a parameter but a JSDoc block that omits @param",
+          "when": "the rule evaluates the function",
+          "then": "a requireJsdocFunctions violation is reported"
+        },
+        {
+          "name": "should report a function with a JSDoc comment missing @returns for a non-void return",
+          "given": "a function that returns a value but has no @returns tag in its JSDoc",
+          "when": "the rule evaluates the function",
+          "then": "a requireJsdocFunctions violation is reported"
+        }
+      ]
+    }
+  ]
+}

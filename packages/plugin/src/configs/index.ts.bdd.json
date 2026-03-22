@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/configs/index.ts",
+  "module": {
+    "name": "configs/index",
+    "description": "Re-exports all config preset factories and legacy config objects from the configs sub-package.",
+    "exports": [
+      "createRecommendedConfig",
+      "createStrictConfig",
+      "legacyRecommendedConfig",
+      "legacyStrictConfig"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Config barrel re-export",
+      "scenarios": [
+        {
+          "name": "should re-export createRecommendedConfig from recommended.ts",
+          "given": "the configs/index module is imported",
+          "when": "createRecommendedConfig is destructured",
+          "then": "the function is available and callable"
+        },
+        {
+          "name": "should re-export createStrictConfig from strict.ts",
+          "given": "the configs/index module is imported",
+          "when": "createStrictConfig is destructured",
+          "then": "the function is available and callable"
+        },
+        {
+          "name": "should re-export legacyRecommendedConfig from legacy-recommended.ts",
+          "given": "the configs/index module is imported",
+          "when": "legacyRecommendedConfig is destructured",
+          "then": "the legacy config object is available"
+        },
+        {
+          "name": "should re-export legacyStrictConfig from legacy-strict.ts",
+          "given": "the configs/index module is imported",
+          "when": "legacyStrictConfig is destructured",
+          "then": "the legacy config object is available"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/configs/legacy-recommended.ts",
+  "module": {
+    "name": "configs/legacy-recommended",
+    "description": "Legacy ESLint config preset mirroring the recommended flat config for ESLint <9 consumers.",
+    "exports": ["legacyRecommendedConfig"]
+  },
+  "specifications": [
+    {
+      "feature": "legacyRecommendedConfig",
+      "scenarios": [
+        {
+          "name": "should spread legacyParserOptions into the config",
+          "given": "legacyRecommendedConfig is imported",
+          "when": "legacyRecommendedConfig.parser is read",
+          "then": "its value is '@typescript-eslint/parser'"
+        },
+        {
+          "name": "should include warn-level rules matching the flat recommended preset",
+          "given": "legacyRecommendedConfig is imported",
+          "when": "a rule entry from legacyRecommendedConfig.rules is read",
+          "then": "the severity is 'warn'"
+        }
+      ]
+    }
+  ]
+}

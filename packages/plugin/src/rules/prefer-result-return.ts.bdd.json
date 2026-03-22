@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-result-return.ts",
+  "module": {
+    "name": "prefer-result-return",
+    "description": "Prefer Result-style return values instead of throw statements to make error flows explicit and composable.",
+    "exports": ["preferResultReturn"]
+  },
+  "specifications": [
+    {
+      "feature": "Result-style error handling",
+      "scenarios": [
+        {
+          "name": "should allow a function that returns a Result-like value on failure",
+          "given": "a function that returns { ok: false, error } instead of throwing",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Throw statements as control flow",
+      "scenarios": [
+        {
+          "name": "should report a throw statement inside a non-constructor function",
+          "given": "a function that throws a new Error to signal failure",
+          "when": "the rule evaluates the throw statement",
+          "then": "a preferResultReturn violation is reported"
+        },
+        {
+          "name": "should report a throw in an arrow function",
+          "given": "an arrow function that throws on an invalid condition",
+          "when": "the rule evaluates the throw statement",
+          "then": "a preferResultReturn violation is reported"
+        }
+      ]
+    }
+  ]
+}

@@ -64,7 +64,11 @@ function getPerRuleCoverageThresholds() {
   const entries = fs.readdirSync(rulesDirectory, { withFileTypes: true });
   const threshold = {};
   for (const entry of entries) {
-    if (entry.isDirectory() || entry.name.endsWith(TEST_FILE_SUFFIX) || !entry.name.endsWith('.ts')) {
+    if (
+      entry.isDirectory() ||
+      entry.name.endsWith(TEST_FILE_SUFFIX) ||
+      !entry.name.endsWith('.ts')
+    ) {
       continue;
     }
     threshold[`src/rules/${entry.name}`] = DEFAULT_THRESHOLD;

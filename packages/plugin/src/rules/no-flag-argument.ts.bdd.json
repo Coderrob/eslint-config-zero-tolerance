@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-flag-argument.ts",
+  "module": {
+    "name": "no-flag-argument",
+    "description": "Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects.",
+    "exports": ["noFlagArgument"]
+  },
+  "specifications": [
+    {
+      "feature": "Functions without boolean flag parameters",
+      "scenarios": [
+        {
+          "name": "should allow a function with only non-boolean parameters",
+          "given": "a function accepting string and number parameters",
+          "when": "the rule evaluates the function declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a function with zero parameters",
+          "given": "a parameterless function",
+          "when": "the rule evaluates the function declaration",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Functions with boolean flag parameters",
+      "scenarios": [
+        {
+          "name": "should report a function parameter typed as boolean",
+          "given": "a function declaration with a parameter typed as boolean",
+          "when": "the rule evaluates the function",
+          "then": "a noFlagArgument violation is reported on the parameter"
+        },
+        {
+          "name": "should report an arrow function with a boolean flag parameter",
+          "given": "an arrow function with a boolean parameter",
+          "when": "the rule evaluates the arrow function",
+          "then": "a noFlagArgument violation is reported"
+        }
+      ]
+    }
+  ]
+}

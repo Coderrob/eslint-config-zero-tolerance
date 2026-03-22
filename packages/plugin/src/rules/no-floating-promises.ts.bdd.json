@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-floating-promises.ts",
+  "module": {
+    "name": "no-floating-promises",
+    "description": "Disallow floating promises; explicitly handle with await, void, or rejection handlers.",
+    "exports": ["noFloatingPromises"]
+  },
+  "specifications": [
+    {
+      "feature": "Properly handled promises",
+      "scenarios": [
+        {
+          "name": "should allow an awaited promise",
+          "given": "an async function that awaits a promise-returning call",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a promise with a .catch() rejection handler",
+          "given": "a promise call chained with .catch(handler)",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a promise prefixed with void",
+          "given": "a void promise() expression",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Floating (unhandled) promises",
+      "scenarios": [
+        {
+          "name": "should report a promise call whose result is not awaited or handled",
+          "given": "a statement that calls an async function without await, void, or .catch",
+          "when": "the rule evaluates the code",
+          "then": "a noFloatingPromises violation is reported"
+        },
+        {
+          "name": "should report a promise returned from a then() callback without handling",
+          "given": "a .then() callback that returns a new unhandled promise",
+          "when": "the rule evaluates the code",
+          "then": "a noFloatingPromises violation is reported"
+        }
+      ]
+    }
+  ]
+}

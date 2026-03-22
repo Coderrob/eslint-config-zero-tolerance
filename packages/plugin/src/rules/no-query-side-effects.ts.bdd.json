@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-query-side-effects.ts",
+  "module": {
+    "name": "no-query-side-effects",
+    "description": "Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier.",
+    "exports": ["noQuerySideEffects"]
+  },
+  "specifications": [
+    {
+      "feature": "Pure query functions",
+      "scenarios": [
+        {
+          "name": "should allow a query function that only reads and returns a value",
+          "given": "a function named getName that returns a property without mutations",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a non-query function that contains side effects",
+          "given": "a function named updateCount that increments a counter",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a nested inner function with side effects inside a query function",
+          "given": "a get function that contains a nested inner function performing mutations",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported as the inner function is a separate scope"
+        },
+        {
+          "name": "should allow mutating a locally-declared collection to build a return value",
+          "given": "a get function that declares a local Map, populates it, and returns it",
+          "when": "the rule evaluates the mutating call on the local Map",
+          "then": "no violation is reported because the mutated object was declared within the same scope"
+        },
+        {
+          "name": "should allow mutating a locally-declared array to build a return value",
+          "given": "a get function that declares a local array, pushes items, and returns it",
+          "when": "the rule evaluates the push call on the local array",
+          "then": "no violation is reported because the mutated object is a local collection"
+        }
+      ]
+    },
+    {
+      "feature": "Side effects in query functions",
+      "scenarios": [
+        {
+          "name": "should report an assignment to an outer-scope variable inside a get function",
+          "given": "a function named getCount that reassigns an external variable total",
+          "when": "the rule evaluates the assignment expression",
+          "then": "a noQuerySideEffects violation is reported"
+        },
+        {
+          "name": "should report an update expression inside an is function",
+          "given": "a function named isReady that increments an external counter",
+          "when": "the rule evaluates the update expression",
+          "then": "a noQuerySideEffects violation is reported"
+        },
+        {
+          "name": "should report a mutating method call on an externally-scoped collection inside a has function",
+          "given": "a function named hasItems that calls push on a parameter-provided array",
+          "when": "the rule evaluates the call expression",
+          "then": "a noQuerySideEffects violation is reported"
+        },
+        {
+          "name": "should report delete of an external object property inside a can function",
+          "given": "a function named canProceed that deletes a property on a parameter-passed object",
+          "when": "the rule evaluates the unary delete expression",
+          "then": "a noQuerySideEffects violation is reported"
+        }
+      ]
+    }
+  ]
+}

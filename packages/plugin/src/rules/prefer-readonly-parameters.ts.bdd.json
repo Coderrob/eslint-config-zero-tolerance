@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-readonly-parameters.ts",
+  "module": {
+    "name": "prefer-readonly-parameters",
+    "description": "Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs.",
+    "exports": ["preferReadonlyParameters"]
+  },
+  "specifications": [
+    {
+      "feature": "Readonly-typed parameters",
+      "scenarios": [
+        {
+          "name": "should allow a parameter typed as Readonly<T>",
+          "given": "a function with a parameter typed Readonly<Config>",
+          "when": "the rule evaluates the function declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a parameter typed as ReadonlyArray<T>",
+          "given": "a function with a parameter typed ReadonlyArray<string>",
+          "when": "the rule evaluates the function declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow primitive-typed parameters",
+          "given": "a function with parameters typed string, number, and boolean",
+          "when": "the rule evaluates the function declaration",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Mutable object or array parameters",
+      "scenarios": [
+        {
+          "name": "should report an object-typed parameter without readonly",
+          "given": "a function with a parameter typed as a plain object interface without readonly",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported"
+        },
+        {
+          "name": "should report an array-typed parameter without readonly",
+          "given": "a function with a parameter typed string[]",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported"
+        }
+      ]
+    }
+  ]
+}

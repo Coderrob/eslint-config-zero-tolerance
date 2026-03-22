@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-jest-have-been-called.ts",
+  "module": {
+    "name": "no-jest-have-been-called",
+    "description": "Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit count and toHaveBeenNthCalledWith instead.",
+    "exports": ["noJestHaveBeenCalled"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted Jest matchers",
+      "scenarios": [
+        {
+          "name": "should allow toHaveBeenCalledTimes with an explicit count",
+          "given": "expect(fn).toHaveBeenCalledTimes(1)",
+          "when": "the rule evaluates the assertion",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow toHaveBeenNthCalledWith with an explicit index",
+          "given": "expect(fn).toHaveBeenNthCalledWith(1, arg)",
+          "when": "the rule evaluates the assertion",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Prohibited Jest call matchers",
+      "scenarios": [
+        {
+          "name": "should report toHaveBeenCalled()",
+          "given": "expect(fn).toHaveBeenCalled()",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report toBeCalled()",
+          "given": "expect(fn).toBeCalled()",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report toHaveBeenCalledWith()",
+          "given": "expect(fn).toHaveBeenCalledWith(arg)",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report toBeCalledWith()",
+          "given": "expect(fn).toBeCalledWith(arg)",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report toHaveBeenLastCalledWith()",
+          "given": "expect(fn).toHaveBeenLastCalledWith(arg)",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report toLastCalledWith()",
+          "given": "expect(fn).toLastCalledWith(arg)",
+          "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        }
+      ]
+    }
+  ]
+}
