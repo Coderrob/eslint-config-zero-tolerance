@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-03-22
+
 ### Added
 
 - **`require-bdd-spec` rule**: Enforce that every non-test TypeScript source file has a valid sibling `.ts.bdd.json` BDD specification file. The rule validates required fields, value types, schema version, non-empty specifications and scenarios, scenario names starting with `"should"`, and exact export parity between `module.exports` and the actual named exports of the source file. All errors are aggregated into a single report per file.
