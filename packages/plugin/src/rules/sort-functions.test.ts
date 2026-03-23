@@ -157,8 +157,44 @@ ruleTester.run('sort-functions', sortFunctions, {
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
+      name: 'should move adjacent same-line trailing block comments with the sorted function',
+      code: 'function beta() {} /* beta one */ /* beta two */\nfunction alpha() {}',
+      output: 'function alpha() {}\nfunction beta() {} /* beta one */ /* beta two */',
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions when trailing comments continue onto the next line',
+      code: 'function beta() {} /* beta one */\n/* beta two */\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions when non-whitespace interrupts same-line trailing comments',
+      code: 'function beta() {} /* beta one */ 0 /* beta two */\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions when code appears between same-line trailing comments',
+      code: 'function beta() {} /* beta one */; /* beta two */\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
       name: 'should report unsorted functions with interstitial comments without fix',
       code: 'function beta() {}\n\n// section break\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions with adjacent leading line comments without fix',
+      code: 'function beta() {}\n// alpha details\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions when a leading block comment is adjacent to preceding code',
+      code: 'function beta() {}\nconst separator = 1;\n/* alpha docs */\nfunction alpha() {}',
       output: null,
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
@@ -166,6 +202,12 @@ ruleTester.run('sort-functions', sortFunctions, {
       name: 'should report unsorted functions with directive comments without fix',
       code:
         '/* istanbul ignore next */\nfunction beta() {}\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
+      name: 'should report unsorted functions with trailing directive comments without fix',
+      code: 'function beta() {} /* istanbul ignore next */\nfunction alpha() {}',
       output: null,
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },

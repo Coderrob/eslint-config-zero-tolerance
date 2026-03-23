@@ -175,6 +175,16 @@ function getFunctionDeclaratorName(declaration: TSESTree.VariableDeclarator): st
 }
 
 /**
+ * Returns a function declaration name for sortable top-level declarations.
+ *
+ * @param declaration - Function declaration node.
+ * @returns Function name, or an empty string when no identifier is present.
+ */
+function getFunctionDeclarationName(declaration: TSESTree.FunctionDeclaration): string {
+  return declaration.id?.name ?? '';
+}
+
+/**
  * Returns owned leading comments for a declaration block.
  *
  * @param sourceCode - ESLint source code helper.
@@ -205,19 +215,13 @@ function getOwnedTrailingComments(
     return [];
   }
 
-  const nodeEndLine = node.loc?.end.line;
-  if (nodeEndLine == null) {
-    return [];
-  }
+  const nodeEndLine = node.loc.end.line;
 
   // Find the first owned same-line trailing comment.
   let startIndex = -1;
   for (let i = 0; i < allTrailingComments.length; i += 1) {
     const comment = allTrailingComments[i];
     if (!isOwnedTrailingComment(sourceCode, node, comment)) {
-      continue;
-    }
-    if (comment.loc?.start.line !== nodeEndLine) {
       continue;
     }
     startIndex = i;
@@ -237,7 +241,7 @@ function getOwnedTrailingComments(
     const prev = owned[owned.length - 1];
     const current = allTrailingComments[i];
 
-    if (current.loc?.start.line !== nodeEndLine) {
+    if (current.loc.start.line !== nodeEndLine) {
       break;
     }
 
@@ -451,9 +455,37 @@ function isAttachedLeadingComment(
 ): boolean {
   return (
     isOwnLineBlockComment(sourceCode, comment) &&
+    !hasAdjacentPreviousNonLeadingContent(sourceCode, comment) &&
     nextStartLine - comment.loc.end.line <= 1 &&
     sourceCode.text.slice(comment.range[1], nextStart).trim().length === 0
   );
+}
+
+/**
+ * Returns true when preceding adjacent content makes a leading comment ambiguous.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate leading comment.
+ * @returns True when nearby previous content means the comment should not move.
+ */
+function hasAdjacentPreviousNonLeadingContent(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+): boolean {
+  const previousTokenOrComment = sourceCode.getTokenBefore(comment, { includeComments: true });
+  if (previousTokenOrComment === null) {
+    return false;
+  }
+
+  if (comment.loc.start.line - previousTokenOrComment.loc.end.line > 1) {
+    return false;
+  }
+
+  if (isCommentToken(previousTokenOrComment)) {
+    return !isOwnLineBlockComment(sourceCode, previousTokenOrComment);
+  }
+
+  return true;
 }
 
 /**
@@ -464,6 +496,18 @@ function isAttachedLeadingComment(
  */
 function isBlockComment(comment: TSESTree.Comment): boolean {
   return comment.type === BLOCK_COMMENT_TYPE;
+}
+
+/**
+ * Returns true when a token-like node is a comment.
+ *
+ * @param tokenOrComment - Token-like node to inspect.
+ * @returns True when the node is a line or block comment.
+ */
+function isCommentToken(
+  tokenOrComment: TSESTree.Comment | TSESTree.Token,
+): tokenOrComment is TSESTree.Comment {
+  return tokenOrComment.type === 'Block' || tokenOrComment.type === 'Line';
 }
 
 /**
@@ -584,10 +628,7 @@ function processFunctionDeclaration(
   if (!isTopLevelFunctionDeclaration(node)) {
     return;
   }
-  if (node.id === null) {
-    return;
-  }
-  functions.push({ name: node.id.name, node });
+  functions.push({ name: getFunctionDeclarationName(node), node });
 }
 
 /**
