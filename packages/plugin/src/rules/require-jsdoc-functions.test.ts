@@ -33,6 +33,11 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
+      code: 'class MyClass {\n  /** Factory JSDoc. */\n  static createDedupeService() {}\n}',
+      name: 'should allow static class method with JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
       code: 'class MyClass {\n  /** Field JSDoc. */\n  handler = () => {};\n}',
       name: 'should allow class field arrow function with JSDoc on PropertyDefinition',
       filename: 'src/utils.ts',
@@ -171,6 +176,19 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
         },
       ],
       output: 'class MyClass {\n  /**\n   * doWork TODO: describe\n   */\n  doWork() {}\n}',
+    },
+    {
+      code: 'class MyClass {\n  static createDedupeService() {}\n}',
+      name: 'should report static class method without JSDoc',
+      filename: 'src/my-class.ts',
+      errors: [
+        {
+          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
+          data: { name: 'createDedupeService' },
+        },
+      ],
+      output:
+        'class MyClass {\n  /**\n   * createDedupeService TODO: describe\n   */\n  static createDedupeService() {}\n}',
     },
     {
       code: 'class MyClass {\n  handler = () => {};\n}',

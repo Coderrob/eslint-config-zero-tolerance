@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-03-22
+
+### Fixed
+
+- **`no-object-mutation` rule**: Stopped reporting constructor field initialization assignments on `this`, so common class setup like `this.name = ...` and `this.context = ...` no longer triggers false positives.
+
+### Changed
+
+- **`require-jsdoc-functions` rule**: Clarified and regression-tested that JSDoc enforcement applies to all function-like constructs in non-test files, including `static` class methods.
+- **`prefer-readonly-parameters` rule**: Added autofix support for safe readonly-typing rewrites, including constructor parameter properties with mutable type references, arrays, and tuples.
+- **`require-bdd-spec` rule**: Removed it from the built-in preset defaults so it is now opt-in in both `recommended` and `strict`.
+- **`sort-functions` rule**: Upgraded autofix to move owned leading comments and same-line trailing comments with sorted declarations, while still skipping directive or ambiguous interstitial comments.
+
 ## [1.1.6] - 2026-03-22
 
 ### Added

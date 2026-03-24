@@ -28,6 +28,12 @@
           "given": "a parameterless function with a /** Description */ comment",
           "when": "the rule evaluates the function",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a static class method with a preceding JSDoc block",
+          "given": "a static class method in a non-test source file with a /** ... */ JSDoc comment on the method definition",
+          "when": "the rule evaluates the method's function expression",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -51,6 +57,12 @@
           "given": "a function that returns a value but has no @returns tag in its JSDoc",
           "when": "the rule evaluates the function",
           "then": "a requireJsdocFunctions violation is reported"
+        },
+        {
+          "name": "should report a static class method without a preceding JSDoc block",
+          "given": "a static class method in a non-test source file with no JSDoc on the method definition",
+          "when": "the rule evaluates the method's function expression",
+          "then": "a requireJsdocFunctions violation is reported and the autofix inserts the missing block above the static method"
         }
       ]
     }

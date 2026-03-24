@@ -8,7 +8,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 ## Features
 
 - 46 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
-- `recommended` preset (all enabled rules at `warn`) and `strict` preset (all enabled rules at `error`)
+- `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
 

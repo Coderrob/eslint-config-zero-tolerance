@@ -33,6 +33,18 @@
           "given": "a module where function zebra() is declared before function apple()",
           "when": "the rule evaluates the Program",
           "then": "a sortFunctions violation is reported on the out-of-order function"
+        },
+        {
+          "name": "should move owned comments with a sorted declaration block",
+          "given": "two out-of-order sortable functions where each declaration has directly attached leading comments or same-line trailing comments",
+          "when": "the rule evaluates the Program",
+          "then": "a sortFunctions violation is reported and the autofix moves the owned comments together with the reordered declaration block"
+        },
+        {
+          "name": "should report without autofixing when directive or ambiguous interstitial comments are present",
+          "given": "two out-of-order sortable functions separated by directive comments or standalone comments between declaration blocks",
+          "when": "the rule evaluates the Program",
+          "then": "a sortFunctions violation is reported but no autofix is offered because comment ownership is unsafe"
         }
       ]
     }

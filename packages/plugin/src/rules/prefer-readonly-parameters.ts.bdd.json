@@ -28,6 +28,12 @@
           "given": "a function with parameters typed string, number, and boolean",
           "when": "the rule evaluates the function declaration",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a constructor parameter property typed as Readonly<T>",
+          "given": "a class constructor parameter property typed Readonly<User>",
+          "when": "the rule evaluates the constructor function expression",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -45,6 +51,24 @@
           "given": "a function with a parameter typed string[]",
           "when": "the rule evaluates the parameter type",
           "then": "a preferReadonlyParameters violation is reported"
+        },
+        {
+          "name": "should autofix a constructor parameter property with a mutable type reference",
+          "given": "a class constructor parameter property typed User",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported and the autofix rewrites the type to Readonly<User>"
+        },
+        {
+          "name": "should autofix a constructor parameter property with a mutable array type",
+          "given": "a class constructor parameter property typed string[]",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported and the autofix rewrites the type to readonly string[]"
+        },
+        {
+          "name": "should report without autofixing mutable inline type literals",
+          "given": "a function parameter typed as an inline object literal with mutable members",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported without an autofix because the structural rewrite is not guaranteed to be safe"
         }
       ]
     }

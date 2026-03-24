@@ -28,6 +28,20 @@ ruleTester.run('no-object-mutation', noObjectMutation, {
       name: 'should allow update expression on identifier',
       code: 'count++;',
     },
+    {
+      name: 'should allow constructor assignment to this fields',
+      code: `
+        class AppError extends Error {
+          context?: Record<string, unknown>;
+
+          constructor(message: string, context?: Record<string, unknown>) {
+            super(message);
+            this.name = this.constructor.name;
+            this.context = context;
+          }
+        }
+      `,
+    },
   ],
   invalid: [
     {
@@ -48,6 +62,11 @@ ruleTester.run('no-object-mutation', noObjectMutation, {
     {
       name: 'should disallow computed property assignment',
       code: "state['count'] = 1;",
+      errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
+    },
+    {
+      name: 'should disallow assignment to this field outside constructor',
+      code: 'class Counter { count = 0; increment() { this.count = this.count + 1; } }',
       errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
     },
   ],
