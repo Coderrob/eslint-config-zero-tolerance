@@ -2615,17 +2615,18 @@
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
-<td><code>warn</code></td>
+<td><code>off</code></td>
 </tr>
 <tr>
 <td><strong>Strict</strong></td>
-<td><code>error</code></td>
+<td><code>off</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
 <p>Every non-test TypeScript source file in the plugin must be accompanied by a sibling <code>.ts.bdd.json</code> file that documents its behaviour in BDD (Given/When/Then) format. This rule validates that the file exists and that its content is semantically valid: required fields are present, types are correct, the <code>specifications</code> array is non-empty, all scenario names start with <code>"should"</code>, and the <code>module.exports</code> list exactly matches the named exports in the source file.</p>
 <p>Violations are reported as an aggregated list of errors so all problems are visible in a single ESLint run.</p>
+<p>This rule is intentionally <strong>opt-in</strong> and is disabled by default in the built-in <code>recommended</code> and <code>strict</code> presets. Enable it explicitly for repositories that require BDD spec files.</p>
 <h2 id="examples">Examples</h2>
 <h3 id="correct">✅ Correct</h3>
 <p>A source file <code>rules/my-rule.ts</code> with a sibling <code>rules/my-rule.ts.bdd.json</code>:</p>

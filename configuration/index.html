@@ -2877,7 +2877,7 @@
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">};</span>
 </code></pre></div>
 <h2 id="rules-included-in-each-preset">Rules Included in Each Preset</h2>
-<p>All core rules are included in every preset. The only difference between <code>recommended</code> and <code>strict</code> is the severity level and the tighter limits for configurable rules.</p>
+<p>Nearly all core rules are included in every preset. <code>require-bdd-spec</code> is available as an opt-in rule and is disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.</p>
 <table>
 <thead>
 <tr>
@@ -3112,9 +3112,14 @@
 <td>warn</td>
 <td>error</td>
 </tr>
+<tr>
+<td><code>require-bdd-spec</code></td>
+<td>off</td>
+<td>off</td>
+</tr>
 </tbody>
 </table>
-<p><code>no-parent-imports</code> is available but intentionally not enabled by default in presets.</p>
+<p><code>no-parent-imports</code> and <code>require-bdd-spec</code> are available but intentionally not enabled by default in presets.</p>
 <h2 id="disabling-individual-rules">Disabling Individual Rules</h2>
 <p>Override any rule to <code>off</code> inside your config:</p>
 <div class="highlight"><span class="filename">eslint.config.js</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@coderrob/eslint-plugin-zero-tolerance&#39;</span><span class="p">;</span>

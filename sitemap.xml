@@ -2,206 +2,206 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/configuration/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/getting-started/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-function-lines/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/max-params/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-array-mutation/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-await-in-loop/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-banned-types/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-boolean-return-trap/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-date-now/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-dynamic-import/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-empty-catch/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-eslint-disable/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-export-alias/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-flag-argument/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-floating-promises/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-for-in/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-identical-branches/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-identical-expressions/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-inline-type-import/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-labels/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-literal-unions/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-numbers/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-magic-strings/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-mock-implementation/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-non-null-assertion/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-object-mutation/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-parameter-reassign/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-parent-imports/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-query-side-effects/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-re-export/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-redundant-boolean/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-throw-literal/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-type-assertion/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-with/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-guard-clauses/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-nullish-coalescing/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-readonly-parameters/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-result-return/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-shortcut-return/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/prefer-string-raw/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-bdd-spec/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-interface-prefix/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-jsdoc-functions/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-optional-chaining/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-readonly-props/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-test-description-style/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-functions/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
     <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/sort-imports/</loc>
-         <lastmod>2026-03-22</lastmod>
+         <lastmod>2026-03-24</lastmod>
     </url>
 </urlset>
