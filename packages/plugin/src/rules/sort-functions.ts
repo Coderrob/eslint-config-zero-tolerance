@@ -18,8 +18,12 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
-const BLOCK_COMMENT_TYPE = 'Block';
 const CONST_VARIABLE_KIND = 'const';
+
+enum CommentType {
+  Block = 'Block',
+  Line = 'Line',
+}
 
 type SortableFunctionNode = TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator;
 type SortableFunction = Readonly<{
@@ -73,6 +77,33 @@ function checkFunctionOrdering(
       reportUnsortedFunction(context, sourceCode, previousFunction, currentFunction);
     }
   }
+}
+
+/**
+ * Collects adjacent owned trailing comments after the first same-line comment.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param trailingComments - Comments that follow the declaration.
+ * @param startIndex - Index of the first owned trailing comment.
+ * @param nodeEndLine - Ending line of the declaration node.
+ * @returns Owned trailing comments that move with the declaration.
+ */
+function collectAdjacentTrailingComments(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+  startIndex: number,
+  nodeEndLine: number,
+): ReadonlyArray<TSESTree.Comment> {
+  const owned = [trailingComments[startIndex]];
+  for (let index = startIndex + 1; index < trailingComments.length; index += 1) {
+    const current = trailingComments[index];
+    const previous = owned[owned.length - 1];
+    if (!isAdjacentTrailingComment(sourceCode, previous, current, nodeEndLine)) {
+      break;
+    }
+    owned.push(current);
+  }
+  return owned;
 }
 
 /**
@@ -162,6 +193,16 @@ function createSwapFix(
 }
 
 /**
+ * Returns a function declaration name for sortable top-level declarations.
+ *
+ * @param declaration - Function declaration node.
+ * @returns Function name, or an empty string when no identifier is present.
+ */
+function getFunctionDeclarationName(declaration: TSESTree.FunctionDeclaration): string {
+  return declaration.id?.name ?? '';
+}
+
+/**
  * Returns declarator identifier name when declaration is function-valued.
  *
  * @param declaration - The variable declarator to inspect.
@@ -172,16 +213,6 @@ function getFunctionDeclaratorName(declaration: TSESTree.VariableDeclarator): st
     return null;
   }
   return declaration.id.name;
-}
-
-/**
- * Returns a function declaration name for sortable top-level declarations.
- *
- * @param declaration - Function declaration node.
- * @returns Function name, or an empty string when no identifier is present.
- */
-function getFunctionDeclarationName(declaration: TSESTree.FunctionDeclaration): string {
-  return declaration.id?.name ?? '';
 }
 
 /**
@@ -209,51 +240,38 @@ function getOwnedTrailingComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: TSESTree.Node,
 ): ReadonlyArray<TSESTree.Comment> {
-  const allTrailingComments = sourceCode.getCommentsAfter(node);
-
-  if (!allTrailingComments.length) {
+  const trailingComments = sourceCode.getCommentsAfter(node);
+  const firstOwnedIndex = getOwnedTrailingCommentStartIndex(sourceCode, node, trailingComments);
+  if (firstOwnedIndex === null) {
     return [];
   }
+  return collectAdjacentTrailingComments(
+    sourceCode,
+    trailingComments,
+    firstOwnedIndex,
+    node.loc.end.line,
+  );
+}
 
-  const nodeEndLine = node.loc.end.line;
-
-  // Find the first owned same-line trailing comment.
-  let startIndex = -1;
-  for (let i = 0; i < allTrailingComments.length; i += 1) {
-    const comment = allTrailingComments[i];
-    if (!isOwnedTrailingComment(sourceCode, node, comment)) {
-      continue;
+/**
+ * Returns the first same-line trailing comment index owned by a declaration.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node that may own trailing comments.
+ * @param trailingComments - Comments that follow the declaration.
+ * @returns First owned trailing comment index, or null when none exist.
+ */
+function getOwnedTrailingCommentStartIndex(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.Node,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+): number | null {
+  for (let index = 0; index < trailingComments.length; index += 1) {
+    if (isOwnedTrailingComment(sourceCode, node, trailingComments[index])) {
+      return index;
     }
-    startIndex = i;
-    break;
   }
-
-  if (startIndex === -1) {
-    return [];
-  }
-
-  const owned: TSESTree.Comment[] = [];
-  owned.push(allTrailingComments[startIndex]);
-
-  // Collect immediately-adjacent same-line trailing comments while there is
-  // only whitespace between them.
-  for (let i = startIndex + 1; i < allTrailingComments.length; i += 1) {
-    const prev = owned[owned.length - 1];
-    const current = allTrailingComments[i];
-
-    if (current.loc.start.line !== nodeEndLine) {
-      break;
-    }
-
-    const betweenText = sourceCode.text.slice(prev.range[1], current.range[0]);
-    if (/[^\s]/u.test(betweenText)) {
-      break;
-    }
-
-    owned.push(current);
-  }
-
-  return owned;
+  return null;
 }
 
 /**
@@ -378,6 +396,27 @@ function getVariableDeclaratorStatementNode(
 }
 
 /**
+ * Returns true when preceding adjacent content makes a leading comment ambiguous.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate leading comment.
+ * @returns True when nearby previous content means the comment should not move.
+ */
+function hasAdjacentPreviousNonLeadingContent(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+): boolean {
+  const previousTokenOrComment = sourceCode.getTokenBefore(comment, { includeComments: true });
+  if (previousTokenOrComment === null) {
+    return false;
+  }
+  return (
+    comment.loc.start.line - previousTokenOrComment.loc.end.line <= 1 &&
+    isPreviousNonLeadingContent(sourceCode, previousTokenOrComment)
+  );
+}
+
+/**
  * Returns true when non-whitespace text between declaration blocks contains comments.
  *
  * @param sourceCode - ESLint source code helper.
@@ -439,6 +478,27 @@ function hasUnsafeOwnedComments(
 }
 
 /**
+ * Returns true when a trailing comment is adjacent to the previous owned comment.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param previousComment - Previously owned trailing comment.
+ * @param currentComment - Candidate trailing comment.
+ * @param nodeEndLine - Ending line of the declaration node.
+ * @returns True when the candidate comment should move with the declaration.
+ */
+function isAdjacentTrailingComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  previousComment: TSESTree.Comment,
+  currentComment: TSESTree.Comment,
+  nodeEndLine: number,
+): boolean {
+  return (
+    currentComment.loc.start.line === nodeEndLine &&
+    !/[^\s]/u.test(sourceCode.text.slice(previousComment.range[1], currentComment.range[0]))
+  );
+}
+
+/**
  * Returns true when a comment is attached to the following node with no blank-line break.
  *
  * @param sourceCode - ESLint source code helper.
@@ -462,40 +522,13 @@ function isAttachedLeadingComment(
 }
 
 /**
- * Returns true when preceding adjacent content makes a leading comment ambiguous.
- *
- * @param sourceCode - ESLint source code helper.
- * @param comment - Candidate leading comment.
- * @returns True when nearby previous content means the comment should not move.
- */
-function hasAdjacentPreviousNonLeadingContent(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  comment: TSESTree.Comment,
-): boolean {
-  const previousTokenOrComment = sourceCode.getTokenBefore(comment, { includeComments: true });
-  if (previousTokenOrComment === null) {
-    return false;
-  }
-
-  if (comment.loc.start.line - previousTokenOrComment.loc.end.line > 1) {
-    return false;
-  }
-
-  if (isCommentToken(previousTokenOrComment)) {
-    return !isOwnLineBlockComment(sourceCode, previousTokenOrComment);
-  }
-
-  return true;
-}
-
-/**
  * Returns true when a comment is a block comment token.
  *
  * @param comment - Candidate comment.
  * @returns True when comment.type is Block.
  */
 function isBlockComment(comment: TSESTree.Comment): boolean {
-  return comment.type === BLOCK_COMMENT_TYPE;
+  return isCommentType(comment.type, CommentType.Block);
 }
 
 /**
@@ -507,7 +540,21 @@ function isBlockComment(comment: TSESTree.Comment): boolean {
 function isCommentToken(
   tokenOrComment: TSESTree.Comment | TSESTree.Token,
 ): tokenOrComment is TSESTree.Comment {
-  return tokenOrComment.type === 'Block' || tokenOrComment.type === 'Line';
+  return (
+    isCommentType(tokenOrComment.type, CommentType.Block) ||
+    isCommentType(tokenOrComment.type, CommentType.Line)
+  );
+}
+
+/**
+ * Returns true when a token type matches a tracked comment kind.
+ *
+ * @param type - Token type string from the parser.
+ * @param commentType - Comment kind to compare.
+ * @returns True when the token type matches the comment kind.
+ */
+function isCommentType(type: string, commentType: CommentType): boolean {
+  return type === commentType;
 }
 
 /**
@@ -585,6 +632,20 @@ function isOwnLineBlockComment(
   comment: TSESTree.Comment,
 ): boolean {
   return isBlockComment(comment) && hasOnlyWhitespaceBeforeComment(sourceCode, comment);
+}
+
+/**
+ * Returns true when previous adjacent content cannot belong to a leading comment block.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param tokenOrComment - Previous adjacent token or comment.
+ * @returns True when the adjacent content makes ownership unsafe.
+ */
+function isPreviousNonLeadingContent(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  tokenOrComment: TSESTree.Comment | TSESTree.Token,
+): boolean {
+  return isCommentToken(tokenOrComment) ? !isOwnLineBlockComment(sourceCode, tokenOrComment) : true;
 }
 
 /**

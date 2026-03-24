@@ -4,12 +4,12 @@ Prefer readonly typing for object and array-like function parameters.
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `suggestion`  |
 | **Fixable**     | Yes (`--fix`) |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 

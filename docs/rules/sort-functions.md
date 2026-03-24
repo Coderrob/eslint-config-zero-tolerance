@@ -4,12 +4,12 @@ Require top-level function declarations to be sorted alphabetically by name.
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
+| Property        | Value         |
+| --------------- | ------------- |
+| **Type**        | `suggestion`  |
 | **Fixable**     | Yes (`--fix`) |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `warn`        |
+| **Strict**      | `error`       |
 
 ## Rationale
 

@@ -144,10 +144,8 @@ ruleTester.run('sort-functions', sortFunctions, {
     },
     {
       name: 'should move attached leading comments with the sorted function',
-      code:
-        '/** Beta docs. */\nfunction beta() {}\n\n/** Alpha docs. */\nfunction alpha() {}',
-      output:
-        '/** Alpha docs. */\nfunction alpha() {}\n\n/** Beta docs. */\nfunction beta() {}',
+      code: '/** Beta docs. */\nfunction beta() {}\n\n/** Alpha docs. */\nfunction alpha() {}',
+      output: '/** Alpha docs. */\nfunction alpha() {}\n\n/** Beta docs. */\nfunction beta() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
@@ -200,8 +198,7 @@ ruleTester.run('sort-functions', sortFunctions, {
     },
     {
       name: 'should report unsorted functions with directive comments without fix',
-      code:
-        '/* istanbul ignore next */\nfunction beta() {}\nfunction alpha() {}',
+      code: '/* istanbul ignore next */\nfunction beta() {}\nfunction alpha() {}',
       output: null,
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },

@@ -23,6 +23,16 @@ Mutating object properties in place introduces side effects and makes state tran
 const next = { ...state, count: state.count + 1 };
 ```
 
+```typescript
+class AppError extends Error {
+  constructor(message: string, context?: Record<string, unknown>) {
+    super(message);
+    this.name = this.constructor.name;
+    this.context = context;
+  }
+}
+```
+
 ### Incorrect
 
 ```typescript

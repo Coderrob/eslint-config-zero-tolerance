@@ -41,6 +41,12 @@
           "then": "a noObjectMutation violation is reported"
         },
         {
+          "name": "should allow assigning to this properties inside a constructor",
+          "given": "class Example { constructor(value) { this.value = value; } }",
+          "when": "the rule evaluates the constructor assignment",
+          "then": "no violation is reported"
+        },
+        {
           "name": "should report a delete operation on an object property",
           "given": "delete obj.key",
           "when": "the rule evaluates the unary expression",

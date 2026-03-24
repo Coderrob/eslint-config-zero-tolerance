@@ -19,6 +19,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
 
 const DELETE_OPERATOR = 'delete';
+const CONSTRUCTOR_METHOD_KIND = 'constructor';
 
 type NoObjectMutationContext = Readonly<TSESLint.RuleContext<'noObjectMutation', []>>;
 
@@ -32,7 +33,7 @@ function checkAssignmentExpression(
   context: NoObjectMutationContext,
   node: TSESTree.AssignmentExpression,
 ): void {
-  if (!isMemberExpressionNode(node.left)) {
+  if (!isMemberExpressionNode(node.left) || isConstructorThisInitialization(node.left)) {
     return;
   }
   reportObjectMutation(context, node, 'assignment');
@@ -85,6 +86,47 @@ function createNoObjectMutationListeners(context: NoObjectMutationContext): TSES
 }
 
 /**
+ * Returns the nearest enclosing function expression, if any.
+ *
+ * @param node - AST node to inspect.
+ * @returns Enclosing function expression or null.
+ */
+function getEnclosingFunctionExpression(node: TSESTree.Node): TSESTree.FunctionExpression | null {
+  let currentNode: TSESTree.Node | undefined = node.parent;
+  while (currentNode !== undefined) {
+    if (currentNode.type === AST_NODE_TYPES.FunctionExpression) {
+      return currentNode;
+    }
+    currentNode = currentNode.parent;
+  }
+  return null;
+}
+
+/**
+ * Returns true when a member assignment initializes a field on this inside a constructor.
+ *
+ * @param node - Member expression on the left-hand side of an assignment.
+ * @returns True when the mutation is constructor initialization.
+ */
+function isConstructorThisInitialization(node: TSESTree.MemberExpression): boolean {
+  return isThisMemberExpression(node) && isInsideConstructor(node);
+}
+
+/**
+ * Returns true when a node is nested inside a class constructor body.
+ *
+ * @param node - AST node to inspect.
+ * @returns True when enclosed by a constructor method definition.
+ */
+function isInsideConstructor(node: TSESTree.Node): boolean {
+  const functionParent = getEnclosingFunctionExpression(node);
+  return (
+    functionParent?.parent.type === AST_NODE_TYPES.MethodDefinition &&
+    functionParent.parent.kind === CONSTRUCTOR_METHOD_KIND
+  );
+}
+
+/**
  * Returns true when node is a MemberExpression.
  *
  * @param node - AST node to inspect.
@@ -92,6 +134,16 @@ function createNoObjectMutationListeners(context: NoObjectMutationContext): TSES
  */
 function isMemberExpressionNode(node: TSESTree.Node): node is TSESTree.MemberExpression {
   return node.type === AST_NODE_TYPES.MemberExpression;
+}
+
+/**
+ * Returns true when a member expression targets this.
+ *
+ * @param node - Member expression to inspect.
+ * @returns True when the object is this.
+ */
+function isThisMemberExpression(node: TSESTree.MemberExpression): boolean {
+  return node.object.type === AST_NODE_TYPES.ThisExpression;
 }
 
 /**

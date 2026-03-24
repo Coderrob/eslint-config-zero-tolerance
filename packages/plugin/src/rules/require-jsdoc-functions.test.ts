@@ -33,8 +33,7 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
-      code:
-        'class MyClass {\n  /** Factory JSDoc. */\n  static createDedupeService() {}\n}',
+      code: 'class MyClass {\n  /** Factory JSDoc. */\n  static createDedupeService() {}\n}',
       name: 'should allow static class method with JSDoc',
       filename: 'src/utils.ts',
     },
