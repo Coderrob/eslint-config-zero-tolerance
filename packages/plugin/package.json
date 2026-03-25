@@ -75,5 +75,5 @@
     "test": "jest --coverage"
   },
   "types": "dist/index.d.ts",
-  "version": "1.1.7"
+  "version": "1.1.8"
 }

@@ -125,31 +125,33 @@ function collectFunctionDeclarators(
 }
 
 /**
- * Collects owned leading comments from a leading-comment list.
+ * Collects owned leading comments by walking backward through adjacent comments.
  *
- * @param comments - Candidate leading comments.
  * @param sourceCode - ESLint source code helper.
- * @param node - Node that may own the comments.
+ * @param nodeOrComment - Current node or comment to scan before.
+ * @param nextStart - Start offset of the following owned span.
+ * @param nextStartLine - Start line of the following owned span.
  * @returns Leading comments that should move with the declaration.
  */
 function collectOwnedLeadingComments(
-  comments: ReadonlyArray<TSESTree.Comment>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
+  nodeOrComment: TSESTree.Node | TSESTree.Comment,
+  nextStart: number,
+  nextStartLine: number,
 ): ReadonlyArray<TSESTree.Comment> {
-  const ownedComments: TSESTree.Comment[] = [];
-  let nextStart = node.range[0];
-  let nextStartLine = node.loc.start.line;
-  for (let index = comments.length - 1; index >= 0; index -= 1) {
-    const comment = comments[index];
-    if (!isAttachedLeadingComment(sourceCode, comment, nextStart, nextStartLine)) {
-      break;
-    }
-    ownedComments.unshift(comment);
-    nextStart = comment.range[0];
-    nextStartLine = comment.loc.start.line;
+  const previousComment = getPreviousLeadingComment(sourceCode, nodeOrComment);
+  if (previousComment === null || !isAttachedLeadingComment(sourceCode, previousComment, nextStart, nextStartLine)) {
+    return [];
   }
-  return ownedComments;
+  return [
+    ...collectOwnedLeadingComments(
+      sourceCode,
+      previousComment,
+      previousComment.range[0],
+      previousComment.loc.start.line,
+    ),
+    previousComment,
+  ];
 }
 
 /**
@@ -226,7 +228,7 @@ function getOwnedLeadingComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: TSESTree.Node,
 ): ReadonlyArray<TSESTree.Comment> {
-  return collectOwnedLeadingComments(sourceCode.getCommentsBefore(node), sourceCode, node);
+  return collectOwnedLeadingComments(sourceCode, node, node.range[0], node.loc.start.line);
 }
 
 /**
@@ -272,6 +274,21 @@ function getOwnedTrailingCommentStartIndex(
     }
   }
   return null;
+}
+
+/**
+ * Returns the closest preceding comment for a declaration block search.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param nodeOrComment - Current node or comment to scan before.
+ * @returns Closest preceding comment, or null when none exists.
+ */
+function getPreviousLeadingComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  nodeOrComment: TSESTree.Node | TSESTree.Comment,
+): TSESTree.Comment | null {
+  const comments = sourceCode.getCommentsBefore(nodeOrComment);
+  return comments.length === 0 ? null : comments[comments.length - 1];
 }
 
 /**
