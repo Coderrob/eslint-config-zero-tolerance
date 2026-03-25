@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.8] - 2026-03-24
+
+### Fixed
+
+- **`sort-functions` rule**: Fixed autofix comment ownership so attached leading JSDoc blocks move with reordered declarations, including exported `const` function declarations.
+
+### Changed
+
+- **`sort-functions` rule**: Reworked owned leading-comment collection to use an iterative scan instead of recursive array spreading, avoiding repeated allocations when many attached comments precede a declaration.
+
 ## [1.1.7] - 2026-03-22
 
 ### Fixed

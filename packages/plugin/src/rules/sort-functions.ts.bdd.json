@@ -36,7 +36,7 @@
         },
         {
           "name": "should move owned comments with a sorted declaration block",
-          "given": "two out-of-order sortable functions where each declaration has directly attached leading comments or same-line trailing comments",
+          "given": "two out-of-order sortable functions where each declaration has one or more directly attached leading comments and optional same-line trailing comments",
           "when": "the rule evaluates the Program",
           "then": "a sortFunctions violation is reported and the autofix moves the owned comments together with the reordered declaration block"
         },
