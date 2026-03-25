@@ -35,6 +35,11 @@ type SortableBlock = Readonly<{
   start: number;
   text: string;
 }>;
+type LeadingCommentScanState = Readonly<{
+  nextStart: number;
+  nextStartLine: number;
+  startIndex: number;
+}>;
 type SortFunctionsContext = Readonly<TSESLint.RuleContext<'unsortedFunction', []>>;
 type SortableFunctions = SortableFunction[];
 
@@ -128,30 +133,26 @@ function collectFunctionDeclarators(
  * Collects owned leading comments by walking backward through adjacent comments.
  *
  * @param sourceCode - ESLint source code helper.
- * @param nodeOrComment - Current node or comment to scan before.
+ * @param leadingComments - Comments that precede the declaration.
+ * @param startIndex - Index of the closest preceding comment to inspect.
  * @param nextStart - Start offset of the following owned span.
  * @param nextStartLine - Start line of the following owned span.
  * @returns Leading comments that should move with the declaration.
  */
 function collectOwnedLeadingComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  nodeOrComment: TSESTree.Node | TSESTree.Comment,
-  nextStart: number,
-  nextStartLine: number,
+  leadingComments: ReadonlyArray<TSESTree.Comment>,
+  scanState: LeadingCommentScanState,
 ): ReadonlyArray<TSESTree.Comment> {
-  const previousComment = getPreviousLeadingComment(sourceCode, nodeOrComment);
-  if (previousComment === null || !isAttachedLeadingComment(sourceCode, previousComment, nextStart, nextStartLine)) {
-    return [];
+  const ownedComments: TSESTree.Comment[] = [];
+  let currentScanState = scanState;
+  while (hasOwnedLeadingComment(sourceCode, leadingComments, currentScanState)) {
+    const previousComment = leadingComments[currentScanState.startIndex];
+    ownedComments.push(previousComment);
+    currentScanState = updateLeadingCommentScanState(currentScanState, previousComment);
   }
-  return [
-    ...collectOwnedLeadingComments(
-      sourceCode,
-      previousComment,
-      previousComment.range[0],
-      previousComment.loc.start.line,
-    ),
-    previousComment,
-  ];
+  ownedComments.reverse();
+  return ownedComments;
 }
 
 /**
@@ -228,7 +229,16 @@ function getOwnedLeadingComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: TSESTree.Node,
 ): ReadonlyArray<TSESTree.Comment> {
-  return collectOwnedLeadingComments(sourceCode, node, node.range[0], node.loc.start.line);
+  const leadingComments = sourceCode.getCommentsBefore(node);
+  return collectOwnedLeadingComments(
+    sourceCode,
+    leadingComments,
+    {
+      nextStart: node.range[0],
+      nextStartLine: node.loc.start.line,
+      startIndex: leadingComments.length - 1,
+    },
+  );
 }
 
 /**
@@ -274,21 +284,6 @@ function getOwnedTrailingCommentStartIndex(
     }
   }
   return null;
-}
-
-/**
- * Returns the closest preceding comment for a declaration block search.
- *
- * @param sourceCode - ESLint source code helper.
- * @param nodeOrComment - Current node or comment to scan before.
- * @returns Closest preceding comment, or null when none exists.
- */
-function getPreviousLeadingComment(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  nodeOrComment: TSESTree.Node | TSESTree.Comment,
-): TSESTree.Comment | null {
-  const comments = sourceCode.getCommentsBefore(nodeOrComment);
-  return comments.length === 0 ? null : comments[comments.length - 1];
 }
 
 /**
@@ -478,6 +473,28 @@ function hasOnlyWhitespaceBeforeComment(
 ): boolean {
   const lineText = sourceCode.lines[comment.loc.start.line - 1] ?? '';
   return lineText.slice(0, comment.loc.start.column).trim().length === 0;
+}
+
+/**
+ * Checks whether the current leading comment scan points at an owned comment.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param leadingComments - Comments that precede the declaration.
+ * @param scanState - Current leading comment scan state.
+ * @returns True when the indexed comment is attached to the owned span.
+ */
+function hasOwnedLeadingComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  leadingComments: ReadonlyArray<TSESTree.Comment>,
+  scanState: LeadingCommentScanState,
+): boolean {
+  return scanState.startIndex >= 0
+    && isAttachedLeadingComment(
+      sourceCode,
+      leadingComments[scanState.startIndex],
+      scanState.nextStart,
+      scanState.nextStartLine,
+    );
 }
 
 /**
@@ -767,6 +784,24 @@ function swapSortableFunctionBlocks(
     [previousBlock.start, currentBlock.end],
     `${currentBlock.text}${betweenText}${previousBlock.text}`,
   );
+}
+
+/**
+ * Advances the leading comment scan to the next earlier comment.
+ *
+ * @param scanState - Current leading comment scan state.
+ * @param previousComment - Owned comment consumed by the scan.
+ * @returns Updated scan state for the next iteration.
+ */
+function updateLeadingCommentScanState(
+  scanState: LeadingCommentScanState,
+  previousComment: TSESTree.Comment,
+): LeadingCommentScanState {
+  return {
+    nextStart: previousComment.range[0],
+    nextStartLine: previousComment.loc.start.line,
+    startIndex: scanState.startIndex - 1,
+  };
 }
 
 /** Enforces alphabetical ordering of top-level function declarations and function-valued consts. */
