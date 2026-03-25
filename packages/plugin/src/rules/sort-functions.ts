@@ -134,9 +134,7 @@ function collectFunctionDeclarators(
  *
  * @param sourceCode - ESLint source code helper.
  * @param leadingComments - Comments that precede the declaration.
- * @param startIndex - Index of the closest preceding comment to inspect.
- * @param nextStart - Start offset of the following owned span.
- * @param nextStartLine - Start line of the following owned span.
+ * @param scanState - Starting state for the backward leading comment scan.
  * @returns Leading comments that should move with the declaration.
  */
 function collectOwnedLeadingComments(
