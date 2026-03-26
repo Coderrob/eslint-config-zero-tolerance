@@ -2,6 +2,8 @@
 
 Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
 
+**Supports ESLint 8.57+, 9.x, and 10.x**
+
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 

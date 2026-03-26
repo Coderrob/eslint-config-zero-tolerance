@@ -228,15 +228,11 @@ function getOwnedLeadingComments(
   node: TSESTree.Node,
 ): ReadonlyArray<TSESTree.Comment> {
   const leadingComments = sourceCode.getCommentsBefore(node);
-  return collectOwnedLeadingComments(
-    sourceCode,
-    leadingComments,
-    {
-      nextStart: node.range[0],
-      nextStartLine: node.loc.start.line,
-      startIndex: leadingComments.length - 1,
-    },
-  );
+  return collectOwnedLeadingComments(sourceCode, leadingComments, {
+    nextStart: node.range[0],
+    nextStartLine: node.loc.start.line,
+    startIndex: leadingComments.length - 1,
+  });
 }
 
 /**
@@ -486,13 +482,15 @@ function hasOwnedLeadingComment(
   leadingComments: ReadonlyArray<TSESTree.Comment>,
   scanState: LeadingCommentScanState,
 ): boolean {
-  return scanState.startIndex >= 0
-    && isAttachedLeadingComment(
+  return (
+    scanState.startIndex >= 0 &&
+    isAttachedLeadingComment(
       sourceCode,
       leadingComments[scanState.startIndex],
       scanState.nextStart,
       scanState.nextStartLine,
-    );
+    )
+  );
 }
 
 /**

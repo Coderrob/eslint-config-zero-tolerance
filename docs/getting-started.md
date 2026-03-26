@@ -4,12 +4,12 @@ This guide shows how to add `@coderrob/eslint-plugin-zero-tolerance` to a TypeSc
 
 ## Requirements
 
-| Dependency                  | Version      |
-| --------------------------- | ------------ |
-| Node.js                     | 18+          |
-| TypeScript                  | 5.x          |
-| ESLint                      | 8.57+ or 9.x |
-| `@typescript-eslint/parser` | 8.x          |
+| Dependency                  | Version                                                       |
+| --------------------------- | ------------------------------------------------------------- |
+| Node.js                     | 18+ (for ESLint 8.57+ or 9.x), 20+ (recommended for 10.x)    |
+| TypeScript                  | 5.x                                                           |
+| ESLint                      | 8.57+ or 9.x (Node 18+), or 10.x (Node 20+ recommended)      |
+| `@typescript-eslint/parser` | 8.x                                                           |
 
 ## Installation
 
