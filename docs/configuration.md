@@ -20,7 +20,7 @@ Internally, flat-config preset selection is typed with a `Preset` enum:
 
 This enum is used by the shared config/rule builders to avoid stringly-typed preset branching.
 
-## Flat Config Presets (ESLint 9+)
+## Flat Config Presets (ESLint 9+/10+)
 
 ### `recommended`
 

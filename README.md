@@ -13,7 +13,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 [![Coverage](https://img.shields.io/badge/coverage-99.71%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
-**Now supports ESLint 9 with Flat Config**
+**Now supports ESLint 8.57+, 9.x, and 10.x with Flat Config**
 
 Documentation:
 
@@ -30,7 +30,7 @@ This monorepo contains two packages:
 
 ## Requirements
 
-- ESLint 8.57.0+ or 9.x
+- ESLint 8.57.0+, 9.x, or 10.x
 - TypeScript-ESLint 8.x
 - TypeScript 5.x
 

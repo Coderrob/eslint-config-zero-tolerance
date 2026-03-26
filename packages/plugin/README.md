@@ -15,7 +15,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 ## Requirements
 
 - Node.js >= 18
-- ESLint 8.57.0+ or 9.x
+- ESLint 8.57.0+, 9.x, or 10.x
 - `@typescript-eslint/parser` 8.x
 - TypeScript 5.x
 

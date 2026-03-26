@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-03-26
+
+### Changed
+
+- **ESLint version support**: Updated peer dependencies to support ESLint 8.57.0+, 9.x, and 10.x (previously 8.57.0+ and 9.x only).
+- **TypeScript-ESLint version**: Updated `@typescript-eslint/*` packages to version 8.57.2 for compatibility with ESLint 10.
+
 ## [1.1.8] - 2026-03-24
 
 ### Fixed
