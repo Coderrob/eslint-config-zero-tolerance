@@ -79,7 +79,7 @@ type RequireJsdocFunctionsContext = Readonly<
  * @returns Updated JSDoc comment text.
  */
 function appendTagLinesToComment(commentText: string, tagLines: ReadonlyArray<string>): string {
-  const closingMatch = commentText.match(/\n([ \t]*)\*\/$/u);
+  const closingMatch = /\n([ \t]*)\*\/$/u.exec(commentText);
   if (closingMatch !== null) {
     return appendToMultilineComment(commentText, tagLines, closingMatch[1]);
   }
@@ -291,7 +291,8 @@ function getLineIndentation(
   node: TSESTree.Node,
 ): string {
   const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
-  return lineText.match(/^\s*/u)?.[0] ?? '';
+  const indentationMatch = /^\s*/u.exec(lineText);
+  return indentationMatch?.[0] ?? '';
 }
 
 /**
@@ -834,18 +835,39 @@ function reportMissingJsdoc(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: FunctionNode,
 ): void {
-  const targetNode = getTargetNode(node);
-  const jsdocComment = getJsdocComment(sourceCode, targetNode);
-  if (jsdocComment === null) {
-    context.report({
-      node,
-      messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
-      data: { name: getFunctionName(node) },
-      fix: createMissingJsdocFix.bind(undefined, sourceCode, targetNode, node),
-    });
+  const functionName = getFunctionName(node);
+  if (functionName === ANONYMOUS_FUNCTION_NAME) {
     return;
   }
-  reportMissingJsdocTags(context, sourceCode, node, jsdocComment);
+  const targetNode = getTargetNode(node);
+  const jsdocComment = getJsdocComment(sourceCode, targetNode);
+  if (jsdocComment !== null) {
+    reportMissingJsdocTags(context, sourceCode, node, jsdocComment);
+    return;
+  }
+  reportMissingJsdocComment(context, sourceCode, node, targetNode);
+}
+
+/**
+ * Reports a missing JSDoc comment for a named function-like construct.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Function-like AST node.
+ * @param targetNode - JSDoc owner target node.
+ */
+function reportMissingJsdocComment(
+  context: RequireJsdocFunctionsContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: FunctionNode,
+  targetNode: TSESTree.Node,
+): void {
+  context.report({
+    node,
+    messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
+    data: { name: getFunctionName(node) },
+    fix: createMissingJsdocFix.bind(undefined, sourceCode, targetNode, node),
+  });
 }
 
 /**

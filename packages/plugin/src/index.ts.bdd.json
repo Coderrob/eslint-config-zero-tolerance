@@ -27,6 +27,12 @@
           "given": "the plugin default export is imported",
           "when": "Object.keys(plugin.rules) is evaluated",
           "then": "contains every rule name defined in the plugin"
+        },
+        {
+          "name": "should register require-jsdoc-anonymous-functions as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['require-jsdoc-anonymous-functions'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

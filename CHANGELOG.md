@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-03-27
+
+### Added
+
+- **`require-jsdoc-anonymous-functions` rule**: Split anonymous-function JSDoc enforcement from `require-jsdoc-functions` into a dedicated rule so teams can configure anonymous and named function documentation requirements independently.
+
+### Changed
+
+- **`require-jsdoc-functions` rule**: Now enforces JSDoc and tag coverage only for named function-like constructs; anonymous function-like constructs are handled by `require-jsdoc-anonymous-functions`.
+- **`require-jsdoc-anonymous-functions` preset defaults**: Set to `off` in `recommended` and `warn` in `strict`.
+- **`prefer-result-return` preset defaults**: Set to `off` in `recommended` and `warn` in `strict`.
+- **`max-function-lines` preset defaults**: Set to `warn` with `max: 30` in `recommended` and `error` with `max: 25` in `strict`.
+
 ## [1.2.0] - 2026-03-26
 
 ### Changed

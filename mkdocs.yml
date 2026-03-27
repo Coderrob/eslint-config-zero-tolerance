@@ -56,6 +56,7 @@ nav:
           - require-interface-prefix: rules/require-interface-prefix.md
       - Documentation:
           - require-bdd-spec: rules/require-bdd-spec.md
+          - require-jsdoc-anonymous-functions: rules/require-jsdoc-anonymous-functions.md
           - require-jsdoc-functions: rules/require-jsdoc-functions.md
           - require-optional-chaining: rules/require-optional-chaining.md
           - require-readonly-props: rules/require-readonly-props.md

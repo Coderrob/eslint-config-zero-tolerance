@@ -55,7 +55,8 @@ pnpm build && pnpm lint
 Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md):
 
 - Interface names must start with `I` (`require-interface-prefix`)
-- All non-test functions must have a JSDoc comment (`require-jsdoc-functions`)
+- Named non-test functions must have a JSDoc comment (`require-jsdoc-functions`)
+- Anonymous non-test function-like constructs must have a JSDoc comment (`require-jsdoc-anonymous-functions`)
 - Import declarations must be ordered by group (side-effect -> builtin -> external -> parent -> peer -> index) and alphabetically within each group (`sort-imports`)
 - No parent-relative re-exports (`no-re-export`)
 - No `eslint-disable` comments — fix the underlying issue (`no-eslint-disable`)

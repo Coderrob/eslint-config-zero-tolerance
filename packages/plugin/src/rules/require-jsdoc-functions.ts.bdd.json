@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/require-jsdoc-functions.ts",
   "module": {
     "name": "require-jsdoc-functions",
-    "description": "Require JSDoc comments on all functions and require @param/@returns/@throws tags when applicable (except in test files).",
+    "description": "Require JSDoc comments on named functions and require @param/@returns/@throws tags when applicable (except in test files).",
     "exports": ["RequireJsdocFunctionsMessageId", "requireJsdocFunctions"]
   },
   "specifications": [
@@ -33,6 +33,12 @@
           "name": "should allow a static class method with a preceding JSDoc block",
           "given": "a static class method in a non-test source file with a /** ... */ JSDoc comment on the method definition",
           "when": "the rule evaluates the method's function expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore anonymous function-like constructs",
+          "given": "an anonymous function-like construct in a non-test source file with no JSDoc",
+          "when": "the rule evaluates the function",
           "then": "no violation is reported"
         }
       ]

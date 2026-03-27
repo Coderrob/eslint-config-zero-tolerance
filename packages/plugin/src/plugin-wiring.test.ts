@@ -20,7 +20,9 @@ import eslintPlugin from './index';
 const RULE_NO_EXPORT_ALIAS = `${PLUGIN_NAMESPACE}/no-export-alias`;
 const RULE_MAX_FUNCTION_LINES = `${PLUGIN_NAMESPACE}/max-function-lines`;
 const RULE_NO_FOR_IN = `${PLUGIN_NAMESPACE}/no-for-in`;
+const RULE_PREFER_RESULT_RETURN = `${PLUGIN_NAMESPACE}/prefer-result-return`;
 const RULE_REQUIRE_BDD_SPEC = `${PLUGIN_NAMESPACE}/require-bdd-spec`;
+const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
 const RULE_KEY_SORT_IMPORTS = 'sort-imports';
 const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
@@ -32,10 +34,14 @@ describe('plugin wiring', () => {
 
     expect(recommendedRules[RULE_NO_EXPORT_ALIAS]).toBe('warn');
     expect(strictRules[RULE_NO_EXPORT_ALIAS]).toBe('error');
-    expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual(['warn', { max: 20 }]);
-    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 15 }]);
+    expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual(['warn', { max: 30 }]);
+    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 25 }]);
     expect(recommendedRules[RULE_NO_FOR_IN]).toBe('warn');
     expect(strictRules[RULE_NO_FOR_IN]).toBe('error');
+    expect(recommendedRules[RULE_PREFER_RESULT_RETURN]).toBe('off');
+    expect(strictRules[RULE_PREFER_RESULT_RETURN]).toBe('warn');
+    expect(recommendedRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
+    expect(strictRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('warn');
     expect(recommendedRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(strictRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(Object.keys(recommendedRules)).toHaveLength(Object.keys(ruleMap).length);

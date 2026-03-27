@@ -73,6 +73,16 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
+      code: 'export default function () {}',
+      name: 'should allow anonymous default export function without JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: 'class C { ["x"]() {} }',
+      name: 'should allow computed class method key without JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
       code: '/** Adds values.\n * @param a first value\n * @param b second value\n * @returns sum\n */\nfunction add(a: number, b: number) { return a + b; }',
       name: 'should allow function with params and return when JSDoc includes @param and @returns',
       filename: 'src/utils.ts',
@@ -267,30 +277,6 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       ],
       output:
         '/* Not a JSDoc */\n/**\n * doSomething TODO: describe\n */\nfunction doSomething() {}',
-    },
-    {
-      code: 'export default function () {}',
-      name: 'should report anonymous default export function without JSDoc',
-      filename: 'src/utils.ts',
-      errors: [
-        {
-          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
-          data: { name: '<anonymous>' },
-        },
-      ],
-      output: '/**\n * <anonymous> TODO: describe\n */\nexport default function () {}',
-    },
-    {
-      code: 'class C { ["x"]() {} }',
-      name: 'should report computed class method key without JSDoc',
-      filename: 'src/utils.ts',
-      errors: [
-        {
-          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
-          data: { name: '<anonymous>' },
-        },
-      ],
-      output: null,
     },
     {
       code: 'function transform(source: string) { return source.trim(); }',

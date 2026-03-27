@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-jsdoc-anonymous-functions.ts",
+  "module": {
+    "name": "require-jsdoc-anonymous-functions",
+    "description": "Require JSDoc comments on anonymous function-like constructs outside of test files.",
+    "exports": ["RequireJsdocAnonymousFunctionsMessageId", "requireJsdocAnonymousFunctions"]
+  },
+  "specifications": [
+    {
+      "feature": "Anonymous functions with JSDoc coverage",
+      "scenarios": [
+        {
+          "name": "should allow anonymous functions when a JSDoc block is present",
+          "given": "an anonymous function-like construct preceded by a /** ... */ comment",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow anonymous functions in test files without JSDoc",
+          "given": "an anonymous function in a .test.ts file with no JSDoc",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore named functions",
+          "given": "a named function-like construct without JSDoc",
+          "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Anonymous functions missing JSDoc",
+      "scenarios": [
+        {
+          "name": "should report an anonymous function with no JSDoc comment",
+          "given": "an anonymous function-like construct in a non-test source file with no preceding JSDoc block",
+          "when": "the rule evaluates the function",
+          "then": "a requireJsdocAnonymousFunctions violation is reported"
+        },
+        {
+          "name": "should autofix missing JSDoc for standalone anonymous export default function",
+          "given": "an anonymous default export function on a standalone line in a non-test source file",
+          "when": "the rule reports a missing JSDoc comment",
+          "then": "autofix inserts a generated JSDoc block above the export statement"
+        }
+      ]
+    }
+  ]
+}

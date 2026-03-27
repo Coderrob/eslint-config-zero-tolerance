@@ -135,6 +135,7 @@ const baseConfig = {
     'zero-tolerance/sort-functions': 'error',
 
     // Documentation and naming
+    'zero-tolerance/require-jsdoc-anonymous-functions': 'error',
     'zero-tolerance/require-jsdoc-functions': 'error',
     'zero-tolerance/require-test-description-style': 'error',
 

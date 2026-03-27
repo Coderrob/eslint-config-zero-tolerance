@@ -20,8 +20,8 @@ import { PLUGIN_NAMESPACE, Preset } from './constants';
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
 const OFF_LEVEL = 'off';
-const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 20;
-const MAX_FUNCTION_LINES_STRICT_MAX = 15;
+const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 30;
+const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
@@ -64,7 +64,6 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',
   'prefer-readonly-parameters',
-  'prefer-result-return',
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
@@ -191,6 +190,8 @@ const ruleEntries: RuleEntryTuple[] = [
     [WARN_LEVEL, { max: MAX_PARAMS_MAX }],
     [ERROR_LEVEL, { max: MAX_PARAMS_MAX }],
   ),
+  createRuleEntry('prefer-result-return', OFF_LEVEL, WARN_LEVEL),
+  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 

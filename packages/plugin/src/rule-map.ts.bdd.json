@@ -36,10 +36,22 @@
           "then": "returns an array entry with 'warn' and the recommended max-lines option"
         },
         {
+          "name": "should keep prefer-result-return relaxed in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/prefer-result-return' entries are read",
+          "then": "the rule is set to off in Recommended and warn in Strict"
+        },
+        {
           "name": "should keep require-bdd-spec disabled in both built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-bdd-spec' entries are read",
           "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
+        },
+        {
+          "name": "should include require-jsdoc-anonymous-functions in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-jsdoc-anonymous-functions' entries are read",
+          "then": "the rule is set to off in Recommended and warn in Strict"
         }
       ]
     }
