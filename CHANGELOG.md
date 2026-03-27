@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`require-clean-barrel` rule**: Enforces that barrel files (`index.*`) remain aggregation-only by allowing only module re-export declarations and reporting imports, local declarations, default exports, and local export lists without a `from` source.
+
+### Changed
+
+- **`no-parent-imports` preset defaults**: Restored it to the built-in preset defaults so it is now `warn` in `recommended` and `error` in `strict` (including the legacy preset variants via shared rule-map wiring).
+- **Documentation sync**: Updated preset and rule docs to reflect that `no-parent-imports` is enabled by default again, while `require-bdd-spec` remains opt-in.
+
 ## [1.2.1] - 2026-03-27
 
 ### Added

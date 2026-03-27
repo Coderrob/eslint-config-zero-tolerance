@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `no-parent-imports` and `require-bdd-spec` remain available as opt-in rules.
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `require-bdd-spec` remains available as an opt-in rule.
 
 ### Naming Conventions
 
@@ -181,12 +181,13 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Imports
 
-| Rule                                                   | Description                                                   |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| [`no-parent-imports`](docs/rules/no-parent-imports.md) | Ban `..` and `../*` parent-directory import traversal         |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban dynamic `import()` and `require()` outside test files     |
-| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements                   |
-| [`no-re-export`](docs/rules/no-re-export.md)           | Disallow re-export statements from parent/grandparent modules |
+| Rule                                                         | Description                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | Require barrel files (`index.*`) to contain only module re-exports |
+| [`no-parent-imports`](docs/rules/no-parent-imports.md)       | Ban `..` and `../*` parent-directory import traversal              |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)       | Ban dynamic `import()` and `require()` outside test files          |
+| [`no-export-alias`](docs/rules/no-export-alias.md)           | Prevent use of aliases in export statements                        |
+| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow re-export statements from parent/grandparent modules      |
 
 ### Bug Prevention
 

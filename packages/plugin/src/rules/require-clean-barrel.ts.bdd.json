@@ -1,0 +1,94 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-clean-barrel.ts",
+  "module": {
+    "name": "require-clean-barrel",
+    "description": "Require barrel files (index.*) to contain only module re-export declarations.",
+    "exports": ["requireCleanBarrel"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed barrel statements",
+      "scenarios": [
+        {
+          "name": "should allow named module re-export declarations in barrel files",
+          "given": "an index.ts file containing export { foo } from './foo'",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow wildcard module re-export declarations in barrel files",
+          "given": "an index.ts file containing export * from './foo'",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow namespace and type wildcard module re-export declarations in barrel files",
+          "given": "an index.ts file containing export * as utils from './utils' and export type * from './types'",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow mixed module re-exports in barrel files",
+          "given": "an index.ts file containing named, wildcard, and type-only re-export declarations",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore non-barrel files",
+          "given": "a non-index source file with arbitrary top-level statements",
+          "when": "the rule evaluates the file",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore index files that are not barrel aggregators",
+          "given": "an index.ts file with no module re-export declarations",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should apply to single-extension JavaScript and module barrel files",
+          "given": "an index.js or index.mts file containing only module re-export declarations",
+          "when": "the rule evaluates the top-level statements",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore double-extension index files",
+          "given": "an index.d.ts, index.test.ts, or index.spec.js file containing non-barrel statements",
+          "when": "the rule evaluates the file",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Disallowed barrel statements",
+      "scenarios": [
+        {
+          "name": "should report non-re-export top-level statements in barrel files",
+          "given": "an index.ts file containing import declarations or local declarations",
+          "when": "the rule evaluates the top-level statements",
+          "then": "a cleanBarrelOnlyReExports violation is reported for each disallowed statement"
+        },
+        {
+          "name": "should report local export declarations without source in barrel files",
+          "given": "an index.ts file containing export { foo } with no from source",
+          "when": "the rule evaluates the top-level statements",
+          "then": "a cleanBarrelOnlyReExports violation is reported"
+        },
+        {
+          "name": "should report directive and declaration statements in barrel files",
+          "given": "an index.ts file containing a directive or a top-level function, class, interface, enum, or namespace declaration alongside a module re-export",
+          "when": "the rule evaluates the top-level statements",
+          "then": "a cleanBarrelOnlyReExports violation is reported for each disallowed statement"
+        },
+        {
+          "name": "should report export assignment statements in barrel files once a module re-export exists",
+          "given": "an index.ts file containing export = value and at least one module re-export declaration",
+          "when": "the rule evaluates the top-level statements",
+          "then": "a cleanBarrelOnlyReExports violation is reported for the export assignment"
+        }
+      ]
+    }
+  ]
+}

@@ -25,6 +25,7 @@ const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
+  'require-clean-barrel',
   'require-interface-prefix',
   'require-test-description-style',
   'no-array-mutation',
@@ -60,6 +61,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-floating-promises',
   'no-for-in',
   'no-labels',
+  'no-parent-imports',
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',

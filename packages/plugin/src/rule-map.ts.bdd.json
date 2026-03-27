@@ -48,10 +48,22 @@
           "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
         },
         {
+          "name": "should include no-parent-imports in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-parent-imports' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
           "name": "should include require-jsdoc-anonymous-functions in built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-jsdoc-anonymous-functions' entries are read",
           "then": "the rule is set to off in Recommended and warn in Strict"
+        },
+        {
+          "name": "should include require-clean-barrel in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-clean-barrel' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
         }
       ]
     }

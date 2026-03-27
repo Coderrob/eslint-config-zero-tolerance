@@ -21,6 +21,11 @@ ruleTester.run('prefer-result-return', preferResultReturn, {
       filename: 'src/parser.test.ts',
       code: 'function parse() { throw new Error("invalid"); }',
     },
+    {
+      name: 'should allow throw in spec files',
+      filename: 'src/parser.spec.ts',
+      code: 'function parse() { throw new Error("invalid"); }',
+    },
   ],
   invalid: [
     {
@@ -33,6 +38,12 @@ ruleTester.run('prefer-result-return', preferResultReturn, {
       name: 'should disallow throw inside nested block',
       filename: 'src/parser.ts',
       code: 'function parse() { if (true) { throw new Error("invalid"); } return { ok: true as const }; }',
+      errors: [{ messageId: 'preferResultReturn' }],
+    },
+    {
+      name: 'should disallow throw statement at module scope in source files',
+      filename: 'src/parser.ts',
+      code: 'throw new Error("invalid");',
       errors: [{ messageId: 'preferResultReturn' }],
     },
   ],

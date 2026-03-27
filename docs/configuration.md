@@ -67,6 +67,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` is availa
 | Rule                                | Recommended    | Strict          |
 | ----------------------------------- | -------------- | --------------- |
 | `require-interface-prefix`          | warn           | error           |
+| `require-clean-barrel`              | warn           | error           |
 | `require-test-description-style`    | warn           | error           |
 | `require-jsdoc-anonymous-functions` | off            | warn            |
 | `require-jsdoc-functions`           | warn           | error           |
@@ -99,6 +100,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` is availa
 | `no-non-null-assertion`             | warn           | error           |
 | `no-for-in`                         | warn           | error           |
 | `no-labels`                         | warn           | error           |
+| `no-parent-imports`                 | warn           | error           |
 | `no-with`                           | warn           | error           |
 | `no-await-in-loop`                  | warn           | error           |
 | `no-floating-promises`              | warn           | error           |
@@ -114,7 +116,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` is availa
 | `require-optional-chaining`         | warn           | error           |
 | `require-bdd-spec`                  | off            | off             |
 
-`no-parent-imports` and `require-bdd-spec` are available but intentionally not enabled by default in presets.
+`require-bdd-spec` is available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 
