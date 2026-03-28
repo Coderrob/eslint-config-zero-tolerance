@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Test infrastructure**: Extracted a shared `test-helper.ts` module that exports a pre-configured `RuleTester` instance. All 46 standard rule test files now import `ruleTester` from `../test-helper` instead of repeating the same 8-line setup block, removing ~370 lines of boilerplate. Three test files with custom parser options (`no-eslint-disable`, `no-with`, `require-readonly-props`) retain their own `RuleTester` instances but had their intermediate `ruleTestConfig` variable inlined for clarity. The `tsconfig.json` exclude list was updated to keep `test-helper.ts` out of the production type-check so devDependency imports do not break the build.
+- **`rule-map.ts` simplifications**: Removed the `buildRuleMap` wrapper function by inlining it as `Object.fromEntries(ruleEntries)` directly at the `ruleMap` export declaration. Simplified `getPresetRuleConfig` from a two-branch if/else to a single ternary expression.
+- **`ast-guards.ts` – `isTestFile`**: Replaced the guard-clause early return with a single `return (... || ...)` expression for a more concise boolean composition.
 - **`no-parent-imports` preset defaults**: Restored it to the built-in preset defaults so it is now `warn` in `recommended` and `error` in `strict` (including the legacy preset variants via shared rule-map wiring).
 - **Documentation sync**: Updated preset and rule docs to reflect that `no-parent-imports` is enabled by default again, while `require-bdd-spec` remains opt-in.
 

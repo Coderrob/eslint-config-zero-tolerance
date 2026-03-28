@@ -1,12 +1,5 @@
-import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { requireInterfacePrefix } from './require-interface-prefix';
-
-const ruleTester = new RuleTester({
-  languageOptions: {
-    parser: tsParser,
-  },
-});
 
 ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
   valid: [

@@ -1,19 +1,10 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { maxParams } from './max-params';
 
 const DEFAULT_MAX_PARAMS = 4;
 const MAX_ONE = 1;
 const MAX_TWO = 2;
 const PARAM_COUNT_FIVE = 5;
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('max-params', maxParams, {
   valid: [

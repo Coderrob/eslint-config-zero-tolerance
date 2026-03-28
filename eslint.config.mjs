@@ -21,8 +21,8 @@ import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 /** File patterns for TypeScript source files */
 const TS_JS_FILES = ['**/*.ts', '**/*.tsx'];
 
-/** File patterns for test files */
-const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts'];
+/** File patterns for test files and test-only infrastructure. */
+const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts', '**/test-helper.ts'];
 
 /** ECMAScript version for parser options */
 const ECMA_VERSION = 2020;

@@ -1,8 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import * as tsParser from '@typescript-eslint/parser';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { RequireBddSpecMessageId, requireBddSpec } from './require-bdd-spec';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -449,13 +448,6 @@ makeBddSpec(
 );
 
 // ─── Rule tester setup ────────────────────────────────────────────────────────
-
-const ruleTestConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('require-bdd-spec', requireBddSpec, {
   valid: [

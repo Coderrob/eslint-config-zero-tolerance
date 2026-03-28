@@ -1,17 +1,8 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import {
   RequireJsdocAnonymousFunctionsMessageId,
   requireJsdocAnonymousFunctions,
 } from './require-jsdoc-anonymous-functions';
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('require-jsdoc-anonymous-functions', requireJsdocAnonymousFunctions, {
   valid: [

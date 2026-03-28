@@ -133,10 +133,10 @@ export function isSwitchCaseNode(
  */
 export function isTestFile(filename: string): boolean {
   const normalizedFilename = filename.replace(/\\/g, '/').toLowerCase();
-  if (normalizedFilename.includes(TEST_DIRECTORY_SEGMENT)) {
-    return true;
-  }
-  return TEST_FILE_PATTERN.test(normalizedFilename);
+  return (
+    normalizedFilename.includes(TEST_DIRECTORY_SEGMENT) ||
+    TEST_FILE_PATTERN.test(normalizedFilename)
+  );
 }
 
 /**

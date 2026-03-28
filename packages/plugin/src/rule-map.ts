@@ -93,19 +93,6 @@ function buildPrefixedRuleName(ruleName: string): string {
 }
 
 /**
- * Builds the canonical rule map object from entry tuples.
- *
- * @returns Rule map keyed by unprefixed rule name.
- */
-function buildRuleMap(): Record<string, IRuleConfig> {
-  const map: Record<string, IRuleConfig> = {};
-  for (const [ruleName, config] of ruleEntries) {
-    map[ruleName] = config;
-  }
-  return map;
-}
-
-/**
  * Builds prefixed ESLint rules for the requested preset.
  *
  * @param preset - Requested preset.
@@ -154,10 +141,7 @@ function createRuleEntry(
  * @returns The matching rule entry.
  */
 function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEntry {
-  if (preset === Preset.Strict) {
-    return config.strict;
-  }
-  return config.recommended;
+  return preset === Preset.Strict ? config.strict : config.recommended;
 }
 
 /**
@@ -197,4 +181,4 @@ const ruleEntries: RuleEntryTuple[] = [
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 
-export const ruleMap = buildRuleMap();
+export const ruleMap: Record<string, IRuleConfig> = Object.fromEntries(ruleEntries);

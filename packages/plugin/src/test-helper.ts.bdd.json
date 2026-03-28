@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/test-helper.ts",
+  "module": {
+    "name": "test-helper",
+    "description": "Shared RuleTester instance pre-configured with the TypeScript parser, used by all rule unit tests to eliminate boilerplate duplication.",
+    "exports": ["ruleTester"]
+  },
+  "specifications": [
+    {
+      "feature": "ruleTester",
+      "scenarios": [
+        {
+          "name": "should export a RuleTester configured with the TypeScript parser",
+          "given": "the test-helper module is imported",
+          "when": "ruleTester is accessed",
+          "then": "returns a RuleTester instance configured to parse TypeScript"
+        }
+      ]
+    }
+  ]
+}
