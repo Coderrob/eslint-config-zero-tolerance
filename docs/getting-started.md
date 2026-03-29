@@ -48,7 +48,7 @@ export default [
 
 ### Strict preset
 
-The strict preset enables all rules at **error** severity and applies tighter limits (e.g. max function body: 25 lines).
+The strict preset raises most rules to **error** severity and applies tighter limits (e.g. max function body: 25 lines); see the preset table for exact rule severities.
 
 ```js title="eslint.config.js"
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
