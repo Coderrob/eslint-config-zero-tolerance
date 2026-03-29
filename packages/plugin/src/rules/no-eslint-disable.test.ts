@@ -1,17 +1,15 @@
 import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noEslintDisable } from './no-eslint-disable';
 
-const ruleTestConfig: RuleTesterConfig = {
+const ruleTester = new RuleTester({
   languageOptions: {
     parser: tsParser,
   },
   linterOptions: {
     reportUnusedDisableDirectives: false,
   },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
+});
 
 ruleTester.run('no-eslint-disable', noEslintDisable, {
   valid: [

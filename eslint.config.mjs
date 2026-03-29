@@ -21,8 +21,8 @@ import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 /** File patterns for TypeScript source files */
 const TS_JS_FILES = ['**/*.ts', '**/*.tsx'];
 
-/** File patterns for test files */
-const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts'];
+/** File patterns for test files and test-only infrastructure. */
+const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts', '**/test-helper.ts'];
 
 /** ECMAScript version for parser options */
 const ECMA_VERSION = 2020;
@@ -135,6 +135,7 @@ const baseConfig = {
     'zero-tolerance/sort-functions': 'error',
 
     // Documentation and naming
+    'zero-tolerance/require-jsdoc-anonymous-functions': 'error',
     'zero-tolerance/require-jsdoc-functions': 'error',
     'zero-tolerance/require-test-description-style': 'error',
 
@@ -145,6 +146,7 @@ const baseConfig = {
     'zero-tolerance/no-non-null-assertion': 'error',
 
     // Import/export patterns
+    'zero-tolerance/require-clean-barrel': 'error',
     'zero-tolerance/no-re-export': 'error',
     'zero-tolerance/no-dynamic-import': 'error',
     'zero-tolerance/no-export-alias': 'error',

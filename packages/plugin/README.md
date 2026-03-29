@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 46 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 48 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -87,12 +87,13 @@ export default [
 
 ### Documentation
 
-| Rule                        | Description                                                                         |
-| --------------------------- | ----------------------------------------------------------------------------------- |
-| `require-bdd-spec`          | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| `require-jsdoc-functions`   | Require JSDoc comments on all functions (except test files)                         |
-| `require-optional-chaining` | Require optional chaining instead of repeated guard access                          |
-| `require-readonly-props`    | Require JSX component props to be typed as readonly                                 |
+| Rule                                | Description                                                                         |
+| ----------------------------------- | ----------------------------------------------------------------------------------- |
+| `require-bdd-spec`                  | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
+| `require-jsdoc-anonymous-functions` | Require JSDoc comments on anonymous function-like constructs (except test files)    |
+| `require-jsdoc-functions`           | Require JSDoc comments on named functions (except test files)                       |
+| `require-optional-chaining`         | Require optional chaining instead of repeated guard access                          |
+| `require-readonly-props`            | Require JSX component props to be typed as readonly                                 |
 
 ### Testing
 
@@ -139,12 +140,13 @@ export default [
 
 ### Imports
 
-| Rule                | Description                                                   |
-| ------------------- | ------------------------------------------------------------- |
-| `no-parent-imports` | Disallow parent-directory traversal in import paths           |
-| `no-dynamic-import` | Ban dynamic `import()` and `require()` outside test files     |
-| `no-export-alias`   | Prevent use of aliases in export statements                   |
-| `no-re-export`      | Disallow re-export statements from parent/grandparent modules |
+| Rule                   | Description                                                        |
+| ---------------------- | ------------------------------------------------------------------ |
+| `require-clean-barrel` | Require barrel files (`index.*`) to contain only module re-exports |
+| `no-parent-imports`    | Disallow parent-directory traversal in import paths                |
+| `no-dynamic-import`    | Ban dynamic `import()` and `require()` outside test files          |
+| `no-export-alias`      | Prevent use of aliases in export statements                        |
+| `no-re-export`         | Disallow re-export statements from parent/grandparent modules      |
 
 ### Bug Prevention
 

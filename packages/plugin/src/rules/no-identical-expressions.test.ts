@@ -1,14 +1,5 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { noIdenticalExpressions } from './no-identical-expressions';
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-identical-expressions', noIdenticalExpressions, {
   valid: [

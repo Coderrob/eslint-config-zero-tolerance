@@ -56,6 +56,7 @@ nav:
           - require-interface-prefix: rules/require-interface-prefix.md
       - Documentation:
           - require-bdd-spec: rules/require-bdd-spec.md
+          - require-jsdoc-anonymous-functions: rules/require-jsdoc-anonymous-functions.md
           - require-jsdoc-functions: rules/require-jsdoc-functions.md
           - require-optional-chaining: rules/require-optional-chaining.md
           - require-readonly-props: rules/require-readonly-props.md
@@ -87,6 +88,7 @@ nav:
           - no-throw-literal: rules/no-throw-literal.md
           - prefer-result-return: rules/prefer-result-return.md
       - Imports:
+          - require-clean-barrel: rules/require-clean-barrel.md
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
           - no-parent-imports: rules/no-parent-imports.md

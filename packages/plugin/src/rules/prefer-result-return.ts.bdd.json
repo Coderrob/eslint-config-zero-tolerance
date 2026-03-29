@@ -16,6 +16,12 @@
           "given": "a function that returns { ok: false, error } instead of throwing",
           "when": "the rule evaluates the function",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore throw statements in test files",
+          "given": "a .test.ts or .spec.ts file containing a throw statement",
+          "when": "the rule evaluates the file",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -31,6 +37,12 @@
         {
           "name": "should report a throw in an arrow function",
           "given": "an arrow function that throws on an invalid condition",
+          "when": "the rule evaluates the throw statement",
+          "then": "a preferResultReturn violation is reported"
+        },
+        {
+          "name": "should report a throw statement at module scope in non-test files",
+          "given": "a non-test source file containing a top-level throw statement",
           "when": "the rule evaluates the throw statement",
           "then": "a preferResultReturn violation is reported"
         }

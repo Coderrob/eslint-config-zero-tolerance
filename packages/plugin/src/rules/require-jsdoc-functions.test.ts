@@ -1,14 +1,5 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { RequireJsdocFunctionsMessageId, requireJsdocFunctions } from './require-jsdoc-functions';
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
   valid: [
@@ -70,6 +61,16 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
     {
       code: 'class C {\n  /** Named computed method. */\n  ["x"]() {}\n}',
       name: 'should allow computed class method with JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: 'export default function () {}',
+      name: 'should allow anonymous default export function without JSDoc',
+      filename: 'src/utils.ts',
+    },
+    {
+      code: 'class C { ["x"]() {} }',
+      name: 'should allow computed class method key without JSDoc',
       filename: 'src/utils.ts',
     },
     {
@@ -267,30 +268,6 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       ],
       output:
         '/* Not a JSDoc */\n/**\n * doSomething TODO: describe\n */\nfunction doSomething() {}',
-    },
-    {
-      code: 'export default function () {}',
-      name: 'should report anonymous default export function without JSDoc',
-      filename: 'src/utils.ts',
-      errors: [
-        {
-          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
-          data: { name: '<anonymous>' },
-        },
-      ],
-      output: '/**\n * <anonymous> TODO: describe\n */\nexport default function () {}',
-    },
-    {
-      code: 'class C { ["x"]() {} }',
-      name: 'should report computed class method key without JSDoc',
-      filename: 'src/utils.ts',
-      errors: [
-        {
-          messageId: RequireJsdocFunctionsMessageId.MissingJsdoc,
-          data: { name: '<anonymous>' },
-        },
-      ],
-      output: null,
     },
     {
       code: 'function transform(source: string) { return source.trim(); }',

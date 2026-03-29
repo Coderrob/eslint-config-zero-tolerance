@@ -1,6 +1,4 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { maxFunctionLines } from './max-function-lines';
 
 const MAX_THREE = 3;
@@ -9,13 +7,6 @@ const MAX_THIRTY = 30;
 const OVER_LIMIT_LINE_COUNT = 5;
 const TOO_BIG_LINE_COUNT = 7;
 const REPEATED_BODY_LINES = 28;
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('max-function-lines', maxFunctionLines, {
   valid: [

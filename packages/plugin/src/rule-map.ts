@@ -20,11 +20,12 @@ import { PLUGIN_NAMESPACE, Preset } from './constants';
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
 const OFF_LEVEL = 'off';
-const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 20;
-const MAX_FUNCTION_LINES_STRICT_MAX = 15;
+const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 30;
+const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
+  'require-clean-barrel',
   'require-interface-prefix',
   'require-test-description-style',
   'no-array-mutation',
@@ -60,11 +61,11 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-floating-promises',
   'no-for-in',
   'no-labels',
+  'no-parent-imports',
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',
   'prefer-readonly-parameters',
-  'prefer-result-return',
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
@@ -89,19 +90,6 @@ export interface IRuleConfig {
  */
 function buildPrefixedRuleName(ruleName: string): string {
   return `${PLUGIN_NAMESPACE}/${ruleName}`;
-}
-
-/**
- * Builds the canonical rule map object from entry tuples.
- *
- * @returns Rule map keyed by unprefixed rule name.
- */
-function buildRuleMap(): Record<string, IRuleConfig> {
-  const map: Record<string, IRuleConfig> = {};
-  for (const [ruleName, config] of ruleEntries) {
-    map[ruleName] = config;
-  }
-  return map;
 }
 
 /**
@@ -153,10 +141,7 @@ function createRuleEntry(
  * @returns The matching rule entry.
  */
 function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEntry {
-  if (preset === Preset.Strict) {
-    return config.strict;
-  }
-  return config.recommended;
+  return preset === Preset.Strict ? config.strict : config.recommended;
 }
 
 /**
@@ -191,7 +176,9 @@ const ruleEntries: RuleEntryTuple[] = [
     [WARN_LEVEL, { max: MAX_PARAMS_MAX }],
     [ERROR_LEVEL, { max: MAX_PARAMS_MAX }],
   ),
+  createRuleEntry('prefer-result-return', OFF_LEVEL, WARN_LEVEL),
+  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 
-export const ruleMap = buildRuleMap();
+export const ruleMap: Record<string, IRuleConfig> = Object.fromEntries(ruleEntries);

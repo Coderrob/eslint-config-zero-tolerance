@@ -8,8 +8,8 @@ Prefer returning Result-style values instead of throwing.
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Recommended** | `off`        |
+| **Strict**      | `warn`       |
 
 ## Rationale
 
@@ -36,5 +36,5 @@ function parse(input: string) {
 ## Configuration
 
 ```js
-'zero-tolerance/prefer-result-return': 'error'
+'zero-tolerance/prefer-result-return': 'warn'
 ```

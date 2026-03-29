@@ -10,12 +10,13 @@
 
 ## Documentation
 
-| Rule                                                      | Type       | Description                                                                         |
-| --------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
-| [require-bdd-spec](require-bdd-spec.md)                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [require-jsdoc-functions](require-jsdoc-functions.md)     | suggestion | Require JSDoc comments on all functions (except test files)                         |
-| [require-optional-chaining](require-optional-chaining.md) | suggestion | Require optional chaining instead of repeated guard access                          |
-| [require-readonly-props](require-readonly-props.md)       | suggestion | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                      | Type       | Description                                                                         |
+| ------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
+| [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
+| [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs (except test files)    |
+| [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                       |
+| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                          |
+| [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                 |
 
 ## Testing
 
@@ -62,12 +63,13 @@
 
 ## Imports
 
-| Rule                                      | Type       | Description                                                   |
-| ----------------------------------------- | ---------- | ------------------------------------------------------------- |
-| [no-dynamic-import](no-dynamic-import.md) | problem    | Ban dynamic `import()` and `require()` outside test files     |
-| [no-export-alias](no-export-alias.md)     | suggestion | Prevent use of aliases in export statements                   |
-| [no-parent-imports](no-parent-imports.md) | suggestion | Disallow parent-directory traversal in import paths           |
-| [no-re-export](no-re-export.md)           | suggestion | Disallow re-export statements from parent/grandparent modules |
+| Rule                                            | Type       | Description                                                       |
+| ----------------------------------------------- | ---------- | ----------------------------------------------------------------- |
+| [require-clean-barrel](require-clean-barrel.md) | suggestion | Require barrel files (index.\*) to contain only module re-exports |
+| [no-dynamic-import](no-dynamic-import.md)       | problem    | Ban dynamic `import()` and `require()` outside test files         |
+| [no-export-alias](no-export-alias.md)           | suggestion | Prevent use of aliases in export statements                       |
+| [no-parent-imports](no-parent-imports.md)       | suggestion | Disallow parent-directory traversal in import paths               |
+| [no-re-export](no-re-export.md)                 | suggestion | Disallow re-export statements from parent/grandparent modules     |
 
 ## Bug Prevention
 

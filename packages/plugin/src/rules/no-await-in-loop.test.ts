@@ -1,14 +1,5 @@
-import * as tsParser from '@typescript-eslint/parser';
-import type { RuleTesterConfig } from '@typescript-eslint/rule-tester';
-import { RuleTester } from '@typescript-eslint/rule-tester';
+import { ruleTester } from '../test-helper';
 import { noAwaitInLoop } from './no-await-in-loop';
-
-const ruleTestConfig: RuleTesterConfig = {
-  languageOptions: {
-    parser: tsParser,
-  },
-};
-const ruleTester = new RuleTester(ruleTestConfig);
 
 ruleTester.run('no-await-in-loop', noAwaitInLoop, {
   valid: [

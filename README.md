@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.71%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-96.36%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 8.57+ (legacy config) and ESLint 9.x/10.x with Flat Config**
 
@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `no-parent-imports` and `require-bdd-spec` remain available as opt-in rules.
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `require-bdd-spec` remains available as an opt-in rule.
 
 ### Naming Conventions
 
@@ -128,12 +128,13 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Documentation
 
-| Rule                                                                   | Description                                                                         |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)     | Require JSDoc comments on all functions (except test files)                         |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md) | Require optional chaining instead of repeated guard access                          |
-| [`require-readonly-props`](docs/rules/require-readonly-props.md)       | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                                   | Description                                                                         |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
+| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | Require JSDoc comments on anonymous function-like constructs (except test files)    |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | Require JSDoc comments on named functions (except test files)                       |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | Require optional chaining instead of repeated guard access                          |
+| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | Require JSX component props to be typed as readonly                                 |
 
 ### Testing
 
@@ -180,12 +181,13 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Imports
 
-| Rule                                                   | Description                                                   |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| [`no-parent-imports`](docs/rules/no-parent-imports.md) | Ban `..` and `../*` parent-directory import traversal         |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | Ban dynamic `import()` and `require()` outside test files     |
-| [`no-export-alias`](docs/rules/no-export-alias.md)     | Prevent use of aliases in export statements                   |
-| [`no-re-export`](docs/rules/no-re-export.md)           | Disallow re-export statements from parent/grandparent modules |
+| Rule                                                         | Description                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | Require barrel files (`index.*`) to contain only module re-exports |
+| [`no-parent-imports`](docs/rules/no-parent-imports.md)       | Ban `..` and `../*` parent-directory import traversal              |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)       | Ban dynamic `import()` and `require()` outside test files          |
+| [`no-export-alias`](docs/rules/no-export-alias.md)           | Prevent use of aliases in export statements                        |
+| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow re-export statements from parent/grandparent modules      |
 
 ### Bug Prevention
 

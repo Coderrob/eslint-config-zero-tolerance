@@ -1,6 +1,6 @@
 # require-jsdoc-functions
 
-Require JSDoc documentation comments on all function-like constructs outside of test files, including declarations, function expressions, arrow functions, class methods, static methods, class field functions, and object methods.
+Require JSDoc documentation comments on named function-like constructs outside of test files, including declarations, named variable-assigned function expressions, named arrow functions, class methods, static methods, class field functions, and object methods.
 
 ## Rule Details
 
@@ -14,6 +14,8 @@ Require JSDoc documentation comments on all function-like constructs outside of 
 ## Rationale
 
 JSDoc comments are essential for self-documenting code and support IDE tooling, generated API documentation, and clear intent communication to future maintainers. This rule is automatically skipped in test files (`.test.*` / `.spec.*`).
+
+Anonymous function-like constructs are enforced by the companion rule `require-jsdoc-anonymous-functions`.
 
 ## Examples
 
