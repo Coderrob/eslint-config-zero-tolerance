@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-jsdoc-functions/">
       
       
-        <link rel="prev" href="../require-bdd-spec/">
+        <link rel="prev" href="../require-jsdoc-anonymous-functions/">
       
       
         <link rel="next" href="../require-optional-chaining/">
@@ -674,6 +674,34 @@
     
   
     require-bdd-spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-jsdoc-anonymous-functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-jsdoc-anonymous-functions
   
 
     
@@ -1894,6 +1922,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-clean-barrel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-clean-barrel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-dynamic-import/" class="md-nav__link">
         
   
@@ -2651,7 +2707,7 @@
 
 
 <h1 id="require-jsdoc-functions">require-jsdoc-functions</h1>
-<p>Require JSDoc documentation comments on all function-like constructs outside of test files, including declarations, function expressions, arrow functions, class methods, static methods, class field functions, and object methods.</p>
+<p>Require JSDoc documentation comments on named function-like constructs outside of test files, including declarations, named variable-assigned function expressions, named arrow functions, class methods, static methods, class field functions, and object methods.</p>
 <h2 id="rule-details">Rule Details</h2>
 <table>
 <thead>
@@ -2681,6 +2737,7 @@
 </table>
 <h2 id="rationale">Rationale</h2>
 <p>JSDoc comments are essential for self-documenting code and support IDE tooling, generated API documentation, and clear intent communication to future maintainers. This rule is automatically skipped in test files (<code>.test.*</code> / <code>.spec.*</code>).</p>
+<p>Anonymous function-like constructs are enforced by the companion rule <code>require-jsdoc-anonymous-functions</code>.</p>
 <h2 id="examples">Examples</h2>
 <h3 id="correct">Correct</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cm">/**</span>

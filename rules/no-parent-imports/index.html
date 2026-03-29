@@ -694,6 +694,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-jsdoc-anonymous-functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-jsdoc-anonymous-functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../require-jsdoc-functions/" class="md-nav__link">
         
   
@@ -1747,6 +1775,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-clean-barrel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-clean-barrel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-dynamic-import/" class="md-nav__link">
         
   
@@ -2603,7 +2659,7 @@
 </table>
 <h2 id="rationale">Rationale</h2>
 <p>Parent-directory imports (<code>..</code> and <code>../*</code>) create tight coupling to folder layout and make modules harder to move safely. Enforcing project-rooted, package, or same-directory imports keeps boundaries explicit and prevents upward traversal through the tree.</p>
-<p>This rule is available as an opt-in rule and is not enabled by default in plugin presets.</p>
+<p>This rule is enabled by default in plugin presets: <code>warn</code> in <code>recommended</code> and <code>error</code> in <code>strict</code>.</p>
 <p>This rule applies to all import patterns:</p>
 <ul>
 <li><code>import ... from '...'</code></li>
