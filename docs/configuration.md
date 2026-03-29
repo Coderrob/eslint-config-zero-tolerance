@@ -24,7 +24,7 @@ This enum is used by the shared config/rule builders to avoid stringly-typed pre
 
 ### `recommended`
 
-All rules enabled at `warn`. Function body limit: **30 lines**. Parameter limit: **4**.
+Most rules enabled at `warn` (with a few documented exceptions disabled). Function body limit: **30 lines**. Parameter limit: **4**.
 
 ```js title="eslint.config.js"
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
