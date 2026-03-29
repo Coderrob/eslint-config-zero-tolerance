@@ -146,13 +146,14 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Type Safety
 
-| Rule                                                           | Description                                                 |
-| -------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`no-type-assertion`](docs/rules/no-type-assertion.md)         | Prevent use of TypeScript `as` and angle-bracket assertions |
-| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md) | Disallow non-null assertions using the `!` postfix operator |
-| [`no-literal-unions`](docs/rules/no-literal-unions.md)         | Ban literal union types in favour of enums                  |
-| [`no-banned-types`](docs/rules/no-banned-types.md)             | Ban `ReturnType` and indexed access types                   |
-| [`no-inline-type-import`](docs/rules/no-inline-type-import.md) | Disallow inline `import("...").Type` annotations            |
+| Rule                                                                                             | Description                                                     |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions     |
+| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator     |
+| [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                      |
+| [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                       |
+| [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                |
+| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters |
 
 ### Code Quality
 

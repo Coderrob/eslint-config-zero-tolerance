@@ -32,6 +32,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-banned-types',
   'no-boolean-return-trap',
   'no-date-now',
+  'no-destructured-parameter-type-literal',
   'no-dynamic-import',
   'no-literal-unions',
   'no-export-alias',

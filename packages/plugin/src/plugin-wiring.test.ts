@@ -19,6 +19,7 @@ import eslintPlugin from './index';
 
 const RULE_NO_EXPORT_ALIAS = `${PLUGIN_NAMESPACE}/no-export-alias`;
 const RULE_MAX_FUNCTION_LINES = `${PLUGIN_NAMESPACE}/max-function-lines`;
+const RULE_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL = `${PLUGIN_NAMESPACE}/no-destructured-parameter-type-literal`;
 const RULE_NO_FOR_IN = `${PLUGIN_NAMESPACE}/no-for-in`;
 const RULE_PREFER_RESULT_RETURN = `${PLUGIN_NAMESPACE}/prefer-result-return`;
 const RULE_REQUIRE_BDD_SPEC = `${PLUGIN_NAMESPACE}/require-bdd-spec`;
@@ -26,6 +27,7 @@ const RULE_REQUIRE_CLEAN_BARREL = `${PLUGIN_NAMESPACE}/require-clean-barrel`;
 const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
 const RULE_KEY_SORT_IMPORTS = 'sort-imports';
+const RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL = 'no-destructured-parameter-type-literal';
 const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
 const RULE_KEY_REQUIRE_CLEAN_BARREL = 'require-clean-barrel';
 const RULE_NO_PARENT_IMPORTS = `${PLUGIN_NAMESPACE}/no-parent-imports`;
@@ -37,6 +39,8 @@ describe('plugin wiring', () => {
 
     expect(recommendedRules[RULE_NO_EXPORT_ALIAS]).toBe('warn');
     expect(strictRules[RULE_NO_EXPORT_ALIAS]).toBe('error');
+    expect(recommendedRules[RULE_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBe('warn');
+    expect(strictRules[RULE_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBe('error');
     expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual(['warn', { max: 30 }]);
     expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 25 }]);
     expect(recommendedRules[RULE_NO_FOR_IN]).toBe('warn');
@@ -78,6 +82,7 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.meta?.name).toBe(PLUGIN_PACKAGE_NAME);
     expect(eslintPlugin.meta?.version).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_SORT_IMPORTS]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_LITERAL_UNIONS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_CLEAN_BARREL]).toBeDefined();
     expect(eslintPlugin.configs.recommended.name).toBe(CONFIG_NAME_RECOMMENDED);

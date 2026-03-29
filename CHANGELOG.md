@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`no-destructured-parameter-type-literal` rule**: Disallows object-destructured parameters from declaring inline object type literals such as `{ set }: Readonly<{ set: UiStateSetter }>` and requires those parameter contracts to flow through a named type instead.
+
 ## [1.2.1] - 2026-03-27
 
 ### Added

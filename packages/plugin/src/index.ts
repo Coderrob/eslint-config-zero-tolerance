@@ -28,6 +28,7 @@ import noAwaitInLoop from './rules/no-await-in-loop';
 import noBannedTypes from './rules/no-banned-types';
 import noBooleanReturnTrap from './rules/no-boolean-return-trap';
 import noDateNow from './rules/no-date-now';
+import noDestructuredParameterTypeLiteral from './rules/no-destructured-parameter-type-literal';
 import noDynamicImport from './rules/no-dynamic-import';
 import noEmptyCatch from './rules/no-empty-catch';
 import noEslintDisable from './rules/no-eslint-disable';
@@ -94,6 +95,7 @@ const rules: Record<string, unknown> = {
   'no-banned-types': noBannedTypes,
   'no-boolean-return-trap': noBooleanReturnTrap,
   'no-date-now': noDateNow,
+  'no-destructured-parameter-type-literal': noDestructuredParameterTypeLiteral,
   'no-dynamic-import': noDynamicImport,
   'no-empty-catch': noEmptyCatch,
   'no-eslint-disable': noEslintDisable,
