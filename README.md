@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `require-bdd-spec` remains available as an opt-in rule.
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` is a fully opt-in rule (off in all presets).
 
 ### Naming Conventions
 
@@ -167,7 +167,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-magic-strings`](docs/rules/no-magic-strings.md)                     | Disallow magic strings in comparisons and switch cases                |
 | [`no-object-mutation`](docs/rules/no-object-mutation.md)                 | Disallow direct object-property mutation                              |
 | [`sort-imports`](docs/rules/sort-imports.md)                             | Require import declarations to be grouped and alphabetized            |
-| [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level function declarations to be sorted alphabetically   |
+| [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level functions to be sorted alphabetically               |
 | [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)   | Prefer nullish coalescing instead of repeated nullish guard ternaries |
 | [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters           |
 | [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                   | Prefer `String.raw` for strings containing escaped backslashes        |
