@@ -8,6 +8,7 @@ import {
   isIdentifierNode,
   isMemberExpressionNode,
   isMethodDefinitionNode,
+  isNodeLike,
   isSwitchCaseNode,
   isTSEnumMemberNode,
   isTestFile,
@@ -54,6 +55,15 @@ describe('ast guards', () => {
   it('should identify method definition nodes', () => {
     expect(isMethodDefinitionNode(createNode(AST_NODE_TYPES.MethodDefinition))).toBe(true);
     expect(isMethodDefinitionNode(createNode(AST_NODE_TYPES.Property))).toBe(false);
+  });
+
+  it('should identify node-like values', () => {
+    expect(isNodeLike(createNode(AST_NODE_TYPES.Identifier))).toBe(true);
+    expect(isNodeLike({ type: 'Identifier' })).toBe(true);
+    expect(isNodeLike(null)).toBe(false);
+    expect(isNodeLike(undefined)).toBe(false);
+    expect(isNodeLike({ type: 42 })).toBe(false);
+    expect(isNodeLike('string')).toBe(false);
   });
 
   it('should identify switch case nodes', () => {

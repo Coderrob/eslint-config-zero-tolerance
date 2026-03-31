@@ -18,23 +18,24 @@
  * Reusable AST helper functions shared across multiple rule implementations.
  */
 
-import type { TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import {
   type FunctionNode,
   isFunctionDeclarationNode,
   isIdentifierNode,
   isMethodDefinitionNode,
+  isNodeLike,
   isVariableDeclaratorNode,
 } from './ast-guards';
 import { ANONYMOUS_FUNCTION_NAME } from './constants';
-import { isString } from './type-guards';
+import { isPlainObject, isString } from './type-guards';
 
 /**
  * Returns the property name for bracket-notation (computed) member access
  * when the computed key is a string literal.
  *
- * @param property - The property node.
- * @returns The property name if it's a string literal, otherwise null.
+ * @param property - The computed property node to inspect.
+ * @returns The property name if it is a string literal, otherwise null.
  */
 function getComputedPropertyName(property: { type: string; value?: unknown }): string | null {
   return isString(property.value) ? property.value : null;
@@ -143,6 +144,50 @@ export function getMemberPropertyName(node: {
  */
 function getNonComputedPropertyName(property: { type: string; name?: string }): string | null {
   return isString(property.name) ? property.name : null;
+}
+
+/**
+ * Reads the `max` property from an option object.
+ *
+ * @param option - First rule option value.
+ * @returns The raw max value when present, otherwise undefined.
+ */
+export function getOptionMaxValue(option: unknown): unknown {
+  if (!isPlainObject(option)) {
+    return undefined;
+  }
+  return Reflect.get(option, 'max');
+}
+
+/**
+ * Returns child nodes extracted from one visitor-key value.
+ *
+ * @param value - Visitor-key value from an AST node.
+ * @returns Child nodes from the value.
+ */
+export function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
+  if (Array.isArray(value)) {
+    return value.filter(isNodeLike);
+  }
+  return isNodeLike(value) ? [value] : [];
+}
+
+/**
+ * Returns direct child nodes for an AST node using source-code visitor keys.
+ *
+ * @param node - Node whose children should be collected.
+ * @param sourceCode - ESLint source code helper.
+ * @returns Child nodes for traversal.
+ */
+export function getVisitorChildNodes(
+  node: TSESTree.Node,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): ReadonlyArray<TSESTree.Node> {
+  const childNodes: TSESTree.Node[] = [];
+  for (const key of sourceCode.visitorKeys[node.type]) {
+    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
+  }
+  return childNodes;
 }
 
 /**

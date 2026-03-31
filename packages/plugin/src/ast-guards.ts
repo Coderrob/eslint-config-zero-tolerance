@@ -114,6 +114,18 @@ export function isMethodDefinitionNode(
 }
 
 /**
+ * Returns true when an unknown value is an AST node.
+ *
+ * @param value - Value to inspect.
+ * @returns True when value has a node-like `type` property.
+ */
+export function isNodeLike(value: unknown): value is TSESTree.Node {
+  return (
+    typeof value === 'object' && value !== null && 'type' in value && typeof value.type === 'string'
+  );
+}
+
+/**
  * Returns true when the node is a SwitchCase.
  *
  * @param node - The node to check.

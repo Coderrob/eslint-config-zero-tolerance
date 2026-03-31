@@ -15,16 +15,21 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import {
   type FunctionNode,
   isIdentifierNode,
   isTestFile,
   isVariableDeclaratorNode,
 } from '../ast-guards';
-import { getIdentifierName } from '../ast-helpers';
+import { getIdentifierName, getVisitorChildNodes } from '../ast-helpers';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
-import { JSDOC_BLOCK_MARKER } from '../rule-constants';
+import {
+  getJsdocComment,
+  getLineIndentation,
+  getTargetNode,
+  isStandaloneLineTarget,
+} from '../jsdoc-helpers';
 import { createRule } from '../rule-factory';
 
 const COMMENT_PREFIX_LENGTH = 3;
@@ -42,13 +47,6 @@ const NAMED_KEY_PARENT_TYPES = new Set([
   AST_NODE_TYPES.Property,
 ]);
 const PARAM_DESCRIPTION_PLACEHOLDER = 'TODO: describe parameter';
-const PARENT_OWNED_TARGET_TYPES = new Set([
-  AST_NODE_TYPES.ExportDefaultDeclaration,
-  AST_NODE_TYPES.ExportNamedDeclaration,
-  AST_NODE_TYPES.MethodDefinition,
-  AST_NODE_TYPES.PropertyDefinition,
-  AST_NODE_TYPES.Property,
-]);
 const RETURNS_DESCRIPTION_PLACEHOLDER = 'TODO: describe return value';
 const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
 const THROWS_DESCRIPTION_PLACEHOLDER = 'TODO: describe error condition';
@@ -253,22 +251,6 @@ function getFunctionName(node: FunctionNode): string {
 }
 
 /**
- * Returns the nearest JSDoc block that appears before a target node.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node to inspect.
- * @returns The nearest JSDoc block, or null.
- */
-function getJsdocComment(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-): TSESTree.Comment | null {
-  const comments = sourceCode.getCommentsBefore(node);
-  const jsdocComments = comments.filter(isJsdocBlockComment);
-  return jsdocComments.at(-1) ?? null;
-}
-
-/**
  * Returns the number of `@param` tags present in a JSDoc comment.
  *
  * @param comment - JSDoc block comment.
@@ -277,22 +259,6 @@ function getJsdocComment(
 function getJsdocParamTagCount(comment: TSESTree.Comment): number {
   const matches = comment.value.match(new RegExp(String.raw`@${JsdocTagName.Param}\b`, 'gu'));
   return matches === null ? 0 : matches.length;
-}
-
-/**
- * Returns indentation prefix for the line containing the node.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node whose line indentation should be read.
- * @returns Whitespace indentation prefix.
- */
-function getLineIndentation(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-): string {
-  const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
-  const indentationMatch = /^\s*/u.exec(lineText);
-  return indentationMatch?.[0] ?? '';
 }
 
 /**
@@ -378,19 +344,6 @@ function getParamTagName(param: TSESTree.Parameter, position: number): string {
 }
 
 /**
- * Returns method and property parent nodes that own JSDoc placement.
- *
- * @param node - Function node.
- * @returns Parent node if it owns JSDoc, otherwise null.
- */
-function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
-  if (!isParentOwnedTargetType(node.parent.type)) {
-    return null;
-  }
-  return node.parent;
-}
-
-/**
  * Returns a one-line summary sentence for generated JSDoc blocks.
  *
  * @param node - Function node to describe.
@@ -398,16 +351,6 @@ function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
  */
 function getSummaryDescriptionLine(node: FunctionNode): string {
   return `${getFunctionName(node)} ${SUMMARY_DESCRIPTION_PLACEHOLDER}`;
-}
-
-/**
- * Returns the node that should own the JSDoc comment for the function.
- *
- * @param node - Function node.
- * @returns Target node for JSDoc placement.
- */
-function getTargetNode(node: FunctionNode): TSESTree.Node {
-  return getParentOwnedTargetNode(node) ?? getVariableOwnedTargetNode(node) ?? node;
 }
 
 /**
@@ -421,56 +364,6 @@ function getVariableFunctionName(node: FunctionNode): string | null {
     return null;
   }
   return getIdentifierName(node.parent.id);
-}
-
-/**
- * Returns variable-related target node for JSDoc ownership when applicable.
- *
- * @param node - Function node.
- * @returns JSDoc owner target node, or null.
- */
-function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
-  if (!isVariableDeclaratorNode(node.parent)) {
-    return null;
-  }
-  const declaration = node.parent.parent;
-  if (declaration.declarations.length !== 1) {
-    return node.parent;
-  }
-  return declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration
-    ? declaration.parent
-    : declaration;
-}
-
-/**
- * Returns node children extracted from one visitor-key value.
- *
- * @param value - Visitor-key value from an AST node.
- * @returns Child nodes from the value.
- */
-function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
-  if (Array.isArray(value)) {
-    return value.filter(isNodeLike);
-  }
-  return isNodeLike(value) ? [value] : [];
-}
-
-/**
- * Returns direct child nodes for an AST node using source-code visitor keys.
- *
- * @param node - Node whose children should be collected.
- * @param sourceCode - ESLint source code helper.
- * @returns Child nodes for traversal.
- */
-function getVisitorChildNodes(
-  node: TSESTree.Node,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): ReadonlyArray<TSESTree.Node> {
-  const childNodes: TSESTree.Node[] = [];
-  for (const key of sourceCode.visitorKeys[node.type]) {
-    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
-  }
-  return childNodes;
 }
 
 /**
@@ -658,16 +551,6 @@ function isExpressionBodiedArrowFunction(node: FunctionNode): boolean {
 }
 
 /**
- * Returns true when a comment token is a JSDoc block.
- *
- * @param comment - Comment token to inspect.
- * @returns True when token is a JSDoc block comment.
- */
-function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
-  return comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith(JSDOC_BLOCK_MARKER);
-}
-
-/**
  * Returns true when generated JSDoc must include a @returns tag.
  *
  * @param node - Function node to inspect.
@@ -766,28 +649,6 @@ function isNestedControlFlowBoundaryNode(node: TSESTree.Node): boolean {
 }
 
 /**
- * Returns true when an unknown value is an AST node.
- *
- * @param value - Value to inspect.
- * @returns True when value has a node-like `type` property.
- */
-function isNodeLike(value: unknown): value is TSESTree.Node {
-  return (
-    typeof value === 'object' && value !== null && 'type' in value && typeof value.type === 'string'
-  );
-}
-
-/**
- * Returns true when a parent node type owns JSDoc placement for enclosed functions.
- *
- * @param type - Node type to inspect.
- * @returns True when node type owns JSDoc placement.
- */
-function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
-  return PARENT_OWNED_TARGET_TYPES.has(type);
-}
-
-/**
  * Returns true when a node is `return` with a non-null argument.
  *
  * @param node - Node to inspect.
@@ -795,22 +656,6 @@ function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
  */
 function isReturnWithValueNode(node: TSESTree.Node): node is TSESTree.ReturnStatement {
   return node.type === AST_NODE_TYPES.ReturnStatement && node.argument !== null;
-}
-
-/**
- * Returns true when a node starts on its own line with only indentation before it.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node that would receive an inserted JSDoc block.
- * @returns True when inserting before the node is formatting-safe.
- */
-function isStandaloneLineTarget(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-): boolean {
-  const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
-  const prefix = lineText.slice(0, node.loc.start.column);
-  return prefix.trim().length === 0;
 }
 
 /**

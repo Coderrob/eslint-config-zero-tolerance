@@ -12,7 +12,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 `@coderrob/eslint-plugin-zero-tolerance` is a collection of custom ESLint rules designed to enforce a zero-tolerance policy on common TypeScript code quality issues. The rules cover:
 
 - **Naming conventions** - prefix interfaces with `I`, sort imports and functions alphabetically
-- **Documentation** - require JSDoc on named and anonymous function-like constructs and enforce sibling BDD spec files
+- **Documentation** - require JSDoc on named functions and on anonymous non-test callbacks, and enforce sibling BDD spec files
 - **Testing standards** - enforce `should`-prefixed descriptions, ban imprecise Jest matchers and leaky mocks
 - **Type safety** - ban `as` assertions, non-null `!` operators, literal union types, banned utility types, and inline object type literals on destructured parameters
 - **Code quality** - limit function length and parameter count, eliminate magic numbers and strings

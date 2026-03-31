@@ -17,6 +17,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
+import { isPlainObject, isString } from '../type-guards';
 
 export enum RequireBddSpecMessageId {
   InvalidBddSpec = 'invalidBddSpec',
@@ -607,7 +608,7 @@ function hasOwnField(record: Readonly<Record<string, unknown>>, field: string): 
  * @returns True when value is a non-empty string.
  */
 function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
+  return isString(value) && value.length > 0;
 }
 
 /**
@@ -618,16 +619,6 @@ function isNonEmptyString(value: unknown): value is string {
  */
 function isParseErrorSpec(value: unknown): value is IParseErrorSpec {
   return isPlainObject(value) && isNonEmptyString(value['__parseError']);
-}
-
-/**
- * Returns true for plain objects.
- *
- * @param value - Candidate value.
- * @returns True when value is a plain object.
- */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**

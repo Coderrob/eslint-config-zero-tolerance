@@ -16,7 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { type FunctionNode, isBlockStatementNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
+import { getOptionMaxValue, resolveFunctionName } from '../ast-helpers';
 import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
 
@@ -72,19 +72,6 @@ function getConfiguredMaxValue(options: unknown[]): number {
   const firstOption = options[0];
   const maxValue = getOptionMaxValue(firstOption);
   return isNumber(maxValue) && maxValue > 0 ? maxValue : DEFAULT_MAX_FUNCTION_LINES;
-}
-
-/**
- * Reads the `max` property from an option object.
- *
- * @param option - First rule option value.
- * @returns The raw max value when present, otherwise undefined.
- */
-function getOptionMaxValue(option: unknown): unknown {
-  if (option === null || typeof option !== 'object') {
-    return undefined;
-  }
-  return Reflect.get(option, 'max');
 }
 
 /**

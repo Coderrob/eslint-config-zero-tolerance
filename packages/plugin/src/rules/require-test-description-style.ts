@@ -24,7 +24,7 @@ import {
   TEST_METHOD_SKIP,
 } from '../rule-constants';
 import { createRule } from '../rule-factory';
-import { isBoolean, isString } from '../type-guards';
+import { isBoolean, isPlainObject, isString } from '../type-guards';
 
 type RuleOption = Readonly<{
   ignoreSkip?: boolean;
@@ -277,16 +277,6 @@ function isMemberTestCall(node: TSESTree.CallExpression): boolean {
 }
 
 /**
- * Returns true when value is a non-array object.
- *
- * @param value - Unknown value.
- * @returns True when value is object-like and not an array.
- */
-function isNonArrayObject(value: unknown): value is object {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/**
  * Returns true when `ignoreSkip` option value is valid.
  *
  * @param value - Option object value.
@@ -315,10 +305,11 @@ function isRuleOptionPrefixValue(value: object): boolean {
  * @returns True when input can be treated as a rule option object.
  */
 function isRuleOptionRecord(value: unknown): value is RuleOption {
-  if (!isNonArrayObject(value)) {
+  if (!isPlainObject(value)) {
     return false;
   }
   if (!isRuleOptionIgnoreSkipValue(value)) {
+    /* istanbul ignore next */
     return false;
   }
   return isRuleOptionPrefixValue(value);

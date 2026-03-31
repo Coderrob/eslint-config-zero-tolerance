@@ -5,7 +5,14 @@
   "module": {
     "name": "type-guards",
     "description": "Primitive runtime type-guard functions shared across rule implementations and AST helpers.",
-    "exports": ["isBoolean", "isDefined", "isNullOrUndefined", "isNumber", "isString"]
+    "exports": [
+      "isBoolean",
+      "isDefined",
+      "isNullOrUndefined",
+      "isNumber",
+      "isPlainObject",
+      "isString"
+    ]
   },
   "specifications": [
     {
@@ -102,6 +109,35 @@
           "name": "should return false for a string that looks like a number",
           "given": "the string '42'",
           "when": "isNumber is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isPlainObject",
+      "scenarios": [
+        {
+          "name": "should return true for a plain object",
+          "given": "a non-null, non-array object value",
+          "when": "isPlainObject is called",
+          "then": "returns true and narrows the type to Record<string, unknown>"
+        },
+        {
+          "name": "should return false for null",
+          "given": "the value null",
+          "when": "isPlainObject is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for an array",
+          "given": "an array value",
+          "when": "isPlainObject is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a primitive",
+          "given": "a string or number value",
+          "when": "isPlainObject is called",
           "then": "returns false"
         }
       ]

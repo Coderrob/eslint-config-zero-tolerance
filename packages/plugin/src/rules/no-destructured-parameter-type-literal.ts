@@ -16,7 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
+import { type FunctionNode } from '../ast-guards';
+import { getVisitorChildNodes } from '../ast-helpers';
 import { createRule } from '../rule-factory';
 
 type NoDestructuredParameterTypeLiteralContext = Readonly<
@@ -102,37 +103,6 @@ function getObjectDestructuredParameterTypeNode(
 }
 
 /**
- * Returns child nodes extracted from one visitor-key value.
- *
- * @param value - Visitor-key value from an AST node.
- * @returns Child nodes from the value.
- */
-function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
-  if (Array.isArray(value)) {
-    return value.filter(isNodeLike);
-  }
-  return isNodeLike(value) ? [value] : [];
-}
-
-/**
- * Returns direct child nodes for an AST node using source-code visitor keys.
- *
- * @param node - Node whose children should be collected.
- * @param sourceCode - ESLint source code helper.
- * @returns Child nodes for traversal.
- */
-function getVisitorChildNodes(
-  node: TSESTree.Node,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): ReadonlyArray<TSESTree.Node> {
-  const childNodes: TSESTree.Node[] = [];
-  for (const key of sourceCode.visitorKeys[node.type]) {
-    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
-  }
-  return childNodes;
-}
-
-/**
  * Returns true when the provided type tree contains an inline object type literal.
  *
  * @param node - Root type node.
@@ -145,23 +115,17 @@ function hasInlineObjectTypeLiteral(
 ): boolean {
   const pendingNodes: TSESTree.Node[] = [node];
   while (pendingNodes.length > 0) {
-    const [current] = pendingNodes.splice(-1, 1);
+    const current = pendingNodes.pop();
+    /* istanbul ignore next */
+    if (current === undefined) {
+      return false;
+    }
     if (current.type === AST_NODE_TYPES.TSTypeLiteral) {
       return true;
     }
     pendingNodes.push(...getVisitorChildNodes(current, sourceCode));
   }
   return false;
-}
-
-/**
- * Returns true when a value is AST-node-like.
- *
- * @param value - Unknown value.
- * @returns True when the value exposes a string node type.
- */
-function isNodeLike(value: unknown): value is TSESTree.Node {
-  return typeof value === 'object' && value !== null && 'type' in value;
 }
 
 /**

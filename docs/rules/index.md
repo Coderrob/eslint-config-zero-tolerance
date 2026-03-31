@@ -10,13 +10,13 @@
 
 ## Documentation
 
-| Rule                                                                      | Type       | Description                                                                         |
-| ------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
-| [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs (except test files)    |
-| [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                       |
-| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                          |
-| [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                      | Type       | Description                                                                                             |
+| ------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
+| [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
+| [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                                           |
+| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                                              |
+| [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                                     |
 
 ## Testing
 

@@ -18,6 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from '../rule-constants';
 import { createRule } from '../rule-factory';
+import { isBoolean } from '../type-guards';
 
 type FixInputs = Readonly<{
   literalValue: boolean;
@@ -166,7 +167,7 @@ function hasBooleanLiteralOperand(
  * @returns True if the node is a boolean literal, false otherwise.
  */
 function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { value: boolean } {
-  return node.type === AST_NODE_TYPES.Literal && typeof node.value === 'boolean';
+  return node.type === AST_NODE_TYPES.Literal && isBoolean(node.value);
 }
 
 /**

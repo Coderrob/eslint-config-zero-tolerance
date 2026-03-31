@@ -5,9 +5,67 @@
   "module": {
     "name": "import-path-helpers",
     "description": "Helper functions for evaluating import path characteristics used by path-based rules.",
-    "exports": ["isParentDirectoryImportPath"]
+    "exports": ["getFilename", "isBarrelFile", "isParentDirectoryImportPath"]
   },
   "specifications": [
+    {
+      "feature": "getFilename",
+      "scenarios": [
+        {
+          "name": "should return the file name from a Unix path",
+          "given": "a Unix-style absolute path",
+          "when": "getFilename is called",
+          "then": "returns the last path segment"
+        },
+        {
+          "name": "should return the file name from a Windows path",
+          "given": "a Windows-style absolute path with backslash separators",
+          "when": "getFilename is called",
+          "then": "returns the last path segment"
+        },
+        {
+          "name": "should return the path unchanged when no separator is present",
+          "given": "a bare file name with no directory separators",
+          "when": "getFilename is called",
+          "then": "returns the input unchanged"
+        },
+        {
+          "name": "should return an empty string for an empty path",
+          "given": "an empty string",
+          "when": "getFilename is called",
+          "then": "returns an empty string"
+        }
+      ]
+    },
+    {
+      "feature": "isBarrelFile",
+      "scenarios": [
+        {
+          "name": "should return true for index.ts",
+          "given": "a file path whose name is 'index.ts'",
+          "when": "isBarrelFile is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for single-extension index files",
+          "given": "a file path whose name is 'index.js' or 'index.mts'",
+          "when": "isBarrelFile is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a double-extension index file",
+          "given": "a file path whose name is 'index.test.ts' or 'index.d.ts'",
+          "when": "isBarrelFile is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a non-index file",
+          "given": "a file path whose name is not 'index.*'",
+          "when": "isBarrelFile is called",
+          "then": "returns false"
+        }
+      ]
+    },
     {
       "feature": "isParentDirectoryImportPath",
       "scenarios": [

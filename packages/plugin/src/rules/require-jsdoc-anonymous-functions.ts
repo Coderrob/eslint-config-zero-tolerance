@@ -15,21 +15,58 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
-import { type FunctionNode, isTestFile, isVariableDeclaratorNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import {
+  type FunctionNode,
+  isCallExpressionNode,
+  isIdentifierNode,
+  isMemberExpressionNode,
+  isTestFile,
+} from '../ast-guards';
+import { getMemberPropertyName, resolveFunctionName } from '../ast-helpers';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
-import { JSDOC_BLOCK_MARKER } from '../rule-constants';
+import {
+  getJsdocComment,
+  getLineIndentation,
+  getTargetNode,
+  isStandaloneLineTarget,
+} from '../jsdoc-helpers';
 import { createRule } from '../rule-factory';
 
-const PARENT_OWNED_TARGET_TYPES = new Set([
-  AST_NODE_TYPES.ExportDefaultDeclaration,
-  AST_NODE_TYPES.ExportNamedDeclaration,
-  AST_NODE_TYPES.MethodDefinition,
-  AST_NODE_TYPES.PropertyDefinition,
-  AST_NODE_TYPES.Property,
-]);
 const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
+const TEST_CALLBACK_NAMES = new Set([
+  'afterAll',
+  'afterEach',
+  'beforeAll',
+  'beforeEach',
+  'context',
+  'describe',
+  'fdescribe',
+  'fit',
+  'it',
+  'setup',
+  'specify',
+  'suite',
+  'suiteSetup',
+  'suiteTeardown',
+  'teardown',
+  'test',
+  'xdescribe',
+  'xit',
+  'xtest',
+]);
+const TEST_CALLBACK_MODIFIER_NAMES = new Set([
+  'concurrent',
+  'each',
+  'failing',
+  'only',
+  'parallel',
+  'runIf',
+  'serial',
+  'skip',
+  'skipIf',
+]);
+const TEST_CALLBACK_NAMESPACE_NAMES = new Set(['Deno']);
 
 export enum RequireJsdocAnonymousFunctionsMessageId {
   MissingJsdoc = 'missingJsdoc',
@@ -111,112 +148,133 @@ function createRequireJsdocAnonymousFunctionsListeners(
 }
 
 /**
- * Returns the nearest JSDoc block that appears before a target node.
+ * Returns the last matched test callback segment index in a callee path.
  *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node to inspect.
- * @returns The nearest JSDoc block, or null.
+ * @param calleeNamePath - Ordered callee name path.
+ * @returns The last callback index, or null when none exists.
  */
-function getJsdocComment(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-): TSESTree.Comment | null {
-  const comments = sourceCode.getCommentsBefore(node);
-  const jsdocComments = comments.filter(isJsdocBlockComment);
-  return jsdocComments.at(-1) ?? null;
+function findLastTestCallbackNameIndex(calleeNamePath: readonly string[]): number | null {
+  for (let index = calleeNamePath.length - 1; index >= 0; index -= 1) {
+    if (TEST_CALLBACK_NAMES.has(calleeNamePath[index])) {
+      return index;
+    }
+  }
+  return null;
 }
 
 /**
- * Returns indentation prefix for the line containing the node.
+ * Returns the callee name path for identifier/member/call callee forms.
  *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node whose line indentation should be read.
- * @returns Whitespace indentation prefix.
+ * @param callee - Call expression callee to inspect.
+ * @returns Ordered name path, or null when not statically resolvable.
  */
-function getLineIndentation(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-): string {
-  const lineText = String(sourceCode.lines[node.loc.start.line - 1]);
-  return lineText.replace(/\S.*$/u, '');
-}
-
-/**
- * Returns method and property parent nodes that own JSDoc placement.
- *
- * @param node - Function node.
- * @returns Parent node if it owns JSDoc, otherwise null.
- */
-function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
-  if (!isParentOwnedTargetType(node.parent.type)) {
+function getCalleeNamePath(callee: TSESTree.Node): string[] | null {
+  if (isIdentifierNode(callee)) {
+    return [callee.name];
+  }
+  if (isCallExpressionNode(callee)) {
+    return getCalleeNamePathFromCallExpression(callee);
+  }
+  if (!isMemberExpressionNode(callee)) {
     return null;
   }
-  return node.parent;
+  return getCalleeNamePathFromMemberExpression(callee);
 }
 
 /**
- * Returns the node that should own the JSDoc comment for the function.
+ * Returns the callee name path for nested call-expression callees.
  *
- * @param node - Function node.
- * @returns Target node for JSDoc placement.
+ * @param callee - Call expression callee to inspect.
+ * @returns Ordered name path, or null when not statically resolvable.
  */
-function getTargetNode(node: FunctionNode): TSESTree.Node {
-  return getParentOwnedTargetNode(node) ?? getVariableOwnedTargetNode(node) ?? node;
+function getCalleeNamePathFromCallExpression(callee: TSESTree.CallExpression): string[] | null {
+  return getCalleeNamePath(callee.callee);
 }
 
 /**
- * Returns variable-related target node for JSDoc ownership when applicable.
+ * Returns the callee name path for member-expression callees.
  *
- * @param node - Function node.
- * @returns JSDoc owner target node, or null.
+ * @param callee - Member expression callee to inspect.
+ * @returns Ordered name path, or null when not statically resolvable.
  */
-function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
-  if (!isVariableDeclaratorNode(node.parent)) {
+function getCalleeNamePathFromMemberExpression(callee: TSESTree.MemberExpression): string[] | null {
+  const propertyName = getMemberPropertyName(callee);
+  const objectPath = getCalleeNamePath(callee.object);
+  if (propertyName === null || objectPath === null) {
     return null;
   }
-  const declaration = node.parent.parent;
-  if (declaration.declarations.length !== 1) {
-    return node.parent;
-  }
-  return declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration
-    ? declaration.parent
-    : declaration;
+  return [...objectPath, propertyName];
 }
 
 /**
- * Returns true when a comment token is a JSDoc block.
+ * Returns true when a callee path matches a known test callback pattern.
  *
- * @param comment - Comment token to inspect.
- * @returns True when token is a JSDoc block comment.
+ * @param calleeNamePath - Ordered callee name path.
+ * @param callbackIndex - Index of the matched callback segment.
+ * @returns True when the path shape is recognized as a test callback API.
  */
-function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
-  return comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith(JSDOC_BLOCK_MARKER);
-}
-
-/**
- * Returns true when a parent node type owns JSDoc placement for enclosed functions.
- *
- * @param type - Node type to inspect.
- * @returns True when node type owns JSDoc placement.
- */
-function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
-  return PARENT_OWNED_TARGET_TYPES.has(type);
-}
-
-/**
- * Returns true when a node starts on its own line with only indentation before it.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - Node that would receive an inserted JSDoc block.
- * @returns True when inserting before the node is formatting-safe.
- */
-function isStandaloneLineTarget(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
+function hasKnownTestCallbackPathShape(
+  calleeNamePath: readonly string[],
+  callbackIndex: number,
 ): boolean {
-  const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
-  const prefix = lineText.slice(0, node.loc.start.column);
-  return prefix.trim().length === 0;
+  return (
+    calleeNamePath.slice(0, callbackIndex).every(isKnownTestCallbackPrefixName) &&
+    calleeNamePath.slice(callbackIndex + 1).every(isKnownTestCallbackModifierName)
+  );
+}
+
+/**
+ * Returns true when a call expression callee matches a known test callback API.
+ *
+ * @param callee - Callee node to inspect.
+ * @returns True when the callee is a known test callback API.
+ */
+function isKnownTestCallbackCallee(callee: TSESTree.Node): boolean {
+  const calleeNamePath = getCalleeNamePath(callee);
+  if (calleeNamePath === null) {
+    return false;
+  }
+  const callbackIndex = findLastTestCallbackNameIndex(calleeNamePath);
+  if (callbackIndex === null) {
+    return false;
+  }
+  return hasKnownTestCallbackPathShape(calleeNamePath, callbackIndex);
+}
+
+/**
+ * Returns true when an anonymous function is a known test framework callback.
+ *
+ * @param node - Function node to inspect.
+ * @returns True when the function is used as a test callback or hook.
+ */
+function isKnownTestCallbackFunction(node: FunctionNode): boolean {
+  if (node.type === AST_NODE_TYPES.FunctionDeclaration || !isCallExpressionNode(node.parent)) {
+    return false;
+  }
+  if (!node.parent.arguments.includes(node)) {
+    return false;
+  }
+  return isKnownTestCallbackCallee(node.parent.callee);
+}
+
+/**
+ * Returns true when a name is a recognized callback modifier.
+ *
+ * @param name - Name segment to inspect.
+ * @returns True when the name is a callback modifier.
+ */
+function isKnownTestCallbackModifierName(name: string): boolean {
+  return TEST_CALLBACK_MODIFIER_NAMES.has(name);
+}
+
+/**
+ * Returns true when a name is allowed before the matched callback API segment.
+ *
+ * @param name - Name segment to inspect.
+ * @returns True when the name is an allowed namespace or test API segment.
+ */
+function isKnownTestCallbackPrefixName(name: string): boolean {
+  return TEST_CALLBACK_NAMES.has(name) || TEST_CALLBACK_NAMESPACE_NAMES.has(name);
 }
 
 /**
@@ -276,6 +334,9 @@ function shouldReportAnonymousJsdoc(
   if (resolveFunctionName(node) !== ANONYMOUS_FUNCTION_NAME) {
     return false;
   }
+  if (isKnownTestCallbackFunction(node)) {
+    return false;
+  }
   return getJsdocComment(sourceCode, targetNode) === null;
 }
 
@@ -287,7 +348,7 @@ export const requireJsdocAnonymousFunctions = createRule({
     fixable: 'code',
     docs: {
       description:
-        'Require JSDoc comments on anonymous function-like constructs (except in test files)',
+        'Require JSDoc comments on anonymous function-like constructs except in test files and known test callbacks',
     },
     messages: {
       missingJsdoc: 'Function "{{name}}" is missing a JSDoc comment',

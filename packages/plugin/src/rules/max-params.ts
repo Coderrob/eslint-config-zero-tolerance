@@ -16,24 +16,11 @@
 
 import type { TSESLint } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
+import { getOptionMaxValue, resolveFunctionName } from '../ast-helpers';
 import { createRule } from '../rule-factory';
 import { isNumber } from '../type-guards';
 
 const MAX_PARAMS_MAX = 4;
-
-/**
- * Reads the `max` property from an option object.
- *
- * @param option - First rule option value.
- * @returns The raw max value when present, otherwise undefined.
- */
-function getOptionMaxValue(option: unknown): unknown {
-  if (option === null || typeof option !== 'object') {
-    return undefined;
-  }
-  return Reflect.get(option, 'max');
-}
 
 /**
  * Reports when a function exceeds the configured parameter limit.

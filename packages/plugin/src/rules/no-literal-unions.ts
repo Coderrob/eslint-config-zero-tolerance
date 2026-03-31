@@ -17,7 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from '../rule-factory';
-import { isBoolean } from '../type-guards';
+import { isBoolean, isString } from '../type-guards';
 
 type NoLiteralUnionsContext = Readonly<TSESLint.RuleContext<'noLiteralUnions', []>>;
 
@@ -301,7 +301,7 @@ function isStringLiteralTypeNode(
   return (
     isLiteralTypeNode(type) &&
     type.literal.type === AST_NODE_TYPES.Literal &&
-    typeof type.literal.value === 'string'
+    isString(type.literal.value)
   );
 }
 

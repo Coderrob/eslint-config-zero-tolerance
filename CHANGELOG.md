@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`no-destructured-parameter-type-literal` rule**: Disallows object-destructured parameters from declaring inline object type literals such as `{ set }: Readonly<{ set: UiStateSetter }>` and requires those parameter contracts to flow through a named type instead.
 
+### Changed
+
+- **`require-jsdoc-anonymous-functions` rule**: Excludes anonymous callbacks passed to well-known test APIs and lifecycle hooks such as `describe`, `it`, `test`, `beforeEach`, and `afterAll`, including common chained forms like `describe.only(...)` and `test.skip.each(...)`.
+
 ## [1.2.1] - 2026-03-27
 
 ### Added

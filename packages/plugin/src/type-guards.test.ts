@@ -1,4 +1,11 @@
-import { isDefined, isNullOrUndefined, isString, isBoolean, isNumber } from './type-guards';
+import {
+  isDefined,
+  isNullOrUndefined,
+  isString,
+  isBoolean,
+  isNumber,
+  isPlainObject,
+} from './type-guards';
 
 describe('type-guards', () => {
   // ── isDefined ────────────────────────────────────────────────────────────
@@ -90,6 +97,34 @@ describe('type-guards', () => {
 
     it('should return false for a string', () => {
       expect(isNumber('42')).toBe(false);
+    });
+  });
+
+  // ── isPlainObject ─────────────────────────────────────────────────────────
+
+  describe('isPlainObject', () => {
+    it('should return true for a plain object', () => {
+      expect(isPlainObject({ key: 'value' })).toBe(true);
+    });
+
+    it('should return true for an empty object', () => {
+      expect(isPlainObject({})).toBe(true);
+    });
+
+    it('should return false for null', () => {
+      expect(isPlainObject(null)).toBe(false);
+    });
+
+    it('should return false for an array', () => {
+      expect(isPlainObject([])).toBe(false);
+    });
+
+    it('should return false for a string', () => {
+      expect(isPlainObject('string')).toBe(false);
+    });
+
+    it('should return false for a number', () => {
+      expect(isPlainObject(42)).toBe(false);
     });
   });
 });

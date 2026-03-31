@@ -19,6 +19,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isParentDirectoryImportPath } from '../import-path-helpers';
 import { CALLEE_REQUIRE } from '../rule-constants';
 import { createRule } from '../rule-factory';
+import { isString } from '../type-guards';
 
 const PARENT_PATH_TOKEN = '..';
 
@@ -140,7 +141,7 @@ function getLiteralStringValue(node: TSESTree.Node): string | null {
   if (node.type !== AST_NODE_TYPES.Literal) {
     return null;
   }
-  return typeof node.value === 'string' ? node.value : null;
+  return isString(node.value) ? node.value : null;
 }
 
 /**

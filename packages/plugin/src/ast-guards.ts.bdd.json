@@ -14,6 +14,7 @@
       "isIdentifierNode",
       "isMemberExpressionNode",
       "isMethodDefinitionNode",
+      "isNodeLike",
       "isSwitchCaseNode",
       "isTestFile",
       "isTSEnumMemberNode",
@@ -145,6 +146,35 @@
           "given": "null or undefined",
           "when": "isMethodDefinitionNode is called",
           "then": "returns false without throwing"
+        }
+      ]
+    },
+    {
+      "feature": "isNodeLike",
+      "scenarios": [
+        {
+          "name": "should return true for an object with a string type property",
+          "given": "an object with a string-valued type property",
+          "when": "isNodeLike is called",
+          "then": "returns true and narrows the type to TSESTree.Node"
+        },
+        {
+          "name": "should return false for null",
+          "given": "the value null",
+          "when": "isNodeLike is called",
+          "then": "returns false without throwing"
+        },
+        {
+          "name": "should return false for an object with a non-string type property",
+          "given": "an object where type is a number",
+          "when": "isNodeLike is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a primitive value",
+          "given": "a string or number value",
+          "when": "isNodeLike is called",
+          "then": "returns false"
         }
       ]
     },

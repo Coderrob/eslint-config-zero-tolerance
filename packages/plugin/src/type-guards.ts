@@ -51,6 +51,15 @@ export function isNumber(value: unknown): value is number {
 }
 
 /**
+ * Returns true when the value is a non-null, non-array plain object.
+ * @param value - The value to check.
+ * @returns True if the value is a plain object, false otherwise.
+ */
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
  * Returns true when the runtime value is a string primitive.
  * @param value - The value to check.
  * @returns True if the value is a string, false otherwise.

@@ -128,13 +128,13 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Documentation
 
-| Rule                                                                                   | Description                                                                         |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | Require JSDoc comments on anonymous function-like constructs (except test files)    |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | Require JSDoc comments on named functions (except test files)                       |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | Require optional chaining instead of repeated guard access                          |
-| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                                   | Description                                                                                             |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
+| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | Require JSDoc comments on named functions (except test files)                                           |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | Require optional chaining instead of repeated guard access                                              |
+| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | Require JSX component props to be typed as readonly                                                     |
 
 ### Testing
 

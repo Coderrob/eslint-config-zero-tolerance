@@ -174,5 +174,16 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       ],
       output: 'it("renders handles correctly", () => {});',
     },
+    {
+      code: 'it("testing behavior", () => {});',
+      name: 'should not double-space when prefix already ends with a space',
+      options: [{ prefix: 'when ' }],
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: 'it("when testing behavior", () => {});',
+    },
   ],
 });
