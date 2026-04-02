@@ -8,17 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Changed
-
-- **Coverage cleanup**: Simplified unreachable defensive branches in `prefer-readonly-parameters`, `no-magic-strings`, and `no-literal-unions` so the rules keep the same behavior while their remaining conditional paths are fully exercised by tests.
-- **Helper structure**: Grouped shared AST, JSDoc, import-path, type-guard, rule-support, and test-helper modules into dedicated `helpers/`, `rules/support/`, and `testing/` folders to make reuse points easier to locate and maintain.
-- **Rule helper reuse**: Extracted shared function-node listener builders into `rules/support/function-listeners.ts`, added shared `getCallMemberMethodName` and parameter-binding helpers, completed a dedicated `helpers/ast/` layer with navigation, calls, parameters, types, search, and statements modules, and rewired rule-local AST interpretation onto those shared helpers while also replacing duplicated function-name resolution in `require-jsdoc-functions` and `require-readonly-props` with the existing shared AST helpers.
-- **Call-shape reuse**: Added a shared `getMatchingCallMemberMethodName` helper in `helpers/ast/calls.ts` and rewired `no-array-mutation` and `no-query-side-effects` to use it instead of keeping duplicate member-call filtering logic.
-- **AST guard reuse**: Added shared `isNamedIdentifierNode` and `isUncomputedMemberExpressionNode` guards in `helpers/ast-guards.ts` and rewired multiple rules to reuse those exact-name and direct-member checks instead of keeping local ad hoc predicates.
-- **Type helper reuse**: Expanded `helpers/ast/types.ts` with shared first-type-argument and named-generic-reference helpers, then rewired `no-boolean-return-trap` and `require-readonly-props` to consume that shared type-reference evaluation instead of combining those checks locally.
-- **Literal helper reuse**: Added shared string-literal extraction in `helpers/ast-helpers.ts`, reused it in `helpers/ast/calls.ts`, and removed duplicate literal-string parsing from `no-parent-imports` and `no-magic-strings`.
-
-## [1.2.1] - 2026-04-01
+## [1.2.1] - 2026-04-02
 
 ### Added
 
@@ -35,6 +25,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`require-jsdoc-functions` rule**: Now enforces JSDoc and tag coverage only for named function-like constructs; anonymous function-like constructs are handled by `require-jsdoc-anonymous-functions`.
 - **Preset defaults**: Set `require-jsdoc-anonymous-functions` to `off` in `recommended` and `warn` in `strict`, set `prefer-result-return` to `off` in `recommended` and `warn` in `strict`, raised `max-function-lines` to `warn` with `max: 30` in `recommended` and `error` with `max: 25` in `strict`, and restored `no-parent-imports` to the built-in preset defaults including the legacy variants.
 - **Documentation sync**: Updated preset and rule docs to reflect the new preset defaults, including `no-parent-imports` being enabled by default again while `require-bdd-spec` remains opt-in.
+- **Coverage cleanup**: Simplified unreachable defensive branches in `prefer-readonly-parameters`, `no-magic-strings`, and `no-literal-unions` so the rules keep the same behavior while their remaining conditional paths are fully exercised by tests.
+- **Helper structure**: Grouped shared AST, JSDoc, import-path, type-guard, rule-support, and test-helper modules into dedicated `helpers/`, `rules/support/`, and `testing/` folders to make reuse points easier to locate and maintain.
+- **Rule helper reuse**: Extracted shared function-node listener builders into `rules/support/function-listeners.ts`, added shared `getCallMemberMethodName` and parameter-binding helpers, completed a dedicated `helpers/ast/` layer with navigation, calls, parameters, types, search, and statements modules, and rewired rule-local AST interpretation onto those shared helpers while also replacing duplicated function-name resolution in `require-jsdoc-functions` and `require-readonly-props` with the existing shared AST helpers.
+- **Call-shape reuse**: Added a shared `getMatchingCallMemberMethodName` helper in `helpers/ast/calls.ts` and rewired `no-array-mutation` and `no-query-side-effects` to use it instead of keeping duplicate member-call filtering logic.
+- **AST guard reuse**: Added shared `isNamedIdentifierNode` and `isUncomputedMemberExpressionNode` guards in `helpers/ast-guards.ts` and rewired multiple rules to reuse those exact-name and direct-member checks instead of keeping local ad hoc predicates.
+- **Type helper reuse**: Expanded `helpers/ast/types.ts` with shared first-type-argument and named-generic-reference helpers, then rewired `no-boolean-return-trap` and `require-readonly-props` to consume that shared type-reference evaluation instead of combining those checks locally.
+- **Literal helper reuse**: Added shared string-literal extraction in `helpers/ast-helpers.ts`, reused it in `helpers/ast/calls.ts`, and removed duplicate literal-string parsing from `no-parent-imports` and `no-magic-strings`.
 
 ### Fixed
 
