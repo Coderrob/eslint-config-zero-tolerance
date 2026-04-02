@@ -48,9 +48,15 @@
           "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
         },
         {
-          "name": "should include no-parent-imports in built-in presets",
+          "name": "should keep no-parent-internal-access disabled in both built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
-          "when": "the 'zero-tolerance/no-parent-imports' entries are read",
+          "when": "the 'zero-tolerance/no-parent-internal-access' entries are read",
+          "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
+        },
+        {
+          "name": "should include no-barrel-parent-imports in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-barrel-parent-imports' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {

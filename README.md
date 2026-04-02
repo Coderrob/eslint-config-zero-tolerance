@@ -11,7 +11,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-96.36%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+[![Coverage](https://img.shields.io/badge/coverage-99.96%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
 
 **Now supports ESLint 8.57+ (legacy config) and ESLint 9.x/10.x with Flat Config**
 
@@ -118,7 +118,9 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` is a fully opt-in rule (off in all presets).
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` and `no-parent-internal-access` are fully opt-in rules (off in all presets).
+
+`no-parent-internal-access` is a targeted boundary rule: it only checks parent-relative paths and only matches the first concrete directory reached after `..` traversal, such as `../src/foo`.
 
 ### Naming Conventions
 
@@ -185,10 +187,11 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | Rule                                                         | Description                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------------ |
 | [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | Require barrel files (`index.*`) to contain only module re-exports |
-| [`no-parent-imports`](docs/rules/no-parent-imports.md)       | Ban `..` and `../*` parent-directory import traversal              |
+| [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md) | Ban `..` and `../*` parent-directory import traversal in barrel files |
+| [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md) | Ban parent-relative access into protected internal directories such as `src` |
 | [`no-dynamic-import`](docs/rules/no-dynamic-import.md)       | Ban dynamic `import()` and `require()` outside test files          |
 | [`no-export-alias`](docs/rules/no-export-alias.md)           | Prevent use of aliases in export statements                        |
-| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow re-export statements from parent/grandparent modules      |
+| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow direct or pass-through re-export statements from parent/grandparent modules |
 
 ### Bug Prevention
 

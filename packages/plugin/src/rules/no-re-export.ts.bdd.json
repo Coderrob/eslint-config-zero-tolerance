@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/no-re-export.ts",
   "module": {
     "name": "no-re-export",
-    "description": "Disallow re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction.",
+    "description": "Disallow direct or indirect re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction.",
     "exports": ["noReExport"]
   },
   "specifications": [
@@ -22,6 +22,12 @@
           "given": "export { foo } from './foo' in a regular source file",
           "when": "the rule evaluates the export declaration",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow exporting a local binding derived from a parent import",
+          "given": "import { foo } from '../foo' followed by const local = foo and export { local } in a non-barrel file",
+          "when": "the rule evaluates the export declaration",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -32,6 +38,30 @@
           "name": "should report a re-export from a parent module in a non-barrel file",
           "given": "export { bar } from '../bar' in a non-index source file",
           "when": "the rule evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        },
+        {
+          "name": "should report a pass-through named export of a parent import in a non-barrel file",
+          "given": "import { bar } from '../bar' followed by export { bar } in a non-index source file",
+          "when": "the rule evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        },
+        {
+          "name": "should report a pass-through named export of a parent import regardless of statement ordering",
+          "given": "export { bar } followed later by import { bar } from '../bar' in a non-index source file",
+          "when": "the rule precomputes parent-imported bindings from the full program and evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        },
+        {
+          "name": "should report a pass-through default export of a parent import in a non-barrel file",
+          "given": "import bar from '../../bar' followed by export default bar in a non-index source file",
+          "when": "the rule evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        },
+        {
+          "name": "should report a TypeScript export assignment of a parent import in a non-barrel file",
+          "given": "import bar = require('../bar') followed by export = bar in a non-index source file",
+          "when": "the rule evaluates the export assignment",
           "then": "a noReExport violation is reported"
         }
       ]

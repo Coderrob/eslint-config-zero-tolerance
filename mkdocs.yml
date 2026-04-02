@@ -92,7 +92,8 @@ nav:
           - require-clean-barrel: rules/require-clean-barrel.md
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
-          - no-parent-imports: rules/no-parent-imports.md
+          - no-barrel-parent-imports: rules/no-barrel-parent-imports.md
+          - no-parent-internal-access: rules/no-parent-internal-access.md
           - no-re-export: rules/no-re-export.md
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md

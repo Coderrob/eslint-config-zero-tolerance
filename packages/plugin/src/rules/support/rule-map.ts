@@ -62,7 +62,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-floating-promises',
   'no-for-in',
   'no-labels',
-  'no-parent-imports',
+  'no-barrel-parent-imports',
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',
@@ -178,6 +178,7 @@ const ruleEntries: RuleEntryTuple[] = [
     [ERROR_LEVEL, { max: MAX_PARAMS_MAX }],
   ),
   createRuleEntry('prefer-result-return', OFF_LEVEL, WARN_LEVEL),
+  createRuleEntry('no-parent-internal-access', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];

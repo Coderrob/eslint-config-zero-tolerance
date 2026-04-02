@@ -36,6 +36,26 @@ ruleTester.run('no-re-export', noReExport, {
       name: 'should allow wildcard re-export from child module',
     },
     {
+      code: "import { foo } from './child';\nexport { foo };",
+      name: 'should allow pass-through export of a child import',
+    },
+    {
+      code: "import { foo } from '../sibling';\nconst local = foo;\nexport { local };",
+      name: 'should allow exporting a local binding derived from a parent import',
+    },
+    {
+      code: "import parentDefault from '../parent';\nexport default wrap(parentDefault);",
+      name: 'should allow default exports that do not directly pass through a parent import',
+    },
+    {
+      code: "import parent = require('./sibling');\nexport { parent };",
+      name: 'should allow pass-through export of a child import-equals binding',
+    },
+    {
+      code: 'import Alias = Namespace.Value;\nexport { Alias };',
+      name: 'should allow pass-through export of an internal import-equals binding',
+    },
+    {
       code: "export { foo } from '../sibling';",
       name: 'should allow any re-export in a barrel file (named)',
       filename: 'src/index.ts',
@@ -90,6 +110,46 @@ ruleTester.run('no-re-export', noReExport, {
     {
       code: "export * from '..';",
       name: 'should disallow wildcard re-export from bare parent path',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import { foo } from '../sibling';\nexport { foo };",
+      name: 'should disallow pass-through named export of a parent import',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import type { Foo } from '../sibling';\nexport type { Foo };",
+      name: 'should disallow pass-through type export of a parent import',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import * as siblingNs from '../sibling';\nexport { siblingNs };",
+      name: 'should disallow pass-through namespace export of a parent import',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import parentDefault from '../../parent';\nexport default parentDefault;",
+      name: 'should disallow pass-through default export of a parent import',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import parent = require('../sibling');\nexport { parent };",
+      name: 'should disallow pass-through export of a parent import-equals binding',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import parent = require('../../parent');\nexport = parent;",
+      name: 'should disallow pass-through TypeScript export assignment of a parent import',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "export { foo };\nimport { foo } from '../sibling';",
+      name: 'should disallow pass-through named export of a parent import declared later in the file',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "export default parentDefault;\nimport parentDefault from '../../parent';",
+      name: 'should disallow pass-through default export of a parent import declared later in the file',
       errors: [{ messageId: 'noReExport' }],
     },
   ],

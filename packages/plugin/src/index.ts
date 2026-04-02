@@ -26,6 +26,7 @@ import maxParams from './rules/max-params';
 import noArrayMutation from './rules/no-array-mutation';
 import noAwaitInLoop from './rules/no-await-in-loop';
 import noBannedTypes from './rules/no-banned-types';
+import noBarrelParentImports from './rules/no-barrel-parent-imports';
 import noBooleanReturnTrap from './rules/no-boolean-return-trap';
 import noDateNow from './rules/no-date-now';
 import noDestructuredParameterTypeLiteral from './rules/no-destructured-parameter-type-literal';
@@ -48,7 +49,7 @@ import noMockImplementation from './rules/no-mock-implementation';
 import noNonNullAssertion from './rules/no-non-null-assertion';
 import noObjectMutation from './rules/no-object-mutation';
 import noParameterReassign from './rules/no-parameter-reassign';
-import noParentImports from './rules/no-parent-imports';
+import noParentInternalAccess from './rules/no-parent-internal-access';
 import noQuerySideEffects from './rules/no-query-side-effects';
 import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
@@ -114,8 +115,9 @@ const rules: Record<string, unknown> = {
   'no-mock-implementation': noMockImplementation,
   'no-non-null-assertion': noNonNullAssertion,
   'no-object-mutation': noObjectMutation,
+  'no-parent-internal-access': noParentInternalAccess,
   'no-parameter-reassign': noParameterReassign,
-  'no-parent-imports': noParentImports,
+  'no-barrel-parent-imports': noBarrelParentImports,
   'no-query-side-effects': noQuerySideEffects,
   'no-re-export': noReExport,
   'no-redundant-boolean': noRedundantBoolean,

@@ -62,7 +62,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-Nearly all core rules are included in every preset. `require-bdd-spec` is available as an opt-in rule and is disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
+Nearly all core rules are included in every preset. `require-bdd-spec` and `no-parent-internal-access` are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
 
 | Rule                                     | Recommended    | Strict          |
 | ---------------------------------------- | -------------- | --------------- |
@@ -101,7 +101,8 @@ Nearly all core rules are included in every preset. `require-bdd-spec` is availa
 | `no-non-null-assertion`                  | warn           | error           |
 | `no-for-in`                              | warn           | error           |
 | `no-labels`                              | warn           | error           |
-| `no-parent-imports`                      | warn           | error           |
+| `no-barrel-parent-imports`               | warn           | error           |
+| `no-parent-internal-access`              | off            | off             |
 | `no-with`                                | warn           | error           |
 | `no-await-in-loop`                       | warn           | error           |
 | `no-floating-promises`                   | warn           | error           |
@@ -117,7 +118,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` is availa
 | `require-optional-chaining`              | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 
-`require-bdd-spec` is available but intentionally not enabled by default in presets.
+`require-bdd-spec` and `no-parent-internal-access` are available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 
@@ -180,3 +181,14 @@ Multiple rules accept an options object:
   },
 ]
 ```
+
+### `no-parent-internal-access`
+
+```js
+'zero-tolerance/no-parent-internal-access': [
+  'error',
+  { protectedDirectories: ['src', 'app', 'internal'] },
+]
+```
+
+The rule matches only the first concrete directory reached after `..` traversal, so `../src/foo` is reported but `../shared/src/foo` is not unless `shared` is also protected. Configured directory names are trimmed and deduplicated, and empty entries are ignored.
