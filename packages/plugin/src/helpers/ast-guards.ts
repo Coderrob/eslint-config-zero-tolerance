@@ -114,6 +114,32 @@ export function isMethodDefinitionNode(
 }
 
 /**
+ * Returns true when the node is an Identifier with the expected name.
+ *
+ * @param node - The node to check.
+ * @param name - Expected identifier name.
+ * @returns True if the node is an Identifier with the expected name, false otherwise.
+ */
+export function isNamedIdentifierNode(
+  node: TSESTree.Node | null | undefined,
+  name: string,
+): node is TSESTree.Identifier {
+  return isIdentifierNode(node) && node.name === name;
+}
+
+/**
+ * Returns true when an unknown value is an AST node.
+ *
+ * @param value - Value to inspect.
+ * @returns True when value has a node-like `type` property.
+ */
+export function isNodeLike(value: unknown): value is TSESTree.Node {
+  return (
+    typeof value === 'object' && value !== null && 'type' in value && typeof value.type === 'string'
+  );
+}
+
+/**
  * Returns true when the node is a SwitchCase.
  *
  * @param node - The node to check.
@@ -161,6 +187,22 @@ export function isUnaryExpressionNode(
   node: TSESTree.Node | null | undefined,
 ): node is TSESTree.UnaryExpression {
   return node?.type === AST_NODE_TYPES.UnaryExpression;
+}
+
+/**
+ * Returns true when the node is a non-computed MemberExpression.
+ *
+ * @param node - The node to check.
+ * @returns True if the node is a direct member access, false otherwise.
+ */
+export function isUncomputedMemberExpressionNode(
+  node: TSESTree.Node | null | undefined,
+): node is TSESTree.MemberExpression & {
+  computed: false;
+  object: TSESTree.Expression;
+  property: TSESTree.Expression | TSESTree.PrivateIdentifier;
+} {
+  return isMemberExpressionNode(node) && !node.computed;
 }
 
 /**

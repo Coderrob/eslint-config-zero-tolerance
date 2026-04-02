@@ -1,0 +1,69 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/statements.ts",
+  "module": {
+    "name": "ast/statements",
+    "description": "Higher-level AST statement helpers for return and boolean-literal evaluation.",
+    "exports": [
+      "getBooleanLiteralReturnValue",
+      "getBooleanLiteralValue",
+      "getReturnStatement",
+      "getSingleReturnStatement"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Boolean return evaluation",
+      "scenarios": [
+        {
+          "name": "should return the boolean literal from a return-bearing statement",
+          "given": "a return statement or reducible block statement that returns a boolean literal",
+          "when": "getBooleanLiteralReturnValue is called",
+          "then": "returns that boolean value"
+        },
+        {
+          "name": "should return null when the return-bearing statement is not a boolean literal return",
+          "given": "a statement that does not reduce to a boolean literal return",
+          "when": "getBooleanLiteralReturnValue is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return the boolean literal value from a boolean literal expression",
+          "given": "a Literal expression whose value is boolean",
+          "when": "getBooleanLiteralValue is called",
+          "then": "returns that boolean value"
+        },
+        {
+          "name": "should return null for non-boolean literal expressions",
+          "given": "an expression that is not a boolean literal",
+          "when": "getBooleanLiteralValue is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "Return statement extraction",
+      "scenarios": [
+        {
+          "name": "should return a direct return statement unchanged",
+          "given": "a statement that is already a ReturnStatement",
+          "when": "getReturnStatement is called",
+          "then": "returns that ReturnStatement"
+        },
+        {
+          "name": "should return the single return statement from a one-statement block",
+          "given": "a BlockStatement containing exactly one ReturnStatement",
+          "when": "getReturnStatement or getSingleReturnStatement is called",
+          "then": "returns the contained ReturnStatement"
+        },
+        {
+          "name": "should return null when a statement or block cannot be reduced to a single return",
+          "given": "a non-return statement or a block that does not contain exactly one ReturnStatement",
+          "when": "getReturnStatement or getSingleReturnStatement is called",
+          "then": "returns null"
+        }
+      ]
+    }
+  ]
+}

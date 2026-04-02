@@ -22,6 +22,12 @@
           "given": "test('should handle the error case', () => {})",
           "when": "the rule evaluates the test call",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow skipped test calls to bypass enforcement by default",
+          "given": "it.skip('skipped test', () => {}) with default options",
+          "when": "the rule evaluates the skipped test call",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -38,6 +44,12 @@
           "name": "should report a test() description not starting with 'should'",
           "given": "test('handles the error case', () => {})",
           "when": "the rule evaluates the test call",
+          "then": "a requireTestDescriptionStyle violation is reported"
+        },
+        {
+          "name": "should report a skipped test description when ignoreSkip is false",
+          "given": "it['skip']('skipped test', () => {}) with ignoreSkip set to false",
+          "when": "the rule evaluates the skipped test call",
           "then": "a requireTestDescriptionStyle violation is reported"
         }
       ]

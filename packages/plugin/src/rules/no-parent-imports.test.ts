@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noParentImports } from './no-parent-imports';
 
 ruleTester.run('no-parent-imports', noParentImports, {
@@ -28,8 +28,16 @@ ruleTester.run('no-parent-imports', noParentImports, {
       code: 'const feature = await import(moduleName);',
     },
     {
+      name: 'should allow dynamic import expressions with non-string literal source',
+      code: 'const feature = await import(123);',
+    },
+    {
       name: 'should allow require from non-parent paths',
       code: "const feature = require('./feature');",
+    },
+    {
+      name: 'should allow member require calls even when the argument is a parent path',
+      code: "const feature = loader.require('../feature');",
     },
     {
       name: 'should allow require with no arguments',

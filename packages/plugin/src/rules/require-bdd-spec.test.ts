@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { RequireBddSpecMessageId, requireBddSpec } from './require-bdd-spec';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────

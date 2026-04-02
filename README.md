@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `require-bdd-spec` remains available as an opt-in rule.
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` is a fully opt-in rule (off in all presets).
 
 ### Naming Conventions
 
@@ -128,13 +128,13 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Documentation
 
-| Rule                                                                                   | Description                                                                         |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | Require JSDoc comments on anonymous function-like constructs (except test files)    |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | Require JSDoc comments on named functions (except test files)                       |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | Require optional chaining instead of repeated guard access                          |
-| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                                   | Description                                                                                             |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
+| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | Require JSDoc comments on named functions (except test files)                                           |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | Require optional chaining instead of repeated guard access                                              |
+| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | Require JSX component props to be typed as readonly                                                     |
 
 ### Testing
 
@@ -146,13 +146,14 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Type Safety
 
-| Rule                                                           | Description                                                 |
-| -------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`no-type-assertion`](docs/rules/no-type-assertion.md)         | Prevent use of TypeScript `as` and angle-bracket assertions |
-| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md) | Disallow non-null assertions using the `!` postfix operator |
-| [`no-literal-unions`](docs/rules/no-literal-unions.md)         | Ban literal union types in favour of enums                  |
-| [`no-banned-types`](docs/rules/no-banned-types.md)             | Ban `ReturnType` and indexed access types                   |
-| [`no-inline-type-import`](docs/rules/no-inline-type-import.md) | Disallow inline `import("...").Type` annotations            |
+| Rule                                                                                             | Description                                                     |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions     |
+| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator     |
+| [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                      |
+| [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                       |
+| [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                |
+| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters |
 
 ### Code Quality
 
@@ -166,7 +167,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-magic-strings`](docs/rules/no-magic-strings.md)                     | Disallow magic strings in comparisons and switch cases                |
 | [`no-object-mutation`](docs/rules/no-object-mutation.md)                 | Disallow direct object-property mutation                              |
 | [`sort-imports`](docs/rules/sort-imports.md)                             | Require import declarations to be grouped and alphabetized            |
-| [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level function declarations to be sorted alphabetically   |
+| [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level functions to be sorted alphabetically               |
 | [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)   | Prefer nullish coalescing instead of repeated nullish guard ternaries |
 | [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters           |
 | [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                   | Prefer `String.raw` for strings containing escaped backslashes        |

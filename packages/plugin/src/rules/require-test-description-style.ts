@@ -15,16 +15,17 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isIdentifierNode, isMemberExpressionNode } from '../ast-guards';
+import { getCalleeNamePath, getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
+import { isBoolean, isPlainObject, isString } from '../helpers/type-guards';
 import {
   TEST_DESCRIPTION_PREFIX,
   TEST_FUNCTION_IT,
   TEST_FUNCTION_TEST,
   TEST_METHOD_SKIP,
-} from '../rule-constants';
-import { createRule } from '../rule-factory';
-import { isBoolean, isString } from '../type-guards';
+} from './support/rule-constants';
+import { createRule } from './support/rule-factory';
+
+const MEMBER_TEST_CALL_SEGMENT_COUNT = 2;
 
 type RuleOption = Readonly<{
   ignoreSkip?: boolean;
@@ -116,10 +117,7 @@ function createRequireTestDescriptionStyleListeners(
  * @returns The string literal argument if present and valid, null otherwise.
  */
 function getDescriptionArgument(node: TSESTree.CallExpression): TSESTree.Literal | null {
-  if (node.arguments.length === 0) {
-    return null;
-  }
-  return getStringLiteralArgument(node.arguments[0]);
+  return getStringLiteralCallArgument(node, 0);
 }
 
 /**
@@ -202,31 +200,6 @@ function getPrefixOption(option: RuleOption | null): string {
 }
 
 /**
- * Returns argument node when it is a string literal.
- *
- * @param arg - The argument node to check.
- * @returns The literal node if it's a string literal, null otherwise.
- */
-function getStringLiteralArgument(arg: TSESTree.CallExpressionArgument): TSESTree.Literal | null {
-  if (arg.type !== AST_NODE_TYPES.Literal || !isString(arg.value)) {
-    return null;
-  }
-  return arg;
-}
-
-/**
- * Returns true when callee is a member expression and narrows the node shape.
- *
- * @param node - The call expression node to check.
- * @returns True when node.callee is a member expression.
- */
-function hasMemberExpressionCallee(
-  node: TSESTree.CallExpression,
-): node is TSESTree.CallExpression & { callee: TSESTree.MemberExpression } {
-  return isMemberExpressionNode(node.callee);
-}
-
-/**
  * Returns true when test description conforms to expected prefix.
  *
  * @param node - The literal node containing the test description.
@@ -244,10 +217,10 @@ function hasRequiredDescriptionPrefix(node: TSESTree.Literal, prefix: string): b
  * @returns True if the call is a direct test call, false otherwise.
  */
 function isDirectTestCall(node: TSESTree.CallExpression): boolean {
-  if (!isIdentifierNode(node.callee)) {
-    return false;
-  }
-  return isTestIdentifierName(node.callee.name);
+  return (
+    hasCallCalleeNamePath(node, [TEST_FUNCTION_IT]) ||
+    hasCallCalleeNamePath(node, [TEST_FUNCTION_TEST])
+  );
 }
 
 /**
@@ -270,20 +243,11 @@ function isEnforcedTestCall(node: TSESTree.CallExpression): boolean {
  * @returns True if the call is a member test call, false otherwise.
  */
 function isMemberTestCall(node: TSESTree.CallExpression): boolean {
-  if (!isMemberExpressionNode(node.callee) || !isIdentifierNode(node.callee.object)) {
+  const calleeNamePath = getCalleeNamePath(node.callee);
+  if (calleeNamePath === null || calleeNamePath.length !== MEMBER_TEST_CALL_SEGMENT_COUNT) {
     return false;
   }
-  return isTestIdentifierName(node.callee.object.name);
-}
-
-/**
- * Returns true when value is a non-array object.
- *
- * @param value - Unknown value.
- * @returns True when value is object-like and not an array.
- */
-function isNonArrayObject(value: unknown): value is object {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return isTestIdentifierName(calleeNamePath[0]);
 }
 
 /**
@@ -315,10 +279,11 @@ function isRuleOptionPrefixValue(value: object): boolean {
  * @returns True when input can be treated as a rule option object.
  */
 function isRuleOptionRecord(value: unknown): value is RuleOption {
-  if (!isNonArrayObject(value)) {
+  if (!isPlainObject(value)) {
     return false;
   }
   if (!isRuleOptionIgnoreSkipValue(value)) {
+    /* istanbul ignore next */
     return false;
   }
   return isRuleOptionPrefixValue(value);
@@ -331,23 +296,10 @@ function isRuleOptionRecord(value: unknown): value is RuleOption {
  * @returns True if the call is a skipped test call, false otherwise.
  */
 function isSkippedTestCall(node: TSESTree.CallExpression): boolean {
-  if (!isMemberTestCall(node) || !hasMemberExpressionCallee(node)) {
-    return false;
-  }
-  return isSkipProperty(node.callee.property);
-}
-
-/**
- * Returns true when the property represents 'skip'.
- *
- * @param property - The property node to check.
- * @returns True if the property is 'skip'.
- */
-function isSkipProperty(property: TSESTree.Expression | TSESTree.PrivateIdentifier): boolean {
-  if (isIdentifierNode(property)) {
-    return property.name === TEST_METHOD_SKIP;
-  }
-  return property.type === AST_NODE_TYPES.Literal && property.value === TEST_METHOD_SKIP;
+  return (
+    hasCallCalleeNamePath(node, [TEST_FUNCTION_IT, TEST_METHOD_SKIP]) ||
+    hasCallCalleeNamePath(node, [TEST_FUNCTION_TEST, TEST_METHOD_SKIP])
+  );
 }
 
 /**

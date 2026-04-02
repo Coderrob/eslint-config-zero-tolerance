@@ -17,19 +17,34 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.js"
+      }
     },
     "./recommended": {
-      "types": "./dist/recommended.d.ts",
-      "import": "./dist/recommended.mjs",
-      "require": "./dist/recommended.js"
+      "import": {
+        "types": "./dist/recommended.d.mts",
+        "default": "./dist/recommended.mjs"
+      },
+      "require": {
+        "types": "./dist/recommended.d.cts",
+        "default": "./dist/recommended.js"
+      }
     },
     "./strict": {
-      "types": "./dist/strict.d.ts",
-      "import": "./dist/strict.mjs",
-      "require": "./dist/strict.js"
+      "import": {
+        "types": "./dist/strict.d.mts",
+        "default": "./dist/strict.mjs"
+      },
+      "require": {
+        "types": "./dist/strict.d.cts",
+        "default": "./dist/strict.js"
+      }
     }
   },
   "files": [
@@ -61,15 +76,16 @@
   "repository": {
     "directory": "packages/config",
     "type": "git",
-    "url": "https://github.com/Coderrob/eslint-config-zero-tolerance.git"
+    "url": "git+https://github.com/Coderrob/eslint-config-zero-tolerance.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/recommended.ts src/strict.ts --format cjs,esm --dts --clean",
+    "build": "tsup src/index.ts src/recommended.ts src/strict.ts --format cjs,esm --dts --clean && node ../../scripts/sync-dts-variants.mjs index recommended strict",
     "clean": "rimraf dist",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "prepack": "npm run build"
   },
   "types": "dist/index.d.ts",
+  "type": "commonjs",
   "version": "1.0.0"
 }

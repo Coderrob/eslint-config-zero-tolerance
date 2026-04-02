@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { preferStringRaw } from './prefer-string-raw';
 
 ruleTester.run('prefer-string-raw', preferStringRaw, {

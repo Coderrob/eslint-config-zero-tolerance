@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noDynamicImport } from './no-dynamic-import';
 
 ruleTester.run('no-dynamic-import', noDynamicImport, {
@@ -37,6 +37,11 @@ ruleTester.run('no-dynamic-import', noDynamicImport, {
       code: 'const module = require("./module");',
       filename: 'src/file.spec.jsx',
       name: 'should allow require in .spec.jsx file',
+    },
+    {
+      code: 'const module = loader.require("./module");',
+      filename: 'src/file.ts',
+      name: 'should allow member require calls on non-global objects',
     },
     {
       code: 'import("./module").then(m => m.default);',

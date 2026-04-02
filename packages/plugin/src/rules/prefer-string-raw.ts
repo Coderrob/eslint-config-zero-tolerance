@@ -15,8 +15,12 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import {
+  isCallExpressionNode,
+  isNamedIdentifierNode,
+  isUncomputedMemberExpressionNode,
+} from '../helpers/ast-guards';
+import { createRule } from './support/rule-factory';
 
 const BACKSLASH = '\\';
 const STRING_RAW_PROPERTY_NAME = 'raw';
@@ -107,7 +111,7 @@ function createPreferStringRawListeners(context: PreferStringRawContext): TSESLi
  */
 function isInsideStringRaw(node: TSESTree.Literal): boolean {
   const parentNode = node.parent;
-  if (parentNode.type !== AST_NODE_TYPES.CallExpression) {
+  if (!isCallExpressionNode(parentNode)) {
     return false;
   }
   if (!parentNode.arguments.includes(node)) {
@@ -123,7 +127,7 @@ function isInsideStringRaw(node: TSESTree.Literal): boolean {
  * @returns True when node is `String`.
  */
 function isStringConstructorIdentifier(node: TSESTree.Expression): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === STRING_CONSTRUCTOR_NAME;
+  return isNamedIdentifierNode(node, STRING_CONSTRUCTOR_NAME);
 }
 
 /**
@@ -143,7 +147,7 @@ function isStringLiteral(node: TSESTree.Literal): node is TSESTree.StringLiteral
  * @returns True when property is `raw`.
  */
 function isStringRawCallee(callee: TSESTree.Expression): boolean {
-  if (!isUncomputedMemberExpression(callee)) {
+  if (!isUncomputedMemberExpressionNode(callee)) {
     return false;
   }
   return (
@@ -160,22 +164,7 @@ function isStringRawCallee(callee: TSESTree.Expression): boolean {
 function isStringRawPropertyIdentifier(
   node: TSESTree.Expression | TSESTree.PrivateIdentifier,
 ): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === STRING_RAW_PROPERTY_NAME;
-}
-
-/**
- * Returns true when expression is a non-computed member expression.
- *
- * @param callee - Call expression callee.
- * @returns True when expression is a direct member access.
- */
-function isUncomputedMemberExpression(
-  callee: TSESTree.Expression,
-): callee is TSESTree.MemberExpression & {
-  object: TSESTree.Expression;
-  property: TSESTree.Expression | TSESTree.PrivateIdentifier;
-} {
-  return callee.type === AST_NODE_TYPES.MemberExpression && !callee.computed;
+  return isNamedIdentifierNode(node, STRING_RAW_PROPERTY_NAME);
 }
 
 /**

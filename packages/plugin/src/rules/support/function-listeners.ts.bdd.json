@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/function-listeners.ts",
+  "module": {
+    "name": "function-listeners",
+    "description": "Reusable listener-map builders for traversing standard function-like AST node variants across multiple rules.",
+    "exports": ["createFunctionNodeEnterExitListeners", "createFunctionNodeListeners"]
+  },
+  "specifications": [
+    {
+      "feature": "createFunctionNodeListeners",
+      "scenarios": [
+        {
+          "name": "should register the same listener for arrow functions, function declarations, and function expressions",
+          "given": "a function-node listener callback",
+          "when": "createFunctionNodeListeners is called",
+          "then": "returns a rule-listener map with entries for ArrowFunctionExpression, FunctionDeclaration, and FunctionExpression"
+        }
+      ]
+    },
+    {
+      "feature": "createFunctionNodeEnterExitListeners",
+      "scenarios": [
+        {
+          "name": "should register matching enter and exit listeners for all standard function-like nodes",
+          "given": "function-node enter and exit callbacks",
+          "when": "createFunctionNodeEnterExitListeners is called",
+          "then": "returns a rule-listener map with enter and :exit entries for arrow functions, function declarations, and function expressions"
+        }
+      ]
+    }
+  ]
+}

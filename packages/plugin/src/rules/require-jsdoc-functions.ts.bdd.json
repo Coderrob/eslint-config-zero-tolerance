@@ -36,10 +36,10 @@
           "then": "no violation is reported"
         },
         {
-          "name": "should ignore anonymous function-like constructs",
-          "given": "an anonymous function-like construct in a non-test source file with no JSDoc",
-          "when": "the rule evaluates the function",
-          "then": "no violation is reported"
+          "name": "should ignore unsupported child node types that do not expose visitor keys",
+          "given": "a function body that includes a traversed node whose type is absent from the parser's visitor key map",
+          "when": "the rule scans the function body for return and throw statements",
+          "then": "the traversal skips that node type without throwing"
         }
       ]
     },

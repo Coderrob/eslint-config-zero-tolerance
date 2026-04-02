@@ -16,8 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
-import { isBoolean } from '../type-guards';
+import { isBoolean, isString } from '../helpers/type-guards';
+import { createRule } from './support/rule-factory';
 
 type NoLiteralUnionsContext = Readonly<TSESLint.RuleContext<'noLiteralUnions', []>>;
 
@@ -166,7 +166,7 @@ function getDirectTypeAliasDeclaration(
   if (parentNode.type !== AST_NODE_TYPES.TSTypeAliasDeclaration) {
     return null;
   }
-  return parentNode.typeAnnotation === node ? parentNode : null;
+  return parentNode;
 }
 
 /**
@@ -301,7 +301,7 @@ function isStringLiteralTypeNode(
   return (
     isLiteralTypeNode(type) &&
     type.literal.type === AST_NODE_TYPES.Literal &&
-    typeof type.literal.value === 'string'
+    isString(type.literal.value)
   );
 }
 

@@ -39,6 +39,12 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['require-clean-barrel'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-destructured-parameter-type-literal as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-destructured-parameter-type-literal'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

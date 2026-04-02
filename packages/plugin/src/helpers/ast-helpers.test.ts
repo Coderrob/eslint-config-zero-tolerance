@@ -1,11 +1,14 @@
 import {
-  getIdentifierName,
+  getCallMemberMethodName,
   getFunctionDeclarationName,
-  getFunctionVariableName,
   getFunctionMethodName,
-  resolveFunctionName,
+  getFunctionVariableName,
+  getIdentifierName,
+  getLiteralStringValue,
   getMemberPropertyName,
   getMappedMemberPropertyName,
+  getVisitorChildNodes,
+  resolveFunctionName,
 } from './ast-helpers';
 
 describe('ast-helpers', () => {
@@ -32,6 +35,45 @@ describe('ast-helpers', () => {
   });
 
   // ── getFunctionDeclarationName ───────────────────────────────────────────
+
+  describe('getCallMemberMethodName', () => {
+    it('should return the method name when the callee is a member expression', () => {
+      const node = {
+        callee: {
+          type: 'MemberExpression',
+          computed: false,
+          property: { type: 'Identifier', name: 'catch' },
+        },
+      } as any;
+
+      expect(getCallMemberMethodName(node)).toBe('catch');
+    });
+
+    it('should return null when the callee is not a member expression', () => {
+      const node = {
+        callee: { type: 'Identifier', name: 'fn' },
+      } as any;
+
+      expect(getCallMemberMethodName(node)).toBeNull();
+    });
+  });
+
+  describe('getLiteralStringValue', () => {
+    it('should return the string value when node is a string Literal', () => {
+      const node = { type: 'Literal', value: 'foo' } as any;
+      expect(getLiteralStringValue(node)).toBe('foo');
+    });
+
+    it('should return null when node is a non-string Literal', () => {
+      const node = { type: 'Literal', value: 42 } as any;
+      expect(getLiteralStringValue(node)).toBeNull();
+    });
+
+    it('should return null when node is not a Literal', () => {
+      const node = { type: 'Identifier', name: 'foo' } as any;
+      expect(getLiteralStringValue(node)).toBeNull();
+    });
+  });
 
   describe('getFunctionDeclarationName', () => {
     it('should return the name from a named FunctionDeclaration', () => {
@@ -189,6 +231,39 @@ describe('ast-helpers', () => {
           mockImplementation: 'mockImplementationOnce',
         }),
       ).toBeNull();
+    });
+  });
+
+  describe('getVisitorChildNodes', () => {
+    it('should return child nodes for configured visitor keys', () => {
+      const sourceCode = {
+        visitorKeys: {
+          BinaryExpression: ['left', 'right', 'extras'],
+        },
+      } as any;
+      const left = { type: 'Identifier', name: 'left' };
+      const right = { type: 'Identifier', name: 'right' };
+      const extra = { type: 'Literal', value: 1 };
+      const node = {
+        type: 'BinaryExpression',
+        left,
+        right,
+        extras: [extra, 'not-a-node'],
+      } as any;
+
+      expect(getVisitorChildNodes(node, sourceCode)).toEqual([left, right, extra]);
+    });
+
+    it('should return an empty array when visitor keys are missing for the node type', () => {
+      const sourceCode = {
+        visitorKeys: {},
+      } as any;
+      const node = {
+        type: 'UnknownExpression',
+        child: { type: 'Identifier', name: 'value' },
+      } as any;
+
+      expect(getVisitorChildNodes(node, sourceCode)).toEqual([]);
     });
   });
 });

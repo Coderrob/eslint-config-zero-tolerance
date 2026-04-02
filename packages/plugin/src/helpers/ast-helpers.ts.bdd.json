@@ -1,21 +1,42 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/ast-helpers.ts",
+  "sourceFile": "packages/plugin/src/helpers/ast-helpers.ts",
   "module": {
     "name": "ast-helpers",
     "description": "Reusable AST helper functions shared across multiple rule implementations.",
     "exports": [
+      "getCallMemberMethodName",
       "getFunctionDeclarationName",
       "getFunctionMethodName",
       "getFunctionVariableName",
       "getIdentifierName",
+      "getLiteralStringValue",
       "getMappedMemberPropertyName",
       "getMemberPropertyName",
+      "getOptionMaxValue",
+      "getVisitorChildNodes",
       "resolveFunctionName"
     ]
   },
   "specifications": [
+    {
+      "feature": "getCallMemberMethodName",
+      "scenarios": [
+        {
+          "name": "should return the member method name for a call expression",
+          "given": "a CallExpression whose callee is a MemberExpression with a resolvable property name",
+          "when": "getCallMemberMethodName is called",
+          "then": "returns the member method name string"
+        },
+        {
+          "name": "should return null when the callee is not a MemberExpression",
+          "given": "a CallExpression whose callee is a plain Identifier",
+          "when": "getCallMemberMethodName is called",
+          "then": "returns null"
+        }
+      ]
+    },
     {
       "feature": "getFunctionDeclarationName",
       "scenarios": [
@@ -97,6 +118,29 @@
       ]
     },
     {
+      "feature": "getLiteralStringValue",
+      "scenarios": [
+        {
+          "name": "should return the string value for a string Literal node",
+          "given": "a Literal AST node whose value is a string",
+          "when": "getLiteralStringValue is called",
+          "then": "returns the literal string value"
+        },
+        {
+          "name": "should return null for a non-string Literal node",
+          "given": "a Literal AST node whose value is not a string",
+          "when": "getLiteralStringValue is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for a non-Literal node",
+          "given": "an AST node whose type is not Literal",
+          "when": "getLiteralStringValue is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
       "feature": "getMemberPropertyName",
       "scenarios": [
         {
@@ -139,6 +183,46 @@
           "given": "a computed MemberExpression with a non-string property",
           "when": "getMappedMemberPropertyName is called",
           "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getOptionMaxValue",
+      "scenarios": [
+        {
+          "name": "should return the max property from a plain option object",
+          "given": "a plain object with a max property",
+          "when": "getOptionMaxValue is called",
+          "then": "returns the value of the max property"
+        },
+        {
+          "name": "should return undefined when the option is not a plain object",
+          "given": "a non-object value such as a string or number",
+          "when": "getOptionMaxValue is called",
+          "then": "returns undefined"
+        },
+        {
+          "name": "should return undefined when the option is null or undefined",
+          "given": "null or undefined as the option",
+          "when": "getOptionMaxValue is called",
+          "then": "returns undefined"
+        }
+      ]
+    },
+    {
+      "feature": "getVisitorChildNodes",
+      "scenarios": [
+        {
+          "name": "should return traversable child nodes for configured visitor keys",
+          "given": "an AST node type with visitor keys that point to child nodes and arrays of child nodes",
+          "when": "getVisitorChildNodes is called",
+          "then": "returns the flattened child-node list in visitor-key order"
+        },
+        {
+          "name": "should return an empty array when visitor keys are missing for the node type",
+          "given": "an AST node whose type is absent from sourceCode.visitorKeys",
+          "when": "getVisitorChildNodes is called",
+          "then": "returns an empty array without throwing"
         }
       ]
     },

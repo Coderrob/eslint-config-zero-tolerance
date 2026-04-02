@@ -15,7 +15,7 @@
  */
 
 import { CONFIG_NAME_RECOMMENDED, PLUGIN_NAMESPACE, Preset } from '../constants';
-import { buildRules } from '../rule-map';
+import { buildRules } from '../rules/support/rule-map';
 
 /** Flat-config shape produced by plugin preset factories. */
 export interface IPluginFlatConfig {

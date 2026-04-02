@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 48 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 50 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -15,8 +15,8 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 ## Requirements
 
 - Node.js
-  - >= 18 when using ESLint 8.57.0+ or 9.x
-  - >= 20 when using ESLint 10.x
+  - > 17 when using ESLint 8.57.0+ or 9.x
+  - > 19 when using ESLint 10.x
 - ESLint 8.57.0+, 9.x, or 10.x
 - `@typescript-eslint/parser` 8.x
 - TypeScript 5.x
@@ -87,13 +87,13 @@ export default [
 
 ### Documentation
 
-| Rule                                | Description                                                                         |
-| ----------------------------------- | ----------------------------------------------------------------------------------- |
-| `require-bdd-spec`                  | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| `require-jsdoc-anonymous-functions` | Require JSDoc comments on anonymous function-like constructs (except test files)    |
-| `require-jsdoc-functions`           | Require JSDoc comments on named functions (except test files)                       |
-| `require-optional-chaining`         | Require optional chaining instead of repeated guard access                          |
-| `require-readonly-props`            | Require JSX component props to be typed as readonly                                 |
+| Rule                                | Description                                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `require-bdd-spec`                  | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
+| `require-jsdoc-anonymous-functions` | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
+| `require-jsdoc-functions`           | Require JSDoc comments on named functions (except test files)                                           |
+| `require-optional-chaining`         | Require optional chaining instead of repeated guard access                                              |
+| `require-readonly-props`            | Require JSX component props to be typed as readonly                                                     |
 
 ### Testing
 
@@ -105,13 +105,14 @@ export default [
 
 ### Type Safety
 
-| Rule                    | Description                                                 |
-| ----------------------- | ----------------------------------------------------------- |
-| `no-type-assertion`     | Prevent use of TypeScript `as` and angle-bracket assertions |
-| `no-non-null-assertion` | Disallow non-null assertions using the `!` postfix operator |
-| `no-literal-unions`     | Ban literal union types in favour of enums                  |
-| `no-banned-types`       | Ban `ReturnType` and indexed access types                   |
-| `no-inline-type-import` | Disallow inline `import("...").Type` annotations            |
+| Rule                                     | Description                                                     |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions     |
+| `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator     |
+| `no-literal-unions`                      | Ban literal union types in favour of enums                      |
+| `no-banned-types`                        | Ban `ReturnType` and indexed access types                       |
+| `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                |
+| `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters |
 
 ### Code Quality
 

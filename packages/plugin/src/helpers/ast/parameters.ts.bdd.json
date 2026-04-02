@@ -1,0 +1,81 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/parameters.ts",
+  "module": {
+    "name": "ast/parameters",
+    "description": "Higher-level AST parameter helpers for type annotations and special parameter shapes.",
+    "exports": [
+      "getFirstNonThisParameter",
+      "getObjectDestructuredParameterTypeNode",
+      "getParameterTypeAnnotation",
+      "getParameterTypeNode",
+      "isThisParameter"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "First non-this parameter lookup",
+      "scenarios": [
+        {
+          "name": "should return the first parameter that is not the this pseudo-parameter",
+          "given": "a function parameter list whose first entry is the TypeScript this pseudo-parameter and a later parameter is a real argument",
+          "when": "getFirstNonThisParameter is called",
+          "then": "returns the first real argument parameter"
+        },
+        {
+          "name": "should return undefined when no real argument parameter exists",
+          "given": "a function parameter list that only contains the TypeScript this pseudo-parameter",
+          "when": "getFirstNonThisParameter is called",
+          "then": "returns undefined"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter type extraction",
+      "scenarios": [
+        {
+          "name": "should return the type node for an object-destructured parameter",
+          "given": "a directly annotated object-pattern parameter or an assignment-pattern parameter whose left side is an annotated object pattern",
+          "when": "getObjectDestructuredParameterTypeNode is called",
+          "then": "returns the annotated type node"
+        },
+        {
+          "name": "should return the type annotation for supported parameter shapes",
+          "given": "a supported parameter shape such as an identifier, assignment pattern, or ts parameter property with a type annotation",
+          "when": "getParameterTypeAnnotation is called",
+          "then": "returns the parameter's type annotation"
+        },
+        {
+          "name": "should return the type node for supported parameter shapes",
+          "given": "a supported parameter shape with a type annotation",
+          "when": "getParameterTypeNode is called",
+          "then": "returns the annotated type node"
+        },
+        {
+          "name": "should return null when a supported parameter shape has no annotation",
+          "given": "a supported parameter shape without a type annotation",
+          "when": "getParameterTypeAnnotation or getParameterTypeNode is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "This pseudo-parameter detection",
+      "scenarios": [
+        {
+          "name": "should return true for the TypeScript this pseudo-parameter",
+          "given": "an Identifier parameter named this",
+          "when": "isThisParameter is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for non-this parameters",
+          "given": "a parameter that is not an Identifier named this",
+          "when": "isThisParameter is called",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

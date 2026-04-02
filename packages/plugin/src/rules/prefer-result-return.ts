@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isTestFile } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import { isTestFile } from '../helpers/ast-guards';
+import { createRule } from './support/rule-factory';
 
 type PreferResultReturnContext = Readonly<TSESLint.RuleContext<'preferResultReturn', []>>;
 

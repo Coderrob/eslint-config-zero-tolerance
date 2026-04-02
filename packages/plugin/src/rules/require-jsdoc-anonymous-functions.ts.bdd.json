@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/require-jsdoc-anonymous-functions.ts",
   "module": {
     "name": "require-jsdoc-anonymous-functions",
-    "description": "Require JSDoc comments on anonymous function-like constructs outside of test files.",
+    "description": "Require JSDoc comments on anonymous function-like constructs outside of test files and known test callbacks.",
     "exports": ["RequireJsdocAnonymousFunctionsMessageId", "requireJsdocAnonymousFunctions"]
   },
   "specifications": [
@@ -21,6 +21,18 @@
           "name": "should allow anonymous functions in test files without JSDoc",
           "given": "an anonymous function in a .test.ts file with no JSDoc",
           "when": "the rule evaluates the function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow anonymous callbacks passed to well-known test APIs without JSDoc",
+          "given": "an anonymous callback passed to describe, it, test, or before/after style hooks in a non-test file",
+          "when": "the rule evaluates the callback function",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow anonymous callbacks passed to chained test API modifiers without JSDoc",
+          "given": "an anonymous callback passed to a chained test API such as test.skip.each or test.describe.beforeEach",
+          "when": "the rule evaluates the callback function",
           "then": "no violation is reported"
         },
         {

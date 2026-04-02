@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { requireTestDescriptionStyle } from './require-test-description-style';
 
 ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
@@ -66,6 +66,10 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
     {
       code: "test['skip']('skipped test', () => {});",
       name: 'should allow test computed skip with description not starting with should',
+    },
+    {
+      code: "test['only']('should run only', () => {});",
+      name: 'should allow computed focused test with should prefix',
     },
     {
       code: 'it("renders correctly", () => {});',
@@ -164,6 +168,27 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       output: 'it.skip("should skipped test", () => {});',
     },
     {
+      code: "test['skip']('skipped test', () => {});",
+      name: 'should enforce computed skip tests when ignoreSkip is false',
+      options: [{ ignoreSkip: false }],
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: "test['skip'](\"should skipped test\", () => {});",
+    },
+    {
+      code: "test['only']('runs focused test', () => {});",
+      name: 'should report computed focused test descriptions without should prefix',
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: "test['only'](\"should runs focused test\", () => {});",
+    },
+    {
       code: 'it("handles correctly", () => {});',
       name: 'should autofix using configured custom prefix',
       options: [{ prefix: 'renders' }],
@@ -173,6 +198,17 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
         },
       ],
       output: 'it("renders handles correctly", () => {});',
+    },
+    {
+      code: 'it("testing behavior", () => {});',
+      name: 'should not double-space when prefix already ends with a space',
+      options: [{ prefix: 'when ' }],
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: 'it("when testing behavior", () => {});',
     },
   ],
 });

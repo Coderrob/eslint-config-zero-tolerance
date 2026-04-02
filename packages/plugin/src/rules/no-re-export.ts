@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isParentDirectoryImportPath } from '../import-path-helpers';
-import { createRule } from '../rule-factory';
+import { isParentDirectoryImportPath, isBarrelFile } from '../helpers/import-path-helpers';
+import { createRule } from './support/rule-factory';
 
 type NoReExportContext = Readonly<TSESLint.RuleContext<'noReExport', []>>;
 
@@ -62,31 +62,6 @@ function createNoReExportListeners(context: NoReExportContext): TSESLint.RuleLis
     ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
     ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context),
   };
-}
-
-/**
- * Returns the file name (last path segment) from a file path.
- *
- * @param filePath - Full or relative file system path.
- * @returns The file name portion of the path.
- */
-function getFilename(filePath: string): string {
-  const parts = filePath.split(/[\\/]/);
-  return parts[parts.length - 1];
-}
-
-/**
- * Returns true when the file is a barrel file (index.*).
- *
- * Only single-extension index files (for example, `index.ts`, `index.js`, or
- * `index.mts`) are treated as barrel files. Double-extension files such as
- * `index.d.ts`, `index.test.ts`, or `index.spec.js` are intentionally excluded.
- *
- * @param filePath - Path to the current file being linted.
- * @returns True if the file is a barrel index file.
- */
-function isBarrelFile(filePath: string): boolean {
-  return /^index\.\w+$/.test(getFilename(filePath));
 }
 
 /**

@@ -18,23 +18,38 @@
  * Reusable AST helper functions shared across multiple rule implementations.
  */
 
-import type { TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import {
   type FunctionNode,
   isFunctionDeclarationNode,
   isIdentifierNode,
   isMethodDefinitionNode,
+  isNodeLike,
   isVariableDeclaratorNode,
 } from './ast-guards';
-import { ANONYMOUS_FUNCTION_NAME } from './constants';
-import { isString } from './type-guards';
+import { isPlainObject, isString } from './type-guards';
+
+/**
+ * Returns the member method name for a call expression, or null.
+ *
+ * @param node - Call expression node.
+ * @returns Method name when callee is a member expression.
+ */
+export function getCallMemberMethodName(node: TSESTree.CallExpression): string | null {
+  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+    return null;
+  }
+  return getMemberPropertyName(node.callee);
+}
 
 /**
  * Returns the property name for bracket-notation (computed) member access
  * when the computed key is a string literal.
  *
- * @param property - The property node.
- * @returns The property name if it's a string literal, otherwise null.
+ * @param property - The computed property node to inspect.
+ * @returns The property name if it is a string literal, otherwise null.
  */
 function getComputedPropertyName(property: { type: string; value?: unknown }): string | null {
   return isString(property.value) ? property.value : null;
@@ -93,6 +108,18 @@ export function getIdentifierName(node: TSESTree.Node | null | undefined): strin
 }
 
 /**
+ * Returns the string value for a Literal node, or null.
+ *
+ * @param node - The node to inspect.
+ * @returns The literal string value when available, otherwise null.
+ */
+export function getLiteralStringValue(
+  node: { type: string; value?: unknown } | null | undefined,
+): string | null {
+  return node?.type === AST_NODE_TYPES.Literal && isString(node.value) ? node.value : null;
+}
+
+/**
  * Returns a mapped replacement for a member property when the property name
  * exists in the provided replacement map.
  *
@@ -143,6 +170,54 @@ export function getMemberPropertyName(node: {
  */
 function getNonComputedPropertyName(property: { type: string; name?: string }): string | null {
   return isString(property.name) ? property.name : null;
+}
+
+/**
+ * Reads the `max` property from an option object.
+ *
+ * @param option - First rule option value.
+ * @returns The raw max value when present, otherwise undefined.
+ */
+export function getOptionMaxValue(option: unknown): unknown {
+  if (!isPlainObject(option)) {
+    return undefined;
+  }
+  return Reflect.get(option, 'max');
+}
+
+/**
+ * Returns child nodes extracted from one visitor-key value.
+ *
+ * @param value - Visitor-key value from an AST node.
+ * @returns Child nodes from the value.
+ */
+function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
+  if (Array.isArray(value)) {
+    return value.filter(isNodeLike);
+  }
+  return isNodeLike(value) ? [value] : [];
+}
+
+/**
+ * Returns direct child nodes for an AST node using source-code visitor keys.
+ *
+ * Missing visitor keys are treated as an empty traversal set so callers can
+ * safely walk custom or unsupported node types without runtime errors.
+ *
+ * @param node - Node whose children should be collected.
+ * @param sourceCode - ESLint source code helper.
+ * @returns Child nodes for traversal.
+ */
+export function getVisitorChildNodes(
+  node: TSESTree.Node,
+  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
+): ReadonlyArray<TSESTree.Node> {
+  const childNodes: TSESTree.Node[] = [];
+  const visitorKeys = sourceCode.visitorKeys[node.type] ?? [];
+  for (const key of visitorKeys) {
+    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
+  }
+  return childNodes;
 }
 
 /**

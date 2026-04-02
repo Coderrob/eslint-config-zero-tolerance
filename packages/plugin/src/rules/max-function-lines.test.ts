@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { maxFunctionLines } from './max-function-lines';
 
 const MAX_THREE = 3;

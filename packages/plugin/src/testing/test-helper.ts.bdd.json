@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/test-helper.ts",
+  "sourceFile": "packages/plugin/src/testing/test-helper.ts",
   "module": {
     "name": "test-helper",
     "description": "Shared RuleTester instance pre-configured with the TypeScript parser, used by all rule unit tests to eliminate boilerplate duplication.",

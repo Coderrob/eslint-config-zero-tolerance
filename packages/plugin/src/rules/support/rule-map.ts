@@ -15,7 +15,7 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, Preset } from './constants';
+import { PLUGIN_NAMESPACE, Preset } from '../../constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
@@ -32,6 +32,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-banned-types',
   'no-boolean-return-trap',
   'no-date-now',
+  'no-destructured-parameter-type-literal',
   'no-dynamic-import',
   'no-literal-unions',
   'no-export-alias',

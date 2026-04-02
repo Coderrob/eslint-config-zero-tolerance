@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noBannedTypes } from './no-banned-types';
 
 ruleTester.run('no-banned-types', noBannedTypes, {

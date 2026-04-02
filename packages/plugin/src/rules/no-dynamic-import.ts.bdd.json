@@ -38,7 +38,7 @@
           "name": "should report require() in a non-test source file",
           "given": "a require('module') call expression in a regular .ts file",
           "when": "the rule evaluates the expression",
-          "then": "a noDynamicImport violation is reported"
+          "then": "a noRequire violation is reported"
         }
       ]
     }

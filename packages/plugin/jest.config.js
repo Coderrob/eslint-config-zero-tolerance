@@ -9,7 +9,7 @@ const DEFAULT_THRESHOLD = {
   statements: 95,
 };
 const SPECIAL_TEST_COVERAGE_GLOBS = {
-  'plugin-wiring.test.ts': ['src/index.ts', 'src/rule-map.ts', 'src/configs/**/*.ts'],
+  'plugin-wiring.test.ts': ['src/index.ts', 'src/rules/support/rule-map.ts', 'src/configs/**/*.ts'],
 };
 const TEST_FILE_SUFFIX = '.test.ts';
 const HAS_EXPLICIT_TEST_ARGS = process.argv.some((arg) => arg.endsWith(TEST_FILE_SUFFIX));

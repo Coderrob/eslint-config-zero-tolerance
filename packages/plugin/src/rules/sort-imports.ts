@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isParentDirectoryImportPath } from '../import-path-helpers';
-import { createRule } from '../rule-factory';
+import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
+import { createRule } from './support/rule-factory';
 
 const GROUP_SIDE_EFFECT = 0;
 const GROUP_BUILTIN = 1;

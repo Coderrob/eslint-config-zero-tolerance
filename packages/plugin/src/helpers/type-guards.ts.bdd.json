@@ -1,11 +1,18 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/type-guards.ts",
+  "sourceFile": "packages/plugin/src/helpers/type-guards.ts",
   "module": {
     "name": "type-guards",
-    "description": "Primitive runtime type-guard functions shared across rule implementations and AST helpers.",
-    "exports": ["isBoolean", "isDefined", "isNullOrUndefined", "isNumber", "isString"]
+    "description": "Runtime type-guard functions shared across rule implementations and AST helpers.",
+    "exports": [
+      "isBoolean",
+      "isDefined",
+      "isNullOrUndefined",
+      "isNumber",
+      "isPlainObject",
+      "isString"
+    ]
   },
   "specifications": [
     {
@@ -13,27 +20,27 @@
       "scenarios": [
         {
           "name": "should return true for boolean true",
-          "given": "the value true",
+          "given": "the boolean primitive true",
           "when": "isBoolean is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to boolean"
         },
         {
           "name": "should return true for boolean false",
-          "given": "the value false",
+          "given": "the boolean primitive false",
           "when": "isBoolean is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to boolean"
         },
         {
           "name": "should return false for a string",
           "given": "the string 'true'",
           "when": "isBoolean is called",
-          "then": "returns false"
+          "then": "returns false because the value is not a boolean primitive"
         },
         {
           "name": "should return false for a number",
           "given": "the number 1",
           "when": "isBoolean is called",
-          "then": "returns false"
+          "then": "returns false because the value is not a boolean primitive"
         }
       ]
     },
@@ -44,19 +51,19 @@
           "name": "should return true for a non-null, non-undefined value",
           "given": "the string 'hello'",
           "when": "isDefined is called",
-          "then": "returns true"
+          "then": "returns true and narrows the input to a defined value"
         },
         {
           "name": "should return false for null",
           "given": "the value null",
           "when": "isDefined is called",
-          "then": "returns false"
+          "then": "returns false because null is excluded from the defined branch"
         },
         {
           "name": "should return false for undefined",
           "given": "the value undefined",
           "when": "isDefined is called",
-          "then": "returns false"
+          "then": "returns false because undefined is excluded from the defined branch"
         }
       ]
     },
@@ -67,19 +74,19 @@
           "name": "should return true for null",
           "given": "the value null",
           "when": "isNullOrUndefined is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to null | undefined"
         },
         {
           "name": "should return true for undefined",
           "given": "the value undefined",
           "when": "isNullOrUndefined is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to null | undefined"
         },
         {
           "name": "should return false for a defined value",
           "given": "the number 0",
           "when": "isNullOrUndefined is called",
-          "then": "returns false"
+          "then": "returns false because the value is neither null nor undefined"
         }
       ]
     },
@@ -90,7 +97,7 @@
           "name": "should return true for a numeric value",
           "given": "the number 42",
           "when": "isNumber is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to number"
         },
         {
           "name": "should return true for NaN (runtime typeof is 'number')",
@@ -102,7 +109,36 @@
           "name": "should return false for a string that looks like a number",
           "given": "the string '42'",
           "when": "isNumber is called",
-          "then": "returns false"
+          "then": "returns false because string input does not satisfy the numeric guard"
+        }
+      ]
+    },
+    {
+      "feature": "isPlainObject",
+      "scenarios": [
+        {
+          "name": "should return true for an object literal",
+          "given": "a standard object literal with Object.prototype",
+          "when": "isPlainObject is called",
+          "then": "returns true and safely narrows the value to Record<string, unknown>"
+        },
+        {
+          "name": "should return true for an object with a null prototype",
+          "given": "an object created with Object.create(null)",
+          "when": "isPlainObject is called",
+          "then": "returns true and safely narrows the value to Record<string, unknown>"
+        },
+        {
+          "name": "should return false for arrays and null",
+          "given": "an array value or null",
+          "when": "isPlainObject is called",
+          "then": "returns false because those values are not plain object records"
+        },
+        {
+          "name": "should return false for Date, Map, and class instances",
+          "given": "built-in or custom objects whose prototype is not Object.prototype or null",
+          "when": "isPlainObject is called",
+          "then": "returns false so non-plain objects are not misclassified as records"
         }
       ]
     },
@@ -113,25 +149,25 @@
           "name": "should return true for a string value",
           "given": "the string 'hello'",
           "when": "isString is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to string"
         },
         {
           "name": "should return true for an empty string",
           "given": "an empty string ''",
           "when": "isString is called",
-          "then": "returns true"
+          "then": "returns true and narrows the value to string"
         },
         {
           "name": "should return false for a number",
           "given": "the number 0",
           "when": "isString is called",
-          "then": "returns false"
+          "then": "returns false because numeric input does not satisfy the string guard"
         },
         {
           "name": "should return false for null",
-          "given": "null",
+          "given": "the null value",
           "when": "isString is called",
-          "then": "returns false"
+          "then": "returns false because null is not a string"
         }
       ]
     }

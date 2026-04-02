@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noArrayMutation } from './no-array-mutation';
 
 ruleTester.run('no-array-mutation', noArrayMutation, {

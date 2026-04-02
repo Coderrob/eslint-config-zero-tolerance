@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noObjectMutation } from './no-object-mutation';
 
 ruleTester.run('no-object-mutation', noObjectMutation, {
@@ -58,6 +58,11 @@ ruleTester.run('no-object-mutation', noObjectMutation, {
     {
       name: 'should disallow assignment to this field outside constructor',
       code: 'class Counter { count = 0; increment() { this.count = this.count + 1; } }',
+      errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
+    },
+    {
+      name: 'should disallow assignment to this field inside arrow function',
+      code: 'const mutate = () => { this.count = 1; };',
       errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
     },
   ],

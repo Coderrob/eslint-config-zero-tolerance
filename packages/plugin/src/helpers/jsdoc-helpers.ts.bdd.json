@@ -1,0 +1,211 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/jsdoc-helpers.ts",
+  "module": {
+    "name": "jsdoc-helpers",
+    "description": "Shared JSDoc-comment helper functions used by JSDoc-enforcement rules.",
+    "exports": [
+      "getJsdocComment",
+      "getLineIndentation",
+      "getParentOwnedTargetNode",
+      "getTargetNode",
+      "getVariableOwnedTargetNode",
+      "isJsdocBlockComment",
+      "isParentOwnedTargetType",
+      "isStandaloneLineTarget"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "isJsdocBlockComment",
+      "scenarios": [
+        {
+          "name": "should return true for a block comment whose value starts with '*'",
+          "given": "a comment token of type Block with a value starting with '*'",
+          "when": "isJsdocBlockComment is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a block comment whose value does not start with '*'",
+          "given": "a comment token of type Block with a value not starting with '*'",
+          "when": "isJsdocBlockComment is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a line comment",
+          "given": "a comment token of type Line",
+          "when": "isJsdocBlockComment is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isParentOwnedTargetType",
+      "scenarios": [
+        {
+          "name": "should return true for MethodDefinition",
+          "given": "an AST_NODE_TYPES value of MethodDefinition",
+          "when": "isParentOwnedTargetType is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return true for ExportDefaultDeclaration",
+          "given": "an AST_NODE_TYPES value of ExportDefaultDeclaration",
+          "when": "isParentOwnedTargetType is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false for a type that does not own JSDoc placement",
+          "given": "an AST_NODE_TYPES value not in the owned set (e.g. Identifier)",
+          "when": "isParentOwnedTargetType is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "getJsdocComment",
+      "scenarios": [
+        {
+          "name": "should return null when there are no comments before the node",
+          "given": "a node with no preceding comments",
+          "when": "getJsdocComment is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null when preceding comments are not JSDoc block comments",
+          "given": "a node preceded only by line or plain block comments",
+          "when": "getJsdocComment is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return the JSDoc block comment when one is present",
+          "given": "a node preceded by a JSDoc block comment",
+          "when": "getJsdocComment is called",
+          "then": "returns the JSDoc comment object"
+        },
+        {
+          "name": "should return the last JSDoc comment when multiple are present",
+          "given": "a node preceded by multiple JSDoc block comments",
+          "when": "getJsdocComment is called",
+          "then": "returns the last JSDoc comment object"
+        }
+      ]
+    },
+    {
+      "feature": "getLineIndentation",
+      "scenarios": [
+        {
+          "name": "should return the leading whitespace of the line containing the node",
+          "given": "a node on an indented line",
+          "when": "getLineIndentation is called",
+          "then": "returns the leading whitespace string"
+        },
+        {
+          "name": "should return an empty string when the line has no indentation",
+          "given": "a node on a line with no leading whitespace",
+          "when": "getLineIndentation is called",
+          "then": "returns an empty string"
+        },
+        {
+          "name": "should return an empty string when the line index is out of range",
+          "given": "a node whose computed line index falls outside the lines array",
+          "when": "getLineIndentation is called",
+          "then": "returns an empty string"
+        }
+      ]
+    },
+    {
+      "feature": "getParentOwnedTargetNode",
+      "scenarios": [
+        {
+          "name": "should return the parent node when its type is in the owned set",
+          "given": "a function node whose parent type is MethodDefinition",
+          "when": "getParentOwnedTargetNode is called",
+          "then": "returns the parent node"
+        },
+        {
+          "name": "should return null when the parent type is not in the owned set",
+          "given": "a function node whose parent type is Program",
+          "when": "getParentOwnedTargetNode is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getTargetNode",
+      "scenarios": [
+        {
+          "name": "should return the parent node when it owns JSDoc placement",
+          "given": "a function node whose parent is a MethodDefinition",
+          "when": "getTargetNode is called",
+          "then": "returns the parent MethodDefinition node"
+        },
+        {
+          "name": "should return the variable declaration when the parent is a VariableDeclarator",
+          "given": "a function node assigned to a single-entry variable declaration",
+          "when": "getTargetNode is called",
+          "then": "returns the VariableDeclaration node"
+        },
+        {
+          "name": "should return the function node itself when no ownership applies",
+          "given": "a function node with an unowned parent (e.g. Program)",
+          "when": "getTargetNode is called",
+          "then": "returns the function node itself"
+        }
+      ]
+    },
+    {
+      "feature": "getVariableOwnedTargetNode",
+      "scenarios": [
+        {
+          "name": "should return null when the parent is not a VariableDeclarator",
+          "given": "a function node whose parent is a Program node",
+          "when": "getVariableOwnedTargetNode is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return the VariableDeclarator itself when there are multiple declarations",
+          "given": "a function node inside a declaration with more than one declarator",
+          "when": "getVariableOwnedTargetNode is called",
+          "then": "returns the VariableDeclarator node"
+        },
+        {
+          "name": "should return the VariableDeclaration for a single non-exported declaration",
+          "given": "a function node assigned to a single-entry const not within an export",
+          "when": "getVariableOwnedTargetNode is called",
+          "then": "returns the VariableDeclaration node"
+        },
+        {
+          "name": "should return the ExportNamedDeclaration for a single exported declaration",
+          "given": "a function node assigned to a single-entry const within an ExportNamedDeclaration",
+          "when": "getVariableOwnedTargetNode is called",
+          "then": "returns the ExportNamedDeclaration node"
+        }
+      ]
+    },
+    {
+      "feature": "isStandaloneLineTarget",
+      "scenarios": [
+        {
+          "name": "should return true when only whitespace precedes the node on its line",
+          "given": "a node at column 0 or after only spaces on its line",
+          "when": "isStandaloneLineTarget is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false when non-whitespace code precedes the node on the same line",
+          "given": "a node after non-whitespace text on the same line",
+          "when": "isStandaloneLineTarget is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return true when the line index is out of range",
+          "given": "a node whose line index falls outside the source lines array",
+          "when": "isStandaloneLineTarget is called",
+          "then": "returns true (empty prefix is standalone)"
+        }
+      ]
+    }
+  ]
+}

@@ -10,13 +10,13 @@
 
 ## Documentation
 
-| Rule                                                                      | Type       | Description                                                                         |
-| ------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
-| [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec |
-| [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs (except test files)    |
-| [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                       |
-| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                          |
-| [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                 |
+| Rule                                                                      | Type       | Description                                                                                             |
+| ------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
+| [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
+| [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                                           |
+| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                                              |
+| [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                                     |
 
 ## Testing
 
@@ -28,13 +28,14 @@
 
 ## Type Safety
 
-| Rule                                              | Type       | Description                                                 |
-| ------------------------------------------------- | ---------- | ----------------------------------------------------------- |
-| [no-type-assertion](no-type-assertion.md)         | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions |
-| [no-non-null-assertion](no-non-null-assertion.md) | problem    | Disallow non-null assertions using the `!` postfix operator |
-| [no-literal-unions](no-literal-unions.md)         | suggestion | Ban literal union types in favour of enums                  |
-| [no-banned-types](no-banned-types.md)             | problem    | Ban `ReturnType` and indexed access types                   |
-| [no-inline-type-import](no-inline-type-import.md) | problem    | Disallow inline `import("...")` type annotations            |
+| Rule                                                                                | Type       | Description                                                     |
+| ----------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------- |
+| [no-type-assertion](no-type-assertion.md)                                           | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions     |
+| [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator     |
+| [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                      |
+| [no-banned-types](no-banned-types.md)                                               | problem    | Ban `ReturnType` and indexed access types                       |
+| [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                |
+| [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters |
 
 ## Code Quality
 

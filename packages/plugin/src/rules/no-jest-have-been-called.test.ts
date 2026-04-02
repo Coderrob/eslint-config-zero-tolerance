@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noJestHaveBeenCalled } from './no-jest-have-been-called';
 
 ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {

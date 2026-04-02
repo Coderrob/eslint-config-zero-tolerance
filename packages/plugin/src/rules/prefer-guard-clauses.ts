@@ -16,7 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import { createRule } from './support/rule-factory';
 
 const TERMINATOR_NODE_TYPES = new Set([
   AST_NODE_TYPES.ReturnStatement,

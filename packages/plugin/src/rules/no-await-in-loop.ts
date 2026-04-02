@@ -16,7 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import { isInsideBoundary } from '../helpers/ast/navigation';
+import { createRule } from './support/rule-factory';
 
 type NoAwaitInLoopContext = Readonly<TSESLint.RuleContext<'noAwaitInLoop', []>>;
 
@@ -35,37 +36,6 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
 ]);
 
 /**
- * Returns loop-boundary evaluation result for a node type, or null if irrelevant.
- *
- * @param type - AST node type to evaluate.
- * @returns True for loop boundary, false for function boundary, null otherwise.
- */
-function getBoundaryResult(type: AST_NODE_TYPES): boolean | null {
-  if (FUNCTION_BOUNDARY_TYPES.has(type)) {
-    return false;
-  }
-  return LOOP_TYPES.has(type) ? true : null;
-}
-
-/**
- * Walks ancestors from innermost outward and returns true when a loop
- * node is reached before any function boundary, indicating the await
- * executes directly inside a loop body rather than inside a nested function.
- *
- * @param ancestors - The array of ancestor nodes from innermost to outermost.
- * @returns True if the await is inside a loop, false otherwise.
- */
-function isInsideLoop(ancestors: TSESTree.Node[]): boolean {
-  for (let i = ancestors.length - 1; i >= 0; i--) {
-    const boundaryResult = getBoundaryResult(ancestors[i].type);
-    if (boundaryResult !== null) {
-      return boundaryResult;
-    }
-  }
-  return false;
-}
-
-/**
  * Reports await-in-loop violations for await expression nodes.
  *
  * @param context - ESLint rule execution context.
@@ -76,7 +46,7 @@ function reportAwaitExpressionInLoop(
   node: TSESTree.AwaitExpression,
 ): void {
   const ancestors = context.sourceCode.getAncestors(node);
-  if (isInsideLoop(ancestors)) {
+  if (isInsideBoundary(ancestors, LOOP_TYPES, FUNCTION_BOUNDARY_TYPES)) {
     context.report({ node, messageId: 'noAwaitInLoop' });
   }
 }

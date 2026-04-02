@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noBooleanReturnTrap } from './no-boolean-return-trap';
 
 ruleTester.run('no-boolean-return-trap', noBooleanReturnTrap, {

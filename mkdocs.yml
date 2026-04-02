@@ -70,6 +70,7 @@ nav:
           - no-literal-unions: rules/no-literal-unions.md
           - no-banned-types: rules/no-banned-types.md
           - no-inline-type-import: rules/no-inline-type-import.md
+          - no-destructured-parameter-type-literal: rules/no-destructured-parameter-type-literal.md
       - Code Quality:
           - max-function-lines: rules/max-function-lines.md
           - max-params: rules/max-params.md

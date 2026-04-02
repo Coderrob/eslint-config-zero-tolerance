@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { preferShortcutReturn } from './prefer-shortcut-return';
 
 ruleTester.run('prefer-shortcut-return', preferShortcutReturn, {

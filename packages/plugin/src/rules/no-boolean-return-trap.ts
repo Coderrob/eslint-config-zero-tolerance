@@ -16,10 +16,12 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { resolveFunctionName } from '../helpers/ast-helpers';
+import { hasNamedTypeReferenceWithTypeArguments } from '../helpers/ast/types';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const PREDICATE_NAME_PATTERN = /^(is|has|can|should)[A-Z_]/;
 const PROMISE_IDENTIFIER = 'Promise';
@@ -57,21 +59,7 @@ function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNo
 function createNoBooleanReturnTrapListeners(
   context: NoBooleanReturnTrapContext,
 ): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
-    FunctionDeclaration: checkFunctionNode.bind(undefined, context),
-    FunctionExpression: checkFunctionNode.bind(undefined, context),
-  };
-}
-
-/**
- * Returns first type argument for a type-reference node.
- *
- * @param node - Type-reference node.
- * @returns First type argument when present.
- */
-function getFirstTypeArgument(node: TSESTree.TSTypeReference): TSESTree.TypeNode | null {
-  return node.typeArguments?.params[0] ?? null;
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
 /**
@@ -107,24 +95,11 @@ function isPredicateName(functionName: string): boolean {
  * @returns True when promise contains boolean type argument.
  */
 function isPromiseBooleanType(node: TSESTree.TSTypeReference): boolean {
-  if (!isPromiseTypeName(node.typeName)) {
+  if (!hasNamedTypeReferenceWithTypeArguments(node, PROMISE_IDENTIFIER)) {
     return false;
   }
-  const firstTypeArgument = getFirstTypeArgument(node);
-  if (firstTypeArgument === null) {
-    return false;
-  }
+  const firstTypeArgument = node.typeArguments.params[0];
   return firstTypeArgument.type === AST_NODE_TYPES.TSBooleanKeyword;
-}
-
-/**
- * Returns true when type name is Promise identifier.
- *
- * @param node - Type name node.
- * @returns True when Promise.
- */
-function isPromiseTypeName(node: TSESTree.EntityName): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === PROMISE_IDENTIFIER;
 }
 
 /**

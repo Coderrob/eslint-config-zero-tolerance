@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { requireInterfacePrefix } from './require-interface-prefix';
 
 ruleTester.run('require-interface-prefix', requireInterfacePrefix, {

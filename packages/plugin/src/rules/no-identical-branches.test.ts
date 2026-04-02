@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noIdenticalBranches } from './no-identical-branches';
 
 ruleTester.run('no-identical-branches', noIdenticalBranches, {

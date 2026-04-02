@@ -16,8 +16,10 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { getNamedParameterName } from '../helpers/parameter-helpers';
+import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 type NoParameterReassignContext = Readonly<TSESLint.RuleContext<'noParameterReassign', []>>;
 type ParameterScopeStack = Array<Set<string>>;
@@ -69,13 +71,11 @@ function createNoParameterReassignListeners(
 ): TSESLint.RuleListener {
   const parameterStack: ParameterScopeStack = [];
   return {
-    ArrowFunctionExpression: enterFunctionScope.bind(undefined, parameterStack),
-    'ArrowFunctionExpression:exit': exitFunctionScope.bind(undefined, parameterStack),
+    ...createFunctionNodeEnterExitListeners(
+      enterFunctionScope.bind(undefined, parameterStack),
+      exitFunctionScope.bind(undefined, parameterStack),
+    ),
     AssignmentExpression: checkAssignmentExpression.bind(undefined, context, parameterStack),
-    FunctionDeclaration: enterFunctionScope.bind(undefined, parameterStack),
-    'FunctionDeclaration:exit': exitFunctionScope.bind(undefined, parameterStack),
-    FunctionExpression: enterFunctionScope.bind(undefined, parameterStack),
-    'FunctionExpression:exit': exitFunctionScope.bind(undefined, parameterStack),
     UpdateExpression: checkUpdateExpression.bind(undefined, context, parameterStack),
   };
 }
@@ -94,22 +94,10 @@ function enterFunctionScope(parameterStack: ParameterScopeStack, node: FunctionN
  * Pops the current function parameter scope.
  *
  * @param parameterStack - Nested function parameter stack.
+ * @param _node - Function node being exited.
  */
-function exitFunctionScope(parameterStack: ParameterScopeStack): void {
+function exitFunctionScope(parameterStack: ParameterScopeStack, _node: FunctionNode): void {
   parameterStack.pop();
-}
-
-/**
- * Returns identifier name for assignment-pattern parameters.
- *
- * @param param - Function parameter node.
- * @returns Identifier name when assignment-pattern parameter is supported.
- */
-function getAssignmentPatternParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type !== AST_NODE_TYPES.AssignmentPattern) {
-    return null;
-  }
-  return param.left.type === AST_NODE_TYPES.Identifier ? param.left.name : null;
 }
 
 /**
@@ -121,42 +109,12 @@ function getAssignmentPatternParameterName(param: TSESTree.Parameter): string | 
 function getFunctionParameterNames(node: FunctionNode): Set<string> {
   const names = new Set<string>();
   for (const param of node.params) {
-    const name = getParameterName(param);
+    const name = getNamedParameterName(param);
     if (name !== null) {
       names.add(name);
     }
   }
   return names;
-}
-
-/**
- * Returns identifier name for supported parameter shapes.
- *
- * @param param - Function parameter node.
- * @returns Parameter name when resolvable, otherwise null.
- */
-function getParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type === AST_NODE_TYPES.Identifier) {
-    return param.name;
-  }
-  const restElementName = getRestElementParameterName(param);
-  if (restElementName !== null) {
-    return restElementName;
-  }
-  return getAssignmentPatternParameterName(param);
-}
-
-/**
- * Returns identifier name for rest-element parameters.
- *
- * @param param - Function parameter node.
- * @returns Identifier name when rest-element parameter is supported.
- */
-function getRestElementParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type !== AST_NODE_TYPES.RestElement) {
-    return null;
-  }
-  return param.argument.type === AST_NODE_TYPES.Identifier ? param.argument.name : null;
 }
 
 /**

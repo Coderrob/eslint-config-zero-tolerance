@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/ast-guards.ts",
+  "sourceFile": "packages/plugin/src/helpers/ast-guards.ts",
   "module": {
     "name": "ast-guards",
     "description": "AST node type guards and related type aliases used across multiple rule implementations.",
@@ -14,10 +14,13 @@
       "isIdentifierNode",
       "isMemberExpressionNode",
       "isMethodDefinitionNode",
+      "isNamedIdentifierNode",
+      "isNodeLike",
       "isSwitchCaseNode",
       "isTestFile",
       "isTSEnumMemberNode",
       "isUnaryExpressionNode",
+      "isUncomputedMemberExpressionNode",
       "isVariableDeclarationNode",
       "isVariableDeclaratorNode"
     ]
@@ -36,7 +39,7 @@
           "name": "should return false for a non-BinaryExpression node",
           "given": "an AST node with a different type",
           "when": "isBinaryExpressionNode is called",
-          "then": "returns false"
+          "then": "returns false because the node is not a BinaryExpression"
         },
         {
           "name": "should return false for null or undefined",
@@ -59,7 +62,7 @@
           "name": "should return false for a non-BlockStatement node",
           "given": "an AST node with a different type",
           "when": "isBlockStatementNode is called",
-          "then": "returns false"
+          "then": "returns false because the node is not a BlockStatement"
         }
       ]
     },
@@ -93,7 +96,7 @@
           "name": "should return false for FunctionExpression or ArrowFunctionExpression",
           "given": "an AST node with type FunctionExpression",
           "when": "isFunctionDeclarationNode is called",
-          "then": "returns false"
+          "then": "returns false because function expressions are not declarations"
         }
       ]
     },
@@ -149,13 +152,59 @@
       ]
     },
     {
+      "feature": "isNamedIdentifierNode",
+      "scenarios": [
+        {
+          "name": "should return true for an Identifier node with the expected name",
+          "given": "an AST node with type Identifier whose name matches the requested name",
+          "when": "isNamedIdentifierNode is called",
+          "then": "returns true and narrows the type to TSESTree.Identifier"
+        },
+        {
+          "name": "should return false for a differently named or non-Identifier node",
+          "given": "an AST node whose type is not Identifier or whose name does not match",
+          "when": "isNamedIdentifierNode is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "isNodeLike",
+      "scenarios": [
+        {
+          "name": "should return true for an object with a string type property",
+          "given": "an object with a string-valued type property",
+          "when": "isNodeLike is called",
+          "then": "returns true and narrows the type to TSESTree.Node"
+        },
+        {
+          "name": "should return false for null",
+          "given": "the value null",
+          "when": "isNodeLike is called",
+          "then": "returns false without throwing"
+        },
+        {
+          "name": "should return false for an object with a non-string type property",
+          "given": "an object where type is a number",
+          "when": "isNodeLike is called",
+          "then": "returns false"
+        },
+        {
+          "name": "should return false for a primitive value",
+          "given": "a string or number value",
+          "when": "isNodeLike is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
       "feature": "isSwitchCaseNode",
       "scenarios": [
         {
           "name": "should return true for a SwitchCase node",
           "given": "an AST node with type SwitchCase",
           "when": "isSwitchCaseNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.SwitchCase"
         },
         {
           "name": "should return false for null or undefined",
@@ -172,25 +221,25 @@
           "name": "should return true for a .test.ts filename",
           "given": "a filename ending in .test.ts",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because the path matches a recognized test-file suffix"
         },
         {
           "name": "should return true for a .spec.ts filename",
           "given": "a filename ending in .spec.ts",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because the path matches a recognized test-file suffix"
         },
         {
           "name": "should return true for a file inside __tests__ directory",
           "given": "a filename whose path contains /__tests__/",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because __tests__ paths are treated as test files"
         },
         {
           "name": "should return false for a regular source file",
           "given": "a filename with no test indicator",
           "when": "isTestFile is called",
-          "then": "returns false"
+          "then": "returns false because the path does not match any recognized test-file pattern"
         },
         {
           "name": "should normalise Windows backslash separators",
@@ -207,7 +256,7 @@
           "name": "should return true for a TSEnumMember node",
           "given": "an AST node with type TSEnumMember",
           "when": "isTSEnumMemberNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.TSEnumMember"
         },
         {
           "name": "should return false for null or undefined",
@@ -224,7 +273,7 @@
           "name": "should return true for a UnaryExpression node",
           "given": "an AST node with type UnaryExpression",
           "when": "isUnaryExpressionNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.UnaryExpression"
         },
         {
           "name": "should return false for null or undefined",
@@ -235,13 +284,30 @@
       ]
     },
     {
+      "feature": "isUncomputedMemberExpressionNode",
+      "scenarios": [
+        {
+          "name": "should return true for a direct non-computed MemberExpression node",
+          "given": "an AST node with type MemberExpression and computed set to false",
+          "when": "isUncomputedMemberExpressionNode is called",
+          "then": "returns true and narrows the type to a direct MemberExpression"
+        },
+        {
+          "name": "should return false for computed or non-member nodes",
+          "given": "an AST node that is computed or is not a MemberExpression",
+          "when": "isUncomputedMemberExpressionNode is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
       "feature": "isVariableDeclaratorNode",
       "scenarios": [
         {
           "name": "should return true for a VariableDeclarator node",
           "given": "an AST node with type VariableDeclarator",
           "when": "isVariableDeclaratorNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.VariableDeclarator"
         },
         {
           "name": "should return false for null or undefined",

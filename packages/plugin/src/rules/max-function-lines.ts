@@ -15,10 +15,11 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { type FunctionNode, isBlockStatementNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
-import { isNumber } from '../type-guards';
+import { type FunctionNode, isBlockStatementNode } from '../helpers/ast-guards';
+import { getOptionMaxValue, resolveFunctionName } from '../helpers/ast-helpers';
+import { isNumber } from '../helpers/type-guards';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const DEFAULT_MAX_FUNCTION_LINES = 30;
 
@@ -32,24 +33,6 @@ type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>
  */
 function countBodyLines(body: TSESTree.BlockStatement): number {
   return body.loc.end.line - body.loc.start.line + 1;
-}
-
-/**
- * Creates listeners for all function-like nodes.
- *
- * @param context - ESLint rule execution context.
- * @param maxLines - Configured maximum line count.
- * @returns Rule listeners.
- */
-function createFunctionListeners(
-  context: MaxFunctionLinesContext,
-  maxLines: number,
-): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-    FunctionDeclaration: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-    FunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-  };
 }
 
 /**
@@ -72,19 +55,6 @@ function getConfiguredMaxValue(options: unknown[]): number {
   const firstOption = options[0];
   const maxValue = getOptionMaxValue(firstOption);
   return isNumber(maxValue) && maxValue > 0 ? maxValue : DEFAULT_MAX_FUNCTION_LINES;
-}
-
-/**
- * Reads the `max` property from an option object.
- *
- * @param option - First rule option value.
- * @returns The raw max value when present, otherwise undefined.
- */
-function getOptionMaxValue(option: unknown): unknown {
-  if (option === null || typeof option !== 'object') {
-    return undefined;
-  }
-  return Reflect.get(option, 'max');
 }
 
 /**
@@ -138,7 +108,9 @@ function reportIfFunctionExceedsLimit(
  */
 function resolveListeners(context: MaxFunctionLinesContext): TSESLint.RuleListener {
   const maxLines = getConfiguredMaxValue(context.options);
-  return createFunctionListeners(context, maxLines);
+  return createFunctionNodeListeners(
+    reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
+  );
 }
 
 /**

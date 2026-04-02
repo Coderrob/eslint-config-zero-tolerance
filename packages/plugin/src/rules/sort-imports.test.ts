@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { sortImports } from './sort-imports';
 
 ruleTester.run('sort-imports', sortImports, {

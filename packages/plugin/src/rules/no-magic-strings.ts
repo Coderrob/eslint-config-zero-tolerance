@@ -16,9 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isBinaryExpressionNode, isSwitchCaseNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
-import { isString } from '../type-guards';
+import { isBinaryExpressionNode, isSwitchCaseNode } from '../helpers/ast-guards';
+import { getLiteralStringValue } from '../helpers/ast-helpers';
+import { createRule } from './support/rule-factory';
 
 const COMPARISON_OPERATORS = new Set(['===', '!==', '==', '!=']);
 const TYPEOF_OPERATOR = 'typeof';
@@ -83,10 +83,11 @@ function createNoMagicStringsListeners(context: NoMagicStringsContext): TSESLint
  * @returns The string value if valid, otherwise null.
  */
 function getStringValue(node: TSESTree.Literal): string | null {
-  if (!isString(node.value) || node.value === '') {
+  const value = getLiteralStringValue(node);
+  if (value === null || value === '') {
     return null;
   }
-  return node.value;
+  return value;
 }
 
 /**
@@ -153,9 +154,6 @@ function isInTypeofComparison(node: TSESTree.Literal): boolean {
   }
   const oppositeExpression =
     parentExpression.left === node ? parentExpression.right : parentExpression.left;
-  if (oppositeExpression.type === AST_NODE_TYPES.PrivateIdentifier) {
-    return false;
-  }
   return isTypeofUnaryExpression(oppositeExpression);
 }
 
@@ -199,7 +197,7 @@ function isSwitchCaseContextEnabled(
  * @param expression - Expression node.
  * @returns True when expression is `typeof ...`.
  */
-function isTypeofUnaryExpression(expression: TSESTree.Expression): boolean {
+function isTypeofUnaryExpression(expression: TSESTree.Node): boolean {
   if (expression.type !== AST_NODE_TYPES.UnaryExpression) {
     return false;
   }

@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/search.ts",
+  "module": {
+    "name": "ast/search",
+    "description": "Higher-level AST search helpers built on visitor-key traversal.",
+    "exports": [
+      "findDescendant",
+      "someDescendant"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Descendant search",
+      "scenarios": [
+        {
+          "name": "should return the first descendant that matches the predicate",
+          "given": "a root AST node whose traversable descendants include a node that satisfies the predicate",
+          "when": "findDescendant is called",
+          "then": "returns the first matching descendant node"
+        },
+        {
+          "name": "should stop descending into nodes that satisfy the stop predicate",
+          "given": "a root AST node whose descendants would only match inside a subtree selected by the stop predicate",
+          "when": "findDescendant is called with that stop predicate",
+          "then": "returns null because the stopped subtree is not traversed"
+        }
+      ]
+    },
+    {
+      "feature": "Boolean descendant checks",
+      "scenarios": [
+        {
+          "name": "should return true when any descendant matches the predicate",
+          "given": "a root AST node with at least one traversable descendant that satisfies the predicate",
+          "when": "someDescendant is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false when no descendant matches the predicate",
+          "given": "a root AST node with no traversable descendant that satisfies the predicate",
+          "when": "someDescendant is called",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

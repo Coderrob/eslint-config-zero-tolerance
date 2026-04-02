@@ -15,10 +15,11 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { type FunctionNode } from '../ast-guards';
-import { getMemberPropertyName, resolveFunctionName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { type FunctionNode } from '../helpers/ast-guards';
+import { resolveFunctionName } from '../helpers/ast-helpers';
+import { getMatchingCallMemberMethodName } from '../helpers/ast/calls';
+import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const DELETE_OPERATOR = 'delete';
 const UPDATE_KIND = 'update';
@@ -74,7 +75,7 @@ function checkCallExpression(
   functionStack: QueryScopeStack,
   node: TSESTree.CallExpression,
 ): void {
-  const method = getMutatingMethodName(node);
+  const method = getMatchingCallMemberMethodName(node, MUTATING_METHODS);
   if (method === null) {
     return;
   }
@@ -153,12 +154,10 @@ function createNoQuerySideEffectsListeners(
 ): TSESLint.RuleListener {
   const functionStack: QueryScopeStack = [];
   return {
-    FunctionDeclaration: enterFunctionScope.bind(undefined, functionStack),
-    FunctionExpression: enterFunctionScope.bind(undefined, functionStack),
-    ArrowFunctionExpression: enterFunctionScope.bind(undefined, functionStack),
-    'FunctionDeclaration:exit': exitFunctionScope.bind(undefined, functionStack),
-    'FunctionExpression:exit': exitFunctionScope.bind(undefined, functionStack),
-    'ArrowFunctionExpression:exit': exitFunctionScope.bind(undefined, functionStack),
+    ...createFunctionNodeEnterExitListeners(
+      enterFunctionScope.bind(undefined, functionStack),
+      exitFunctionScope.bind(undefined, functionStack),
+    ),
     AssignmentExpression: createAssignmentVisitor(context, functionStack),
     CallExpression: createCallVisitor(context, functionStack),
     UnaryExpression: createUnaryVisitor(context, functionStack),
@@ -212,8 +211,9 @@ function enterFunctionScope(functionStack: QueryScopeStack, node: FunctionNode):
  * Pops active function scope metadata.
  *
  * @param functionStack - Function scope stack.
+ * @param _node - Function node being exited.
  */
-function exitFunctionScope(functionStack: QueryScopeStack): void {
+function exitFunctionScope(functionStack: QueryScopeStack, _node: FunctionNode): void {
   functionStack.pop();
 }
 
@@ -225,23 +225,6 @@ function exitFunctionScope(functionStack: QueryScopeStack): void {
  */
 function getCurrentScope(functionStack: QueryScopeStack): QueryScopeInfo | null {
   return functionStack.at(-1) ?? null;
-}
-
-/**
- * Returns mutating method name when call expression is mutating.
- *
- * @param node - Call expression node.
- * @returns Method name if mutating, otherwise null.
- */
-function getMutatingMethodName(node: TSESTree.CallExpression): string | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
-    return null;
-  }
-  const method = getMemberPropertyName(node.callee);
-  if (method === null || !MUTATING_METHODS.has(method)) {
-    return null;
-  }
-  return method;
 }
 
 /**

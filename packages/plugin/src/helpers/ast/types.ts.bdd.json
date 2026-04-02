@@ -1,0 +1,101 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/types.ts",
+  "module": {
+    "name": "ast/types",
+    "description": "Higher-level AST helpers for TypeScript type and wrapper-node evaluation.",
+    "exports": [
+      "getFirstTypeArgument",
+      "getTypeReferenceName",
+      "hasNamedTypeReferenceWithTypeArguments",
+      "hasAllReadonlyPropertyMembers",
+      "hasTypeArguments",
+      "isNamedTypeReference",
+      "unwrapTsExpression"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Type reference inspection",
+      "scenarios": [
+        {
+          "name": "should return the simple identifier name for an unqualified type reference",
+          "given": "a TSTypeReference whose typeName is an Identifier",
+          "when": "getTypeReferenceName is called",
+          "then": "returns the identifier name"
+        },
+        {
+          "name": "should return the first type argument when a type reference has one",
+          "given": "a TSTypeReference with at least one type argument",
+          "when": "getFirstTypeArgument is called",
+          "then": "returns the first type argument node"
+        },
+        {
+          "name": "should return null when a type reference has no type arguments",
+          "given": "a TSTypeReference without type arguments",
+          "when": "getFirstTypeArgument is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for a qualified type reference name",
+          "given": "a TSTypeReference whose typeName is a TSQualifiedName",
+          "when": "getTypeReferenceName is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should report whether a type reference has type arguments",
+          "given": "a TSTypeReference with or without type arguments",
+          "when": "hasTypeArguments is called",
+          "then": "returns true only when at least one type argument exists"
+        },
+        {
+          "name": "should match a type reference by its simple identifier name",
+          "given": "a TSTypeReference and an expected simple type name",
+          "when": "isNamedTypeReference is called",
+          "then": "returns true only when the type reference name matches"
+        },
+        {
+          "name": "should identify a named type reference that also has type arguments",
+          "given": "a TSTypeReference and an expected simple type name",
+          "when": "hasNamedTypeReferenceWithTypeArguments is called",
+          "then": "returns true only when the type reference name matches and at least one type argument exists"
+        }
+      ]
+    },
+    {
+      "feature": "Readonly type-member inspection",
+      "scenarios": [
+        {
+          "name": "should return true when every type-literal member is a readonly property signature",
+          "given": "a TSTypeLiteral whose members are all readonly TSPropertySignature nodes",
+          "when": "hasAllReadonlyPropertyMembers is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false when any type-literal member is mutable or non-property",
+          "given": "a TSTypeLiteral containing a mutable property or a non-property member",
+          "when": "hasAllReadonlyPropertyMembers is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "TypeScript expression unwrapping",
+      "scenarios": [
+        {
+          "name": "should recursively unwrap TypeScript wrapper expressions",
+          "given": "an expression wrapped in nested as, satisfies, or non-null TypeScript wrapper nodes",
+          "when": "unwrapTsExpression is called",
+          "then": "returns the innermost runtime expression"
+        },
+        {
+          "name": "should return the original expression when no wrapper is present",
+          "given": "an expression that is not wrapped by TypeScript wrapper nodes",
+          "when": "unwrapTsExpression is called",
+          "then": "returns the original expression"
+        }
+      ]
+    }
+  ]
+}

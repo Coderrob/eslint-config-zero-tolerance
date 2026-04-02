@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { preferResultReturn } from './prefer-result-return';
 
 ruleTester.run('prefer-result-return', preferResultReturn, {

@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-destructured-parameter-type-literal.ts",
+  "module": {
+    "name": "no-destructured-parameter-type-literal",
+    "description": "Disallow inline object type literals on destructured parameters; require a named type instead.",
+    "exports": ["noDestructuredParameterTypeLiteral"]
+  },
+  "specifications": [
+    {
+      "feature": "Named destructured parameter types",
+      "scenarios": [
+        {
+          "name": "should allow an object-destructured parameter typed with a named interface",
+          "given": "a function parameter written as { set }: IUiActions",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a non-destructured parameter with an inline object type literal",
+          "given": "a function parameter written as actions: Readonly<{ readonly set: UiStateSetter }>",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Inline object type literals on destructured parameters",
+      "scenarios": [
+        {
+          "name": "should report a destructured parameter with a direct inline object type literal",
+          "given": "a function parameter written as { set }: { readonly set: UiStateSetter }",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "a noDestructuredParameterTypeLiteral violation is reported"
+        },
+        {
+          "name": "should report a destructured parameter with a Readonly-wrapped inline object type literal",
+          "given": "a function parameter written as { set }: Readonly<{ set: UiStateSetter }>",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "a noDestructuredParameterTypeLiteral violation is reported"
+        },
+        {
+          "name": "should report a destructured assignment parameter with an inline object type literal",
+          "given": "a function parameter written as { set }: Readonly<{ set: UiStateSetter }> = defaults",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "a noDestructuredParameterTypeLiteral violation is reported"
+        }
+      ]
+    }
+  ]
+}

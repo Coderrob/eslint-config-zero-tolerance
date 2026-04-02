@@ -16,7 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import { isMemberExpressionNode } from '../helpers/ast-guards';
+import { findEnclosingFunction } from '../helpers/ast/navigation';
+import { createRule } from './support/rule-factory';
 
 const DELETE_OPERATOR = 'delete';
 const CONSTRUCTOR_METHOD_KIND = 'constructor';
@@ -86,23 +88,6 @@ function createNoObjectMutationListeners(context: NoObjectMutationContext): TSES
 }
 
 /**
- * Returns the nearest enclosing function expression, if any.
- *
- * @param node - AST node to inspect.
- * @returns Enclosing function expression or null.
- */
-function getEnclosingFunctionExpression(node: TSESTree.Node): TSESTree.FunctionExpression | null {
-  let currentNode: TSESTree.Node | undefined = node.parent;
-  while (currentNode !== undefined) {
-    if (currentNode.type === AST_NODE_TYPES.FunctionExpression) {
-      return currentNode;
-    }
-    currentNode = currentNode.parent;
-  }
-  return null;
-}
-
-/**
  * Returns true when a member assignment initializes a field on this inside a constructor.
  *
  * @param node - Member expression on the left-hand side of an assignment.
@@ -119,21 +104,14 @@ function isConstructorThisInitialization(node: TSESTree.MemberExpression): boole
  * @returns True when enclosed by a constructor method definition.
  */
 function isInsideConstructor(node: TSESTree.Node): boolean {
-  const functionParent = getEnclosingFunctionExpression(node);
+  const functionParent = findEnclosingFunction(node);
+  if (functionParent === null || functionParent.type !== AST_NODE_TYPES.FunctionExpression) {
+    return false;
+  }
   return (
-    functionParent?.parent.type === AST_NODE_TYPES.MethodDefinition &&
+    functionParent.parent.type === AST_NODE_TYPES.MethodDefinition &&
     functionParent.parent.kind === CONSTRUCTOR_METHOD_KIND
   );
-}
-
-/**
- * Returns true when node is a MemberExpression.
- *
- * @param node - AST node to inspect.
- * @returns True for member expressions.
- */
-function isMemberExpressionNode(node: TSESTree.Node): node is TSESTree.MemberExpression {
-  return node.type === AST_NODE_TYPES.MemberExpression;
 }
 
 /**

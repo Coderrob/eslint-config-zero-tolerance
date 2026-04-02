@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { getMappedMemberPropertyName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { getMappedMemberPropertyName } from '../helpers/ast-helpers';
+import { createRule } from './support/rule-factory';
 
 const BANNED_MATCHERS: Record<string, string> = {
   toBeCalled: 'toHaveBeenCalledTimes',

@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noForIn } from './no-for-in';
 
 ruleTester.run('no-for-in', noForIn, {

@@ -16,9 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isIdentifierNode } from '../ast-guards';
-import { getMemberPropertyName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { isMemberExpressionNode, isNamedIdentifierNode } from '../helpers/ast-guards';
+import { getCallMemberMethodName } from '../helpers/ast-helpers';
+import { createRule } from './support/rule-factory';
 
 const PROMISE_CHAIN_METHODS = new Set(['then', 'catch', 'finally']);
 const PROMISE_STATIC_METHODS = new Set(['resolve', 'reject', 'all', 'allSettled', 'race', 'any']);
@@ -63,26 +63,13 @@ function createNoFloatingPromisesListeners(
 }
 
 /**
- * Returns the member method name for a call expression, or null.
- *
- * @param node - Call expression node.
- * @returns Method name when callee is a member expression.
- */
-function getCallMemberMethodName(node: TSESTree.CallExpression): string | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
-    return null;
-  }
-  return getMemberPropertyName(node.callee);
-}
-
-/**
  * Returns chained object call when callee is a member call on another call.
  *
  * @param node - Call expression node.
  * @returns Parent call expression in chain, or null.
  */
 function getChainedObjectCall(node: TSESTree.CallExpression): TSESTree.CallExpression | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+  if (!isMemberExpressionNode(node.callee)) {
     return null;
   }
   if (node.callee.object.type !== AST_NODE_TYPES.CallExpression) {
@@ -195,7 +182,7 @@ function isPromiseConstructorExpression(expression: TSESTree.Expression): boolea
   if (expression.type !== AST_NODE_TYPES.NewExpression) {
     return false;
   }
-  return isIdentifierNode(expression.callee) && expression.callee.name === PROMISE_IDENTIFIER;
+  return isNamedIdentifierNode(expression.callee, PROMISE_IDENTIFIER);
 }
 
 /**
@@ -250,9 +237,7 @@ function isPromiseStaticCall(node: TSESTree.CallExpression): boolean {
  */
 function isPromiseStaticCallee(callee: TSESTree.Expression): boolean {
   return (
-    callee.type === AST_NODE_TYPES.MemberExpression &&
-    isIdentifierNode(callee.object) &&
-    callee.object.name === PROMISE_IDENTIFIER
+    isMemberExpressionNode(callee) && isNamedIdentifierNode(callee.object, PROMISE_IDENTIFIER)
   );
 }
 

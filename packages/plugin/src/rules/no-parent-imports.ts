@@ -16,9 +16,11 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isParentDirectoryImportPath } from '../import-path-helpers';
-import { CALLEE_REQUIRE } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { getLiteralStringValue as getLiteralStringNodeValue } from '../helpers/ast-helpers';
+import { getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
+import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
+import { CALLEE_REQUIRE } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 const PARENT_PATH_TOKEN = '..';
 
@@ -31,17 +33,14 @@ type NoParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImport', []
  * @param node - Call expression node.
  */
 function checkCallExpression(context: NoParentImportsContext, node: TSESTree.CallExpression): void {
-  if (!isRequireIdentifier(node.callee)) {
+  if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
   }
-  const firstArgument = getFirstArgument(node);
+  const firstArgument = getStringLiteralCallArgument(node, 0);
   if (firstArgument === null) {
     return;
   }
-  const importPath = getStringLiteralArgumentValue(firstArgument);
-  if (importPath !== null) {
-    reportIfParentImport(context, firstArgument, importPath);
-  }
+  reportIfParentImport(context, firstArgument, firstArgument.value);
 }
 
 /**
@@ -67,7 +66,7 @@ function checkImportExpression(
   context: NoParentImportsContext,
   node: TSESTree.ImportExpression,
 ): void {
-  const importPath = getLiteralStringValue(node.source);
+  const importPath = getLiteralStringNodeValue(node.source);
   if (importPath !== null) {
     reportIfParentImport(context, node.source, importPath);
   }
@@ -84,7 +83,7 @@ function checkTsImportEqualsDeclaration(
   node: TSESTree.TSImportEqualsDeclaration,
 ): void {
   const moduleReference = getExternalModuleReference(node);
-  const importPath = moduleReference === null ? null : getLiteralStringValue(moduleReference);
+  const importPath = moduleReference === null ? null : getLiteralStringNodeValue(moduleReference);
   if (moduleReference !== null && importPath !== null) {
     reportIfParentImport(context, moduleReference, importPath);
   }
@@ -118,49 +117,6 @@ function getExternalModuleReference(
     return null;
   }
   return node.moduleReference.expression;
-}
-
-/**
- * Safely extracts the first call argument.
- *
- * @param node - Call expression node.
- * @returns The first argument, or null when absent.
- */
-function getFirstArgument(node: TSESTree.CallExpression): TSESTree.CallExpressionArgument | null {
-  return node.arguments.length === 0 ? null : node.arguments[0];
-}
-
-/**
- * Extracts a string literal value from a literal node.
- *
- * @param node - Potential literal node.
- * @returns The literal string value, or null.
- */
-function getLiteralStringValue(node: TSESTree.Node): string | null {
-  if (node.type !== AST_NODE_TYPES.Literal) {
-    return null;
-  }
-  return typeof node.value === 'string' ? node.value : null;
-}
-
-/**
- * Extracts a string literal value from a call expression argument.
- *
- * @param argument - Call expression argument node.
- * @returns The string literal value, or null when not a string literal.
- */
-function getStringLiteralArgumentValue(argument: TSESTree.CallExpressionArgument): string | null {
-  return getLiteralStringValue(argument);
-}
-
-/**
- * Returns true when a callee node is the global `require` identifier.
- *
- * @param callee - Call expression callee node.
- * @returns True when the callee is `require`.
- */
-function isRequireIdentifier(callee: TSESTree.Node): boolean {
-  return callee.type === AST_NODE_TYPES.Identifier && callee.name === CALLEE_REQUIRE;
 }
 
 /**
