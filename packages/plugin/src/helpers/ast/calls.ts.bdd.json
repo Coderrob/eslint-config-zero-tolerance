@@ -8,6 +8,7 @@
     "exports": [
       "getCalleeNamePath",
       "getCallArgument",
+      "getMatchingCallMemberMethodName",
       "getStringLiteralCallArgument",
       "hasCallCalleeNamePath"
     ]
@@ -91,6 +92,23 @@
           "given": "a CallExpression whose callee resolves to a different path than the expected ordered path",
           "when": "hasCallCalleeNamePath is called",
           "then": "returns false"
+        }
+      ]
+    },
+    {
+      "feature": "Matching member call method names",
+      "scenarios": [
+        {
+          "name": "should return the member method name when it matches the allowed set",
+          "given": "a CallExpression that targets a member method whose static name is included in the allowed set",
+          "when": "getMatchingCallMemberMethodName is called",
+          "then": "returns that member method name"
+        },
+        {
+          "name": "should return null when the member method name does not match the allowed set",
+          "given": "a CallExpression whose static member method name is absent or not included in the allowed set",
+          "when": "getMatchingCallMemberMethodName is called",
+          "then": "returns null"
         }
       ]
     }

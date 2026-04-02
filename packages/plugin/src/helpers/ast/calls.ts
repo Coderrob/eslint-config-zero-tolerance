@@ -25,7 +25,7 @@ import {
   isIdentifierNode,
   isMemberExpressionNode,
 } from '../ast-guards';
-import { getMemberPropertyName } from '../ast-helpers';
+import { getCallMemberMethodName, getMemberPropertyName } from '../ast-helpers';
 import { isString } from '../type-guards';
 
 type StringLiteralArgument = TSESTree.Literal & { value: string };
@@ -94,6 +94,24 @@ function getCalleeNamePathFromMemberExpression(callee: TSESTree.MemberExpression
     return null;
   }
   return [...objectPath, propertyName];
+}
+
+/**
+ * Returns the member method name when a call expression targets a matching set.
+ *
+ * @param node - Call expression node.
+ * @param names - Allowed member method names.
+ * @returns Matching member method name, or null when absent or not allowed.
+ */
+export function getMatchingCallMemberMethodName(
+  node: TSESTree.CallExpression,
+  names: ReadonlySet<string>,
+): string | null {
+  const methodName = getCallMemberMethodName(node);
+  if (methodName === null || !names.has(methodName)) {
+    return null;
+  }
+  return methodName;
 }
 
 /**

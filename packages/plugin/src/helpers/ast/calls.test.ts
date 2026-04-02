@@ -2,6 +2,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import {
   getCallArgument,
   getCalleeNamePath,
+  getMatchingCallMemberMethodName,
   getStringLiteralCallArgument,
   hasCallCalleeNamePath,
 } from './calls';
@@ -146,6 +147,59 @@ describe('ast call helpers', () => {
       } as any;
 
       expect(hasCallCalleeNamePath(node, ['test'])).toBe(false);
+    });
+  });
+
+  describe('getMatchingCallMemberMethodName', () => {
+    it('should return the member method name when it is in the allowed set', () => {
+      const node = {
+        type: AST_NODE_TYPES.CallExpression,
+        callee: {
+          type: AST_NODE_TYPES.MemberExpression,
+          computed: false,
+          object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
+          property: { type: AST_NODE_TYPES.Identifier, name: 'push' },
+        },
+      } as any;
+
+      expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBe('push');
+    });
+
+    it('should return the computed string-member name when it is in the allowed set', () => {
+      const node = {
+        type: AST_NODE_TYPES.CallExpression,
+        callee: {
+          type: AST_NODE_TYPES.MemberExpression,
+          computed: true,
+          object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
+          property: { type: AST_NODE_TYPES.Literal, value: 'splice' },
+        },
+      } as any;
+
+      expect(getMatchingCallMemberMethodName(node, new Set(['splice']))).toBe('splice');
+    });
+
+    it('should return null when the member method name is not in the allowed set', () => {
+      const node = {
+        type: AST_NODE_TYPES.CallExpression,
+        callee: {
+          type: AST_NODE_TYPES.MemberExpression,
+          computed: false,
+          object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
+          property: { type: AST_NODE_TYPES.Identifier, name: 'map' },
+        },
+      } as any;
+
+      expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBeNull();
+    });
+
+    it('should return null when the call does not target a member expression', () => {
+      const node = {
+        type: AST_NODE_TYPES.CallExpression,
+        callee: { type: AST_NODE_TYPES.Identifier, name: 'push' },
+      } as any;
+
+      expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBeNull();
     });
   });
 });

@@ -16,7 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../helpers/ast-guards';
-import { getCallMemberMethodName, resolveFunctionName } from '../helpers/ast-helpers';
+import { resolveFunctionName } from '../helpers/ast-helpers';
+import { getMatchingCallMemberMethodName } from '../helpers/ast/calls';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -74,7 +75,7 @@ function checkCallExpression(
   functionStack: QueryScopeStack,
   node: TSESTree.CallExpression,
 ): void {
-  const method = getMutatingMethodName(node);
+  const method = getMatchingCallMemberMethodName(node, MUTATING_METHODS);
   if (method === null) {
     return;
   }
@@ -224,20 +225,6 @@ function exitFunctionScope(functionStack: QueryScopeStack, _node: FunctionNode):
  */
 function getCurrentScope(functionStack: QueryScopeStack): QueryScopeInfo | null {
   return functionStack.at(-1) ?? null;
-}
-
-/**
- * Returns mutating method name when call expression is mutating.
- *
- * @param node - Call expression node.
- * @returns Method name if mutating, otherwise null.
- */
-function getMutatingMethodName(node: TSESTree.CallExpression): string | null {
-  const method = getCallMemberMethodName(node);
-  if (method === null || !MUTATING_METHODS.has(method)) {
-    return null;
-  }
-  return method;
 }
 
 /**

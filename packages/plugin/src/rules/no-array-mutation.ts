@@ -15,7 +15,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { getCallMemberMethodName } from '../helpers/ast-helpers';
+import { getMatchingCallMemberMethodName } from '../helpers/ast/calls';
 import { createRule } from './support/rule-factory';
 
 const MUTATING_ARRAY_METHODS = new Set([
@@ -39,7 +39,7 @@ type NoArrayMutationContext = Readonly<TSESLint.RuleContext<'noArrayMutation', [
  * @param node - Call expression node.
  */
 function checkCallExpression(context: NoArrayMutationContext, node: TSESTree.CallExpression): void {
-  const methodName = getMutatingMethodName(node);
+  const methodName = getMatchingCallMemberMethodName(node, MUTATING_ARRAY_METHODS);
   if (methodName === null) {
     return;
   }
@@ -60,20 +60,6 @@ function createNoArrayMutationListeners(context: NoArrayMutationContext): TSESLi
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
   };
-}
-
-/**
- * Returns mutating method name for array-like member call expressions.
- *
- * @param node - Call expression node.
- * @returns Method name when mutating, otherwise null.
- */
-function getMutatingMethodName(node: TSESTree.CallExpression): string | null {
-  const methodName = getCallMemberMethodName(node);
-  if (methodName === null || !MUTATING_ARRAY_METHODS.has(methodName)) {
-    return null;
-  }
-  return methodName;
 }
 
 /** Disallows mutating array methods. */
