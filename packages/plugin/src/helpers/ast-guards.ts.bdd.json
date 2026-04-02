@@ -14,11 +14,13 @@
       "isIdentifierNode",
       "isMemberExpressionNode",
       "isMethodDefinitionNode",
+      "isNamedIdentifierNode",
       "isNodeLike",
       "isSwitchCaseNode",
       "isTestFile",
       "isTSEnumMemberNode",
       "isUnaryExpressionNode",
+      "isUncomputedMemberExpressionNode",
       "isVariableDeclarationNode",
       "isVariableDeclaratorNode"
     ]
@@ -150,6 +152,23 @@
       ]
     },
     {
+      "feature": "isNamedIdentifierNode",
+      "scenarios": [
+        {
+          "name": "should return true for an Identifier node with the expected name",
+          "given": "an AST node with type Identifier whose name matches the requested name",
+          "when": "isNamedIdentifierNode is called",
+          "then": "returns true and narrows the type to TSESTree.Identifier"
+        },
+        {
+          "name": "should return false for a differently named or non-Identifier node",
+          "given": "an AST node whose type is not Identifier or whose name does not match",
+          "when": "isNamedIdentifierNode is called",
+          "then": "returns false"
+        }
+      ]
+    },
+    {
       "feature": "isNodeLike",
       "scenarios": [
         {
@@ -261,6 +280,23 @@
           "given": "null or undefined",
           "when": "isUnaryExpressionNode is called",
           "then": "returns false without throwing"
+        }
+      ]
+    },
+    {
+      "feature": "isUncomputedMemberExpressionNode",
+      "scenarios": [
+        {
+          "name": "should return true for a direct non-computed MemberExpression node",
+          "given": "an AST node with type MemberExpression and computed set to false",
+          "when": "isUncomputedMemberExpressionNode is called",
+          "then": "returns true and narrows the type to a direct MemberExpression"
+        },
+        {
+          "name": "should return false for computed or non-member nodes",
+          "given": "an AST node that is computed or is not a MemberExpression",
+          "when": "isUncomputedMemberExpressionNode is called",
+          "then": "returns false"
         }
       ]
     },

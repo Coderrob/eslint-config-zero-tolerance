@@ -15,7 +15,10 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import {
+  isNamedIdentifierNode,
+  isUncomputedMemberExpressionNode,
+} from '../helpers/ast-guards';
 import { createRule } from './support/rule-factory';
 
 const DATE_IDENTIFIER = 'Date';
@@ -93,7 +96,7 @@ function isDateNowCall(node: TSESTree.CallExpression): boolean {
  * @returns True when member is Date.now.
  */
 function isDateNowMember(node: TSESTree.Expression): boolean {
-  if (node.type !== AST_NODE_TYPES.MemberExpression || node.computed) {
+  if (!isUncomputedMemberExpressionNode(node)) {
     return false;
   }
   return isDateNowObject(node.object) && isNowProperty(node.property);
@@ -106,7 +109,7 @@ function isDateNowMember(node: TSESTree.Expression): boolean {
  * @returns True when object is Date.
  */
 function isDateNowObject(node: TSESTree.Expression): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === DATE_IDENTIFIER;
+  return isNamedIdentifierNode(node, DATE_IDENTIFIER);
 }
 
 /**
@@ -116,7 +119,7 @@ function isDateNowObject(node: TSESTree.Expression): boolean {
  * @returns True for no-arg Date constructor.
  */
 function isNoArgDateConstructor(node: TSESTree.NewExpression): boolean {
-  if (node.callee.type !== AST_NODE_TYPES.Identifier || node.callee.name !== DATE_IDENTIFIER) {
+  if (!isNamedIdentifierNode(node.callee, DATE_IDENTIFIER)) {
     return false;
   }
   return node.arguments.length === 0;
@@ -129,7 +132,7 @@ function isNoArgDateConstructor(node: TSESTree.NewExpression): boolean {
  * @returns True when property is now.
  */
 function isNowProperty(node: TSESTree.Expression | TSESTree.PrivateIdentifier): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === NOW_IDENTIFIER;
+  return isNamedIdentifierNode(node, NOW_IDENTIFIER);
 }
 
 /** Disallows Date.now() and no-arg new Date(). */

@@ -8,11 +8,13 @@ import {
   isIdentifierNode,
   isMemberExpressionNode,
   isMethodDefinitionNode,
+  isNamedIdentifierNode,
   isNodeLike,
   isSwitchCaseNode,
   isTSEnumMemberNode,
   isTestFile,
   isUnaryExpressionNode,
+  isUncomputedMemberExpressionNode,
   isVariableDeclarationNode,
   isVariableDeclaratorNode,
 } from './ast-guards';
@@ -57,6 +59,14 @@ describe('ast guards', () => {
     expect(isMethodDefinitionNode(createNode(AST_NODE_TYPES.Property))).toBe(false);
   });
 
+  it('should identify named identifier nodes', () => {
+    const node = { type: AST_NODE_TYPES.Identifier, name: 'Promise' } as unknown as TSESTree.Node;
+
+    expect(isNamedIdentifierNode(node, 'Promise')).toBe(true);
+    expect(isNamedIdentifierNode(node, 'Date')).toBe(false);
+    expect(isNamedIdentifierNode(createNode(AST_NODE_TYPES.Literal), 'Promise')).toBe(false);
+  });
+
   it('should identify node-like values', () => {
     expect(isNodeLike(createNode(AST_NODE_TYPES.Identifier))).toBe(true);
     expect(isNodeLike({ type: 'Identifier' })).toBe(true);
@@ -79,6 +89,21 @@ describe('ast guards', () => {
   it('should identify unary expression nodes', () => {
     expect(isUnaryExpressionNode(createNode(AST_NODE_TYPES.UnaryExpression))).toBe(true);
     expect(isUnaryExpressionNode(createNode(AST_NODE_TYPES.UpdateExpression))).toBe(false);
+  });
+
+  it('should identify non-computed member expression nodes', () => {
+    const uncomputedNode = {
+      type: AST_NODE_TYPES.MemberExpression,
+      computed: false,
+    } as unknown as TSESTree.Node;
+    const computedNode = {
+      type: AST_NODE_TYPES.MemberExpression,
+      computed: true,
+    } as unknown as TSESTree.Node;
+
+    expect(isUncomputedMemberExpressionNode(uncomputedNode)).toBe(true);
+    expect(isUncomputedMemberExpressionNode(computedNode)).toBe(false);
+    expect(isUncomputedMemberExpressionNode(createNode(AST_NODE_TYPES.Identifier))).toBe(false);
   });
 
   it('should identify variable declaration nodes', () => {

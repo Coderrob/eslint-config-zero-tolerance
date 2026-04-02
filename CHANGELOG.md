@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Helper structure**: Grouped shared AST, JSDoc, import-path, type-guard, rule-support, and test-helper modules into dedicated `helpers/`, `rules/support/`, and `testing/` folders to make reuse points easier to locate and maintain.
 - **Rule helper reuse**: Extracted shared function-node listener builders into `rules/support/function-listeners.ts`, added shared `getCallMemberMethodName` and parameter-binding helpers, completed a dedicated `helpers/ast/` layer with navigation, calls, parameters, types, search, and statements modules, and rewired rule-local AST interpretation onto those shared helpers while also replacing duplicated function-name resolution in `require-jsdoc-functions` and `require-readonly-props` with the existing shared AST helpers.
 - **Call-shape reuse**: Added a shared `getMatchingCallMemberMethodName` helper in `helpers/ast/calls.ts` and rewired `no-array-mutation` and `no-query-side-effects` to use it instead of keeping duplicate member-call filtering logic.
+- **AST guard reuse**: Added shared `isNamedIdentifierNode` and `isUncomputedMemberExpressionNode` guards in `helpers/ast-guards.ts` and rewired multiple rules to reuse those exact-name and direct-member checks instead of keeping local ad hoc predicates.
+- **Type helper reuse**: Expanded `helpers/ast/types.ts` with shared first-type-argument and named-generic-reference helpers, then rewired `no-boolean-return-trap` and `require-readonly-props` to consume that shared type-reference evaluation instead of combining those checks locally.
 
 ## [1.2.1] - 2026-04-01
 

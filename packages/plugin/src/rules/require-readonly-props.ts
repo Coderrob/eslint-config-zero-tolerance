@@ -22,9 +22,8 @@ import {
   getParameterTypeAnnotation,
 } from '../helpers/ast/parameters';
 import {
+  hasNamedTypeReferenceWithTypeArguments,
   hasAllReadonlyPropertyMembers,
-  hasTypeArguments,
-  isNamedTypeReference,
   unwrapTsExpression,
 } from '../helpers/ast/types';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
@@ -202,10 +201,7 @@ function isReadonlyPropsType(node: TSESTree.TypeNode): boolean {
  * @returns True when node references `Readonly<T>`.
  */
 function isReadonlyTypeReference(node: TSESTree.TSTypeReference): boolean {
-  if (!isNamedTypeReference(node, READONLY_TYPE_NAME)) {
-    return false;
-  }
-  return hasTypeArguments(node);
+  return hasNamedTypeReferenceWithTypeArguments(node, READONLY_TYPE_NAME);
 }
 
 /**

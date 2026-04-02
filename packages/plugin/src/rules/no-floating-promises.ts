@@ -16,7 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isIdentifierNode } from '../helpers/ast-guards';
+import { isMemberExpressionNode, isNamedIdentifierNode } from '../helpers/ast-guards';
 import { getCallMemberMethodName } from '../helpers/ast-helpers';
 import { createRule } from './support/rule-factory';
 
@@ -69,7 +69,7 @@ function createNoFloatingPromisesListeners(
  * @returns Parent call expression in chain, or null.
  */
 function getChainedObjectCall(node: TSESTree.CallExpression): TSESTree.CallExpression | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+  if (!isMemberExpressionNode(node.callee)) {
     return null;
   }
   if (node.callee.object.type !== AST_NODE_TYPES.CallExpression) {
@@ -182,7 +182,7 @@ function isPromiseConstructorExpression(expression: TSESTree.Expression): boolea
   if (expression.type !== AST_NODE_TYPES.NewExpression) {
     return false;
   }
-  return isIdentifierNode(expression.callee) && expression.callee.name === PROMISE_IDENTIFIER;
+  return isNamedIdentifierNode(expression.callee, PROMISE_IDENTIFIER);
 }
 
 /**
@@ -237,9 +237,7 @@ function isPromiseStaticCall(node: TSESTree.CallExpression): boolean {
  */
 function isPromiseStaticCallee(callee: TSESTree.Expression): boolean {
   return (
-    callee.type === AST_NODE_TYPES.MemberExpression &&
-    isIdentifierNode(callee.object) &&
-    callee.object.name === PROMISE_IDENTIFIER
+    isMemberExpressionNode(callee) && isNamedIdentifierNode(callee.object, PROMISE_IDENTIFIER)
   );
 }
 

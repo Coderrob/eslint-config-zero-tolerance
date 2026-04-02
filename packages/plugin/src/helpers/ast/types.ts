@@ -22,6 +22,16 @@ import type { TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 /**
+ * Returns the first type argument for a type reference, or null.
+ *
+ * @param node - Type-reference node.
+ * @returns First type argument when present, otherwise null.
+ */
+export function getFirstTypeArgument(node: TSESTree.TSTypeReference): TSESTree.TypeNode | null {
+  return node.typeArguments?.params[0] ?? null;
+}
+
+/**
  * Returns the unqualified identifier name of a type reference, or null.
  *
  * @param node - Type-reference node.
@@ -44,6 +54,24 @@ export function hasAllReadonlyPropertyMembers(node: TSESTree.TSTypeLiteral): boo
     }
   }
   return true;
+}
+
+/**
+ * Returns true when a type reference matches a simple identifier name and has type arguments.
+ *
+ * @param node - Type-reference node.
+ * @param expectedName - Expected simple type-reference name.
+ * @returns True when the type reference name matches and type arguments are present.
+ */
+export function hasNamedTypeReferenceWithTypeArguments(
+  node: TSESTree.TSTypeReference,
+  expectedName: string,
+): node is TSESTree.TSTypeReference & {
+  typeArguments: TSESTree.TSTypeParameterInstantiation & {
+    params: [TSESTree.TypeNode, ...TSESTree.TypeNode[]];
+  };
+} {
+  return isNamedTypeReference(node, expectedName) && hasTypeArguments(node);
 }
 
 /**

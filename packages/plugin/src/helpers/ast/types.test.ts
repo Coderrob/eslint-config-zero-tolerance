@@ -1,6 +1,8 @@
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import {
+  getFirstTypeArgument,
   getTypeReferenceName,
+  hasNamedTypeReferenceWithTypeArguments,
   hasAllReadonlyPropertyMembers,
   hasTypeArguments,
   isNamedTypeReference,
@@ -25,6 +27,26 @@ describe('ast type helpers', () => {
       } as any;
 
       expect(getTypeReferenceName(node)).toBeNull();
+    });
+  });
+
+  describe('getFirstTypeArgument', () => {
+    it('should return the first type argument when one is present', () => {
+      const firstTypeArgument = { type: AST_NODE_TYPES.TSBooleanKeyword };
+      const node = {
+        type: AST_NODE_TYPES.TSTypeReference,
+        typeArguments: { params: [firstTypeArgument] },
+      } as any;
+
+      expect(getFirstTypeArgument(node)).toBe(firstTypeArgument);
+    });
+
+    it('should return null when a type reference has no type arguments', () => {
+      const node = {
+        type: AST_NODE_TYPES.TSTypeReference,
+      } as any;
+
+      expect(getFirstTypeArgument(node)).toBeNull();
     });
   });
 
@@ -84,6 +106,33 @@ describe('ast type helpers', () => {
       } as any;
 
       expect(isNamedTypeReference(node, 'Readonly')).toBe(false);
+    });
+  });
+
+  describe('hasNamedTypeReferenceWithTypeArguments', () => {
+    it('should return true when the type reference name matches and type arguments exist', () => {
+      const node = {
+        type: AST_NODE_TYPES.TSTypeReference,
+        typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
+        typeArguments: { params: [{ type: AST_NODE_TYPES.TSTypeLiteral, members: [] }] },
+      } as any;
+
+      expect(hasNamedTypeReferenceWithTypeArguments(node, 'Readonly')).toBe(true);
+    });
+
+    it('should return false when the name differs or type arguments are absent', () => {
+      const mismatchedNode = {
+        type: AST_NODE_TYPES.TSTypeReference,
+        typeName: { type: AST_NODE_TYPES.Identifier, name: 'Props' },
+        typeArguments: { params: [{ type: AST_NODE_TYPES.TSTypeLiteral, members: [] }] },
+      } as any;
+      const missingArgsNode = {
+        type: AST_NODE_TYPES.TSTypeReference,
+        typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
+      } as any;
+
+      expect(hasNamedTypeReferenceWithTypeArguments(mismatchedNode, 'Readonly')).toBe(false);
+      expect(hasNamedTypeReferenceWithTypeArguments(missingArgsNode, 'Readonly')).toBe(false);
     });
   });
 

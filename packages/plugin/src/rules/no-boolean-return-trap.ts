@@ -19,6 +19,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import type { FunctionNode } from '../helpers/ast-guards';
 import { resolveFunctionName } from '../helpers/ast-helpers';
+import { hasNamedTypeReferenceWithTypeArguments } from '../helpers/ast/types';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -62,16 +63,6 @@ function createNoBooleanReturnTrapListeners(
 }
 
 /**
- * Returns first type argument for a type-reference node.
- *
- * @param node - Type-reference node.
- * @returns First type argument when present.
- */
-function getFirstTypeArgument(node: TSESTree.TSTypeReference): TSESTree.TypeNode | null {
-  return node.typeArguments?.params[0] ?? null;
-}
-
-/**
  * Returns true when a type annotation is a boolean-like return type.
  *
  * @param node - Type node.
@@ -104,24 +95,11 @@ function isPredicateName(functionName: string): boolean {
  * @returns True when promise contains boolean type argument.
  */
 function isPromiseBooleanType(node: TSESTree.TSTypeReference): boolean {
-  if (!isPromiseTypeName(node.typeName)) {
+  if (!hasNamedTypeReferenceWithTypeArguments(node, PROMISE_IDENTIFIER)) {
     return false;
   }
-  const firstTypeArgument = getFirstTypeArgument(node);
-  if (firstTypeArgument === null) {
-    return false;
-  }
+  const firstTypeArgument = node.typeArguments.params[0];
   return firstTypeArgument.type === AST_NODE_TYPES.TSBooleanKeyword;
-}
-
-/**
- * Returns true when type name is Promise identifier.
- *
- * @param node - Type name node.
- * @returns True when Promise.
- */
-function isPromiseTypeName(node: TSESTree.EntityName): boolean {
-  return node.type === AST_NODE_TYPES.Identifier && node.name === PROMISE_IDENTIFIER;
 }
 
 /**
