@@ -1,6 +1,6 @@
 # no-re-export
 
-Disallow re-export statements from parent or ancestor modules in non-barrel files.
+Disallow direct and pass-through re-export statements from parent or ancestor modules in non-barrel files.
 
 ## Rule Details
 
@@ -13,11 +13,11 @@ Disallow re-export statements from parent or ancestor modules in non-barrel file
 
 ## Rationale
 
-Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. Only barrel files (`index.*`) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
+Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as `export { foo } from '../foo'` and pass-through patterns such as `import { foo } from '../foo'; export { foo };`. Only barrel files (`index.*`) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
 
 ## Examples
 
-### ✅ Correct
+### Correct
 
 ```typescript
 // Direct exports
@@ -29,23 +29,35 @@ export function myFunction() {}
 export { childFunction } from './child';
 export * from './child/utils';
 
-// In a barrel file (index.ts) — any re-export is allowed
+// Exporting a local binding remains allowed
+import { parentValue } from '../parent';
+const localValue = parentValue;
+export { localValue };
+
+// In a barrel file (index.ts), upward re-exports are allowed
 // export { peerFunction } from '../sibling';
 // export * from '../../parent';
 ```
 
-### ❌ Incorrect
+### Incorrect
 
 ```typescript
-// Re-exports from peers — not allowed in non-barrel files
+// Re-exports from peers are not allowed in non-barrel files
 export { peerFunction } from '../sibling';
 export * from '../utils';
 
-// Re-exports from parents — not allowed
+// Re-exports from parents are not allowed
 export { parentFunction } from '../../parent';
 export * from '../../grandparent';
 
-// Re-exports from grandparents — not allowed
+// Pass-through re-exports from parents are also not allowed
+import { peerFunction } from '../sibling';
+export { peerFunction };
+
+import parentDefault from '../../parent';
+export default parentDefault;
+
+// Re-exports from grandparents are not allowed
 export { grandparentFunction } from '../../../ancestor';
 export * as ns from '../../../../distant-ancestor';
 ```

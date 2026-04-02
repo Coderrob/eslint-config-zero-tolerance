@@ -40,11 +40,26 @@ ruleTester.run('no-parent-imports', noParentImports, {
       code: "const feature = loader.require('../feature');",
     },
     {
+      name: 'should allow member require calls in barrel files even when the argument is a parent path',
+      filename: '/src/index.ts',
+      code: "const feature = loader.require('../feature');",
+    },
+    {
       name: 'should allow require with no arguments',
       code: 'const feature = require();',
     },
     {
+      name: 'should allow require with no arguments in barrel files',
+      filename: '/src/index.ts',
+      code: 'const feature = require();',
+    },
+    {
       name: 'should allow require with non-string literal argument',
+      code: 'const feature = require(123);',
+    },
+    {
+      name: 'should allow require with non-string literal argument in barrel files',
+      filename: '/src/index.ts',
       code: 'const feature = require(123);',
     },
     {
@@ -59,40 +74,72 @@ ruleTester.run('no-parent-imports', noParentImports, {
       name: 'should allow import-equals with internal module reference',
       code: 'import Alias = Namespace.Value;',
     },
+    {
+      name: 'should allow import-equals with internal module reference in barrel files',
+      filename: '/src/index.ts',
+      code: 'import Alias = Namespace.Value;',
+    },
+    {
+      name: 'should allow parent directory import declarations in non-barrel files',
+      filename: '/src/feature.ts',
+      code: "import parent from '../parent';",
+    },
+    {
+      name: 'should allow dynamic parent imports in non-barrel files',
+      filename: '/src/feature.ts',
+      code: "const parent = await import('../parent');",
+    },
+    {
+      name: 'should allow require calls from parent paths in non-barrel files',
+      filename: '/src/feature.ts',
+      code: "const parent = require('../parent');",
+    },
+    {
+      name: 'should allow import-equals from parent paths in non-barrel files',
+      filename: '/src/feature.ts',
+      code: "import parent = require('../parent');",
+    },
   ],
   invalid: [
     {
-      name: 'should disallow parent directory import declarations',
+      name: 'should disallow parent directory import declarations in barrel files',
+      filename: '/src/index.ts',
       code: "import parent from '../parent';",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow bare parent import declarations',
+      name: 'should disallow bare parent import declarations in barrel files',
+      filename: '/src/index.ts',
       code: "import '..';",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow type-only parent import declarations',
+      name: 'should disallow type-only parent import declarations in barrel files',
+      filename: '/src/index.ts',
       code: "import type { ParentType } from '../types';",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow dynamic parent imports',
+      name: 'should disallow dynamic parent imports in barrel files',
+      filename: '/src/index.ts',
       code: "const parent = await import('../parent');",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow require calls from parent paths',
+      name: 'should disallow require calls from parent paths in barrel files',
+      filename: '/src/index.ts',
       code: "const parent = require('../parent');",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow import-equals from parent paths',
+      name: 'should disallow import-equals from parent paths in barrel files',
+      filename: '/src/index.ts',
       code: "import parent = require('../parent');",
       errors: [{ messageId: 'noParentImport' }],
     },
     {
-      name: 'should disallow import-equals from bare parent path',
+      name: 'should disallow import-equals from bare parent path in barrel files',
+      filename: '/src/index.ts',
       code: "import parent = require('..');",
       errors: [{ messageId: 'noParentImport' }],
     },

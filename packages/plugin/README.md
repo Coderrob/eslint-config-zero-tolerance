@@ -144,10 +144,10 @@ export default [
 | Rule                   | Description                                                        |
 | ---------------------- | ------------------------------------------------------------------ |
 | `require-clean-barrel` | Require barrel files (`index.*`) to contain only module re-exports |
-| `no-parent-imports`    | Disallow parent-directory traversal in import paths                |
+| `no-parent-imports`    | Disallow parent-directory traversal in barrel-file import paths    |
 | `no-dynamic-import`    | Ban dynamic `import()` and `require()` outside test files          |
 | `no-export-alias`      | Prevent use of aliases in export statements                        |
-| `no-re-export`         | Disallow re-export statements from parent/grandparent modules      |
+| `no-re-export`         | Disallow direct or pass-through re-exports from parent/grandparent modules |
 
 ### Bug Prevention
 

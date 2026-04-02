@@ -69,8 +69,8 @@
 | [require-clean-barrel](require-clean-barrel.md) | suggestion | Require barrel files (index.\*) to contain only module re-exports |
 | [no-dynamic-import](no-dynamic-import.md)       | problem    | Ban dynamic `import()` and `require()` outside test files         |
 | [no-export-alias](no-export-alias.md)           | suggestion | Prevent use of aliases in export statements                       |
-| [no-parent-imports](no-parent-imports.md)       | suggestion | Disallow parent-directory traversal in import paths               |
-| [no-re-export](no-re-export.md)                 | suggestion | Disallow re-export statements from parent/grandparent modules     |
+| [no-parent-imports](no-parent-imports.md)       | suggestion | Disallow parent-directory traversal in barrel-file import paths   |
+| [no-re-export](no-re-export.md)                 | suggestion | Disallow direct or pass-through re-exports from parent/grandparent modules |
 
 ## Bug Prevention
 

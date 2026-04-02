@@ -1,6 +1,6 @@
 # no-parent-imports
 
-Disallow parent-directory traversal in all import patterns.
+Disallow parent-directory traversal inside barrel files.
 
 ## Rule Details
 
@@ -13,11 +13,11 @@ Disallow parent-directory traversal in all import patterns.
 
 ## Rationale
 
-Parent-directory imports (`..` and `../*`) create tight coupling to folder layout and make modules harder to move safely. Enforcing project-rooted, package, or same-directory imports keeps boundaries explicit and prevents upward traversal through the tree.
+Barrel files (`index.*`) should aggregate exports from their own directory. Parent-directory imports (`..` and `../*`) inside those files create upward coupling, blur package boundaries, and make the barrel harder to reason about.
 
 This rule is enabled by default in plugin presets: `warn` in `recommended` and `error` in `strict`.
 
-This rule applies to all import patterns:
+This rule applies only when the current file is a barrel file (`index.*`). In those files, it checks:
 
 - `import ... from '...'`
 - `import('...')`
@@ -26,21 +26,25 @@ This rule applies to all import patterns:
 
 ## Examples
 
-### ✅ Correct
+### Correct
 
 ```typescript
+// feature.ts
 import React from 'react';
-import { logger } from '@/shared/logger';
-import { parseUser } from './parse-user';
+import { parseUser } from '../parse-user';
+const helpers = await import('../helpers');
+const feature = require('../feature');
+import legacyFeature = require('../legacy-feature');
 
-const helpers = await import('./helpers');
-const feature = require('./feature');
-import legacyFeature = require('./legacy-feature');
+// index.ts
+export { parseUser } from './parse-user';
+export { helpers } from './helpers';
 ```
 
-### ❌ Incorrect
+### Incorrect
 
 ```typescript
+// index.ts
 import { parseUser } from '../parse-user';
 import '..';
 

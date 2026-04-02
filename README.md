@@ -185,10 +185,10 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | Rule                                                         | Description                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------------ |
 | [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | Require barrel files (`index.*`) to contain only module re-exports |
-| [`no-parent-imports`](docs/rules/no-parent-imports.md)       | Ban `..` and `../*` parent-directory import traversal              |
+| [`no-parent-imports`](docs/rules/no-parent-imports.md)       | Ban `..` and `../*` parent-directory import traversal in barrel files |
 | [`no-dynamic-import`](docs/rules/no-dynamic-import.md)       | Ban dynamic `import()` and `require()` outside test files          |
 | [`no-export-alias`](docs/rules/no-export-alias.md)           | Prevent use of aliases in export statements                        |
-| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow re-export statements from parent/grandparent modules      |
+| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow direct or pass-through re-export statements from parent/grandparent modules |
 
 ### Bug Prevention
 

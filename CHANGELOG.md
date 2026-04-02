@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-04-02
+
+### Fixed
+
+- **`no-parent-imports` rule**: Restored barrel-only scope so `..` and `../*` imports are ignored in non-`index.*` files and reported only when the importing file is a barrel.
+- **`no-re-export` rule**: Preserved parent-boundary protection after the `no-parent-imports` rollback by reporting pass-through exports of bindings imported from parent or grandparent paths in non-barrel files.
+
 ## [1.2.1] - 2026-04-02
 
 ### Added

@@ -18,7 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { getLiteralStringValue as getLiteralStringNodeValue } from '../helpers/ast-helpers';
 import { getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
-import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
+import { isBarrelFile, isParentDirectoryImportPath } from '../helpers/import-path-helpers';
 import { CALLEE_REQUIRE } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
@@ -96,6 +96,9 @@ function checkTsImportEqualsDeclaration(
  * @returns Listener map for the rule.
  */
 function createNoParentImportsListeners(context: NoParentImportsContext): TSESLint.RuleListener {
+  if (!isBarrelFile(context.filename)) {
+    return {};
+  }
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
     ImportDeclaration: checkImportDeclaration.bind(undefined, context),
@@ -141,18 +144,18 @@ function reportIfParentImport(
 }
 
 /**
- * ESLint rule that disallows parent-directory traversal in all import patterns.
+ * ESLint rule that disallows parent-directory traversal in barrel-file import patterns.
  */
 export const noParentImports = createRule({
   name: 'no-parent-imports',
   meta: {
     type: 'suggestion',
     docs: {
-      description: `Disallow parent-directory imports (\`${PARENT_PATH_TOKEN}\` and \`${PARENT_PATH_TOKEN}/*\`) in import declarations, import expressions, require calls, and import-equals declarations`,
+      description: `Disallow parent-directory imports (\`${PARENT_PATH_TOKEN}\` and \`${PARENT_PATH_TOKEN}/*\`) inside barrel files (\`index.*\`) across import declarations, import expressions, require calls, and import-equals declarations`,
     },
     messages: {
       noParentImport:
-        'Parent-directory import "{{importPath}}" is not allowed; use absolute or project-rooted import paths instead',
+        'Parent-directory import "{{importPath}}" is not allowed in barrel files; use same-directory re-exports or project-rooted import paths instead',
     },
     schema: [],
   },

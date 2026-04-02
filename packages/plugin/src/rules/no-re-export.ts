@@ -19,6 +19,42 @@ import { isParentDirectoryImportPath, isBarrelFile } from '../helpers/import-pat
 import { createRule } from './support/rule-factory';
 
 type NoReExportContext = Readonly<TSESLint.RuleContext<'noReExport', []>>;
+type ImportedBindingNames = Set<string>;
+
+/**
+ * Adds imported local binding names when an import declaration targets a parent path.
+ *
+ * @param importedBindings - Collected imported binding names from parent paths.
+ * @param node - Import declaration node.
+ */
+function collectParentImportDeclarationBindings(
+  importedBindings: ImportedBindingNames,
+  node: TSESTree.ImportDeclaration,
+): void {
+  if (!isParentDirectoryImportPath(node.source.value)) {
+    return;
+  }
+  for (const specifier of node.specifiers) {
+    importedBindings.add(specifier.local.name);
+  }
+}
+
+/**
+ * Adds imported local binding names when an import-equals declaration targets a parent path.
+ *
+ * @param importedBindings - Collected imported binding names from parent paths.
+ * @param node - TS import-equals declaration node.
+ */
+function collectParentImportEqualsBindings(
+  importedBindings: ImportedBindingNames,
+  node: TSESTree.TSImportEqualsDeclaration,
+): void {
+  const importPath = getImportEqualsModulePath(node);
+  if (importPath === null || !isParentDirectoryImportPath(importPath)) {
+    return;
+  }
+  importedBindings.add(node.id.name);
+}
 
 /**
  * Checks all export declarations for re-exports from parent modules.
@@ -41,10 +77,52 @@ function checkExportAllDeclaration(
  */
 function checkExportNamedDeclaration(
   context: NoReExportContext,
+  importedBindings: ImportedBindingNames,
   node: TSESTree.ExportNamedDeclaration,
 ): void {
   if (node.source !== null) {
     reportIfParentReExport(context, node, node.source.value);
+    return;
+  }
+  if (hasExportedParentImportBinding(importedBindings, node.specifiers)) {
+    reportIndirectParentReExport(context, node);
+  }
+}
+
+/**
+ * Checks default exports for pass-through exports of parent imports.
+ *
+ * @param context - ESLint rule execution context.
+ * @param importedBindings - Collected imported binding names from parent paths.
+ * @param node - Export default declaration node.
+ */
+function checkExportDefaultDeclaration(
+  context: NoReExportContext,
+  importedBindings: ImportedBindingNames,
+  node: TSESTree.ExportDefaultDeclaration,
+): void {
+  if (
+    node.declaration.type === 'Identifier' &&
+    importedBindings.has(node.declaration.name)
+  ) {
+    reportIndirectParentReExport(context, node);
+  }
+}
+
+/**
+ * Checks TypeScript export assignments for pass-through exports of parent imports.
+ *
+ * @param context - ESLint rule execution context.
+ * @param importedBindings - Collected imported binding names from parent paths.
+ * @param node - TS export assignment node.
+ */
+function checkTsExportAssignment(
+  context: NoReExportContext,
+  importedBindings: ImportedBindingNames,
+  node: TSESTree.TSExportAssignment,
+): void {
+  if (node.expression.type === 'Identifier' && importedBindings.has(node.expression.name)) {
+    reportIndirectParentReExport(context, node);
   }
 }
 
@@ -58,14 +136,53 @@ function createNoReExportListeners(context: NoReExportContext): TSESLint.RuleLis
   if (isBarrelFile(context.filename)) {
     return {};
   }
+  const importedBindings: ImportedBindingNames = new Set<string>();
   return {
+    ImportDeclaration: collectParentImportDeclarationBindings.bind(undefined, importedBindings),
+    TSImportEqualsDeclaration: collectParentImportEqualsBindings.bind(undefined, importedBindings),
     ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
-    ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context),
+    ExportDefaultDeclaration: checkExportDefaultDeclaration.bind(
+      undefined,
+      context,
+      importedBindings,
+    ),
+    ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context, importedBindings),
+    TSExportAssignment: checkTsExportAssignment.bind(undefined, context, importedBindings),
   };
 }
 
 /**
- * Reports when an export source traverses to a parent directory.
+ * Gets the referenced module path from a TS import-equals declaration.
+ *
+ * @param node - TS import-equals declaration node.
+ * @returns Import path when the declaration targets an external module.
+ */
+function getImportEqualsModulePath(node: TSESTree.TSImportEqualsDeclaration): string | null {
+  if (node.moduleReference.type !== 'TSExternalModuleReference') {
+    return null;
+  }
+  return node.moduleReference.expression.value as string;
+}
+
+/**
+ * Returns true when an export specifier list exposes a binding imported from a parent path.
+ *
+ * @param importedBindings - Collected imported binding names from parent paths.
+ * @param specifiers - Export specifiers to inspect.
+ * @returns True when any exported binding was imported from a parent path.
+ */
+function hasExportedParentImportBinding(
+  importedBindings: ImportedBindingNames,
+  specifiers: readonly TSESTree.ExportSpecifier[],
+): boolean {
+  return specifiers.some((specifier) =>
+    importedBindings.has((specifier.local as TSESTree.Identifier).name),
+  );
+}
+
+/**
+ * Reports when an export source traverses to a parent directory or when a parent import is
+ * passed through an export in a non-barrel file.
  *
  * @param context - ESLint rule execution context.
  * @param node - Export node that owns the source value.
@@ -85,7 +202,27 @@ function reportIfParentReExport(
 }
 
 /**
- * ESLint rule that disallows re-export statements from parent or ancestor modules.
+ * Reports when a non-barrel file exports a binding imported from a parent path.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Export node that exposes the imported parent binding.
+ */
+function reportIndirectParentReExport(
+  context: NoReExportContext,
+  node:
+    | TSESTree.ExportDefaultDeclaration
+    | TSESTree.ExportNamedDeclaration
+    | TSESTree.TSExportAssignment,
+): void {
+  context.report({
+    node,
+    messageId: 'noReExport',
+  });
+}
+
+/**
+ * ESLint rule that disallows re-export statements from parent or ancestor modules, including
+ * indirect pass-through exports of parent imports.
  */
 export const noReExport = createRule({
   name: 'no-re-export',
@@ -93,11 +230,11 @@ export const noReExport = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Disallow re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction',
+        'Disallow direct or indirect re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction',
     },
     messages: {
       noReExport:
-        'Re-export statements from parent or ancestor modules are not allowed in non-barrel files',
+        'Re-export statements from parent or ancestor modules are not allowed in non-barrel files, including pass-through exports of parent imports',
     },
     schema: [],
   },

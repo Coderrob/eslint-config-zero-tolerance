@@ -4,58 +4,64 @@
   "sourceFile": "packages/plugin/src/rules/no-parent-imports.ts",
   "module": {
     "name": "no-parent-imports",
-    "description": "Disallow parent-directory imports ('..'' and '../*') in import declarations, import expressions, require calls, and import-equals declarations.",
+    "description": "Disallow parent-directory imports ('..' and '../*') inside barrel files ('index.*') across import declarations, import expressions, require calls, and import-equals declarations.",
     "exports": ["noParentImports"]
   },
   "specifications": [
     {
-      "feature": "Permitted import paths",
+      "feature": "Ignored non-barrel files",
       "scenarios": [
         {
-          "name": "should allow a same-directory relative import",
-          "given": "import { foo } from './sibling'",
+          "name": "should allow a parent import declaration in a non-barrel file",
+          "given": "import { foo } from '../sibling' inside src/feature.ts",
           "when": "the rule evaluates the import declaration",
           "then": "no violation is reported"
         },
         {
-          "name": "should allow a package/module import",
-          "given": "import { foo } from 'lodash'",
-          "when": "the rule evaluates the import declaration",
-          "then": "no violation is reported"
-        },
-        {
-          "name": "should allow a require call with a same-directory path",
-          "given": "const value = require('./module')",
+          "name": "should allow a require call with a parent path in a non-barrel file",
+          "given": "const value = require('../module') inside src/feature.ts",
           "when": "the rule evaluates the require call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a dynamic import with a parent path in a non-barrel file",
+          "given": "await import('../module') inside src/feature.ts",
+          "when": "the rule evaluates the import expression",
           "then": "no violation is reported"
         }
       ]
     },
     {
-      "feature": "Parent-directory imports in non-barrel files",
+      "feature": "Parent-directory imports in barrel files",
       "scenarios": [
         {
-          "name": "should report an import using '../' prefix in a non-index source file",
-          "given": "import { Bar } from '../bar' in a non-barrel source file",
+          "name": "should report an import using '../' prefix in a barrel file",
+          "given": "import { Bar } from '../bar' inside src/index.ts",
           "when": "the rule evaluates the import declaration",
           "then": "a noParentImports violation is reported"
         },
         {
-          "name": "should report the bare '..' parent path",
-          "given": "import something from '..' in a non-index file",
+          "name": "should report the bare '..' parent path in a barrel file",
+          "given": "import something from '..' inside src/index.ts",
           "when": "the rule evaluates the import declaration",
           "then": "a noParentImports violation is reported"
         },
         {
-          "name": "should report a dynamic import() with a parent path",
-          "given": "await import('../module') in a non-index file",
+          "name": "should report a dynamic import() with a parent path in a barrel file",
+          "given": "await import('../module') inside src/index.ts",
           "when": "the rule evaluates the import expression",
           "then": "a noParentImports violation is reported"
         },
         {
-          "name": "should report a require() call with a parent path",
-          "given": "const value = require('../module')",
+          "name": "should report a require() call with a parent path in a barrel file",
+          "given": "const value = require('../module') inside src/index.ts",
           "when": "the rule evaluates the require call",
+          "then": "a noParentImport violation is reported"
+        },
+        {
+          "name": "should report an import-equals declaration with a parent path in a barrel file",
+          "given": "import value = require('../module') inside src/index.ts",
+          "when": "the rule evaluates the import-equals declaration",
           "then": "a noParentImport violation is reported"
         }
       ]
