@@ -16,21 +16,22 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import {
-  type FunctionNode,
-  isIdentifierNode,
-  isTestFile,
-  isVariableDeclaratorNode,
-} from '../ast-guards';
-import { getIdentifierName, getVisitorChildNodes } from '../ast-helpers';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
+import { type FunctionNode, isIdentifierNode, isTestFile } from '../helpers/ast-guards';
+import {
+  getFunctionDeclarationName,
+  getFunctionVariableName,
+  getIdentifierName,
+  getVisitorChildNodes,
+} from '../helpers/ast-helpers';
 import {
   getJsdocComment,
   getLineIndentation,
   getTargetNode,
   isStandaloneLineTarget,
-} from '../jsdoc-helpers';
-import { createRule } from '../rule-factory';
+} from '../helpers/jsdoc-helpers';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const COMMENT_PREFIX_LENGTH = 3;
 const COMMENT_SUFFIX_LENGTH = 2;
@@ -210,24 +211,7 @@ function createRequireJsdocFunctionsListeners(
     return {};
   }
   const sourceCode = context.sourceCode;
-  return {
-    ArrowFunctionExpression: reportMissingJsdoc.bind(undefined, context, sourceCode),
-    FunctionDeclaration: reportMissingJsdoc.bind(undefined, context, sourceCode),
-    FunctionExpression: reportMissingJsdoc.bind(undefined, context, sourceCode),
-  };
-}
-
-/**
- * Returns declaration identifier name for function declarations.
- *
- * @param node - Function node to check.
- * @returns The declaration name if available, otherwise null.
- */
-function getDeclarationFunctionName(node: FunctionNode): string | null {
-  if (node.type !== AST_NODE_TYPES.FunctionDeclaration) {
-    return null;
-  }
-  return getIdentifierName(node.id);
+  return createFunctionNodeListeners(reportMissingJsdoc.bind(undefined, context, sourceCode));
 }
 
 /**
@@ -238,8 +222,8 @@ function getDeclarationFunctionName(node: FunctionNode): string | null {
  */
 function getFunctionName(node: FunctionNode): string {
   const names = [
-    getDeclarationFunctionName(node),
-    getVariableFunctionName(node),
+    getFunctionDeclarationName(node),
+    getFunctionVariableName(node),
     getNamedKeyFunctionName(node),
   ];
   for (const name of names) {
@@ -351,19 +335,6 @@ function getParamTagName(param: TSESTree.Parameter, position: number): string {
  */
 function getSummaryDescriptionLine(node: FunctionNode): string {
   return `${getFunctionName(node)} ${SUMMARY_DESCRIPTION_PLACEHOLDER}`;
-}
-
-/**
- * Returns variable declarator identifier name for assigned functions.
- *
- * @param node - Function node to inspect.
- * @returns Variable name if available, otherwise null.
- */
-function getVariableFunctionName(node: FunctionNode): string | null {
-  if (!isVariableDeclaratorNode(node.parent)) {
-    return null;
-  }
-  return getIdentifierName(node.parent.id);
 }
 
 /**

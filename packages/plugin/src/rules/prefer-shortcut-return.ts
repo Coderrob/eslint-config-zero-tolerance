@@ -16,7 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import { createRule } from './support/rule-factory';
 
 const FIRST_ITEM_INDEX = 0;
 const SINGLE_ITEM_COUNT = 1;

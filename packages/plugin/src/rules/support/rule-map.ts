@@ -15,7 +15,7 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, Preset } from './constants';
+import { PLUGIN_NAMESPACE, Preset } from '../../constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';

@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/type-guards.ts",
+  "sourceFile": "packages/plugin/src/helpers/type-guards.ts",
   "module": {
     "name": "type-guards",
     "description": "Runtime type-guard functions shared across rule implementations and AST helpers.",

@@ -14,7 +14,7 @@ import {
   Preset,
   TYPESCRIPT_ESLINT_PARSER,
 } from './constants';
-import { buildRules, ruleMap } from './rule-map';
+import { buildRules, ruleMap } from './rules/support/rule-map';
 import eslintPlugin from './index';
 
 const RULE_NO_EXPORT_ALIAS = `${PLUGIN_NAMESPACE}/no-export-alias`;

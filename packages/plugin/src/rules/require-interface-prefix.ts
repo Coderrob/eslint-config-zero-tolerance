@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { INTERFACE_REQUIRED_PREFIX } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { INTERFACE_REQUIRED_PREFIX } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 const INTERFACE_SECOND_CHARACTER_INDEX = 1;
 const INTERFACE_MINIMUM_LENGTH = 2;

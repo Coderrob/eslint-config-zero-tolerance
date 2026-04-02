@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { requireCleanBarrel } from './require-clean-barrel';
 
 ruleTester.run('require-clean-barrel', requireCleanBarrel, {

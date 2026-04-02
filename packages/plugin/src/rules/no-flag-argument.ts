@@ -16,8 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 type NoFlagArgumentContext = Readonly<TSESLint.RuleContext<'noFlagArgument', []>>;
 
@@ -44,11 +45,7 @@ function checkFunctionNode(context: NoFlagArgumentContext, node: FunctionNode): 
  * @returns Rule visitor map.
  */
 function createNoFlagArgumentListeners(context: NoFlagArgumentContext): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
-    FunctionDeclaration: checkFunctionNode.bind(undefined, context),
-    FunctionExpression: checkFunctionNode.bind(undefined, context),
-  };
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
 /**

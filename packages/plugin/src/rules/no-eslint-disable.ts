@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint } from '@typescript-eslint/utils';
-import { ESLINT_DISABLE_PREFIX } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { ESLINT_DISABLE_PREFIX } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type NoEslintDisableContext = Readonly<TSESLint.RuleContext<'noEslintDisable', []>>;
 

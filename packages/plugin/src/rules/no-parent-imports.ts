@@ -16,10 +16,10 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isParentDirectoryImportPath } from '../import-path-helpers';
-import { CALLEE_REQUIRE } from '../rule-constants';
-import { createRule } from '../rule-factory';
-import { isString } from '../type-guards';
+import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
+import { isString } from '../helpers/type-guards';
+import { CALLEE_REQUIRE } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 const PARENT_PATH_TOKEN = '..';
 

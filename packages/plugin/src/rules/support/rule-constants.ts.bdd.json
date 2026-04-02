@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/rule-constants.ts",
+  "sourceFile": "packages/plugin/src/rules/support/rule-constants.ts",
   "module": {
     "name": "rule-constants",
     "description": "Domain-specific string constants used within individual rule implementations, kept separate from plugin-level constants.",

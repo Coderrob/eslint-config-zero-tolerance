@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noFlagArgument } from './no-flag-argument';
 
 ruleTester.run('no-flag-argument', noFlagArgument, {

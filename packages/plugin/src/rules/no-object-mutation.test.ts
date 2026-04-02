@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noObjectMutation } from './no-object-mutation';
 
 ruleTester.run('no-object-mutation', noObjectMutation, {

@@ -16,8 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { getMemberPropertyName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { getMemberPropertyName } from '../helpers/ast-helpers';
+import { createRule } from './support/rule-factory';
 
 const MUTATING_ARRAY_METHODS = new Set([
   'copyWithin',

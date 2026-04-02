@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noIdenticalExpressions } from './no-identical-expressions';
 
 ruleTester.run('no-identical-expressions', noIdenticalExpressions, {

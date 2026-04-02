@@ -16,22 +16,23 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import {
   type FunctionNode,
   isCallExpressionNode,
   isIdentifierNode,
   isMemberExpressionNode,
   isTestFile,
-} from '../ast-guards';
-import { getMemberPropertyName, resolveFunctionName } from '../ast-helpers';
-import { ANONYMOUS_FUNCTION_NAME } from '../constants';
+} from '../helpers/ast-guards';
+import { getMemberPropertyName, resolveFunctionName } from '../helpers/ast-helpers';
 import {
   getJsdocComment,
   getLineIndentation,
   getTargetNode,
   isStandaloneLineTarget,
-} from '../jsdoc-helpers';
-import { createRule } from '../rule-factory';
+} from '../helpers/jsdoc-helpers';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
 const TEST_CALLBACK_NAMES = new Set([
@@ -140,11 +141,9 @@ function createRequireJsdocAnonymousFunctionsListeners(
     return {};
   }
   const sourceCode = context.sourceCode;
-  return {
-    ArrowFunctionExpression: reportMissingAnonymousJsdoc.bind(undefined, context, sourceCode),
-    FunctionDeclaration: reportMissingAnonymousJsdoc.bind(undefined, context, sourceCode),
-    FunctionExpression: reportMissingAnonymousJsdoc.bind(undefined, context, sourceCode),
-  };
+  return createFunctionNodeListeners(
+    reportMissingAnonymousJsdoc.bind(undefined, context, sourceCode),
+  );
 }
 
 /**

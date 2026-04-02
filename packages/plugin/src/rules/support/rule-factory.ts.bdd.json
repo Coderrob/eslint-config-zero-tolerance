@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/rule-factory.ts",
+  "sourceFile": "packages/plugin/src/rules/support/rule-factory.ts",
   "module": {
     "name": "rule-factory",
     "description": "Shared ESLint RuleCreator factory used by all plugin rules to produce consistently documented rule instances.",

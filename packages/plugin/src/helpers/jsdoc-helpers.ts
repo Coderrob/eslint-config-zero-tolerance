@@ -20,8 +20,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES, AST_TOKEN_TYPES } from '@typescript-eslint/utils';
+import { JSDOC_BLOCK_MARKER } from '../rules/support/rule-constants';
 import { type FunctionNode, isVariableDeclaratorNode } from './ast-guards';
-import { JSDOC_BLOCK_MARKER } from './rule-constants';
 
 const PARENT_OWNED_TARGET_TYPES = new Set([
   AST_NODE_TYPES.ExportDefaultDeclaration,

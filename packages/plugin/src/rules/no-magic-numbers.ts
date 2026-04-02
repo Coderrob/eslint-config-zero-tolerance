@@ -15,10 +15,14 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isTSEnumMemberNode, isUnaryExpressionNode, isVariableDeclaratorNode } from '../ast-guards';
-import { OPERATOR_UNARY_MINUS, VARIABLE_KIND_CONST } from '../rule-constants';
-import { createRule } from '../rule-factory';
-import { isNumber } from '../type-guards';
+import {
+  isTSEnumMemberNode,
+  isUnaryExpressionNode,
+  isVariableDeclaratorNode,
+} from '../helpers/ast-guards';
+import { isNumber } from '../helpers/type-guards';
+import { OPERATOR_UNARY_MINUS, VARIABLE_KIND_CONST } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type NoMagicNumbersContext = Readonly<TSESLint.RuleContext<'noMagicNumbers', []>>;
 

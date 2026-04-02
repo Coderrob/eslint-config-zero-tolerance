@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noInlineTypeImport } from './no-inline-type-import';
 
 ruleTester.run('no-inline-type-import', noInlineTypeImport, {

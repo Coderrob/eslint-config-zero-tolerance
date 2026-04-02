@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noDateNow } from './no-date-now';
 
 ruleTester.run('no-date-now', noDateNow, {

@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isParentDirectoryImportPath, isBarrelFile } from '../import-path-helpers';
-import { createRule } from '../rule-factory';
+import { isParentDirectoryImportPath, isBarrelFile } from '../helpers/import-path-helpers';
+import { createRule } from './support/rule-factory';
 
 type NoReExportContext = Readonly<TSESLint.RuleContext<'noReExport', []>>;
 

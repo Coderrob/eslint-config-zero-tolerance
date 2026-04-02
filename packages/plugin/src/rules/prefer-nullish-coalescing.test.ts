@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { preferNullishCoalescing } from './prefer-nullish-coalescing';
 
 ruleTester.run('prefer-nullish-coalescing', preferNullishCoalescing, {

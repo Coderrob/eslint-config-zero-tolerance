@@ -16,8 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isIdentifierNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import { getFunctionDeclarationName, getFunctionVariableName } from '../helpers/ast-helpers';
+import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 type FunctionNode =
   | TSESTree.ArrowFunctionExpression
@@ -68,12 +69,10 @@ function createRequireReadonlyPropsListeners(
 ): TSESLint.RuleListener {
   const stateStack: IFunctionState[] = [];
   return {
-    ArrowFunctionExpression: onArrowFunctionEnter.bind(undefined, stateStack),
-    'ArrowFunctionExpression:exit': onArrowFunctionExit.bind(undefined, context, stateStack),
-    FunctionDeclaration: onFunctionDeclarationEnter.bind(undefined, stateStack),
-    'FunctionDeclaration:exit': onFunctionDeclarationExit.bind(undefined, context, stateStack),
-    FunctionExpression: onFunctionExpressionEnter.bind(undefined, stateStack),
-    'FunctionExpression:exit': onFunctionExpressionExit.bind(undefined, context, stateStack),
+    ...createFunctionNodeEnterExitListeners(
+      onFunctionEnter.bind(undefined, stateStack),
+      onFunctionExit.bind(undefined, context, stateStack),
+    ),
     ReturnStatement: onReturnStatement.bind(undefined, stateStack),
   };
 }
@@ -103,7 +102,7 @@ function getAssignmentPatternTypeAnnotation(
 function getComponentName(node: FunctionNode): string | null {
   return node.type === AST_NODE_TYPES.FunctionDeclaration
     ? getFunctionDeclarationName(node)
-    : getVariableComponentName(node);
+    : getFunctionVariableName(node);
 }
 
 /**
@@ -116,16 +115,6 @@ function getComponentName(node: FunctionNode): string | null {
  */
 function getFirstPropsParam(params: TSESTree.Parameter[]): TSESTree.Parameter | undefined {
   return params.find(isNotThisParameter);
-}
-
-/**
- * Returns function declaration identifier name when present.
- *
- * @param node - Function declaration node.
- * @returns Declared name, or null.
- */
-function getFunctionDeclarationName(node: TSESTree.FunctionDeclaration): string | null {
-  return node.id?.name ?? null;
 }
 
 /**
@@ -172,32 +161,6 @@ function getSatisfiesWrappedExpression(
     return expression.expression;
   }
   return null;
-}
-
-/**
- * Returns variable-assigned component name for function expressions and arrows.
- *
- * @param node - Function-like node.
- * @returns Component name, or null when unavailable.
- */
-function getVariableComponentName(
-  node: TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
-): string | null {
-  const parent = node.parent;
-  if (parent.type !== AST_NODE_TYPES.VariableDeclarator || !isIdentifierNode(parent.id)) {
-    return null;
-  }
-  return getVariableDeclaratorName(parent.id);
-}
-
-/**
- * Returns declared variable name when parent is an identifier declarator.
- *
- * @param parent - Parent node for a function expression.
- * @returns Variable name.
- */
-function getVariableDeclaratorName(identifier: TSESTree.Identifier): string {
-  return identifier.name;
 }
 
 /**
@@ -369,10 +332,7 @@ function markJsxReturn(stateStack: IFunctionState[], node: TSESTree.ReturnStatem
  * @param stateStack - Active function-state stack.
  * @param node - Arrow function node.
  */
-function onArrowFunctionEnter(
-  stateStack: IFunctionState[],
-  node: TSESTree.ArrowFunctionExpression,
-): void {
+function onFunctionEnter(stateStack: IFunctionState[], node: FunctionNode): void {
   stateStack.push(buildFunctionState(node));
 }
 
@@ -383,66 +343,10 @@ function onArrowFunctionEnter(
  * @param stateStack - Active function-state stack.
  * @param node - Arrow function node.
  */
-function onArrowFunctionExit(
+function onFunctionExit(
   context: RequireReadonlyPropsContext,
   stateStack: IFunctionState[],
-  node: TSESTree.ArrowFunctionExpression,
-): void {
-  popAndReportReadonlyViolation(context, stateStack, node);
-}
-
-/**
- * Handles function declaration entry by pushing a new function state.
- *
- * @param stateStack - Active function-state stack.
- * @param node - Function declaration node.
- */
-function onFunctionDeclarationEnter(
-  stateStack: IFunctionState[],
-  node: TSESTree.FunctionDeclaration,
-): void {
-  stateStack.push(buildFunctionState(node));
-}
-
-/**
- * Handles function declaration exit and reports missing readonly props when needed.
- *
- * @param context - ESLint rule execution context.
- * @param stateStack - Active function-state stack.
- * @param node - Function declaration node.
- */
-function onFunctionDeclarationExit(
-  context: RequireReadonlyPropsContext,
-  stateStack: IFunctionState[],
-  node: TSESTree.FunctionDeclaration,
-): void {
-  popAndReportReadonlyViolation(context, stateStack, node);
-}
-
-/**
- * Handles function expression entry by pushing a new function state.
- *
- * @param stateStack - Active function-state stack.
- * @param node - Function expression node.
- */
-function onFunctionExpressionEnter(
-  stateStack: IFunctionState[],
-  node: TSESTree.FunctionExpression,
-): void {
-  stateStack.push(buildFunctionState(node));
-}
-
-/**
- * Handles function expression exit and reports missing readonly props when needed.
- *
- * @param context - ESLint rule execution context.
- * @param stateStack - Active function-state stack.
- * @param node - Function expression node.
- */
-function onFunctionExpressionExit(
-  context: RequireReadonlyPropsContext,
-  stateStack: IFunctionState[],
-  node: TSESTree.FunctionExpression,
+  node: FunctionNode,
 ): void {
   popAndReportReadonlyViolation(context, stateStack, node);
 }

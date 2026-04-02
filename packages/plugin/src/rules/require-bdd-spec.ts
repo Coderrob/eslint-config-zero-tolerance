@@ -16,8 +16,8 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
-import { isPlainObject, isString } from '../type-guards';
+import { isPlainObject, isString } from '../helpers/type-guards';
+import { createRule } from './support/rule-factory';
 
 export enum RequireBddSpecMessageId {
   InvalidBddSpec = 'invalidBddSpec',

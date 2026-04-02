@@ -1,7 +1,7 @@
 {
   "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/jsdoc-helpers.ts",
+  "sourceFile": "packages/plugin/src/helpers/jsdoc-helpers.ts",
   "module": {
     "name": "jsdoc-helpers",
     "description": "Shared JSDoc-comment helper functions used by JSDoc-enforcement rules.",

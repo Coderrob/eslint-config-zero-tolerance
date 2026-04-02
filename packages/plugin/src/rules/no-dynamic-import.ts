@@ -15,9 +15,9 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isIdentifierNode, isTestFile } from '../ast-guards';
-import { CALLEE_REQUIRE } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { isIdentifierNode, isTestFile } from '../helpers/ast-guards';
+import { CALLEE_REQUIRE } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type NoDynamicImportContext = Readonly<TSESLint.RuleContext<string, []>>;
 

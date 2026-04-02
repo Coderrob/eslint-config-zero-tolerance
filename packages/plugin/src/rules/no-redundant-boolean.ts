@@ -16,9 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from '../rule-constants';
-import { createRule } from '../rule-factory';
-import { isBoolean } from '../type-guards';
+import { isBoolean } from '../helpers/type-guards';
+import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type FixInputs = Readonly<{
   literalValue: boolean;

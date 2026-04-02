@@ -15,7 +15,7 @@
  */
 
 import { CONFIG_NAME_STRICT, PLUGIN_NAMESPACE, Preset } from '../constants';
-import { buildRules } from '../rule-map';
+import { buildRules } from '../rules/support/rule-map';
 import type { IPluginFlatConfig } from './recommended';
 
 /**

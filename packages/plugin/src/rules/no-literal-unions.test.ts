@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noLiteralUnions } from './no-literal-unions';
 
 ruleTester.run('no-literal-unions', noLiteralUnions, {

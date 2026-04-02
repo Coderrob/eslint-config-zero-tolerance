@@ -16,8 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 type NoParameterReassignContext = Readonly<TSESLint.RuleContext<'noParameterReassign', []>>;
 type ParameterScopeStack = Array<Set<string>>;
@@ -69,13 +70,11 @@ function createNoParameterReassignListeners(
 ): TSESLint.RuleListener {
   const parameterStack: ParameterScopeStack = [];
   return {
-    ArrowFunctionExpression: enterFunctionScope.bind(undefined, parameterStack),
-    'ArrowFunctionExpression:exit': exitFunctionScope.bind(undefined, parameterStack),
+    ...createFunctionNodeEnterExitListeners(
+      enterFunctionScope.bind(undefined, parameterStack),
+      exitFunctionScope.bind(undefined, parameterStack),
+    ),
     AssignmentExpression: checkAssignmentExpression.bind(undefined, context, parameterStack),
-    FunctionDeclaration: enterFunctionScope.bind(undefined, parameterStack),
-    'FunctionDeclaration:exit': exitFunctionScope.bind(undefined, parameterStack),
-    FunctionExpression: enterFunctionScope.bind(undefined, parameterStack),
-    'FunctionExpression:exit': exitFunctionScope.bind(undefined, parameterStack),
     UpdateExpression: checkUpdateExpression.bind(undefined, context, parameterStack),
   };
 }
@@ -94,8 +93,9 @@ function enterFunctionScope(parameterStack: ParameterScopeStack, node: FunctionN
  * Pops the current function parameter scope.
  *
  * @param parameterStack - Nested function parameter stack.
+ * @param _node - Function node being exited.
  */
-function exitFunctionScope(parameterStack: ParameterScopeStack): void {
+function exitFunctionScope(parameterStack: ParameterScopeStack, _node: FunctionNode): void {
   parameterStack.pop();
 }
 

@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { requireTestDescriptionStyle } from './require-test-description-style';
 
 ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {

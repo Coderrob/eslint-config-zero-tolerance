@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noRedundantBoolean } from './no-redundant-boolean';
 
 ruleTester.run('no-redundant-boolean', noRedundantBoolean, {

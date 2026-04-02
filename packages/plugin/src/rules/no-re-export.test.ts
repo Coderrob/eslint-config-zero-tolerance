@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noReExport } from './no-re-export';
 
 ruleTester.run('no-re-export', noReExport, {

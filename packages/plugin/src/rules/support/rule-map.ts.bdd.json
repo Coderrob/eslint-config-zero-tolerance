@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/rule-map.ts",
+  "sourceFile": "packages/plugin/src/rules/support/rule-map.ts",
   "module": {
     "name": "rule-map",
     "description": "Builds the canonical plugin rule map and exports preset-aware rule configurations for consumption by flat and legacy config builders.",

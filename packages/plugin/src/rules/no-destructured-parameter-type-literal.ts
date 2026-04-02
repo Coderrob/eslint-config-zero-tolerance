@@ -16,9 +16,10 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { type FunctionNode } from '../ast-guards';
-import { getVisitorChildNodes } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { type FunctionNode } from '../helpers/ast-guards';
+import { getVisitorChildNodes } from '../helpers/ast-helpers';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 type NoDestructuredParameterTypeLiteralContext = Readonly<
   TSESLint.RuleContext<'noDestructuredParameterTypeLiteral', []>
@@ -48,11 +49,7 @@ function checkFunctionNode(
 function createNoDestructuredParameterTypeLiteralListeners(
   context: NoDestructuredParameterTypeLiteralContext,
 ): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
-    FunctionDeclaration: checkFunctionNode.bind(undefined, context),
-    FunctionExpression: checkFunctionNode.bind(undefined, context),
-  };
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
 /**

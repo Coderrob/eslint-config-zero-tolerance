@@ -15,10 +15,11 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { type FunctionNode, isBlockStatementNode } from '../ast-guards';
-import { getOptionMaxValue, resolveFunctionName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
-import { isNumber } from '../type-guards';
+import { type FunctionNode, isBlockStatementNode } from '../helpers/ast-guards';
+import { getOptionMaxValue, resolveFunctionName } from '../helpers/ast-helpers';
+import { isNumber } from '../helpers/type-guards';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const DEFAULT_MAX_FUNCTION_LINES = 30;
 
@@ -32,24 +33,6 @@ type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>
  */
 function countBodyLines(body: TSESTree.BlockStatement): number {
   return body.loc.end.line - body.loc.start.line + 1;
-}
-
-/**
- * Creates listeners for all function-like nodes.
- *
- * @param context - ESLint rule execution context.
- * @param maxLines - Configured maximum line count.
- * @returns Rule listeners.
- */
-function createFunctionListeners(
-  context: MaxFunctionLinesContext,
-  maxLines: number,
-): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-    FunctionDeclaration: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-    FunctionExpression: reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
-  };
 }
 
 /**
@@ -125,7 +108,9 @@ function reportIfFunctionExceedsLimit(
  */
 function resolveListeners(context: MaxFunctionLinesContext): TSESLint.RuleListener {
   const maxLines = getConfiguredMaxValue(context.options);
-  return createFunctionListeners(context, maxLines);
+  return createFunctionNodeListeners(
+    reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),
+  );
 }
 
 /**

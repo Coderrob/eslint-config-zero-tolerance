@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { requireOptionalChaining } from './require-optional-chaining';
 
 ruleTester.run('require-optional-chaining', requireOptionalChaining, {

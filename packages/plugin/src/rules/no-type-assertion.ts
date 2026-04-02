@@ -16,9 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isTestFile } from '../ast-guards';
-import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { isTestFile } from '../helpers/ast-guards';
+import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type NoTypeAssertionContext = Readonly<TSESLint.RuleContext<'noTypeAssertion', []>>;
 

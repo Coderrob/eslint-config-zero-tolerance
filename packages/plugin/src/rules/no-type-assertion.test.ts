@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noTypeAssertion } from './no-type-assertion';
 
 ruleTester.run('no-type-assertion', noTypeAssertion, {

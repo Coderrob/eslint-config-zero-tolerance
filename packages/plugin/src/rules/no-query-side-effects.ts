@@ -16,9 +16,10 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { type FunctionNode } from '../ast-guards';
-import { getMemberPropertyName, resolveFunctionName } from '../ast-helpers';
-import { createRule } from '../rule-factory';
+import { type FunctionNode } from '../helpers/ast-guards';
+import { getMemberPropertyName, resolveFunctionName } from '../helpers/ast-helpers';
+import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const DELETE_OPERATOR = 'delete';
 const UPDATE_KIND = 'update';
@@ -153,12 +154,10 @@ function createNoQuerySideEffectsListeners(
 ): TSESLint.RuleListener {
   const functionStack: QueryScopeStack = [];
   return {
-    FunctionDeclaration: enterFunctionScope.bind(undefined, functionStack),
-    FunctionExpression: enterFunctionScope.bind(undefined, functionStack),
-    ArrowFunctionExpression: enterFunctionScope.bind(undefined, functionStack),
-    'FunctionDeclaration:exit': exitFunctionScope.bind(undefined, functionStack),
-    'FunctionExpression:exit': exitFunctionScope.bind(undefined, functionStack),
-    'ArrowFunctionExpression:exit': exitFunctionScope.bind(undefined, functionStack),
+    ...createFunctionNodeEnterExitListeners(
+      enterFunctionScope.bind(undefined, functionStack),
+      exitFunctionScope.bind(undefined, functionStack),
+    ),
     AssignmentExpression: createAssignmentVisitor(context, functionStack),
     CallExpression: createCallVisitor(context, functionStack),
     UnaryExpression: createUnaryVisitor(context, functionStack),
@@ -212,8 +211,9 @@ function enterFunctionScope(functionStack: QueryScopeStack, node: FunctionNode):
  * Pops active function scope metadata.
  *
  * @param functionStack - Function scope stack.
+ * @param _node - Function node being exited.
  */
-function exitFunctionScope(functionStack: QueryScopeStack): void {
+function exitFunctionScope(functionStack: QueryScopeStack, _node: FunctionNode): void {
   functionStack.pop();
 }
 

@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noQuerySideEffects } from './no-query-side-effects';
 
 ruleTester.run('no-query-side-effects', noQuerySideEffects, {

@@ -16,8 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const DESTRUCTURED_PARAMETER_NAME = 'destructured parameter';
 const READONLY_OPERATOR = 'readonly';
@@ -49,11 +50,7 @@ function checkFunctionNode(context: PreferReadonlyParametersContext, node: Funct
 function createPreferReadonlyParametersListeners(
   context: PreferReadonlyParametersContext,
 ): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
-    FunctionDeclaration: checkFunctionNode.bind(undefined, context),
-    FunctionExpression: checkFunctionNode.bind(undefined, context),
-  };
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
 /**
@@ -66,13 +63,9 @@ function createPreferReadonlyParametersListeners(
  */
 function createReadonlyParameterFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  param: TSESTree.Parameter,
+  typeNode: TSESTree.TypeNode,
   fixer: TSESLint.RuleFixer,
 ): TSESLint.RuleFix | null {
-  const typeNode = getParameterTypeNode(param);
-  if (typeNode === null) {
-    return null;
-  }
   const replacementType = getReadonlyReplacementTypeText(sourceCode, typeNode);
   if (replacementType === null) {
     return null;
@@ -180,10 +173,9 @@ function getReadonlyReplacementTypeText(
  * @param param - Function parameter node.
  * @returns Type node when present.
  */
-function getSimpleAnnotatedParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
-  if (!('typeAnnotation' in param)) {
-    return null;
-  }
+function getSimpleAnnotatedParameterTypeNode(
+  param: Exclude<TSESTree.Parameter, TSESTree.AssignmentPattern | TSESTree.TSParameterProperty>,
+): TSESTree.TypeNode | null {
   return param.typeAnnotation?.typeAnnotation ?? null;
 }
 
@@ -337,7 +329,7 @@ function reportIfMutableParameter(
     node: param,
     messageId: 'preferReadonlyParameter',
     data: { name: getParameterName(param) },
-    fix: createReadonlyParameterFix.bind(undefined, context.sourceCode, param),
+    fix: createReadonlyParameterFix.bind(undefined, context.sourceCode, typeNode),
   });
 }
 

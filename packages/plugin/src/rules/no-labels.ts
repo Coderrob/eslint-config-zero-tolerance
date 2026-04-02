@@ -15,7 +15,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { createRule } from '../rule-factory';
+import { createRule } from './support/rule-factory';
 
 type NoLabelsContext = Readonly<TSESLint.RuleContext<'noLabels', []>>;
 

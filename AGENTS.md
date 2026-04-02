@@ -64,7 +64,7 @@ eslint-config-zero-tolerance/
 - Use `strict` TypeScript (`"strict": true` in `tsconfig.json`).
 - Prefer explicit types over inferred ones on public function signatures.
 - Never use `any` except where required by ESLint's internal APIs (e.g., rule tester casts, plugin registration).
-- Use the shared `createRule` helper from `packages/plugin/src/rule-factory.ts` for all custom rules.
+- Use the shared `createRule` helper from `packages/plugin/src/rules/support/rule-factory.ts` for all custom rules.
 
 ### JSDoc
 

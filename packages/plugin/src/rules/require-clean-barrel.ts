@@ -16,8 +16,8 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isBarrelFile } from '../import-path-helpers';
-import { createRule } from '../rule-factory';
+import { isBarrelFile } from '../helpers/import-path-helpers';
+import { createRule } from './support/rule-factory';
 
 type RequireCleanBarrelContext = Readonly<TSESLint.RuleContext<'cleanBarrelOnlyReExports', []>>;
 

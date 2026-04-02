@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noDestructuredParameterTypeLiteral } from './no-destructured-parameter-type-literal';
 
 ruleTester.run('no-destructured-parameter-type-literal', noDestructuredParameterTypeLiteral, {

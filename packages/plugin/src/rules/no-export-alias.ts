@@ -15,8 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isIdentifierNode } from '../ast-guards';
-import { createRule } from '../rule-factory';
+import { isIdentifierNode } from '../helpers/ast-guards';
+import { createRule } from './support/rule-factory';
 
 type NoExportAliasContext = Readonly<TSESLint.RuleContext<'noExportAlias', []>>;
 type ExportAliasInfo = { local: string; alias: string };

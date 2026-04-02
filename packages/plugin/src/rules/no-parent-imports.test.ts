@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noParentImports } from './no-parent-imports';
 
 ruleTester.run('no-parent-imports', noParentImports, {

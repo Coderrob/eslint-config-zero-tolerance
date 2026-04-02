@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noDynamicImport } from './no-dynamic-import';
 
 ruleTester.run('no-dynamic-import', noDynamicImport, {

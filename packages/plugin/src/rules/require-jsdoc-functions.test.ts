@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { RequireJsdocFunctionsMessageId, requireJsdocFunctions } from './require-jsdoc-functions';
 
 ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {

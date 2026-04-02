@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/ast-helpers.ts",
+  "sourceFile": "packages/plugin/src/helpers/ast-helpers.ts",
   "module": {
     "name": "ast-helpers",
     "description": "Reusable AST helper functions shared across multiple rule implementations.",

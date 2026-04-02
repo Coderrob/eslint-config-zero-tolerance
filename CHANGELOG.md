@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Coverage cleanup**: Simplified unreachable defensive branches in `prefer-readonly-parameters`, `no-magic-strings`, and `no-literal-unions` so the rules keep the same behavior while their remaining conditional paths are fully exercised by tests.
+- **Helper structure**: Grouped shared AST, JSDoc, import-path, type-guard, rule-support, and test-helper modules into dedicated `helpers/`, `rules/support/`, and `testing/` folders to make reuse points easier to locate and maintain.
+- **Rule helper reuse**: Extracted shared function-node listener builders into `rules/support/function-listeners.ts` and rewired multiple rules to reuse them, while also replacing duplicated function-name resolution in `require-jsdoc-functions` and `require-readonly-props` with the existing shared AST helpers.
+
 ## [1.2.1] - 2026-04-01
 
 ### Added

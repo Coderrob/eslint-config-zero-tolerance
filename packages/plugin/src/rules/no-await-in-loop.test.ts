@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { noAwaitInLoop } from './no-await-in-loop';
 
 ruleTester.run('no-await-in-loop', noAwaitInLoop, {

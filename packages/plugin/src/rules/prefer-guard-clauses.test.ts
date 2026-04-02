@@ -1,4 +1,4 @@
-import { ruleTester } from '../test-helper';
+import { ruleTester } from '../testing/test-helper';
 import { preferGuardClauses } from './prefer-guard-clauses';
 
 ruleTester.run('prefer-guard-clauses', preferGuardClauses, {

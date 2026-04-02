@@ -1,5 +1,5 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
-import { RULE_CREATOR_URL } from './constants';
+import { RULE_CREATOR_URL } from '../../constants';
 
 /**
  * Builds the canonical documentation URL for a rule.

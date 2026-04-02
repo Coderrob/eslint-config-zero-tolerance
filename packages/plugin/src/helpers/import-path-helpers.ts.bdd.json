@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/import-path-helpers.ts",
+  "sourceFile": "packages/plugin/src/helpers/import-path-helpers.ts",
   "module": {
     "name": "import-path-helpers",
     "description": "Helper functions for evaluating import path characteristics used by path-based rules.",

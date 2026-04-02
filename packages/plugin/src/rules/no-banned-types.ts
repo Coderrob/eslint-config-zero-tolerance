@@ -15,9 +15,9 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isIdentifierNode } from '../ast-guards';
-import { RETURN_TYPE_NAME } from '../rule-constants';
-import { createRule } from '../rule-factory';
+import { isIdentifierNode } from '../helpers/ast-guards';
+import { RETURN_TYPE_NAME } from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type NoBannedTypesContext = Readonly<TSESLint.RuleContext<string, []>>;
 

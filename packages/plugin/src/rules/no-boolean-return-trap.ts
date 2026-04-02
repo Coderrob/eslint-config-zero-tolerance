@@ -16,10 +16,11 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../ast-guards';
-import { resolveFunctionName } from '../ast-helpers';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
-import { createRule } from '../rule-factory';
+import type { FunctionNode } from '../helpers/ast-guards';
+import { resolveFunctionName } from '../helpers/ast-helpers';
+import { createFunctionNodeListeners } from './support/function-listeners';
+import { createRule } from './support/rule-factory';
 
 const PREDICATE_NAME_PATTERN = /^(is|has|can|should)[A-Z_]/;
 const PROMISE_IDENTIFIER = 'Promise';
@@ -57,11 +58,7 @@ function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNo
 function createNoBooleanReturnTrapListeners(
   context: NoBooleanReturnTrapContext,
 ): TSESLint.RuleListener {
-  return {
-    ArrowFunctionExpression: checkFunctionNode.bind(undefined, context),
-    FunctionDeclaration: checkFunctionNode.bind(undefined, context),
-    FunctionExpression: checkFunctionNode.bind(undefined, context),
-  };
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
 /**

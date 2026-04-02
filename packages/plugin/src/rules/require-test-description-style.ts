@@ -16,15 +16,15 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { isIdentifierNode, isMemberExpressionNode } from '../ast-guards';
+import { isIdentifierNode, isMemberExpressionNode } from '../helpers/ast-guards';
+import { isBoolean, isPlainObject, isString } from '../helpers/type-guards';
 import {
   TEST_DESCRIPTION_PREFIX,
   TEST_FUNCTION_IT,
   TEST_FUNCTION_TEST,
   TEST_METHOD_SKIP,
-} from '../rule-constants';
-import { createRule } from '../rule-factory';
-import { isBoolean, isPlainObject, isString } from '../type-guards';
+} from './support/rule-constants';
+import { createRule } from './support/rule-factory';
 
 type RuleOption = Readonly<{
   ignoreSkip?: boolean;

@@ -1,7 +1,7 @@
 {
-  "$schema": "../../../bdd-spec.schema.json",
+  "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/ast-guards.ts",
+  "sourceFile": "packages/plugin/src/helpers/ast-guards.ts",
   "module": {
     "name": "ast-guards",
     "description": "AST node type guards and related type aliases used across multiple rule implementations.",

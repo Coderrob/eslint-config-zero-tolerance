@@ -19,6 +19,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import {
   type FunctionNode,
   isFunctionDeclarationNode,
@@ -27,7 +28,6 @@ import {
   isNodeLike,
   isVariableDeclaratorNode,
 } from './ast-guards';
-import { ANONYMOUS_FUNCTION_NAME } from './constants';
 import { isPlainObject, isString } from './type-guards';
 
 /**
