@@ -1,4 +1,4 @@
-# no-parent-imports
+# no-barrel-parent-imports
 
 Disallow parent-directory traversal inside barrel files.
 
@@ -8,8 +8,8 @@ Disallow parent-directory traversal inside barrel files.
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
 | **Fixable**     | No           |
-| **Recommended** | `off`        |
-| **Strict**      | `off`        |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -23,6 +23,11 @@ This rule applies only when the current file is a barrel file (`index.*`). In th
 - `import('...')`
 - `require('...')`
 - TypeScript `import x = require('...')`
+
+## Notes
+
+- The rule applies only to single-extension barrel files such as `index.ts`, `index.js`, and `index.mts`.
+- Double-extension files such as `index.d.ts`, `index.test.ts`, and `index.spec.js` are ignored.
 
 ## Examples
 

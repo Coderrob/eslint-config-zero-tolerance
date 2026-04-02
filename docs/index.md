@@ -17,7 +17,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 - **Type safety** - ban `as` assertions, non-null `!` operators, literal union types, banned utility types, and inline object type literals on destructured parameters
 - **Code quality** - limit function length and parameter count, eliminate magic numbers and strings
 - **Error handling** - require `new Error()` in throw statements, disallow empty catch blocks
-- **Import hygiene** - keep barrel files clean, ban parent-relative imports inside barrel files, dynamic imports, and export aliases
+- **Import hygiene** - keep barrel files clean, ban parent-relative imports inside barrel files, optionally protect folders such as `src` from parent-relative access, ban dynamic imports, and prevent export aliases
 - **Bug prevention** - flag identical expressions, redundant boolean comparisons, shortcut-return opportunities, and `await` inside loops
 
 ## Packages

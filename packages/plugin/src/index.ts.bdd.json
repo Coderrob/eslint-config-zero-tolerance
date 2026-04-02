@@ -45,6 +45,18 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['no-destructured-parameter-type-literal'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-parent-internal-access as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-parent-internal-access'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-barrel-parent-imports as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-barrel-parent-imports'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

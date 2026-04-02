@@ -24,7 +24,7 @@ import { createRule } from './support/rule-factory';
 
 const PARENT_PATH_TOKEN = '..';
 
-type NoParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImport', []>>;
+type NoBarrelParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImport', []>>;
 
 /**
  * Checks require calls for parent-directory import paths.
@@ -32,7 +32,10 @@ type NoParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImport', []
  * @param context - ESLint rule execution context.
  * @param node - Call expression node.
  */
-function checkCallExpression(context: NoParentImportsContext, node: TSESTree.CallExpression): void {
+function checkCallExpression(
+  context: NoBarrelParentImportsContext,
+  node: TSESTree.CallExpression,
+): void {
   if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
   }
@@ -50,7 +53,7 @@ function checkCallExpression(context: NoParentImportsContext, node: TSESTree.Cal
  * @param node - Import declaration node.
  */
 function checkImportDeclaration(
-  context: NoParentImportsContext,
+  context: NoBarrelParentImportsContext,
   node: TSESTree.ImportDeclaration,
 ): void {
   reportIfParentImport(context, node.source, node.source.value);
@@ -63,7 +66,7 @@ function checkImportDeclaration(
  * @param node - Import expression node.
  */
 function checkImportExpression(
-  context: NoParentImportsContext,
+  context: NoBarrelParentImportsContext,
   node: TSESTree.ImportExpression,
 ): void {
   const importPath = getLiteralStringNodeValue(node.source);
@@ -79,7 +82,7 @@ function checkImportExpression(
  * @param node - TS import-equals declaration node.
  */
 function checkTsImportEqualsDeclaration(
-  context: NoParentImportsContext,
+  context: NoBarrelParentImportsContext,
   node: TSESTree.TSImportEqualsDeclaration,
 ): void {
   const moduleReference = getExternalModuleReference(node);
@@ -95,7 +98,9 @@ function checkTsImportEqualsDeclaration(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoParentImportsListeners(context: NoParentImportsContext): TSESLint.RuleListener {
+function createNoBarrelParentImportsListeners(
+  context: NoBarrelParentImportsContext,
+): TSESLint.RuleListener {
   if (!isBarrelFile(context.filename)) {
     return {};
   }
@@ -130,7 +135,7 @@ function getExternalModuleReference(
  * @param importPath - The module path to validate.
  */
 function reportIfParentImport(
-  context: NoParentImportsContext,
+  context: NoBarrelParentImportsContext,
   node: TSESTree.Node,
   importPath: string,
 ): void {
@@ -146,8 +151,8 @@ function reportIfParentImport(
 /**
  * ESLint rule that disallows parent-directory traversal in barrel-file import patterns.
  */
-export const noParentImports = createRule({
-  name: 'no-parent-imports',
+export const noBarrelParentImports = createRule({
+  name: 'no-barrel-parent-imports',
   meta: {
     type: 'suggestion',
     docs: {
@@ -160,7 +165,7 @@ export const noParentImports = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create: createNoParentImportsListeners,
+  create: createNoBarrelParentImportsListeners,
 });
 
-export default noParentImports;
+export default noBarrelParentImports;

@@ -1,7 +1,7 @@
 import { ruleTester } from '../testing/test-helper';
-import { noParentImports } from './no-parent-imports';
+import { noBarrelParentImports } from './no-barrel-parent-imports';
 
-ruleTester.run('no-parent-imports', noParentImports, {
+ruleTester.run('no-barrel-parent-imports', noBarrelParentImports, {
   valid: [
     {
       name: 'should allow external package imports',
@@ -98,6 +98,11 @@ ruleTester.run('no-parent-imports', noParentImports, {
       name: 'should allow import-equals from parent paths in non-barrel files',
       filename: '/src/feature.ts',
       code: "import parent = require('../parent');",
+    },
+    {
+      name: 'should allow parent directory import declarations in double-extension index-like files',
+      filename: '/src/index.test.ts',
+      code: "import parent from '../parent';",
     },
   ],
   invalid: [

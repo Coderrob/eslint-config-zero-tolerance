@@ -1,0 +1,82 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-parent-internal-access.ts",
+  "module": {
+    "name": "no-parent-internal-access",
+    "description": "Disallow parent-relative access into protected internal directories such as src.",
+    "exports": ["noParentInternalAccess"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted parent-relative paths",
+      "scenarios": [
+        {
+          "name": "should allow parent imports into non-protected directories",
+          "given": "import { foo } from '../shared/foo' with default options",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow parent imports when the protected directory name is nested later in the path",
+          "given": "import { foo } from '../shared/src/foo' with default options",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow protected-directory paths when the configured directory list does not include that name",
+          "given": "import { foo } from '../src/foo' with protectedDirectories set to ['internal']",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore protected-directory names that appear only after the first traversed segment",
+          "given": "import { foo } from '../shared/src/foo' with protectedDirectories set to ['src']",
+          "when": "the rule evaluates the import declaration",
+          "then": "the path is matched only against the first non-parent segment and no src-specific violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Forbidden protected parent paths",
+      "scenarios": [
+        {
+          "name": "should report an import declaration that reaches into src through a parent path",
+          "given": "import { foo } from '../src/foo' with default options",
+          "when": "the rule evaluates the import declaration",
+          "then": "a protectedParentImport violation is reported"
+        },
+        {
+          "name": "should report a dynamic import that reaches into src through a parent path",
+          "given": "await import('../../src/foo') with default options",
+          "when": "the rule evaluates the import expression",
+          "then": "a protectedParentImport violation is reported"
+        },
+        {
+          "name": "should report a require call that reaches into a configured protected directory",
+          "given": "const foo = require('../internal/foo') with protectedDirectories set to ['internal']",
+          "when": "the rule evaluates the require call",
+          "then": "a protectedParentImport violation is reported"
+        },
+        {
+          "name": "should report a direct re-export that reaches into a protected directory through a parent path",
+          "given": "export { foo } from '../app/foo' with protectedDirectories set to ['app']",
+          "when": "the rule evaluates the export declaration",
+          "then": "a protectedParentImport violation is reported"
+        },
+        {
+          "name": "should report an import-equals declaration that reaches into src through a parent path",
+          "given": "import foo = require('../src/foo') with default options",
+          "when": "the rule evaluates the import-equals declaration",
+          "then": "a protectedParentImport violation is reported"
+        },
+        {
+          "name": "should trim configured protected directory names before matching",
+          "given": "import { foo } from '../src/foo' with protectedDirectories set to ['  src  ', 'src', '   ']",
+          "when": "the rule resolves options and evaluates the import declaration",
+          "then": "empty entries are ignored, duplicate entries collapse, and a protectedParentImport violation is reported"
+        }
+      ]
+    }
+  ]
+}

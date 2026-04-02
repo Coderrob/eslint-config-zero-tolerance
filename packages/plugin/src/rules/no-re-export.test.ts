@@ -142,5 +142,15 @@ ruleTester.run('no-re-export', noReExport, {
       name: 'should disallow pass-through TypeScript export assignment of a parent import',
       errors: [{ messageId: 'noReExport' }],
     },
+    {
+      code: "export { foo };\nimport { foo } from '../sibling';",
+      name: 'should disallow pass-through named export of a parent import declared later in the file',
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "export default parentDefault;\nimport parentDefault from '../../parent';",
+      name: 'should disallow pass-through default export of a parent import declared later in the file',
+      errors: [{ messageId: 'noReExport' }],
+    },
   ],
 });

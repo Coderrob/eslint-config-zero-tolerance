@@ -1,11 +1,11 @@
 {
   "$schema": "../../../../bdd-spec.schema.json",
   "schemaVersion": "1.0.0",
-  "sourceFile": "packages/plugin/src/rules/no-parent-imports.ts",
+  "sourceFile": "packages/plugin/src/rules/no-barrel-parent-imports.ts",
   "module": {
-    "name": "no-parent-imports",
-    "description": "Disallow parent-directory imports ('..' and '../*') inside barrel files ('index.*') across import declarations, import expressions, require calls, and import-equals declarations.",
-    "exports": ["noParentImports"]
+    "name": "no-barrel-parent-imports",
+    "description": "Disallow parent-directory imports ('..' and '../*') inside single-extension barrel files such as index.ts and index.js across import declarations, import expressions, require calls, and import-equals declarations.",
+    "exports": ["noBarrelParentImports"]
   },
   "specifications": [
     {
@@ -28,6 +28,12 @@
           "given": "await import('../module') inside src/feature.ts",
           "when": "the rule evaluates the import expression",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow a parent import in a double-extension index-like file",
+          "given": "import { foo } from '../sibling' inside src/index.test.ts",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported because only single-extension index files are treated as barrels"
         }
       ]
     },
@@ -38,19 +44,19 @@
           "name": "should report an import using '../' prefix in a barrel file",
           "given": "import { Bar } from '../bar' inside src/index.ts",
           "when": "the rule evaluates the import declaration",
-          "then": "a noParentImports violation is reported"
+          "then": "a noParentImport violation is reported"
         },
         {
           "name": "should report the bare '..' parent path in a barrel file",
           "given": "import something from '..' inside src/index.ts",
           "when": "the rule evaluates the import declaration",
-          "then": "a noParentImports violation is reported"
+          "then": "a noParentImport violation is reported"
         },
         {
           "name": "should report a dynamic import() with a parent path in a barrel file",
           "given": "await import('../module') inside src/index.ts",
           "when": "the rule evaluates the import expression",
-          "then": "a noParentImports violation is reported"
+          "then": "a noParentImport violation is reported"
         },
         {
           "name": "should report a require() call with a parent path in a barrel file",

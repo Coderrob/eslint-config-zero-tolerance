@@ -26,11 +26,14 @@ const RULE_REQUIRE_BDD_SPEC = `${PLUGIN_NAMESPACE}/require-bdd-spec`;
 const RULE_REQUIRE_CLEAN_BARREL = `${PLUGIN_NAMESPACE}/require-clean-barrel`;
 const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
+const RULE_NO_PARENT_INTERNAL_ACCESS = `${PLUGIN_NAMESPACE}/no-parent-internal-access`;
 const RULE_KEY_SORT_IMPORTS = 'sort-imports';
 const RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL = 'no-destructured-parameter-type-literal';
 const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
+const RULE_KEY_NO_BARREL_PARENT_IMPORTS = 'no-barrel-parent-imports';
+const RULE_KEY_NO_PARENT_INTERNAL_ACCESS = 'no-parent-internal-access';
 const RULE_KEY_REQUIRE_CLEAN_BARREL = 'require-clean-barrel';
-const RULE_NO_PARENT_IMPORTS = `${PLUGIN_NAMESPACE}/no-parent-imports`;
+const RULE_NO_BARREL_PARENT_IMPORTS = `${PLUGIN_NAMESPACE}/no-barrel-parent-imports`;
 
 describe('plugin wiring', () => {
   it('should build prefixed recommended and strict rule maps', () => {
@@ -53,8 +56,10 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(strictRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
-    expect(recommendedRules[RULE_NO_PARENT_IMPORTS]).toBe('warn');
-    expect(strictRules[RULE_NO_PARENT_IMPORTS]).toBe('error');
+    expect(recommendedRules[RULE_NO_BARREL_PARENT_IMPORTS]).toBe('warn');
+    expect(strictRules[RULE_NO_BARREL_PARENT_IMPORTS]).toBe('error');
+    expect(recommendedRules[RULE_NO_PARENT_INTERNAL_ACCESS]).toBe('off');
+    expect(strictRules[RULE_NO_PARENT_INTERNAL_ACCESS]).toBe('off');
     expect(Object.keys(recommendedRules)).toHaveLength(Object.keys(ruleMap).length);
     expect(Object.keys(strictRules)).toHaveLength(Object.keys(ruleMap).length);
   });
@@ -84,6 +89,8 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.rules?.[RULE_KEY_SORT_IMPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_LITERAL_UNIONS]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_NO_BARREL_PARENT_IMPORTS]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_NO_PARENT_INTERNAL_ACCESS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_CLEAN_BARREL]).toBeDefined();
     expect(eslintPlugin.configs.recommended.name).toBe(CONFIG_NAME_RECOMMENDED);
     expect(eslintPlugin.configs.strict.name).toBe(CONFIG_NAME_STRICT);

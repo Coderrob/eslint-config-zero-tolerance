@@ -47,6 +47,12 @@
           "then": "a noReExport violation is reported"
         },
         {
+          "name": "should report a pass-through named export of a parent import regardless of statement ordering",
+          "given": "export { bar } followed later by import { bar } from '../bar' in a non-index source file",
+          "when": "the rule precomputes parent-imported bindings from the full program and evaluates the export declaration",
+          "then": "a noReExport violation is reported"
+        },
+        {
           "name": "should report a pass-through default export of a parent import in a non-barrel file",
           "given": "import bar from '../../bar' followed by export default bar in a non-index source file",
           "when": "the rule evaluates the export declaration",

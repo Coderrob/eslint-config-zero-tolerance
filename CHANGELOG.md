@@ -10,10 +10,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.2.2] - 2026-04-02
 
+### Added
+
+- **`no-parent-internal-access` rule**: Added a new opt-in rule that blocks parent-relative access into protected internal directories such as `src`, with configurable directory names for stricter package-boundary enforcement. Matching is limited to the first concrete directory reached after `..` traversal, and configured directory names are trimmed with empty entries ignored.
+
+### Changed
+
+- **`no-barrel-parent-imports` rule**: Renamed the barrel-only parent-import rule from `no-parent-imports` so its public name reflects that it only applies to single-extension `index.*` barrel files and not to general parent-relative imports in ordinary modules.
+
 ### Fixed
 
+- **`no-re-export` rule**: Removed statement-order dependence for pass-through parent-import exports by precomputing parent-imported bindings from the full module, so exports are still reported even when they appear before the corresponding parent import.
+- **`no-barrel-parent-imports` documentation**: Clarified that barrel detection is limited to single-extension `index.*` files such as `index.ts` and `index.js`, while double-extension files like `index.d.ts` and `index.test.ts` remain ignored, and added regression coverage for that behavior.
 - **`no-parent-imports` rule**: Restored barrel-only scope so `..` and `../*` imports are ignored in non-`index.*` files and reported only when the importing file is a barrel.
-- **`no-re-export` rule**: Preserved parent-boundary protection after the `no-parent-imports` rollback by reporting pass-through exports of bindings imported from parent or grandparent paths in non-barrel files.
+- **`no-re-export` rule**: Preserved parent-boundary protection after the barrel-only parent-import rollback by reporting pass-through exports of bindings imported from parent or grandparent paths in non-barrel files.
 
 ## [1.2.1] - 2026-04-02
 
