@@ -1,11 +1,12 @@
 import {
-  getIdentifierName,
   getFunctionDeclarationName,
-  getFunctionVariableName,
   getFunctionMethodName,
-  resolveFunctionName,
+  getFunctionVariableName,
+  getIdentifierName,
   getMemberPropertyName,
   getMappedMemberPropertyName,
+  getVisitorChildNodes,
+  resolveFunctionName,
 } from './ast-helpers';
 
 describe('ast-helpers', () => {
@@ -189,6 +190,39 @@ describe('ast-helpers', () => {
           mockImplementation: 'mockImplementationOnce',
         }),
       ).toBeNull();
+    });
+  });
+
+  describe('getVisitorChildNodes', () => {
+    it('should return child nodes for configured visitor keys', () => {
+      const sourceCode = {
+        visitorKeys: {
+          BinaryExpression: ['left', 'right', 'extras'],
+        },
+      } as any;
+      const left = { type: 'Identifier', name: 'left' };
+      const right = { type: 'Identifier', name: 'right' };
+      const extra = { type: 'Literal', value: 1 };
+      const node = {
+        type: 'BinaryExpression',
+        left,
+        right,
+        extras: [extra, 'not-a-node'],
+      } as any;
+
+      expect(getVisitorChildNodes(node, sourceCode)).toEqual([left, right, extra]);
+    });
+
+    it('should return an empty array when visitor keys are missing for the node type', () => {
+      const sourceCode = {
+        visitorKeys: {},
+      } as any;
+      const node = {
+        type: 'UnknownExpression',
+        child: { type: 'Identifier', name: 'value' },
+      } as any;
+
+      expect(getVisitorChildNodes(node, sourceCode)).toEqual([]);
     });
   });
 });

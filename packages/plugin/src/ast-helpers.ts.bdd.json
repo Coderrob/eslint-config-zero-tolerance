@@ -13,7 +13,6 @@
       "getMappedMemberPropertyName",
       "getMemberPropertyName",
       "getOptionMaxValue",
-      "getVisitorArrayNodes",
       "getVisitorChildNodes",
       "resolveFunctionName"
     ]
@@ -146,6 +145,46 @@
       ]
     },
     {
+      "feature": "getOptionMaxValue",
+      "scenarios": [
+        {
+          "name": "should return the max property from a plain option object",
+          "given": "a plain object with a max property",
+          "when": "getOptionMaxValue is called",
+          "then": "returns the value of the max property"
+        },
+        {
+          "name": "should return undefined when the option is not a plain object",
+          "given": "a non-object value such as a string or number",
+          "when": "getOptionMaxValue is called",
+          "then": "returns undefined"
+        },
+        {
+          "name": "should return undefined when the option is null or undefined",
+          "given": "null or undefined as the option",
+          "when": "getOptionMaxValue is called",
+          "then": "returns undefined"
+        }
+      ]
+    },
+    {
+      "feature": "getVisitorChildNodes",
+      "scenarios": [
+        {
+          "name": "should return traversable child nodes for configured visitor keys",
+          "given": "an AST node type with visitor keys that point to child nodes and arrays of child nodes",
+          "when": "getVisitorChildNodes is called",
+          "then": "returns the flattened child-node list in visitor-key order"
+        },
+        {
+          "name": "should return an empty array when visitor keys are missing for the node type",
+          "given": "an AST node whose type is absent from sourceCode.visitorKeys",
+          "when": "getVisitorChildNodes is called",
+          "then": "returns an empty array without throwing"
+        }
+      ]
+    },
+    {
       "feature": "resolveFunctionName",
       "scenarios": [
         {
@@ -171,69 +210,6 @@
           "given": "an immediately-invoked arrow function with no reachable identifier",
           "when": "resolveFunctionName is called",
           "then": "returns the ANONYMOUS_FUNCTION_NAME constant"
-        }
-      ]
-    },
-    {
-      "feature": "getOptionMaxValue",
-      "scenarios": [
-        {
-          "name": "should return the max property from a plain option object",
-          "given": "a plain object with a max property",
-          "when": "getOptionMaxValue is called",
-          "then": "returns the value of the max property"
-        },
-        {
-          "name": "should return undefined when the option is not a plain object",
-          "given": "a non-object value such as a string or number",
-          "when": "getOptionMaxValue is called",
-          "then": "returns undefined"
-        },
-        {
-          "name": "should return undefined when the option is null or undefined",
-          "given": "null or undefined as the option",
-          "when": "getOptionMaxValue is called",
-          "then": "returns undefined"
-        }
-      ]
-    },
-    {
-      "feature": "getVisitorArrayNodes",
-      "scenarios": [
-        {
-          "name": "should return filtered nodes when the value is an array containing node-like objects",
-          "given": "an array of mixed node-like and non-node-like values",
-          "when": "getVisitorArrayNodes is called",
-          "then": "returns only the node-like entries"
-        },
-        {
-          "name": "should return a single-element array when the value is a node-like object",
-          "given": "a single node-like object",
-          "when": "getVisitorArrayNodes is called",
-          "then": "returns an array containing that node"
-        },
-        {
-          "name": "should return an empty array when the value is neither an array nor a node-like object",
-          "given": "a primitive value such as null or a string",
-          "when": "getVisitorArrayNodes is called",
-          "then": "returns an empty array"
-        }
-      ]
-    },
-    {
-      "feature": "getVisitorChildNodes",
-      "scenarios": [
-        {
-          "name": "should return all direct child nodes using the source-code visitor keys",
-          "given": "an AST node and an ESLint SourceCode instance with visitor keys",
-          "when": "getVisitorChildNodes is called",
-          "then": "returns an array of all child nodes reachable via visitor keys"
-        },
-        {
-          "name": "should return an empty array when the node type has no visitor keys",
-          "given": "an AST node whose type has an empty visitor key list",
-          "when": "getVisitorChildNodes is called",
-          "then": "returns an empty array"
         }
       ]
     }

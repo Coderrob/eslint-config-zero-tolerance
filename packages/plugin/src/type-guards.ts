@@ -51,12 +51,25 @@ export function isNumber(value: unknown): value is number {
 }
 
 /**
- * Returns true when the value is a non-null, non-array plain object.
+ * Returns true when the value is a plain object with an object or null prototype.
  * @param value - The value to check.
  * @returns True if the value is a plain object, false otherwise.
  */
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+  return isPlainObjectPrototype(value);
+}
+
+/**
+ * Returns true when an object's prototype matches plain-object shapes.
+ * @param value - The object to inspect.
+ * @returns True if the object prototype is Object.prototype or null.
+ */
+function isPlainObjectPrototype(value: object): boolean {
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === null || Object.getPrototypeOf(prototype) === null;
 }
 
 /**

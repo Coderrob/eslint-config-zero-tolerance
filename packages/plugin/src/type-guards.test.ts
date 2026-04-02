@@ -1,10 +1,10 @@
 import {
+  isBoolean,
   isDefined,
   isNullOrUndefined,
-  isString,
-  isBoolean,
   isNumber,
   isPlainObject,
+  isString,
 } from './type-guards';
 
 describe('type-guards', () => {
@@ -36,7 +36,7 @@ describe('type-guards', () => {
     });
   });
 
-  // ── isNullOrUndefined ────────────────────────────────────────────────────
+  // ── isNullOrUndefined ───────────────────────────────────────────────────
 
   describe('isNullOrUndefined', () => {
     it('should return true for null', () => {
@@ -100,31 +100,35 @@ describe('type-guards', () => {
     });
   });
 
-  // ── isPlainObject ─────────────────────────────────────────────────────────
-
   describe('isPlainObject', () => {
-    it('should return true for a plain object', () => {
+    it('should return true for object literals', () => {
       expect(isPlainObject({ key: 'value' })).toBe(true);
     });
 
-    it('should return true for an empty object', () => {
-      expect(isPlainObject({})).toBe(true);
+    it('should return true for null-prototype objects', () => {
+      expect(isPlainObject(Object.create(null))).toBe(true);
     });
 
     it('should return false for null', () => {
       expect(isPlainObject(null)).toBe(false);
     });
 
-    it('should return false for an array', () => {
+    it('should return false for arrays', () => {
       expect(isPlainObject([])).toBe(false);
     });
 
-    it('should return false for a string', () => {
-      expect(isPlainObject('string')).toBe(false);
+    it('should return false for Date instances', () => {
+      expect(isPlainObject(new Date())).toBe(false);
     });
 
-    it('should return false for a number', () => {
-      expect(isPlainObject(42)).toBe(false);
+    it('should return false for Map instances', () => {
+      expect(isPlainObject(new Map())).toBe(false);
+    });
+
+    it('should return false for class instances', () => {
+      class ExampleClass {}
+
+      expect(isPlainObject(new ExampleClass())).toBe(false);
     });
   });
 });

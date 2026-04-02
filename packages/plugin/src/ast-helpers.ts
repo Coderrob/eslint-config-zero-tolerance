@@ -165,7 +165,7 @@ export function getOptionMaxValue(option: unknown): unknown {
  * @param value - Visitor-key value from an AST node.
  * @returns Child nodes from the value.
  */
-export function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
+function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
   if (Array.isArray(value)) {
     return value.filter(isNodeLike);
   }
@@ -175,16 +175,20 @@ export function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Nod
 /**
  * Returns direct child nodes for an AST node using source-code visitor keys.
  *
+ * Missing visitor keys are treated as an empty traversal set so callers can
+ * safely walk custom or unsupported node types without runtime errors.
+ *
  * @param node - Node whose children should be collected.
  * @param sourceCode - ESLint source code helper.
  * @returns Child nodes for traversal.
  */
 export function getVisitorChildNodes(
   node: TSESTree.Node,
-  sourceCode: Readonly<TSESLint.SourceCode>,
+  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
 ): ReadonlyArray<TSESTree.Node> {
   const childNodes: TSESTree.Node[] = [];
-  for (const key of sourceCode.visitorKeys[node.type]) {
+  const visitorKeys = sourceCode.visitorKeys[node.type] ?? [];
+  for (const key of visitorKeys) {
     childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
   }
   return childNodes;

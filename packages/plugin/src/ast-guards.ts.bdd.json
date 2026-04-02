@@ -37,7 +37,7 @@
           "name": "should return false for a non-BinaryExpression node",
           "given": "an AST node with a different type",
           "when": "isBinaryExpressionNode is called",
-          "then": "returns false"
+          "then": "returns false because the node is not a BinaryExpression"
         },
         {
           "name": "should return false for null or undefined",
@@ -60,7 +60,7 @@
           "name": "should return false for a non-BlockStatement node",
           "given": "an AST node with a different type",
           "when": "isBlockStatementNode is called",
-          "then": "returns false"
+          "then": "returns false because the node is not a BlockStatement"
         }
       ]
     },
@@ -94,7 +94,7 @@
           "name": "should return false for FunctionExpression or ArrowFunctionExpression",
           "given": "an AST node with type FunctionExpression",
           "when": "isFunctionDeclarationNode is called",
-          "then": "returns false"
+          "then": "returns false because function expressions are not declarations"
         }
       ]
     },
@@ -185,7 +185,7 @@
           "name": "should return true for a SwitchCase node",
           "given": "an AST node with type SwitchCase",
           "when": "isSwitchCaseNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.SwitchCase"
         },
         {
           "name": "should return false for null or undefined",
@@ -202,25 +202,25 @@
           "name": "should return true for a .test.ts filename",
           "given": "a filename ending in .test.ts",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because the path matches a recognized test-file suffix"
         },
         {
           "name": "should return true for a .spec.ts filename",
           "given": "a filename ending in .spec.ts",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because the path matches a recognized test-file suffix"
         },
         {
           "name": "should return true for a file inside __tests__ directory",
           "given": "a filename whose path contains /__tests__/",
           "when": "isTestFile is called",
-          "then": "returns true"
+          "then": "returns true because __tests__ paths are treated as test files"
         },
         {
           "name": "should return false for a regular source file",
           "given": "a filename with no test indicator",
           "when": "isTestFile is called",
-          "then": "returns false"
+          "then": "returns false because the path does not match any recognized test-file pattern"
         },
         {
           "name": "should normalise Windows backslash separators",
@@ -237,7 +237,7 @@
           "name": "should return true for a TSEnumMember node",
           "given": "an AST node with type TSEnumMember",
           "when": "isTSEnumMemberNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.TSEnumMember"
         },
         {
           "name": "should return false for null or undefined",
@@ -254,7 +254,7 @@
           "name": "should return true for a UnaryExpression node",
           "given": "an AST node with type UnaryExpression",
           "when": "isUnaryExpressionNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.UnaryExpression"
         },
         {
           "name": "should return false for null or undefined",
@@ -271,7 +271,7 @@
           "name": "should return true for a VariableDeclarator node",
           "given": "an AST node with type VariableDeclarator",
           "when": "isVariableDeclaratorNode is called",
-          "then": "returns true"
+          "then": "returns true and narrows the type to TSESTree.VariableDeclarator"
         },
         {
           "name": "should return false for null or undefined",

@@ -75,6 +75,12 @@
           "then": "an invalidBddSpec violation reports that module must be an object"
         },
         {
+          "name": "should reject non-plain object values for object-shaped spec sections",
+          "given": "a parsed spec value where module, feature, or scenario entries use object instances whose prototype is not Object.prototype or null",
+          "when": "the rule validates those object-shaped sections",
+          "then": "the values are treated as invalid objects instead of being narrowed to Record<string, unknown>"
+        },
+        {
           "name": "should report invalidBddSpec when specifications is not an array",
           "given": "a BDD spec file where specifications is a non-array value",
           "when": "the rule validates the parsed spec object",
