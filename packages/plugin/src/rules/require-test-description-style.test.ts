@@ -176,7 +176,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
-      output: "test['skip'](\"should skipped test\", () => {});",
+      output: 'test[\'skip\']("should skipped test", () => {});',
     },
     {
       code: "test['only']('runs focused test', () => {});",
@@ -186,7 +186,7 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
           messageId: 'requireTestDescriptionStyle',
         },
       ],
-      output: "test['only'](\"should runs focused test\", () => {});",
+      output: 'test[\'only\']("should runs focused test", () => {});',
     },
     {
       code: 'it("handles correctly", () => {});',

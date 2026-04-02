@@ -15,7 +15,11 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { getCalleeNamePath, getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
+import {
+  getCalleeNamePath,
+  getStringLiteralCallArgument,
+  hasCallCalleeNamePath,
+} from '../helpers/ast/calls';
 import { isBoolean, isPlainObject, isString } from '../helpers/type-guards';
 import {
   TEST_DESCRIPTION_PREFIX,

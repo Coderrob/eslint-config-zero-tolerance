@@ -18,10 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import type { FunctionNode } from '../helpers/ast-guards';
 import { getParameterTypeNode } from '../helpers/ast/parameters';
-import {
-  getTypeReferenceName,
-  hasAllReadonlyPropertyMembers,
-} from '../helpers/ast/types';
+import { getTypeReferenceName, hasAllReadonlyPropertyMembers } from '../helpers/ast/types';
 import { getNamedParameterName } from '../helpers/parameter-helpers';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
@@ -180,10 +177,7 @@ function isMutableStructuredType(node: TSESTree.TypeNode): boolean {
  */
 function isMutableTypeReference(node: TSESTree.TSTypeReference): boolean {
   const typeReferenceName = getTypeReferenceName(node);
-  if (
-    typeReferenceName === READONLY_ARRAY_TYPE_NAME ||
-    typeReferenceName === READONLY_TYPE_NAME
-  ) {
+  if (typeReferenceName === READONLY_ARRAY_TYPE_NAME || typeReferenceName === READONLY_TYPE_NAME) {
     return false;
   }
   return true;

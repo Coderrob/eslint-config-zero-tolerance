@@ -30,9 +30,13 @@ const THIS_PARAMETER_NAME = 'this';
  * @returns Type annotation when present.
  */
 function getAnnotatableParameterTypeAnnotation(
-  param: TSESTree.ArrayPattern | TSESTree.Identifier | TSESTree.ObjectPattern | TSESTree.RestElement,
+  param:
+    | TSESTree.ArrayPattern
+    | TSESTree.Identifier
+    | TSESTree.ObjectPattern
+    | TSESTree.RestElement,
 ): TSESTree.TSTypeAnnotation | null {
-  return 'typeAnnotation' in param ? param.typeAnnotation ?? null : null;
+  return 'typeAnnotation' in param ? (param.typeAnnotation ?? null) : null;
 }
 
 /**
@@ -53,11 +57,9 @@ function getAssignmentPatternTypeAnnotation(
  * @param param - Function parameter node.
  * @returns Type node when the parameter is an annotated object pattern.
  */
-function getDirectObjectDestructuredTypeNode(
-  param: TSESTree.Parameter,
-): TSESTree.TypeNode | null {
+function getDirectObjectDestructuredTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
   return param.type === AST_NODE_TYPES.ObjectPattern
-    ? param.typeAnnotation?.typeAnnotation ?? null
+    ? (param.typeAnnotation?.typeAnnotation ?? null)
     : null;
 }
 
@@ -89,7 +91,7 @@ function getObjectDestructuredAssignmentTypeNode(
 ): TSESTree.TypeNode | null {
   const left = param.left;
   return left.type === AST_NODE_TYPES.ObjectPattern
-    ? left.typeAnnotation?.typeAnnotation ?? null
+    ? (left.typeAnnotation?.typeAnnotation ?? null)
     : null;
 }
 
@@ -154,7 +156,7 @@ function getTsParameterPropertyTypeAnnotation(
   const inner = param.parameter;
   return inner.type === AST_NODE_TYPES.AssignmentPattern
     ? getAssignmentPatternTypeAnnotation(inner)
-    : inner.typeAnnotation ?? null;
+    : (inner.typeAnnotation ?? null);
 }
 
 /**

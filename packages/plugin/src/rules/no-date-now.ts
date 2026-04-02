@@ -15,10 +15,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import {
-  isNamedIdentifierNode,
-  isUncomputedMemberExpressionNode,
-} from '../helpers/ast-guards';
+import { isNamedIdentifierNode, isUncomputedMemberExpressionNode } from '../helpers/ast-guards';
 import { createRule } from './support/rule-factory';
 
 const DATE_IDENTIFIER = 'Date';

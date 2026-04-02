@@ -17,10 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { getFunctionDeclarationName, getFunctionVariableName } from '../helpers/ast-helpers';
-import {
-  getFirstNonThisParameter,
-  getParameterTypeAnnotation,
-} from '../helpers/ast/parameters';
+import { getFirstNonThisParameter, getParameterTypeAnnotation } from '../helpers/ast/parameters';
 import {
   hasNamedTypeReferenceWithTypeArguments,
   hasAllReadonlyPropertyMembers,

@@ -236,9 +236,7 @@ function isPromiseStaticCall(node: TSESTree.CallExpression): boolean {
  * @returns True when callee object is Promise.
  */
 function isPromiseStaticCallee(callee: TSESTree.Expression): boolean {
-  return (
-    isMemberExpressionNode(callee) && isNamedIdentifierNode(callee.object, PROMISE_IDENTIFIER)
-  );
+  return isMemberExpressionNode(callee) && isNamedIdentifierNode(callee.object, PROMISE_IDENTIFIER);
 }
 
 /**
