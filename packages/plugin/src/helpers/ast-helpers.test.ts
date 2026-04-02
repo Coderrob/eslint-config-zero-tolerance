@@ -4,6 +4,7 @@ import {
   getFunctionMethodName,
   getFunctionVariableName,
   getIdentifierName,
+  getLiteralStringValue,
   getMemberPropertyName,
   getMappedMemberPropertyName,
   getVisitorChildNodes,
@@ -54,6 +55,23 @@ describe('ast-helpers', () => {
       } as any;
 
       expect(getCallMemberMethodName(node)).toBeNull();
+    });
+  });
+
+  describe('getLiteralStringValue', () => {
+    it('should return the string value when node is a string Literal', () => {
+      const node = { type: 'Literal', value: 'foo' } as any;
+      expect(getLiteralStringValue(node)).toBe('foo');
+    });
+
+    it('should return null when node is a non-string Literal', () => {
+      const node = { type: 'Literal', value: 42 } as any;
+      expect(getLiteralStringValue(node)).toBeNull();
+    });
+
+    it('should return null when node is not a Literal', () => {
+      const node = { type: 'Identifier', name: 'foo' } as any;
+      expect(getLiteralStringValue(node)).toBeNull();
     });
   });
 

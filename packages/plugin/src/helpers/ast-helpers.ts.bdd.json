@@ -11,6 +11,7 @@
       "getFunctionMethodName",
       "getFunctionVariableName",
       "getIdentifierName",
+      "getLiteralStringValue",
       "getMappedMemberPropertyName",
       "getMemberPropertyName",
       "getOptionMaxValue",
@@ -113,6 +114,29 @@
           "given": "null or undefined",
           "when": "getIdentifierName is called",
           "then": "returns null without throwing"
+        }
+      ]
+    },
+    {
+      "feature": "getLiteralStringValue",
+      "scenarios": [
+        {
+          "name": "should return the string value for a string Literal node",
+          "given": "a Literal AST node whose value is a string",
+          "when": "getLiteralStringValue is called",
+          "then": "returns the literal string value"
+        },
+        {
+          "name": "should return null for a non-string Literal node",
+          "given": "a Literal AST node whose value is not a string",
+          "when": "getLiteralStringValue is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for a non-Literal node",
+          "given": "an AST node whose type is not Literal",
+          "when": "getLiteralStringValue is called",
+          "then": "returns null"
         }
       ]
     },

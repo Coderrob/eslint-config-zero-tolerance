@@ -17,7 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isBinaryExpressionNode, isSwitchCaseNode } from '../helpers/ast-guards';
-import { isString } from '../helpers/type-guards';
+import { getLiteralStringValue } from '../helpers/ast-helpers';
 import { createRule } from './support/rule-factory';
 
 const COMPARISON_OPERATORS = new Set(['===', '!==', '==', '!=']);
@@ -83,10 +83,11 @@ function createNoMagicStringsListeners(context: NoMagicStringsContext): TSESLint
  * @returns The string value if valid, otherwise null.
  */
 function getStringValue(node: TSESTree.Literal): string | null {
-  if (!isString(node.value) || node.value === '') {
+  const value = getLiteralStringValue(node);
+  if (value === null || value === '') {
     return null;
   }
-  return node.value;
+  return value;
 }
 
 /**

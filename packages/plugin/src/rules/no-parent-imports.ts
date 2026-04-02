@@ -16,9 +16,9 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { getLiteralStringValue as getLiteralStringNodeValue } from '../helpers/ast-helpers';
 import { getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
 import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
-import { isString } from '../helpers/type-guards';
 import { CALLEE_REQUIRE } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
@@ -66,7 +66,7 @@ function checkImportExpression(
   context: NoParentImportsContext,
   node: TSESTree.ImportExpression,
 ): void {
-  const importPath = getLiteralStringValue(node.source);
+  const importPath = getLiteralStringNodeValue(node.source);
   if (importPath !== null) {
     reportIfParentImport(context, node.source, importPath);
   }
@@ -83,7 +83,7 @@ function checkTsImportEqualsDeclaration(
   node: TSESTree.TSImportEqualsDeclaration,
 ): void {
   const moduleReference = getExternalModuleReference(node);
-  const importPath = moduleReference === null ? null : getLiteralStringValue(moduleReference);
+  const importPath = moduleReference === null ? null : getLiteralStringNodeValue(moduleReference);
   if (moduleReference !== null && importPath !== null) {
     reportIfParentImport(context, moduleReference, importPath);
   }
@@ -117,19 +117,6 @@ function getExternalModuleReference(
     return null;
   }
   return node.moduleReference.expression;
-}
-
-/**
- * Extracts a string literal value from a literal node.
- *
- * @param node - Potential literal node.
- * @returns The literal string value, or null.
- */
-function getLiteralStringValue(node: TSESTree.Node): string | null {
-  if (node.type !== AST_NODE_TYPES.Literal) {
-    return null;
-  }
-  return isString(node.value) ? node.value : null;
 }
 
 /**

@@ -108,6 +108,18 @@ export function getIdentifierName(node: TSESTree.Node | null | undefined): strin
 }
 
 /**
+ * Returns the string value for a Literal node, or null.
+ *
+ * @param node - The node to inspect.
+ * @returns The literal string value when available, otherwise null.
+ */
+export function getLiteralStringValue(
+  node: { type: string; value?: unknown } | null | undefined,
+): string | null {
+  return node?.type === AST_NODE_TYPES.Literal && isString(node.value) ? node.value : null;
+}
+
+/**
  * Returns a mapped replacement for a member property when the property name
  * exists in the provided replacement map.
  *

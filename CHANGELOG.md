@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Call-shape reuse**: Added a shared `getMatchingCallMemberMethodName` helper in `helpers/ast/calls.ts` and rewired `no-array-mutation` and `no-query-side-effects` to use it instead of keeping duplicate member-call filtering logic.
 - **AST guard reuse**: Added shared `isNamedIdentifierNode` and `isUncomputedMemberExpressionNode` guards in `helpers/ast-guards.ts` and rewired multiple rules to reuse those exact-name and direct-member checks instead of keeping local ad hoc predicates.
 - **Type helper reuse**: Expanded `helpers/ast/types.ts` with shared first-type-argument and named-generic-reference helpers, then rewired `no-boolean-return-trap` and `require-readonly-props` to consume that shared type-reference evaluation instead of combining those checks locally.
+- **Literal helper reuse**: Added shared string-literal extraction in `helpers/ast-helpers.ts`, reused it in `helpers/ast/calls.ts`, and removed duplicate literal-string parsing from `no-parent-imports` and `no-magic-strings`.
 
 ## [1.2.1] - 2026-04-01
 

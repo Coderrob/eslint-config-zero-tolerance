@@ -19,14 +19,16 @@
  */
 
 import type { TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import {
   isCallExpressionNode,
   isIdentifierNode,
   isMemberExpressionNode,
 } from '../ast-guards';
-import { getCallMemberMethodName, getMemberPropertyName } from '../ast-helpers';
-import { isString } from '../type-guards';
+import {
+  getCallMemberMethodName,
+  getLiteralStringValue,
+  getMemberPropertyName,
+} from '../ast-helpers';
 
 type StringLiteralArgument = TSESTree.Literal & { value: string };
 
@@ -178,5 +180,5 @@ function hasMatchingNamePath(
 function isStringLiteralArgument(
   argument: TSESTree.CallExpressionArgument | null,
 ): argument is StringLiteralArgument {
-  return argument?.type === AST_NODE_TYPES.Literal && isString(argument.value);
+  return getLiteralStringValue(argument) !== null;
 }
