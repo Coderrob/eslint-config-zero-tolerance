@@ -215,6 +215,8 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ## Development
 
+This repository itself is a `pnpm` workspace. Use `pnpm install` at the repo root; `npm install` examples above are for consuming the published packages in another project, not for bootstrapping this monorepo.
+
 ### Setup
 
 ```bash
