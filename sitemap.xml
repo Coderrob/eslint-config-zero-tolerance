@@ -37,6 +37,10 @@
          <lastmod>2026-04-02</lastmod>
     </url>
     <url>
+         <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-barrel-parent-imports/</loc>
+         <lastmod>2026-04-02</lastmod>
+    </url>
+    <url>
          <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-boolean-return-trap/</loc>
          <lastmod>2026-04-02</lastmod>
     </url>
@@ -125,7 +129,7 @@
          <lastmod>2026-04-02</lastmod>
     </url>
     <url>
-         <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-parent-imports/</loc>
+         <loc>https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-parent-internal-access/</loc>
          <lastmod>2026-04-02</lastmod>
     </url>
     <url>

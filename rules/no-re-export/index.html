@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-re-export/">
       
       
-        <link rel="prev" href="../no-parent-imports/">
+        <link rel="prev" href="../no-parent-internal-access/">
       
       
         <link rel="next" href="../no-identical-expressions/">
@@ -1887,14 +1887,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../no-parent-imports/" class="md-nav__link">
+      <a href="../no-barrel-parent-imports/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    no-parent-imports
+    no-barrel-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-parent-internal-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-internal-access
   
 
     
@@ -1997,6 +2025,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2012,7 +2051,7 @@
   <a href="#correct" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Correct
+        Correct
       
     </span>
   </a>
@@ -2023,7 +2062,7 @@
   <a href="#incorrect" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Incorrect
+        Incorrect
       
     </span>
   </a>
@@ -2593,6 +2632,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2608,7 +2658,7 @@
   <a href="#correct" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Correct
+        Correct
       
     </span>
   </a>
@@ -2619,7 +2669,7 @@
   <a href="#incorrect" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Incorrect
+        Incorrect
       
     </span>
   </a>
@@ -2657,7 +2707,7 @@
 
 
 <h1 id="no-re-export">no-re-export</h1>
-<p>Disallow re-export statements from parent or ancestor modules in non-barrel files.</p>
+<p>Disallow direct and pass-through re-export statements from parent or ancestor modules in non-barrel files.</p>
 <h2 id="rule-details">Rule Details</h2>
 <table>
 <thead>
@@ -2686,9 +2736,14 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
-<p>Re-export statements that reach outside the current directory (<code>../</code>) create upward dependencies that violate proper module hierarchy. Only barrel files (<code>index.*</code>) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (<code>../sibling</code>) or ancestors (<code>../../parent</code>, <code>../../../grandparent</code>).</p>
+<p>Re-export statements that reach outside the current directory (<code>../</code>) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as <code>export { foo } from '../foo'</code> and pass-through patterns such as <code>import { foo } from '../foo'; export { foo };</code>. Statement ordering does not matter: <code>export { foo }; import { foo } from '../foo';</code> is also reported. Only barrel files (<code>index.*</code>) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (<code>../sibling</code>) or ancestors (<code>../../parent</code>, <code>../../../grandparent</code>).</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The barrel-file exemption applies only to single-extension index files such as <code>index.ts</code>, <code>index.js</code>, and <code>index.mts</code>.</li>
+<li>Double-extension files such as <code>index.d.ts</code>, <code>index.test.ts</code>, and <code>index.spec.js</code> are not treated as barrel files and are still checked by this rule.</li>
+</ul>
 <h2 id="examples">Examples</h2>
-<h3 id="correct">✅ Correct</h3>
+<h3 id="correct">Correct</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// Direct exports</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">foo</span><span class="p">,</span><span class="w"> </span><span class="nx">bar</span><span class="w"> </span><span class="p">};</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">42</span><span class="p">;</span>
@@ -2698,22 +2753,34 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">childFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./child&#39;</span><span class="p">;</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">export</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./child/utils&#39;</span><span class="p">;</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">// In a barrel file (index.ts) — any re-export is allowed</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">// export { peerFunction } from &#39;../sibling&#39;;</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// export * from &#39;../../parent&#39;;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">// Exporting a local binding remains allowed</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">parentValue</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../parent&#39;</span><span class="p">;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">localValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parentValue</span><span class="p">;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">localValue</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1">// In a barrel file (index.ts), upward re-exports are allowed</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1">// export { peerFunction } from &#39;../sibling&#39;;</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1">// export * from &#39;../../parent&#39;;</span>
 </code></pre></div>
-<h3 id="incorrect">❌ Incorrect</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Re-exports from peers — not allowed in non-barrel files</span>
+<h3 id="incorrect">Incorrect</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Re-exports from peers are not allowed in non-barrel files</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">peerFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../sibling&#39;</span><span class="p">;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">export</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../utils&#39;</span><span class="p">;</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1">// Re-exports from parents — not allowed</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1">// Re-exports from parents are not allowed</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">parentFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../parent&#39;</span><span class="p">;</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">export</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../grandparent&#39;</span><span class="p">;</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1">// Re-exports from grandparents — not allowed</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">grandparentFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../../ancestor&#39;</span><span class="p">;</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">export</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">ns</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../../../distant-ancestor&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1">// Pass-through re-exports from parents are also not allowed</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">peerFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../sibling&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">peerFunction</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="k">import</span><span class="w"> </span><span class="nx">parentDefault</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../parent&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">parentDefault</span><span class="p">;</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1">// Re-exports from grandparents are not allowed</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">grandparentFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../../ancestor&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="k">export</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">ns</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../../../../distant-ancestor&#39;</span><span class="p">;</span>
 </code></pre></div>
 
 

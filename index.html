@@ -1941,14 +1941,42 @@
   
   
     <li class="md-nav__item">
-      <a href="rules/no-parent-imports/" class="md-nav__link">
+      <a href="rules/no-barrel-parent-imports/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    no-parent-imports
+    no-barrel-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-parent-internal-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-internal-access
   
 
     
@@ -2585,7 +2613,7 @@
 <li><strong>Type safety</strong> - ban <code>as</code> assertions, non-null <code>!</code> operators, literal union types, banned utility types, and inline object type literals on destructured parameters</li>
 <li><strong>Code quality</strong> - limit function length and parameter count, eliminate magic numbers and strings</li>
 <li><strong>Error handling</strong> - require <code>new Error()</code> in throw statements, disallow empty catch blocks</li>
-<li><strong>Import hygiene</strong> - keep barrel files clean, ban parent-relative imports, dynamic imports, and export aliases</li>
+<li><strong>Import hygiene</strong> - keep barrel files clean, ban parent-relative imports inside barrel files, optionally protect folders such as <code>src</code> from parent-relative access, ban dynamic imports, and prevent export aliases</li>
 <li><strong>Bug prevention</strong> - flag identical expressions, redundant boolean comparisons, shortcut-return opportunities, and <code>await</code> inside loops</li>
 </ul>
 <h2 id="packages">Packages</h2>

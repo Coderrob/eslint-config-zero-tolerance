@@ -2022,14 +2022,42 @@
   
   
     <li class="md-nav__item">
-      <a href="no-parent-imports/" class="md-nav__link">
+      <a href="no-barrel-parent-imports/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    no-parent-imports
+    no-barrel-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-parent-internal-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-internal-access
   
 
     
@@ -2960,14 +2988,19 @@
 <td>Prevent use of aliases in export statements</td>
 </tr>
 <tr>
-<td><a href="no-parent-imports/">no-parent-imports</a></td>
+<td><a href="no-barrel-parent-imports/">no-barrel-parent-imports</a></td>
 <td>suggestion</td>
-<td>Disallow parent-directory traversal in import paths</td>
+<td>Disallow parent-directory traversal in barrel-file import paths</td>
+</tr>
+<tr>
+<td><a href="no-parent-internal-access/">no-parent-internal-access</a></td>
+<td>suggestion</td>
+<td>Disallow parent-relative access into protected internal directories such as src</td>
 </tr>
 <tr>
 <td><a href="no-re-export/">no-re-export</a></td>
 <td>suggestion</td>
-<td>Disallow re-export statements from parent/grandparent modules</td>
+<td>Disallow direct or pass-through re-exports from parent/grandparent modules</td>
 </tr>
 </tbody>
 </table>

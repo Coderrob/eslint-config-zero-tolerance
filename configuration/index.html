@@ -652,6 +652,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#no-parent-internal-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        no-parent-internal-access
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2104,14 +2115,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../rules/no-parent-imports/" class="md-nav__link">
+      <a href="../rules/no-barrel-parent-imports/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    no-parent-imports
+    no-barrel-parent-imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/no-parent-internal-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-parent-internal-access
   
 
     
@@ -2865,6 +2904,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#no-parent-internal-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        no-parent-internal-access
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2961,7 +3011,7 @@
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">};</span>
 </code></pre></div>
 <h2 id="rules-included-in-each-preset">Rules Included in Each Preset</h2>
-<p>Nearly all core rules are included in every preset. <code>require-bdd-spec</code> is available as an opt-in rule and is disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.</p>
+<p>Nearly all core rules are included in every preset. <code>require-bdd-spec</code> and <code>no-parent-internal-access</code> are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.</p>
 <table>
 <thead>
 <tr>
@@ -3147,9 +3197,14 @@
 <td>error</td>
 </tr>
 <tr>
-<td><code>no-parent-imports</code></td>
+<td><code>no-barrel-parent-imports</code></td>
 <td>warn</td>
 <td>error</td>
+</tr>
+<tr>
+<td><code>no-parent-internal-access</code></td>
+<td>off</td>
+<td>off</td>
 </tr>
 <tr>
 <td><code>no-with</code></td>
@@ -3223,7 +3278,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>require-bdd-spec</code> is available but intentionally not enabled by default in presets.</p>
+<p><code>require-bdd-spec</code> and <code>no-parent-internal-access</code> are available but intentionally not enabled by default in presets.</p>
 <h2 id="disabling-individual-rules">Disabling Individual Rules</h2>
 <p>Override any rule to <code>off</code> inside your config:</p>
 <div class="highlight"><span class="filename">eslint.config.js</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@coderrob/eslint-plugin-zero-tolerance&#39;</span><span class="p">;</span>
@@ -3265,6 +3320,13 @@
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="p">},</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">]</span>
 </code></pre></div>
+<h3 id="no-parent-internal-access"><code>no-parent-internal-access</code></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="s1">&#39;zero-tolerance/no-parent-internal-access&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">protectedDirectories</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;app&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;internal&#39;</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">]</span>
+</code></pre></div>
+<p>The rule matches only the first concrete directory reached after <code>..</code> traversal, so <code>../src/foo</code> is reported but <code>../shared/src/foo</code> is not unless <code>shared</code> is also protected. Configured directory names are trimmed and deduplicated, and empty entries are ignored.</p>
 
 
 
