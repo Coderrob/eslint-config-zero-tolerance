@@ -838,10 +838,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-files-are-exempt" class="md-nav__link">
+  <a href="#test-files-and-test-callbacks-are-exempt" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test files are exempt
+        Test files and test callbacks are exempt
       
     </span>
   </a>
@@ -1287,6 +1287,34 @@
     
   
     no-inline-type-import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-destructured-parameter-type-literal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-destructured-parameter-type-literal
   
 
     
@@ -2666,10 +2694,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-files-are-exempt" class="md-nav__link">
+  <a href="#test-files-and-test-callbacks-are-exempt" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test files are exempt
+        Test files and test callbacks are exempt
       
     </span>
   </a>
@@ -2707,7 +2735,7 @@
 
 
 <h1 id="require-jsdoc-anonymous-functions">require-jsdoc-anonymous-functions</h1>
-<p>Require JSDoc documentation comments on anonymous function-like constructs outside of test files, such as anonymous default exports, computed methods without identifier keys, and inline anonymous callbacks.</p>
+<p>Require JSDoc documentation comments on anonymous function-like constructs outside of test files, such as anonymous default exports, computed methods without identifier keys, and inline anonymous callbacks. Anonymous callbacks passed to well-known test APIs such as <code>describe</code>, <code>it</code>, <code>test</code>, <code>beforeEach</code>, and <code>afterAll</code> are excluded.</p>
 <h2 id="rule-details">Rule Details</h2>
 <table>
 <thead>
@@ -2737,7 +2765,7 @@
 </table>
 <h2 id="rationale">Rationale</h2>
 <p>Anonymous functions hide intent at the callsite and can make behavior harder to understand in larger codebases. Requiring JSDoc on anonymous function-like constructs makes their purpose explicit and improves generated documentation quality.</p>
-<p>This rule is automatically skipped in test files (<code>.test.*</code> / <code>.spec.*</code>).</p>
+<p>This rule is automatically skipped in test files (<code>.test.*</code> / <code>.spec.*</code>). It also skips anonymous callbacks passed to common test framework APIs and hook helpers, including chained forms such as <code>describe.only(...)</code>, <code>test.skip.each(...)</code>, and <code>test.beforeEach(...)</code>.</p>
 <h2 id="examples">Examples</h2>
 <h3 id="correct">Correct</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cm">/**</span>
@@ -2753,6 +2781,12 @@
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="cm">   */</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">]()</span><span class="w"> </span><span class="p">{}</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;CLI knowledge-base command&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should register the command&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">getKnowledgeBaseCommand</span><span class="p">()).</span><span class="nx">toBeDefined</span><span class="p">();</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="p">});</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">});</span>
 </code></pre></div>
 <h3 id="incorrect">Incorrect</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -2762,6 +2796,10 @@
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">class</span><span class="w"> </span><span class="nx">Registry</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">]()</span><span class="w"> </span><span class="p">{}</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nx">registerCommand</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">buildCommand</span><span class="p">();</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">});</span>
 </code></pre></div>
 <h2 id="configuration">Configuration</h2>
 <p>This rule has no options:</p>
@@ -2770,8 +2808,9 @@
 <h2 id="autofix-notes">Autofix Notes</h2>
 <p>Autofix can insert a missing JSDoc block for standalone anonymous targets such as default export functions.</p>
 <p>Autofix intentionally skips unsafe insertion targets such as inline expressions and multi-declarator variable statements.</p>
-<h3 id="test-files-are-exempt">Test files are exempt</h3>
+<h3 id="test-files-and-test-callbacks-are-exempt">Test files and test callbacks are exempt</h3>
 <p>Functions inside files matching <code>*.test.ts</code>, <code>*.spec.ts</code>, <code>*.test.js</code>, <code>*.spec.js</code> (and their JSX equivalents) are not checked.</p>
+<p>Anonymous callbacks passed to well-known test APIs such as <code>describe</code>, <code>it</code>, <code>test</code>, <code>beforeAll</code>, <code>beforeEach</code>, <code>afterAll</code>, and <code>afterEach</code> are also not checked, even when they appear in non-test files.</p>
 
 
 

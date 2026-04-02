@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-dynamic-import/">
+        <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-destructured-parameter-type-literal/">
       
       
-        <link rel="prev" href="../require-clean-barrel/">
+        <link rel="prev" href="../no-inline-type-import/">
       
       
-        <link rel="next" href="../no-export-alias/">
+        <link rel="next" href="../max-function-lines/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>no-dynamic-import - @coderrob/eslint-plugin-zero-tolerance</title>
+        <title>no-destructured-parameter-type-literal - @coderrob/eslint-plugin-zero-tolerance</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#no-dynamic-import" class="md-skip">
+        <a href="#no-destructured-parameter-type-literal" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              no-dynamic-import
+              no-destructured-parameter-type-literal
             
           </span>
         </div>
@@ -960,8 +960,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -975,13 +977,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" checked>
         
           
           <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="">
@@ -1002,7 +1002,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1157,10 +1157,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../no-destructured-parameter-type-literal/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-destructured-parameter-type-literal
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1176,6 +1203,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rule-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rationale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rationale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#correct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correct
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incorrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incorrect
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1743,8 +1862,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1760,11 +1877,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
         
           
           <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="">
@@ -1785,7 +1904,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1828,37 +1947,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-dynamic-import
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../no-dynamic-import/" class="md-nav__link">
         
   
   
@@ -1874,98 +1966,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rule-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule Details
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rationale" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rationale
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Examples
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#correct" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ✅ Correct
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#incorrect-in-non-test-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ❌ Incorrect (in non-test files)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2619,7 +2619,7 @@
   <a href="#correct" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ✅ Correct
+        Correct
       
     </span>
   </a>
@@ -2627,10 +2627,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#incorrect-in-non-test-files" class="md-nav__link">
+  <a href="#incorrect" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Incorrect (in non-test files)
+        Incorrect
       
     </span>
   </a>
@@ -2670,7 +2670,7 @@
 
 
   
-    <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/edit/main/docs/rules/no-dynamic-import.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/edit/main/docs/rules/no-destructured-parameter-type-literal.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2678,8 +2678,8 @@
   
 
 
-<h1 id="no-dynamic-import">no-dynamic-import</h1>
-<p>Ban dynamic <code>import()</code> and <code>require()</code> calls outside of test files.</p>
+<h1 id="no-destructured-parameter-type-literal">no-destructured-parameter-type-literal</h1>
+<p>Disallow inline object type literals on destructured parameters.</p>
 <h2 id="rule-details">Rule Details</h2>
 <table>
 <thead>
@@ -2691,7 +2691,7 @@
 <tbody>
 <tr>
 <td><strong>Type</strong></td>
-<td><code>problem</code></td>
+<td><code>suggestion</code></td>
 </tr>
 <tr>
 <td><strong>Fixable</strong></td>
@@ -2708,28 +2708,35 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
-<p>Dynamic imports and <code>require()</code> calls load modules at runtime rather than at bundle time. This hides dependencies from static analysis tools, prevents tree-shaking, complicates code-splitting strategies, and can introduce subtle load-order bugs. Static <code>import</code> declarations at the top of a file are always preferable in application code.</p>
-<p>The rule is <strong>automatically skipped</strong> in test files (<code>*.test.*</code>, <code>*.spec.*</code>, <code>*.e2e.*</code>, <code>*.integration.*</code>, and files under <code>__tests__/</code>), where dynamic loading is sometimes required by test utilities.</p>
+<p>Destructured parameters already hide the original object shape at the call site. Adding an inline object type literal to the same parameter makes the contract harder to reuse, harder to scan, and harder to name in documentation. Requiring a named type keeps the contract explicit and reusable.</p>
 <h2 id="examples">Examples</h2>
-<h3 id="correct">✅ Correct</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// Static import at the top of the file</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">parseConfig</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./config-parser&#39;</span><span class="p">;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">// Allowed in test files: mymodule.test.ts</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">import</span><span class="p">(</span><span class="s1">&#39;./module&#39;</span><span class="p">);</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">import</span><span class="p">(</span><span class="s1">&#39;./module&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">m</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">m</span><span class="p">.</span><span class="k">default</span><span class="p">);</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">pkg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./package&#39;</span><span class="p">);</span>
+<h3 id="correct">Correct</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">interface</span><span class="w"> </span><span class="nx">IUiActions</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="k">readonly</span><span class="w"> </span><span class="nx">set</span><span class="o">:</span><span class="w"> </span><span class="kt">UiStateSetter</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">}</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">function</span><span class="w"> </span><span class="nx">update</span><span class="p">({</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="nx">IUiActions</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">);</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kr">type</span><span class="w"> </span><span class="nx">UiActions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Readonly</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">set</span><span class="o">:</span><span class="w"> </span><span class="kt">UiStateSetter</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="kd">const</span><span class="w"> </span><span class="nx">updateLater</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="nx">UiActions</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;later&#39;</span><span class="p">);</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">};</span>
 </code></pre></div>
-<h3 id="incorrect-in-non-test-files">❌ Incorrect (in non-test files)</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// In mymodule.ts</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">import</span><span class="p">(</span><span class="s1">&#39;./heavy-module&#39;</span><span class="p">);</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="p">(</span><span class="s1">&#39;./heavy-module&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">m</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">m</span><span class="p">.</span><span class="k">default</span><span class="p">);</span>
+<h3 id="incorrect">Incorrect</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">function</span><span class="w"> </span><span class="nx">update</span><span class="p">({</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="nx">Readonly</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">set</span><span class="o">:</span><span class="w"> </span><span class="kt">UiStateSetter</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">);</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">}</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">pkg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;some-package&#39;</span><span class="p">);</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">updateLater</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">set</span><span class="o">:</span><span class="w"> </span><span class="kt">UiStateSetter</span><span class="w"> </span><span class="p">})</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;later&#39;</span><span class="p">);</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">};</span>
 </code></pre></div>
 <h2 id="configuration">Configuration</h2>
 <p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/no-dynamic-import&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/no-destructured-parameter-type-literal&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
 </code></pre></div>
 
 
