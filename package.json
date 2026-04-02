@@ -31,6 +31,7 @@
   ],
   "license": "Apache-2.0",
   "name": "eslint-config-zero-tolerance",
+  "packageManager": "pnpm@10.0.0",
   "private": true,
   "scripts": {
     "build": "pnpm -r build",

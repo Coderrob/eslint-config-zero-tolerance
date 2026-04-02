@@ -184,14 +184,14 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ### Imports
 
-| Rule                                                         | Description                                                        |
-| ------------------------------------------------------------ | ------------------------------------------------------------------ |
-| [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | Require barrel files (`index.*`) to contain only module re-exports |
-| [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md) | Ban `..` and `../*` parent-directory import traversal in barrel files |
-| [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md) | Ban parent-relative access into protected internal directories such as `src` |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)       | Ban dynamic `import()` and `require()` outside test files          |
-| [`no-export-alias`](docs/rules/no-export-alias.md)           | Prevent use of aliases in export statements                        |
-| [`no-re-export`](docs/rules/no-re-export.md)                 | Disallow direct or pass-through re-export statements from parent/grandparent modules |
+| Rule                                                                   | Description                                                                          |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [`require-clean-barrel`](docs/rules/require-clean-barrel.md)           | Require barrel files (`index.*`) to contain only module re-exports                   |
+| [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md)   | Ban `..` and `../*` parent-directory import traversal in barrel files                |
+| [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md) | Ban parent-relative access into protected internal directories such as `src`         |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)                 | Ban dynamic `import()` and `require()` outside test files                            |
+| [`no-export-alias`](docs/rules/no-export-alias.md)                     | Prevent use of aliases in export statements                                          |
+| [`no-re-export`](docs/rules/no-re-export.md)                           | Disallow direct or pass-through re-export statements from parent/grandparent modules |
 
 ### Bug Prevention
 
@@ -214,6 +214,8 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-query-side-effects`](docs/rules/no-query-side-effects.md)       | Disallow side effects in query-style functions                               |
 
 ## Development
+
+This repository itself is a `pnpm` workspace. Use `pnpm install` at the repo root; `npm install` examples above are for consuming the published packages in another project, not for bootstrapping this monorepo.
 
 ### Setup
 

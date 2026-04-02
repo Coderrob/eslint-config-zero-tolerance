@@ -58,7 +58,8 @@ describe('ast search helpers', () => {
         someDescendant(
           root,
           sourceCode,
-          (candidate): candidate is typeof identifier => candidate.type === AST_NODE_TYPES.Identifier,
+          (candidate): candidate is typeof identifier =>
+            candidate.type === AST_NODE_TYPES.Identifier,
         ),
       ).toBe(true);
     });

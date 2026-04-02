@@ -143,14 +143,14 @@ export default [
 
 `no-parent-internal-access` remains opt-in and only matches the first concrete directory reached after `..` traversal, such as `../src/foo`.
 
-| Rule                   | Description                                                        |
-| ---------------------- | ------------------------------------------------------------------ |
-| `require-clean-barrel` | Require barrel files (`index.*`) to contain only module re-exports |
-| `no-barrel-parent-imports` | Disallow parent-directory traversal in barrel-file import paths |
+| Rule                        | Description                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| `require-clean-barrel`      | Require barrel files (`index.*`) to contain only module re-exports                |
+| `no-barrel-parent-imports`  | Disallow parent-directory traversal in barrel-file import paths                   |
 | `no-parent-internal-access` | Disallow parent-relative access into protected internal directories such as `src` |
-| `no-dynamic-import`    | Ban dynamic `import()` and `require()` outside test files          |
-| `no-export-alias`      | Prevent use of aliases in export statements                        |
-| `no-re-export`         | Disallow direct or pass-through re-exports from parent/grandparent modules |
+| `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |
+| `no-export-alias`           | Prevent use of aliases in export statements                                       |
+| `no-re-export`              | Disallow direct or pass-through re-exports from parent/grandparent modules        |
 
 ### Bug Prevention
 

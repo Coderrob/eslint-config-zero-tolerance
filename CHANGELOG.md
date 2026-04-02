@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **`no-barrel-parent-imports` rule**: Renamed the barrel-only parent-import rule from `no-parent-imports` so its public name reflects that it only applies to single-extension `index.*` barrel files and not to general parent-relative imports in ordinary modules.
+- **Workspace package-manager guidance**: Declared `pnpm` as the repo package manager and clarified contributor docs so the monorepo setup path uses `pnpm install` instead of `npm install` at the repository root.
+- **CI package-manager alignment**: Removed the duplicate pnpm version pin from GitHub Actions and aligned the workspace `packageManager` field to pnpm 10 so CI and local setup use one consistent source of truth.
 
 ### Fixed
 

@@ -21,6 +21,8 @@ cd eslint-config-zero-tolerance
 pnpm install
 ```
 
+Use `pnpm install` for the workspace root. `npm install` is supported for consumers installing the published packages into their own projects, but not for bootstrapping this monorepo.
+
 ## Building
 
 ```bash

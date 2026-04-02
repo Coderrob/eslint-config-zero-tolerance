@@ -392,7 +392,12 @@ function hasThrowStatement(node: FunctionNode, sourceCode: Readonly<TSESLint.Sou
   if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
     return false;
   }
-  return someDescendant(node.body, sourceCode, isThrowStatementNode, isNestedControlFlowBoundaryNode);
+  return someDescendant(
+    node.body,
+    sourceCode,
+    isThrowStatementNode,
+    isNestedControlFlowBoundaryNode,
+  );
 }
 
 /**

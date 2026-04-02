@@ -72,8 +72,6 @@ export function getNamedParameterName(param: TSESTree.Parameter): string | null 
  * @param param - Rest parameter node.
  * @returns Identifier bound by the rest parameter, or null when unsupported.
  */
-export function getRestElementIdentifier(
-  param: TSESTree.RestElement,
-): TSESTree.Identifier | null {
+export function getRestElementIdentifier(param: TSESTree.RestElement): TSESTree.Identifier | null {
   return param.argument.type === AST_NODE_TYPES.Identifier ? param.argument : null;
 }

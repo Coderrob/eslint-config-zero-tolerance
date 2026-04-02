@@ -5,10 +5,7 @@
   "module": {
     "name": "ast/search",
     "description": "Higher-level AST search helpers built on visitor-key traversal.",
-    "exports": [
-      "findDescendant",
-      "someDescendant"
-    ]
+    "exports": ["findDescendant", "someDescendant"]
   },
   "specifications": [
     {

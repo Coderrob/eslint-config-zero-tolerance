@@ -19,11 +19,7 @@
  */
 
 import type { TSESTree } from '@typescript-eslint/utils';
-import {
-  isCallExpressionNode,
-  isIdentifierNode,
-  isMemberExpressionNode,
-} from '../ast-guards';
+import { isCallExpressionNode, isIdentifierNode, isMemberExpressionNode } from '../ast-guards';
 import {
   getCallMemberMethodName,
   getLiteralStringValue,
