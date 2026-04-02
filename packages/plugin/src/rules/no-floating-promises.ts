@@ -17,7 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isIdentifierNode } from '../helpers/ast-guards';
-import { getMemberPropertyName } from '../helpers/ast-helpers';
+import { getCallMemberMethodName } from '../helpers/ast-helpers';
 import { createRule } from './support/rule-factory';
 
 const PROMISE_CHAIN_METHODS = new Set(['then', 'catch', 'finally']);
@@ -60,19 +60,6 @@ function createNoFloatingPromisesListeners(
   return {
     ExpressionStatement: checkExpressionStatement.bind(undefined, context),
   };
-}
-
-/**
- * Returns the member method name for a call expression, or null.
- *
- * @param node - Call expression node.
- * @returns Method name when callee is a member expression.
- */
-function getCallMemberMethodName(node: TSESTree.CallExpression): string | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
-    return null;
-  }
-  return getMemberPropertyName(node.callee);
 }
 
 /**

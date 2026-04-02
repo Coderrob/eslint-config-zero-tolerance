@@ -60,5 +60,10 @@ ruleTester.run('no-object-mutation', noObjectMutation, {
       code: 'class Counter { count = 0; increment() { this.count = this.count + 1; } }',
       errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
     },
+    {
+      name: 'should disallow assignment to this field inside arrow function',
+      code: 'const mutate = () => { this.count = 1; };',
+      errors: [{ messageId: 'noObjectMutation', data: { kind: 'assignment' } }],
+    },
   ],
 });

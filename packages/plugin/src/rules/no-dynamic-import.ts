@@ -15,7 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isIdentifierNode, isTestFile } from '../helpers/ast-guards';
+import { isTestFile } from '../helpers/ast-guards';
+import { hasCallCalleeNamePath } from '../helpers/ast/calls';
 import { CALLEE_REQUIRE } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
@@ -59,7 +60,7 @@ function createNoDynamicImportListeners(context: NoDynamicImportContext): TSESLi
  * @returns True when the callee is the `require` identifier.
  */
 function isRequireCall(node: TSESTree.CallExpression): boolean {
-  return isIdentifierNode(node.callee) && node.callee.name === CALLEE_REQUIRE;
+  return hasCallCalleeNamePath(node, [CALLEE_REQUIRE]);
 }
 
 /**

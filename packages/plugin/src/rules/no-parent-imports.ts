@@ -16,6 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { getStringLiteralCallArgument, hasCallCalleeNamePath } from '../helpers/ast/calls';
 import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
 import { isString } from '../helpers/type-guards';
 import { CALLEE_REQUIRE } from './support/rule-constants';
@@ -32,17 +33,14 @@ type NoParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImport', []
  * @param node - Call expression node.
  */
 function checkCallExpression(context: NoParentImportsContext, node: TSESTree.CallExpression): void {
-  if (!isRequireIdentifier(node.callee)) {
+  if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
   }
-  const firstArgument = getFirstArgument(node);
+  const firstArgument = getStringLiteralCallArgument(node, 0);
   if (firstArgument === null) {
     return;
   }
-  const importPath = getStringLiteralArgumentValue(firstArgument);
-  if (importPath !== null) {
-    reportIfParentImport(context, firstArgument, importPath);
-  }
+  reportIfParentImport(context, firstArgument, firstArgument.value);
 }
 
 /**
@@ -122,16 +120,6 @@ function getExternalModuleReference(
 }
 
 /**
- * Safely extracts the first call argument.
- *
- * @param node - Call expression node.
- * @returns The first argument, or null when absent.
- */
-function getFirstArgument(node: TSESTree.CallExpression): TSESTree.CallExpressionArgument | null {
-  return node.arguments.length === 0 ? null : node.arguments[0];
-}
-
-/**
  * Extracts a string literal value from a literal node.
  *
  * @param node - Potential literal node.
@@ -142,26 +130,6 @@ function getLiteralStringValue(node: TSESTree.Node): string | null {
     return null;
   }
   return isString(node.value) ? node.value : null;
-}
-
-/**
- * Extracts a string literal value from a call expression argument.
- *
- * @param argument - Call expression argument node.
- * @returns The string literal value, or null when not a string literal.
- */
-function getStringLiteralArgumentValue(argument: TSESTree.CallExpressionArgument): string | null {
-  return getLiteralStringValue(argument);
-}
-
-/**
- * Returns true when a callee node is the global `require` identifier.
- *
- * @param callee - Call expression callee node.
- * @returns True when the callee is `require`.
- */
-function isRequireIdentifier(callee: TSESTree.Node): boolean {
-  return callee.type === AST_NODE_TYPES.Identifier && callee.name === CALLEE_REQUIRE;
 }
 
 /**

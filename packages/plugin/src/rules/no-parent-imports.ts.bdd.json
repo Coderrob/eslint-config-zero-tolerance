@@ -24,10 +24,10 @@
           "then": "no violation is reported"
         },
         {
-          "name": "should allow a parent import in a barrel index file",
-          "given": "import { foo } from '../module' inside an index.ts file",
-          "when": "the rule evaluates the import declaration",
-          "then": "no violation is reported because barrel files are exempt"
+          "name": "should allow a require call with a same-directory path",
+          "given": "const value = require('./module')",
+          "when": "the rule evaluates the require call",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -51,6 +51,12 @@
           "given": "await import('../module') in a non-index file",
           "when": "the rule evaluates the import expression",
           "then": "a noParentImports violation is reported"
+        },
+        {
+          "name": "should report a require() call with a parent path",
+          "given": "const value = require('../module')",
+          "when": "the rule evaluates the require call",
+          "then": "a noParentImport violation is reported"
         }
       ]
     }

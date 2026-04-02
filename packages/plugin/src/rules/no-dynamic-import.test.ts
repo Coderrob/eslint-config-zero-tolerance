@@ -39,6 +39,11 @@ ruleTester.run('no-dynamic-import', noDynamicImport, {
       name: 'should allow require in .spec.jsx file',
     },
     {
+      code: 'const module = loader.require("./module");',
+      filename: 'src/file.ts',
+      name: 'should allow member require calls on non-global objects',
+    },
+    {
       code: 'import("./module").then(m => m.default);',
       filename: 'src/file.test.ts',
       name: 'should allow import expression in test file',

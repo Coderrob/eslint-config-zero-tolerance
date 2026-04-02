@@ -68,6 +68,10 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
       name: 'should allow test computed skip with description not starting with should',
     },
     {
+      code: "test['only']('should run only', () => {});",
+      name: 'should allow computed focused test with should prefix',
+    },
+    {
       code: 'it("renders correctly", () => {});',
       name: 'should allow custom prefix when configured',
       options: [{ prefix: 'renders' }],
@@ -162,6 +166,27 @@ ruleTester.run('require-test-description-style', requireTestDescriptionStyle, {
         },
       ],
       output: 'it.skip("should skipped test", () => {});',
+    },
+    {
+      code: "test['skip']('skipped test', () => {});",
+      name: 'should enforce computed skip tests when ignoreSkip is false',
+      options: [{ ignoreSkip: false }],
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: "test['skip'](\"should skipped test\", () => {});",
+    },
+    {
+      code: "test['only']('runs focused test', () => {});",
+      name: 'should report computed focused test descriptions without should prefix',
+      errors: [
+        {
+          messageId: 'requireTestDescriptionStyle',
+        },
+      ],
+      output: "test['only'](\"should runs focused test\", () => {});",
     },
     {
       code: 'it("handles correctly", () => {});',

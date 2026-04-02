@@ -1,0 +1,97 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/parameter-helpers.ts",
+  "module": {
+    "name": "parameter-helpers",
+    "description": "Reusable parameter-shape helpers shared across multiple rule implementations.",
+    "exports": [
+      "getAssignmentPatternIdentifier",
+      "getNamedParameterIdentifier",
+      "getNamedParameterName",
+      "getRestElementIdentifier"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "getAssignmentPatternIdentifier",
+      "scenarios": [
+        {
+          "name": "should return the left identifier for a defaulted parameter",
+          "given": "an AssignmentPattern whose left side is an Identifier",
+          "when": "getAssignmentPatternIdentifier is called",
+          "then": "returns the bound Identifier node"
+        },
+        {
+          "name": "should return null for a destructured defaulted parameter",
+          "given": "an AssignmentPattern whose left side is an ObjectPattern or ArrayPattern",
+          "when": "getAssignmentPatternIdentifier is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getNamedParameterIdentifier",
+      "scenarios": [
+        {
+          "name": "should return the identifier for a plain Identifier parameter",
+          "given": "a function parameter node that is an Identifier",
+          "when": "getNamedParameterIdentifier is called",
+          "then": "returns that Identifier node"
+        },
+        {
+          "name": "should return the identifier for a defaulted Identifier parameter",
+          "given": "a function parameter node that is an AssignmentPattern with an Identifier left side",
+          "when": "getNamedParameterIdentifier is called",
+          "then": "returns the left Identifier node"
+        },
+        {
+          "name": "should return the identifier for a rest Identifier parameter",
+          "given": "a function parameter node that is a RestElement with an Identifier argument",
+          "when": "getNamedParameterIdentifier is called",
+          "then": "returns the rest Identifier node"
+        },
+        {
+          "name": "should return null for a destructured parameter",
+          "given": "a function parameter node that is an ObjectPattern or ArrayPattern",
+          "when": "getNamedParameterIdentifier is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getNamedParameterName",
+      "scenarios": [
+        {
+          "name": "should return the identifier name for a directly nameable parameter",
+          "given": "a function parameter that resolves to a bound Identifier node",
+          "when": "getNamedParameterName is called",
+          "then": "returns the identifier name string"
+        },
+        {
+          "name": "should return null for a destructured parameter",
+          "given": "a function parameter that does not resolve to a bound Identifier node",
+          "when": "getNamedParameterName is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getRestElementIdentifier",
+      "scenarios": [
+        {
+          "name": "should return the argument identifier for a rest parameter",
+          "given": "a RestElement whose argument is an Identifier",
+          "when": "getRestElementIdentifier is called",
+          "then": "returns the bound Identifier node"
+        },
+        {
+          "name": "should return null for a destructured rest parameter",
+          "given": "a RestElement whose argument is an ArrayPattern or ObjectPattern",
+          "when": "getRestElementIdentifier is called",
+          "then": "returns null"
+        }
+      ]
+    }
+  ]
+}

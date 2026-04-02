@@ -1,0 +1,98 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/calls.ts",
+  "module": {
+    "name": "ast/calls",
+    "description": "Higher-level AST helpers for evaluating call and callee shapes.",
+    "exports": [
+      "getCalleeNamePath",
+      "getCallArgument",
+      "getStringLiteralCallArgument",
+      "hasCallCalleeNamePath"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "getCalleeNamePath",
+      "scenarios": [
+        {
+          "name": "should return a single segment for an identifier callee",
+          "given": "a callee node that is an Identifier",
+          "when": "getCalleeNamePath is called",
+          "then": "returns an array containing the identifier name"
+        },
+        {
+          "name": "should return the full path for chained member callees",
+          "given": "a callee node composed of nested MemberExpression segments with static property names",
+          "when": "getCalleeNamePath is called",
+          "then": "returns the ordered callee name path"
+        },
+        {
+          "name": "should unwrap nested call-expression callees",
+          "given": "a CallExpression whose callee is itself a statically resolvable callee chain",
+          "when": "getCalleeNamePath is called",
+          "then": "returns the ordered callee name path of the nested callee"
+        },
+        {
+          "name": "should return null when the callee path cannot be resolved statically",
+          "given": "a callee path that includes a computed member with a non-string-resolvable property",
+          "when": "getCalleeNamePath is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return null for unsupported callee node shapes",
+          "given": "a callee node that is neither an Identifier, MemberExpression, nor CallExpression",
+          "when": "getCalleeNamePath is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "Call argument access",
+      "scenarios": [
+        {
+          "name": "should return the requested call argument when it exists",
+          "given": "a CallExpression with an argument at the requested index",
+          "when": "getCallArgument is called",
+          "then": "returns that argument node"
+        },
+        {
+          "name": "should return null when the requested call argument is absent",
+          "given": "a CallExpression without an argument at the requested index",
+          "when": "getCallArgument is called",
+          "then": "returns null"
+        },
+        {
+          "name": "should return the string-literal call argument when the argument is a string literal",
+          "given": "a CallExpression whose argument at the requested index is a string literal",
+          "when": "getStringLiteralCallArgument is called",
+          "then": "returns that string-literal argument node"
+        },
+        {
+          "name": "should return null when the requested call argument is not a string literal",
+          "given": "a CallExpression whose argument at the requested index is missing or not a string literal",
+          "when": "getStringLiteralCallArgument is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "Call callee path matching",
+      "scenarios": [
+        {
+          "name": "should match a call expression when its resolved callee path exactly matches",
+          "given": "a CallExpression whose callee resolves to the expected ordered path, including string-computed member segments",
+          "when": "hasCallCalleeNamePath is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should not match a call expression when its resolved callee path differs",
+          "given": "a CallExpression whose callee resolves to a different path than the expected ordered path",
+          "when": "hasCallCalleeNamePath is called",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

@@ -15,8 +15,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { getMemberPropertyName } from '../helpers/ast-helpers';
+import { getCallMemberMethodName } from '../helpers/ast-helpers';
 import { createRule } from './support/rule-factory';
 
 const MUTATING_ARRAY_METHODS = new Set([
@@ -70,10 +69,7 @@ function createNoArrayMutationListeners(context: NoArrayMutationContext): TSESLi
  * @returns Method name when mutating, otherwise null.
  */
 function getMutatingMethodName(node: TSESTree.CallExpression): string | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
-    return null;
-  }
-  const methodName = getMemberPropertyName(node.callee);
+  const methodName = getCallMemberMethodName(node);
   if (methodName === null || !MUTATING_ARRAY_METHODS.has(methodName)) {
     return null;
   }

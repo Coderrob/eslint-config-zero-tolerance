@@ -22,14 +22,15 @@ import {
   getFunctionDeclarationName,
   getFunctionVariableName,
   getIdentifierName,
-  getVisitorChildNodes,
 } from '../helpers/ast-helpers';
+import { someDescendant } from '../helpers/ast/search';
 import {
   getJsdocComment,
   getLineIndentation,
   getTargetNode,
   isStandaloneLineTarget,
 } from '../helpers/jsdoc-helpers';
+import { getNamedParameterName } from '../helpers/parameter-helpers';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -315,16 +316,7 @@ function getNamedKeyFunctionName(node: FunctionNode): string | null {
  * @returns Parameter name for generated JSDoc.
  */
 function getParamTagName(param: TSESTree.Parameter, position: number): string {
-  if (isNamedParamIdentifier(param)) {
-    return param.name;
-  }
-  if (isNamedParamAssignment(param)) {
-    return param.left.name;
-  }
-  if (isNamedParamRestElement(param)) {
-    return param.argument.name;
-  }
-  return `param${position}`;
+  return getNamedParameterName(param) ?? `param${position}`;
 }
 
 /**
@@ -384,114 +376,9 @@ function hasReturnWithValue(
   const body = node.body;
   return (
     isExpressionBodiedArrowFunction(node) ||
-    (body.type === AST_NODE_TYPES.BlockStatement && hasReturnWithValueInBlock(body, sourceCode))
+    (body.type === AST_NODE_TYPES.BlockStatement &&
+      someDescendant(body, sourceCode, isReturnWithValueNode, isNestedControlFlowBoundaryNode))
   );
-}
-
-/**
- * Returns true when a block contains a return statement with an argument.
- *
- * Nested function and class boundaries are intentionally skipped so their
- * control flow does not affect the containing function's JSDoc requirements.
- *
- * @param body - Function block body.
- * @param sourceCode - ESLint source code helper.
- * @returns True when the block contains a return-with-value.
- */
-function hasReturnWithValueInBlock(
-  body: TSESTree.BlockStatement,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  return hasReturnWithValueInNodes(body.body, sourceCode);
-}
-
-/**
- * Returns true when a node contains a return statement with a value.
- *
- * @param node - Node to inspect.
- * @param sourceCode - ESLint source code helper.
- * @returns True when the node or its traversable children return a value.
- */
-function hasReturnWithValueInNode(
-  node: TSESTree.Node,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  if (isReturnWithValueNode(node)) {
-    return true;
-  }
-  if (isNestedControlFlowBoundaryNode(node)) {
-    return false;
-  }
-  return hasReturnWithValueInNodes(getVisitorChildNodes(node, sourceCode), sourceCode);
-}
-
-/**
- * Returns true when a node tree contains a return statement with a value.
- *
- * @param nodes - Root nodes to inspect.
- * @param sourceCode - ESLint source code helper.
- * @returns True when a return-with-value is found.
- */
-function hasReturnWithValueInNodes(
-  nodes: ReadonlyArray<TSESTree.Node>,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  for (const node of nodes) {
-    if (hasReturnWithValueInNode(node, sourceCode)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Returns true when a block contains a throw statement.
- *
- * @param body - Function block body.
- * @param sourceCode - ESLint source code helper.
- * @returns True when throw exists.
- */
-function hasThrowInBlock(
-  body: TSESTree.BlockStatement,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  return hasThrowInNodes(body.body, sourceCode);
-}
-
-/**
- * Returns true when a node contains a throw statement.
- *
- * @param node - Node to inspect.
- * @param sourceCode - ESLint source code helper.
- * @returns True when the node or its traversable children contain a throw statement.
- */
-function hasThrowInNode(node: TSESTree.Node, sourceCode: Readonly<TSESLint.SourceCode>): boolean {
-  if (isThrowStatementNode(node)) {
-    return true;
-  }
-  if (isNestedControlFlowBoundaryNode(node)) {
-    return false;
-  }
-  return hasThrowInNodes(getVisitorChildNodes(node, sourceCode), sourceCode);
-}
-
-/**
- * Returns true when a node tree contains a throw statement.
- *
- * @param nodes - Root nodes to inspect.
- * @param sourceCode - ESLint source code helper.
- * @returns True when a throw statement is found.
- */
-function hasThrowInNodes(
-  nodes: ReadonlyArray<TSESTree.Node>,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  for (const node of nodes) {
-    if (hasThrowInNode(node, sourceCode)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 /**
@@ -505,7 +392,7 @@ function hasThrowStatement(node: FunctionNode, sourceCode: Readonly<TSESLint.Sou
   if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
     return false;
   }
-  return hasThrowInBlock(node.body, sourceCode);
+  return someDescendant(node.body, sourceCode, isThrowStatementNode, isNestedControlFlowBoundaryNode);
 }
 
 /**
@@ -572,44 +459,6 @@ function isNamedKeyParentNode(
 }
 
 /**
- * Returns true when a function parameter is an assignment with identifier lhs.
- *
- * @param node - Parameter node to inspect.
- * @returns True when parameter resolves to identifier through default assignment.
- */
-function isNamedParamAssignment(
-  node: TSESTree.Parameter,
-): node is TSESTree.AssignmentPattern & { left: TSESTree.Identifier } {
-  return (
-    node.type === AST_NODE_TYPES.AssignmentPattern && node.left.type === AST_NODE_TYPES.Identifier
-  );
-}
-
-/**
- * Returns true when a function parameter is a named identifier.
- *
- * @param node - Parameter node to inspect.
- * @returns True when parameter resolves to an identifier name.
- */
-function isNamedParamIdentifier(node: TSESTree.Parameter): node is TSESTree.Identifier {
-  return node.type === AST_NODE_TYPES.Identifier;
-}
-
-/**
- * Returns true when a function parameter is a rest identifier.
- *
- * @param node - Parameter node to inspect.
- * @returns True when parameter resolves to rest identifier.
- */
-function isNamedParamRestElement(
-  node: TSESTree.Parameter,
-): node is TSESTree.RestElement & { argument: TSESTree.Identifier } {
-  return (
-    node.type === AST_NODE_TYPES.RestElement && node.argument.type === AST_NODE_TYPES.Identifier
-  );
-}
-
-/**
  * Returns true when a node should stop return-statement traversal.
  *
  * @param node - AST node to inspect.
@@ -635,7 +484,7 @@ function isReturnWithValueNode(node: TSESTree.Node): node is TSESTree.ReturnStat
  * @param node - Node to inspect.
  * @returns True when node is a throw statement.
  */
-function isThrowStatementNode(node: TSESTree.Node): boolean {
+function isThrowStatementNode(node: TSESTree.Node): node is TSESTree.ThrowStatement {
   return node.type === AST_NODE_TYPES.ThrowStatement;
 }
 

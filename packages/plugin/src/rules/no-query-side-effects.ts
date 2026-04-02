@@ -15,9 +15,8 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../helpers/ast-guards';
-import { getMemberPropertyName, resolveFunctionName } from '../helpers/ast-helpers';
+import { getCallMemberMethodName, resolveFunctionName } from '../helpers/ast-helpers';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -234,10 +233,7 @@ function getCurrentScope(functionStack: QueryScopeStack): QueryScopeInfo | null 
  * @returns Method name if mutating, otherwise null.
  */
 function getMutatingMethodName(node: TSESTree.CallExpression): string | null {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
-    return null;
-  }
-  const method = getMemberPropertyName(node.callee);
+  const method = getCallMemberMethodName(node);
   if (method === null || !MUTATING_METHODS.has(method)) {
     return null;
   }

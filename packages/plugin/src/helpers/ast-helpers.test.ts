@@ -1,4 +1,5 @@
 import {
+  getCallMemberMethodName,
   getFunctionDeclarationName,
   getFunctionMethodName,
   getFunctionVariableName,
@@ -33,6 +34,28 @@ describe('ast-helpers', () => {
   });
 
   // ── getFunctionDeclarationName ───────────────────────────────────────────
+
+  describe('getCallMemberMethodName', () => {
+    it('should return the method name when the callee is a member expression', () => {
+      const node = {
+        callee: {
+          type: 'MemberExpression',
+          computed: false,
+          property: { type: 'Identifier', name: 'catch' },
+        },
+      } as any;
+
+      expect(getCallMemberMethodName(node)).toBe('catch');
+    });
+
+    it('should return null when the callee is not a member expression', () => {
+      const node = {
+        callee: { type: 'Identifier', name: 'fn' },
+      } as any;
+
+      expect(getCallMemberMethodName(node)).toBeNull();
+    });
+  });
 
   describe('getFunctionDeclarationName', () => {
     it('should return the name from a named FunctionDeclaration', () => {

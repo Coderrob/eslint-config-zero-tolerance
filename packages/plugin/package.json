@@ -26,9 +26,14 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.js"
+      }
     }
   },
   "files": [
@@ -63,10 +68,10 @@
   "repository": {
     "directory": "packages/plugin",
     "type": "git",
-    "url": "https://github.com/Coderrob/eslint-config-zero-tolerance.git"
+    "url": "git+https://github.com/Coderrob/eslint-config-zero-tolerance.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean && node ../../scripts/sync-dts-variants.mjs index",
     "clean": "rimraf dist",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
@@ -75,5 +80,6 @@
     "test": "jest --coverage"
   },
   "types": "dist/index.d.ts",
+  "type": "commonjs",
   "version": "1.2.1"
 }

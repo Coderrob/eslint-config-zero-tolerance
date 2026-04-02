@@ -17,14 +17,9 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
-import {
-  type FunctionNode,
-  isCallExpressionNode,
-  isIdentifierNode,
-  isMemberExpressionNode,
-  isTestFile,
-} from '../helpers/ast-guards';
-import { getMemberPropertyName, resolveFunctionName } from '../helpers/ast-helpers';
+import { type FunctionNode, isCallExpressionNode, isTestFile } from '../helpers/ast-guards';
+import { resolveFunctionName } from '../helpers/ast-helpers';
+import { getCalleeNamePath } from '../helpers/ast/calls';
 import {
   getJsdocComment,
   getLineIndentation,
@@ -159,50 +154,6 @@ function findLastTestCallbackNameIndex(calleeNamePath: readonly string[]): numbe
     }
   }
   return null;
-}
-
-/**
- * Returns the callee name path for identifier/member/call callee forms.
- *
- * @param callee - Call expression callee to inspect.
- * @returns Ordered name path, or null when not statically resolvable.
- */
-function getCalleeNamePath(callee: TSESTree.Node): string[] | null {
-  if (isIdentifierNode(callee)) {
-    return [callee.name];
-  }
-  if (isCallExpressionNode(callee)) {
-    return getCalleeNamePathFromCallExpression(callee);
-  }
-  if (!isMemberExpressionNode(callee)) {
-    return null;
-  }
-  return getCalleeNamePathFromMemberExpression(callee);
-}
-
-/**
- * Returns the callee name path for nested call-expression callees.
- *
- * @param callee - Call expression callee to inspect.
- * @returns Ordered name path, or null when not statically resolvable.
- */
-function getCalleeNamePathFromCallExpression(callee: TSESTree.CallExpression): string[] | null {
-  return getCalleeNamePath(callee.callee);
-}
-
-/**
- * Returns the callee name path for member-expression callees.
- *
- * @param callee - Member expression callee to inspect.
- * @returns Ordered name path, or null when not statically resolvable.
- */
-function getCalleeNamePathFromMemberExpression(callee: TSESTree.MemberExpression): string[] | null {
-  const propertyName = getMemberPropertyName(callee);
-  const objectPath = getCalleeNamePath(callee.object);
-  if (propertyName === null || objectPath === null) {
-    return null;
-  }
-  return [...objectPath, propertyName];
 }
 
 /**

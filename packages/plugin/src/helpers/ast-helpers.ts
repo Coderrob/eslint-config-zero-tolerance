@@ -19,6 +19,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import {
   type FunctionNode,
@@ -29,6 +30,19 @@ import {
   isVariableDeclaratorNode,
 } from './ast-guards';
 import { isPlainObject, isString } from './type-guards';
+
+/**
+ * Returns the member method name for a call expression, or null.
+ *
+ * @param node - Call expression node.
+ * @returns Method name when callee is a member expression.
+ */
+export function getCallMemberMethodName(node: TSESTree.CallExpression): string | null {
+  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+    return null;
+  }
+  return getMemberPropertyName(node.callee);
+}
 
 /**
  * Returns the property name for bracket-notation (computed) member access

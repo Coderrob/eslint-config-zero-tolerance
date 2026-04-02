@@ -17,6 +17,16 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { getFunctionDeclarationName, getFunctionVariableName } from '../helpers/ast-helpers';
+import {
+  getFirstNonThisParameter,
+  getParameterTypeAnnotation,
+} from '../helpers/ast/parameters';
+import {
+  hasAllReadonlyPropertyMembers,
+  hasTypeArguments,
+  isNamedTypeReference,
+  unwrapTsExpression,
+} from '../helpers/ast/types';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -34,7 +44,6 @@ interface IFunctionState {
 
 const PASCAL_CASE_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
 const READONLY_TYPE_NAME = 'Readonly';
-const THIS_PARAMETER_NAME = 'this';
 
 /**
  * Builds tracked state for one function-like node.
@@ -78,22 +87,6 @@ function createRequireReadonlyPropsListeners(
 }
 
 /**
- * Returns type annotation from an assignment-pattern parameter.
- *
- * @param param - Assignment-pattern parameter.
- * @returns Type annotation when present.
- */
-function getAssignmentPatternTypeAnnotation(
-  param: TSESTree.AssignmentPattern,
-): TSESTree.TSTypeAnnotation | null {
-  const left = param.left;
-  if (left.type === AST_NODE_TYPES.Identifier || left.type === AST_NODE_TYPES.ObjectPattern) {
-    return left.typeAnnotation ?? null;
-  }
-  return null;
-}
-
-/**
  * Returns a component name when function declaration shape provides one.
  *
  * @param node - Function-like node.
@@ -114,7 +107,7 @@ function getComponentName(node: FunctionNode): string | null {
  * @returns First non-`this` parameter, or undefined when none exists.
  */
 function getFirstPropsParam(params: TSESTree.Parameter[]): TSESTree.Parameter | undefined {
-  return params.find(isNotThisParameter);
+  return getFirstNonThisParameter(params);
 }
 
 /**
@@ -133,95 +126,13 @@ function getMutablePropsNode(
 }
 
 /**
- * Returns type annotation from supported parameter node shapes.
- *
- * @param param - Function parameter.
- * @returns Parameter type annotation when present.
- */
-function getParameterTypeAnnotation(param: TSESTree.Parameter): TSESTree.TSTypeAnnotation | null {
-  if (param.type === AST_NODE_TYPES.AssignmentPattern) {
-    return getAssignmentPatternTypeAnnotation(param);
-  }
-  if (isDirectlyTypedParameter(param)) {
-    return param.typeAnnotation ?? null;
-  }
-  return null;
-}
-
-/**
- * Returns wrapped expression for TypeScript satisfies wrapper nodes around JSX.
- *
- * @param expression - Candidate expression.
- * @returns Wrapped expression when satisfies is used.
- */
-function getSatisfiesWrappedExpression(
-  expression: TSESTree.Expression,
-): TSESTree.Expression | null {
-  if (expression.type === AST_NODE_TYPES.TSSatisfiesExpression) {
-    return expression.expression;
-  }
-  return null;
-}
-
-/**
- * Returns wrapped expression for TypeScript wrapper nodes around JSX.
- *
- * @param expression - Candidate expression.
- * @returns Wrapped expression when wrapper is supported.
- */
-function getWrappedJsxExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
-  const satisfiesExpression = getSatisfiesWrappedExpression(expression);
-  if (satisfiesExpression !== null) {
-    return satisfiesExpression;
-  }
-  if (expression.type === AST_NODE_TYPES.TSAsExpression) {
-    return expression.expression;
-  }
-  if (expression.type === AST_NODE_TYPES.TSNonNullExpression) {
-    return expression.expression;
-  }
-  return null;
-}
-
-/**
- * Returns true when `Readonly<T>` has at least one type argument.
- *
- * @param node - Type-reference node.
- * @returns True when type arguments exist.
- */
-function hasReadonlyTypeArgument(node: TSESTree.TSTypeReference): boolean {
-  return node.typeArguments !== undefined && node.typeArguments.params.length > 0;
-}
-
-/**
  * Returns true when every type literal member is a readonly property signature.
  *
  * @param node - Type-literal node.
  * @returns True when all members are readonly properties.
  */
 function hasReadonlyTypeMembers(node: TSESTree.TSTypeLiteral): boolean {
-  for (const member of node.members) {
-    if (member.type !== AST_NODE_TYPES.TSPropertySignature || !member.readonly) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Returns true when parameter type can carry a direct type annotation.
- *
- * @param param - Function parameter.
- * @returns True for identifier/object/rest parameters.
- */
-function isDirectlyTypedParameter(
-  param: TSESTree.Parameter,
-): param is TSESTree.Identifier | TSESTree.ObjectPattern | TSESTree.RestElement {
-  return (
-    param.type === AST_NODE_TYPES.Identifier ||
-    param.type === AST_NODE_TYPES.ObjectPattern ||
-    param.type === AST_NODE_TYPES.RestElement
-  );
+  return hasAllReadonlyPropertyMembers(node);
 }
 
 /**
@@ -237,8 +148,8 @@ function isJsxExpression(expression: TSESTree.Expression): boolean {
   ) {
     return true;
   }
-  const wrappedExpression = getWrappedJsxExpression(expression);
-  if (wrappedExpression !== null) {
+  const wrappedExpression = unwrapTsExpression(expression);
+  if (wrappedExpression !== expression) {
     return isJsxExpression(wrappedExpression);
   }
   return false;
@@ -256,16 +167,6 @@ function isMutablePropsParameter(param: TSESTree.Parameter): boolean {
     return true;
   }
   return !isReadonlyPropsType(typeAnnotation.typeAnnotation);
-}
-
-/**
- * Returns true when a parameter is not a TypeScript `this` pseudo-parameter.
- *
- * @param param - Function parameter.
- * @returns True when the parameter is not the `this` pseudo-parameter.
- */
-function isNotThisParameter(param: TSESTree.Parameter): boolean {
-  return !(param.type === AST_NODE_TYPES.Identifier && param.name === THIS_PARAMETER_NAME);
 }
 
 /**
@@ -301,13 +202,10 @@ function isReadonlyPropsType(node: TSESTree.TypeNode): boolean {
  * @returns True when node references `Readonly<T>`.
  */
 function isReadonlyTypeReference(node: TSESTree.TSTypeReference): boolean {
-  if (node.typeName.type !== AST_NODE_TYPES.Identifier) {
+  if (!isNamedTypeReference(node, READONLY_TYPE_NAME)) {
     return false;
   }
-  if (node.typeName.name !== READONLY_TYPE_NAME) {
-    return false;
-  }
-  return hasReadonlyTypeArgument(node);
+  return hasTypeArguments(node);
 }
 
 /**

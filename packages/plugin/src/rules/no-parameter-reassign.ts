@@ -17,6 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import type { FunctionNode } from '../helpers/ast-guards';
+import { getNamedParameterName } from '../helpers/parameter-helpers';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -100,19 +101,6 @@ function exitFunctionScope(parameterStack: ParameterScopeStack, _node: FunctionN
 }
 
 /**
- * Returns identifier name for assignment-pattern parameters.
- *
- * @param param - Function parameter node.
- * @returns Identifier name when assignment-pattern parameter is supported.
- */
-function getAssignmentPatternParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type !== AST_NODE_TYPES.AssignmentPattern) {
-    return null;
-  }
-  return param.left.type === AST_NODE_TYPES.Identifier ? param.left.name : null;
-}
-
-/**
  * Creates a set of parameter names for one function scope.
  *
  * @param node - Function node to inspect.
@@ -121,42 +109,12 @@ function getAssignmentPatternParameterName(param: TSESTree.Parameter): string | 
 function getFunctionParameterNames(node: FunctionNode): Set<string> {
   const names = new Set<string>();
   for (const param of node.params) {
-    const name = getParameterName(param);
+    const name = getNamedParameterName(param);
     if (name !== null) {
       names.add(name);
     }
   }
   return names;
-}
-
-/**
- * Returns identifier name for supported parameter shapes.
- *
- * @param param - Function parameter node.
- * @returns Parameter name when resolvable, otherwise null.
- */
-function getParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type === AST_NODE_TYPES.Identifier) {
-    return param.name;
-  }
-  const restElementName = getRestElementParameterName(param);
-  if (restElementName !== null) {
-    return restElementName;
-  }
-  return getAssignmentPatternParameterName(param);
-}
-
-/**
- * Returns identifier name for rest-element parameters.
- *
- * @param param - Function parameter node.
- * @returns Identifier name when rest-element parameter is supported.
- */
-function getRestElementParameterName(param: TSESTree.Parameter): string | null {
-  if (param.type !== AST_NODE_TYPES.RestElement) {
-    return null;
-  }
-  return param.argument.type === AST_NODE_TYPES.Identifier ? param.argument.name : null;
 }
 
 /**

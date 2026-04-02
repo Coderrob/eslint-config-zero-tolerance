@@ -17,7 +17,8 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../helpers/ast-guards';
-import { getVisitorChildNodes } from '../helpers/ast-helpers';
+import { getObjectDestructuredParameterTypeNode } from '../helpers/ast/parameters';
+import { someDescendant } from '../helpers/ast/search';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -53,53 +54,6 @@ function createNoDestructuredParameterTypeLiteralListeners(
 }
 
 /**
- * Returns the type node for an assignment-pattern object-destructured parameter shape.
- *
- * @param param - Assignment-pattern parameter.
- * @returns Type node when the left side destructures an object and is annotated.
- */
-function getAssignmentPatternObjectDestructuredTypeNode(
-  param: TSESTree.AssignmentPattern,
-): TSESTree.TypeNode | null {
-  if (param.left.type !== AST_NODE_TYPES.ObjectPattern) {
-    return null;
-  }
-  return param.left.typeAnnotation?.typeAnnotation ?? null;
-}
-
-/**
- * Returns the type node for a directly object-destructured parameter shape.
- *
- * @param param - Function parameter node.
- * @returns Type node when the parameter is an object pattern and is annotated.
- */
-function getDirectObjectDestructuredTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
-  if (param.type !== AST_NODE_TYPES.ObjectPattern) {
-    return null;
-  }
-  return param.typeAnnotation?.typeAnnotation ?? null;
-}
-
-/**
- * Returns the type node for an object-destructured parameter shape.
- *
- * @param param - Function parameter node.
- * @returns Type node when the parameter destructures an object and is annotated.
- */
-function getObjectDestructuredParameterTypeNode(
-  param: TSESTree.Parameter,
-): TSESTree.TypeNode | null {
-  const directTypeNode = getDirectObjectDestructuredTypeNode(param);
-  if (directTypeNode !== null) {
-    return directTypeNode;
-  }
-  if (param.type !== AST_NODE_TYPES.AssignmentPattern) {
-    return null;
-  }
-  return getAssignmentPatternObjectDestructuredTypeNode(param);
-}
-
-/**
  * Returns true when the provided type tree contains an inline object type literal.
  *
  * @param node - Root type node.
@@ -110,19 +64,17 @@ function hasInlineObjectTypeLiteral(
   node: TSESTree.TypeNode,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
-  const pendingNodes: TSESTree.Node[] = [node];
-  while (pendingNodes.length > 0) {
-    const current = pendingNodes.pop();
-    /* istanbul ignore next */
-    if (current === undefined) {
-      return false;
-    }
-    if (current.type === AST_NODE_TYPES.TSTypeLiteral) {
-      return true;
-    }
-    pendingNodes.push(...getVisitorChildNodes(current, sourceCode));
-  }
-  return false;
+  return someDescendant(node, sourceCode, isTypeLiteralNode);
+}
+
+/**
+ * Returns true when a node is a TypeScript type literal.
+ *
+ * @param node - Node to inspect.
+ * @returns True when the node is a TSTypeLiteral.
+ */
+function isTypeLiteralNode(node: TSESTree.Node): node is TSESTree.TSTypeLiteral {
+  return node.type === AST_NODE_TYPES.TSTypeLiteral;
 }
 
 /**

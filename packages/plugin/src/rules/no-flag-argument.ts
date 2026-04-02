@@ -17,6 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import type { FunctionNode } from '../helpers/ast-guards';
+import { getNamedParameterIdentifier } from '../helpers/parameter-helpers';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -30,7 +31,7 @@ type NoFlagArgumentContext = Readonly<TSESLint.RuleContext<'noFlagArgument', []>
  */
 function checkFunctionNode(context: NoFlagArgumentContext, node: FunctionNode): void {
   for (const parameter of node.params) {
-    const parameterIdentifier = getParameterIdentifier(parameter);
+    const parameterIdentifier = getNamedParameterIdentifier(parameter);
     if (parameterIdentifier === null || !hasBooleanTypeAnnotation(parameterIdentifier)) {
       continue;
     }
@@ -46,25 +47,6 @@ function checkFunctionNode(context: NoFlagArgumentContext, node: FunctionNode): 
  */
 function createNoFlagArgumentListeners(context: NoFlagArgumentContext): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
-}
-
-/**
- * Returns identifier node for supported parameters.
- *
- * @param parameter - Function parameter node.
- * @returns Identifier node for direct/defaulted parameters, otherwise null.
- */
-function getParameterIdentifier(parameter: TSESTree.Parameter): TSESTree.Identifier | null {
-  if (parameter.type === AST_NODE_TYPES.Identifier) {
-    return parameter;
-  }
-  if (
-    parameter.type === AST_NODE_TYPES.AssignmentPattern &&
-    parameter.left.type === AST_NODE_TYPES.Identifier
-  ) {
-    return parameter.left;
-  }
-  return null;
 }
 
 /**

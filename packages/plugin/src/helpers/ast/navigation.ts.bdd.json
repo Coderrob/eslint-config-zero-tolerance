@@ -1,0 +1,103 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/helpers/ast/navigation.ts",
+  "module": {
+    "name": "ast/navigation",
+    "description": "Higher-level AST navigation helpers for ancestry and sibling traversal.",
+    "exports": [
+      "findAncestor",
+      "findEnclosingFunction",
+      "getNextStatementInBlock",
+      "getParentBlockStatement",
+      "isInsideBoundary"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "findAncestor",
+      "scenarios": [
+        {
+          "name": "should return the nearest ancestor that matches the predicate",
+          "given": "a node whose parent chain includes an ancestor accepted by the predicate",
+          "when": "findAncestor is called",
+          "then": "returns the nearest matching ancestor node"
+        },
+        {
+          "name": "should return null when no ancestor matches the predicate",
+          "given": "a node whose parent chain does not include a matching ancestor",
+          "when": "findAncestor is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "findEnclosingFunction",
+      "scenarios": [
+        {
+          "name": "should return the nearest enclosing function-like ancestor",
+          "given": "a node nested inside an arrow function, function declaration, or function expression",
+          "when": "findEnclosingFunction is called",
+          "then": "returns the nearest enclosing function-like node"
+        },
+        {
+          "name": "should return null when no function-like ancestor exists",
+          "given": "a node outside of any function-like ancestor",
+          "when": "findEnclosingFunction is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getNextStatementInBlock",
+      "scenarios": [
+        {
+          "name": "should return the following statement in a block",
+          "given": "a block statement containing a statement followed by another statement",
+          "when": "getNextStatementInBlock is called",
+          "then": "returns the next statement in the block body"
+        },
+        {
+          "name": "should return null when the statement is the last block entry",
+          "given": "a block statement whose target statement has no following sibling",
+          "when": "getNextStatementInBlock is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "getParentBlockStatement",
+      "scenarios": [
+        {
+          "name": "should return the parent block statement for a statement node",
+          "given": "a statement whose parent is a BlockStatement",
+          "when": "getParentBlockStatement is called",
+          "then": "returns that BlockStatement"
+        },
+        {
+          "name": "should return null when the parent is not a block statement",
+          "given": "a statement whose parent is not a BlockStatement",
+          "when": "getParentBlockStatement is called",
+          "then": "returns null"
+        }
+      ]
+    },
+    {
+      "feature": "isInsideBoundary",
+      "scenarios": [
+        {
+          "name": "should return true when a matching boundary is reached before a stop boundary",
+          "given": "an ancestor chain where the nearest relevant boundary type is in the match set",
+          "when": "isInsideBoundary is called",
+          "then": "returns true"
+        },
+        {
+          "name": "should return false when a stop boundary is reached before a matching boundary",
+          "given": "an ancestor chain where the nearest relevant boundary type is in the stop set",
+          "when": "isInsideBoundary is called",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

@@ -15,11 +15,14 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { getNextStatementInBlock, getParentBlockStatement } from '../helpers/ast/navigation';
+import {
+  getBooleanLiteralReturnValue,
+  getBooleanLiteralValue,
+  getReturnStatement,
+} from '../helpers/ast/statements';
 import { createRule } from './support/rule-factory';
 
-const FIRST_ITEM_INDEX = 0;
-const SINGLE_ITEM_COUNT = 1;
 const RANGE_START_INDEX = 0;
 const RANGE_END_INDEX = 1;
 
@@ -114,46 +117,6 @@ function createReportFix(
 }
 
 /**
- * Reads a boolean return statement from a block containing one statement.
- *
- * @param blockStatement - Block statement to inspect.
- * @returns Return statement, or null when block does not match.
- */
-function getBooleanReturnFromBlock(
-  blockStatement: TSESTree.BlockStatement,
-): TSESTree.ReturnStatement | null {
-  if (blockStatement.body.length !== SINGLE_ITEM_COUNT) {
-    return null;
-  }
-  const statement = blockStatement.body[FIRST_ITEM_INDEX];
-  return statement.type === AST_NODE_TYPES.ReturnStatement ? statement : null;
-}
-
-/**
- * Reads a boolean return value from a statement.
- *
- * @param statement - Statement to inspect.
- * @returns Boolean value, or null when statement is not a boolean return.
- */
-function getBooleanReturnFromStatement(statement: TSESTree.Statement): boolean | null {
-  const returnStatement = getReturnStatementFromStatement(statement);
-  return returnStatement === null ? null : getBooleanReturnFromValue(returnStatement.argument);
-}
-
-/**
- * Reads a boolean value from a return argument expression.
- *
- * @param value - Return argument expression.
- * @returns Boolean value, or null when not a boolean literal.
- */
-function getBooleanReturnFromValue(value: TSESTree.Expression | null): boolean | null {
-  if (value?.type !== AST_NODE_TYPES.Literal) {
-    return null;
-  }
-  return typeof value.value === 'boolean' ? value.value : null;
-}
-
-/**
  * Returns the immediately following boolean return statement in the same block.
  *
  * @param node - If statement node.
@@ -167,7 +130,7 @@ function getFollowingBooleanReturnStatement(
     return null;
   }
   const nextStatement = getNextStatementInBlock(parent, node);
-  return getReturnStatementFromStatement(nextStatement);
+  return getReturnStatement(nextStatement);
 }
 
 /**
@@ -217,61 +180,6 @@ function getIfThenReturnReplacement(
         whenTrue: booleanPair.whenTrue,
         whenFalse: booleanPair.whenFalse,
       });
-}
-
-/**
- * Returns the next statement for a node inside a block.
- *
- * @param blockStatement - Parent block statement.
- * @param node - Node to locate in the block body.
- * @returns Next statement, or null when missing.
- */
-function getNextStatementInBlock(
-  blockStatement: TSESTree.BlockStatement,
-  node: TSESTree.Statement,
-): TSESTree.Statement | null {
-  const index = blockStatement.body.indexOf(node);
-  return blockStatement.body[index + SINGLE_ITEM_COUNT] ?? null;
-}
-
-/**
- * Returns a block-statement parent for the provided statement.
- *
- * @param node - Statement node.
- * @returns Parent block statement, or null.
- */
-function getParentBlockStatement(node: TSESTree.Statement): TSESTree.BlockStatement | null {
-  const parent = node.parent;
-  return parent.type === AST_NODE_TYPES.BlockStatement ? parent : null;
-}
-
-/**
- * Reads a return statement from either a return statement or a single-return block.
- *
- * @param statement - Statement to inspect.
- * @returns Return statement, or null when none is available.
- */
-function getReturnStatementFromNonNullStatement(
-  statement: TSESTree.Statement,
-): TSESTree.ReturnStatement | null {
-  if (statement.type === AST_NODE_TYPES.ReturnStatement) {
-    return statement;
-  }
-  return statement.type === AST_NODE_TYPES.BlockStatement
-    ? getBooleanReturnFromBlock(statement)
-    : null;
-}
-
-/**
- * Reads a return statement from either a return statement or a single-return block.
- *
- * @param statement - Statement to inspect.
- * @returns Return statement, or null when none is available.
- */
-function getReturnStatementFromStatement(
-  statement: TSESTree.Statement | null,
-): TSESTree.ReturnStatement | null {
-  return statement === null ? null : getReturnStatementFromNonNullStatement(statement);
 }
 
 /**
@@ -378,8 +286,8 @@ function zIfElseBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | nu
   if (node.alternate === null) {
     return null;
   }
-  const whenTrue = getBooleanReturnFromStatement(node.consequent);
-  const whenFalse = getBooleanReturnFromStatement(node.alternate);
+  const whenTrue = getBooleanLiteralReturnValue(node.consequent);
+  const whenFalse = getBooleanLiteralReturnValue(node.alternate);
   return whenTrue === null || whenFalse === null ? null : { endNode: node, whenTrue, whenFalse };
 }
 
@@ -394,7 +302,7 @@ function zIfElseBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | nu
  * @returns Replacement plan, or null when pair is not transformable.
  */
 function zIfThenBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | null {
-  const whenTrue = getBooleanReturnFromStatement(node.consequent);
+  const whenTrue = getBooleanLiteralReturnValue(node.consequent);
   const trailingReturn = zTrailingBooleanReturn(node);
   if (whenTrue === null || trailingReturn === null) {
     return null;
@@ -413,7 +321,7 @@ function zTrailingBooleanReturn(node: TSESTree.IfStatement): ITrailingBooleanRet
   if (nextReturn === null) {
     return null;
   }
-  const whenFalse = getBooleanReturnFromValue(nextReturn.argument);
+  const whenFalse = getBooleanLiteralValue(nextReturn.argument);
   return whenFalse === null ? null : { nextReturn, whenFalse };
 }
 

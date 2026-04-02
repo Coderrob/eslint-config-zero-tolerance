@@ -17,6 +17,12 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import type { FunctionNode } from '../helpers/ast-guards';
+import { getParameterTypeNode } from '../helpers/ast/parameters';
+import {
+  getTypeReferenceName,
+  hasAllReadonlyPropertyMembers,
+} from '../helpers/ast/types';
+import { getNamedParameterName } from '../helpers/parameter-helpers';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -74,30 +80,6 @@ function createReadonlyParameterFix(
 }
 
 /**
- * Returns parameter name for assignment-pattern shapes.
- *
- * @param param - Assignment-pattern parameter.
- * @returns Parameter display name.
- */
-function getAssignmentPatternParameterName(param: TSESTree.AssignmentPattern): string {
-  const simpleName = getSimpleParameterName(param.left);
-  if (simpleName !== null) {
-    return simpleName;
-  }
-  return DESTRUCTURED_PARAMETER_NAME;
-}
-
-/**
- * Returns assignment-pattern parameter type annotation.
- *
- * @param param - Assignment-pattern parameter.
- * @returns Type node when present.
- */
-function getAssignmentPatternTypeNode(param: TSESTree.AssignmentPattern): TSESTree.TypeNode | null {
-  return param.left.typeAnnotation?.typeAnnotation ?? null;
-}
-
-/**
  * Returns parameter display name for diagnostics.
  *
  * @param param - Function parameter node.
@@ -105,32 +87,13 @@ function getAssignmentPatternTypeNode(param: TSESTree.AssignmentPattern): TSESTr
  */
 function getParameterName(param: TSESTree.Parameter): string {
   if (param.type === AST_NODE_TYPES.TSParameterProperty) {
-    return getTSParameterPropertyName(param);
+    return getNamedParameterName(param.parameter) ?? DESTRUCTURED_PARAMETER_NAME;
   }
-  const simpleName = getSimpleParameterName(param);
-  if (simpleName !== null) {
-    return simpleName;
-  }
-  if (param.type === AST_NODE_TYPES.AssignmentPattern) {
-    return getAssignmentPatternParameterName(param);
+  const name = getNamedParameterName(param);
+  if (name !== null) {
+    return name;
   }
   return DESTRUCTURED_PARAMETER_NAME;
-}
-
-/**
- * Returns type annotation node for supported parameter shapes.
- *
- * @param param - Function parameter node.
- * @returns Type node when present.
- */
-function getParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
-  if (param.type === AST_NODE_TYPES.TSParameterProperty) {
-    return getTSParameterPropertyTypeNode(param);
-  }
-  if (param.type === AST_NODE_TYPES.AssignmentPattern) {
-    return getAssignmentPatternTypeNode(param);
-  }
-  return getSimpleAnnotatedParameterTypeNode(param);
 }
 
 /**
@@ -168,86 +131,13 @@ function getReadonlyReplacementTypeText(
 }
 
 /**
- * Returns parameter type for non-assignment parameter shapes.
- *
- * @param param - Function parameter node.
- * @returns Type node when present.
- */
-function getSimpleAnnotatedParameterTypeNode(
-  param: Exclude<TSESTree.Parameter, TSESTree.AssignmentPattern | TSESTree.TSParameterProperty>,
-): TSESTree.TypeNode | null {
-  return param.typeAnnotation?.typeAnnotation ?? null;
-}
-
-/**
- * Returns simple identifier parameter name when directly available.
- *
- * @param param - Function parameter-like node.
- * @returns Identifier name when resolvable.
- */
-function getSimpleParameterName(
-  param:
-    | TSESTree.ArrayPattern
-    | TSESTree.Identifier
-    | TSESTree.ObjectPattern
-    | TSESTree.Parameter
-    | TSESTree.RestElement,
-): string | null {
-  if (param.type === AST_NODE_TYPES.Identifier) {
-    return param.name;
-  }
-  if (
-    param.type === AST_NODE_TYPES.RestElement &&
-    param.argument.type === AST_NODE_TYPES.Identifier
-  ) {
-    return param.argument.name;
-  }
-  return null;
-}
-
-/**
- * Returns parameter display name for constructor parameter property.
- *
- * @param param - TSParameterProperty node.
- * @returns Parameter display name.
- */
-function getTSParameterPropertyName(param: TSESTree.TSParameterProperty): string {
-  const inner = param.parameter;
-  if (inner.type === AST_NODE_TYPES.AssignmentPattern) {
-    return getAssignmentPatternParameterName(inner);
-  }
-  return inner.name;
-}
-
-/**
- * Returns type annotation node for constructor parameter property.
- *
- * @param param - TSParameterProperty node.
- * @returns Type node when present.
- */
-function getTSParameterPropertyTypeNode(
-  param: TSESTree.TSParameterProperty,
-): TSESTree.TypeNode | null {
-  const inner = param.parameter;
-  if (inner.type === AST_NODE_TYPES.AssignmentPattern) {
-    return getAssignmentPatternTypeNode(inner);
-  }
-  return inner.typeAnnotation?.typeAnnotation ?? null;
-}
-
-/**
  * Returns true when any type-literal member is mutable.
  *
  * @param node - Type-literal node.
  * @returns True when mutable.
  */
 function hasMutableTypeLiteralMembers(node: TSESTree.TSTypeLiteral): boolean {
-  for (const member of node.members) {
-    if (member.type !== AST_NODE_TYPES.TSPropertySignature || !member.readonly) {
-      return true;
-    }
-  }
-  return false;
+  return !hasAllReadonlyPropertyMembers(node);
 }
 
 /**
@@ -289,12 +179,10 @@ function isMutableStructuredType(node: TSESTree.TypeNode): boolean {
  * @returns True when mutable.
  */
 function isMutableTypeReference(node: TSESTree.TSTypeReference): boolean {
-  if (node.typeName.type !== AST_NODE_TYPES.Identifier) {
-    return true;
-  }
+  const typeReferenceName = getTypeReferenceName(node);
   if (
-    node.typeName.name === READONLY_ARRAY_TYPE_NAME ||
-    node.typeName.name === READONLY_TYPE_NAME
+    typeReferenceName === READONLY_ARRAY_TYPE_NAME ||
+    typeReferenceName === READONLY_TYPE_NAME
   ) {
     return false;
   }

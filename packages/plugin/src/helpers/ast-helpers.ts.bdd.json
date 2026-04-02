@@ -6,6 +6,7 @@
     "name": "ast-helpers",
     "description": "Reusable AST helper functions shared across multiple rule implementations.",
     "exports": [
+      "getCallMemberMethodName",
       "getFunctionDeclarationName",
       "getFunctionMethodName",
       "getFunctionVariableName",
@@ -18,6 +19,23 @@
     ]
   },
   "specifications": [
+    {
+      "feature": "getCallMemberMethodName",
+      "scenarios": [
+        {
+          "name": "should return the member method name for a call expression",
+          "given": "a CallExpression whose callee is a MemberExpression with a resolvable property name",
+          "when": "getCallMemberMethodName is called",
+          "then": "returns the member method name string"
+        },
+        {
+          "name": "should return null when the callee is not a MemberExpression",
+          "given": "a CallExpression whose callee is a plain Identifier",
+          "when": "getCallMemberMethodName is called",
+          "then": "returns null"
+        }
+      ]
+    },
     {
       "feature": "getFunctionDeclarationName",
       "scenarios": [
