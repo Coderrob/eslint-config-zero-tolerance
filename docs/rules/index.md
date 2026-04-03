@@ -36,6 +36,7 @@
 | [no-banned-types](no-banned-types.md)                                               | problem    | Ban `ReturnType` and indexed access types                       |
 | [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                |
 | [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters |
+| [require-exported-object-type](require-exported-object-type.md)                     | suggestion | Require exported object constants to declare an explicit type annotation |
 
 ## Code Quality
 

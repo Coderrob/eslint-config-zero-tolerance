@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 51 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 52 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -113,6 +113,7 @@ export default [
 | `no-banned-types`                        | Ban `ReturnType` and indexed access types                       |
 | `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                |
 | `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters |
+| `require-exported-object-type`           | Require exported object constants to declare an explicit type annotation |
 
 ### Code Quality
 

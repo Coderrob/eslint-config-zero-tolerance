@@ -43,6 +43,18 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       code: 'type T = `foo`;',
       name: 'should allow single template literal type',
     },
+    {
+      code: 'const ACTIVE = getStatus(); const INACTIVE = getStatus(); type Status = typeof ACTIVE | typeof INACTIVE;',
+      name: 'should allow typeof unions that do not fully resolve to literal const values',
+    },
+    {
+      code: 'const ENABLED = true; const DISABLED = false; type Toggle = typeof ENABLED | typeof DISABLED;',
+      name: 'should allow boolean literal unions hidden behind const typeof references',
+    },
+    {
+      code: 'const ENABLED = true; const DISABLED = false; export type Toggle = typeof ENABLED | typeof DISABLED;',
+      name: 'should allow exported boolean literal unions hidden behind const typeof references',
+    },
   ],
   invalid: [
     {
@@ -212,6 +224,46 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'function run(mode: "fast" | "safe") {}',
       name: 'should report non-alias literal unions without offering enum autofix',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: "const ACTIVE = 'active'; const INACTIVE = 'inactive'; export type Status = typeof ACTIVE | typeof INACTIVE;",
+      name: 'should report typeof unions that resolve to string literal const values',
+      output:
+        'const ACTIVE = \'active\'; const INACTIVE = \'inactive\'; export enum Status { ACTIVE = "active", INACTIVE = "inactive" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: "const ACTIVE = 'active'; export type Status = typeof ACTIVE | 'inactive';",
+      name: 'should autofix mixed string literals and typeof string literal const references to exported enums',
+      output:
+        'const ACTIVE = \'active\'; export enum Status { ACTIVE = "active", Inactive = "inactive" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'const DRAFT = 0; const PUBLISHED = 1; export type Status = typeof DRAFT | typeof PUBLISHED;',
+      name: 'should report typeof unions that resolve to numeric literal const values without autofix',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: "const ACTIVE = 'active'; const UNKNOWN = getStatus(); export type Status = typeof ACTIVE | typeof UNKNOWN;",
+      name: 'should report typeof unions that mix literal const references with non-literal const references',
       errors: [
         {
           messageId: 'noLiteralUnions',

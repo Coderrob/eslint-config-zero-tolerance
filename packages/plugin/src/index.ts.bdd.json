@@ -57,6 +57,12 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['no-barrel-parent-imports'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register require-exported-object-type as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['require-exported-object-type'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

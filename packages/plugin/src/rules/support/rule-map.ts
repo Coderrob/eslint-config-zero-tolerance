@@ -26,6 +26,7 @@ const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
   'require-clean-barrel',
+  'require-exported-object-type',
   'require-interface-prefix',
   'require-test-description-style',
   'no-array-mutation',

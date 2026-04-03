@@ -27,12 +27,14 @@ const RULE_REQUIRE_CLEAN_BARREL = `${PLUGIN_NAMESPACE}/require-clean-barrel`;
 const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
 const RULE_NO_PARENT_INTERNAL_ACCESS = `${PLUGIN_NAMESPACE}/no-parent-internal-access`;
+const RULE_REQUIRE_EXPORTED_OBJECT_TYPE = `${PLUGIN_NAMESPACE}/require-exported-object-type`;
 const RULE_KEY_SORT_IMPORTS = 'sort-imports';
 const RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL = 'no-destructured-parameter-type-literal';
 const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
 const RULE_KEY_NO_BARREL_PARENT_IMPORTS = 'no-barrel-parent-imports';
 const RULE_KEY_NO_PARENT_INTERNAL_ACCESS = 'no-parent-internal-access';
 const RULE_KEY_REQUIRE_CLEAN_BARREL = 'require-clean-barrel';
+const RULE_KEY_REQUIRE_EXPORTED_OBJECT_TYPE = 'require-exported-object-type';
 const RULE_NO_BARREL_PARENT_IMPORTS = `${PLUGIN_NAMESPACE}/no-barrel-parent-imports`;
 
 describe('plugin wiring', () => {
@@ -54,6 +56,8 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('warn');
     expect(recommendedRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('warn');
     expect(strictRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('error');
+    expect(recommendedRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('warn');
+    expect(strictRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(strictRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(recommendedRules[RULE_NO_BARREL_PARENT_IMPORTS]).toBe('warn');
@@ -92,6 +96,7 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.rules?.[RULE_KEY_NO_BARREL_PARENT_IMPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_PARENT_INTERNAL_ACCESS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_CLEAN_BARREL]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_EXPORTED_OBJECT_TYPE]).toBeDefined();
     expect(eslintPlugin.configs.recommended.name).toBe(CONFIG_NAME_RECOMMENDED);
     expect(eslintPlugin.configs.strict.name).toBe(CONFIG_NAME_STRICT);
     expect(eslintPlugin.configs[CONFIG_KEY_LEGACY_RECOMMENDED]).toBe(legacyRecommendedConfig);

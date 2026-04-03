@@ -72,6 +72,12 @@
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {
+          "name": "should include require-exported-object-type in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-exported-object-type' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
           "name": "should include no-destructured-parameter-type-literal in built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/no-destructured-parameter-type-literal' entries are read",
