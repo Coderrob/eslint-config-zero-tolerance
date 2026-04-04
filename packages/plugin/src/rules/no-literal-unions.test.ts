@@ -84,7 +84,7 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       name: 'should allow typeof unions backed by const declarations without initializers',
     },
     {
-      code: "const { ACTIVE } = values; export type Status = typeof ACTIVE | typeof ACTIVE;",
+      code: 'const { ACTIVE } = values; export type Status = typeof ACTIVE | typeof ACTIVE;',
       name: 'should allow typeof unions backed by destructured const declarations',
     },
     {

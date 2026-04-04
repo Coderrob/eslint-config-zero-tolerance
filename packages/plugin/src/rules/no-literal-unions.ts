@@ -348,7 +348,10 @@ function getResolvedConstLiteral(
   type: TSESTree.TypeNode,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): IResolvedConstLiteral | null {
-  if (type.type !== AST_NODE_TYPES.TSTypeQuery || type.exprName.type !== AST_NODE_TYPES.Identifier) {
+  if (
+    type.type !== AST_NODE_TYPES.TSTypeQuery ||
+    type.exprName.type !== AST_NODE_TYPES.Identifier
+  ) {
     return null;
   }
   return constLiteralMap.get(type.exprName.name) ?? null;
@@ -471,7 +474,9 @@ function hasBannedLiteralUnionMember(
   node: TSESTree.TSUnionType,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  return hasDirectLiteralUnionMember(node) || hasLiteralConstReferenceUnionMember(node, constLiteralMap);
+  return (
+    hasDirectLiteralUnionMember(node) || hasLiteralConstReferenceUnionMember(node, constLiteralMap)
+  );
 }
 
 /**
@@ -499,10 +504,7 @@ function hasConstLiteralReferenceKind(
  */
 function hasDirectLiteralUnionMember(node: TSESTree.TSUnionType): boolean {
   for (const unionMember of node.types) {
-    if (
-      isLiteralTypeNode(unionMember) &&
-      BANNED_LITERAL_NODE_TYPES.has(unionMember.literal.type)
-    ) {
+    if (isLiteralTypeNode(unionMember) && BANNED_LITERAL_NODE_TYPES.has(unionMember.literal.type)) {
       return true;
     }
   }
@@ -566,10 +568,9 @@ function isBooleanLiteralType(
   type: TSESTree.TypeNode,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  return isDirectBooleanLiteralType(type) || hasConstLiteralReferenceKind(
-    type,
-    constLiteralMap,
-    ResolvedLiteralKind.Boolean,
+  return (
+    isDirectBooleanLiteralType(type) ||
+    hasConstLiteralReferenceKind(type, constLiteralMap, ResolvedLiteralKind.Boolean)
   );
 }
 
@@ -702,10 +703,7 @@ function isNoSubstitutionTemplateLiteral(
 ): expression is TSESTree.TemplateLiteral & {
   expressions: [];
 } {
-  return (
-    expression.type === AST_NODE_TYPES.TemplateLiteral &&
-    expression.expressions.length === 0
-  );
+  return expression.type === AST_NODE_TYPES.TemplateLiteral && expression.expressions.length === 0;
 }
 
 /**

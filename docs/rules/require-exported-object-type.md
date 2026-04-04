@@ -53,6 +53,8 @@ const StatusMap = {
 export { StatusMap };
 ```
 
+The rule only applies when the exported `const` initializer is an object literal or `Object.freeze({ ... })`. Calls such as `Object.freeze()` or `Object.freeze(...values)` are ignored because they do not expose a direct frozen object literal shape.
+
 ## Configuration
 
 This rule has no options:

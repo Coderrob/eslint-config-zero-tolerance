@@ -105,14 +105,14 @@ export default [
 
 ### Type Safety
 
-| Rule                                     | Description                                                     |
-| ---------------------------------------- | --------------------------------------------------------------- |
-| `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions     |
-| `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator     |
-| `no-literal-unions`                      | Ban literal union types in favour of enums                      |
-| `no-banned-types`                        | Ban `ReturnType` and indexed access types                       |
-| `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                |
-| `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters |
+| Rule                                     | Description                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------ |
+| `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions              |
+| `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator              |
+| `no-literal-unions`                      | Ban literal union types in favour of enums                               |
+| `no-banned-types`                        | Ban `ReturnType` and indexed access types                                |
+| `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                         |
+| `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters          |
 | `require-exported-object-type`           | Require exported object constants to declare an explicit type annotation |
 
 ### Code Quality
