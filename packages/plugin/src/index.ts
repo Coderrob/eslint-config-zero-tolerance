@@ -64,6 +64,7 @@ import preferShortcutReturn from './rules/prefer-shortcut-return';
 import preferStringRaw from './rules/prefer-string-raw';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
+import requireExportedObjectType from './rules/require-exported-object-type';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocAnonymousFunctions from './rules/require-jsdoc-anonymous-functions';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
@@ -131,6 +132,7 @@ const rules: Record<string, unknown> = {
   'prefer-shortcut-return': preferShortcutReturn,
   'prefer-string-raw': preferStringRaw,
   'require-clean-barrel': requireCleanBarrel,
+  'require-exported-object-type': requireExportedObjectType,
   'require-interface-prefix': requireInterfacePrefix,
   'require-bdd-spec': requireBddSpec,
   'require-jsdoc-anonymous-functions': requireJsdocAnonymousFunctions,

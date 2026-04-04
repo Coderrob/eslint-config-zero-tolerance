@@ -13,7 +13,7 @@ Ban literal union types in favour of enums.
 
 ## Rationale
 
-Literal union types (`"active" | "inactive"`) scatter magic strings throughout the codebase, are not refactor-safe, and provide no single place to enumerate valid values. TypeScript enums (or `const` objects with `as const`) give the values a canonical home, making them easy to discover, iterate over, and refactor.
+Literal union types (`"active" | "inactive"`) scatter magic strings throughout the codebase, are not refactor-safe, and provide no single place to enumerate valid values. The same problem exists when an exported type alias hides those values behind `typeof` references to literal-valued `const` declarations. TypeScript enums give the values a canonical home, making them easy to discover, iterate over, and refactor.
 
 ## Examples
 
@@ -41,6 +41,11 @@ type Status = 'active' | 'inactive';
 type Direction = 'north' | 'south' | 'east' | 'west';
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
+
+const ACTIVE = 'active';
+const INACTIVE = 'inactive';
+
+export type Status = typeof ACTIVE | typeof INACTIVE;
 ```
 
 ## Exceptions
@@ -54,7 +59,7 @@ type Toggle = true | false;
 
 ## Autofix Behavior
 
-This rule can auto-convert simple string-literal union type aliases to enums.
+This rule can auto-convert simple string-literal union type aliases, including exported unions of `typeof` references to same-file string literal `const` declarations, to enums.
 
 ### Auto-fixable
 
@@ -64,6 +69,18 @@ type Status = 'active' | 'inactive';
 enum Status {
   Active = 'active',
   Inactive = 'inactive',
+}
+```
+
+```typescript
+const ACTIVE = 'active';
+const INACTIVE = 'inactive';
+
+export type Status = typeof ACTIVE | typeof INACTIVE;
+// becomes:
+export enum Status {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 ```
 

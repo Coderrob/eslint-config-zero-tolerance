@@ -156,6 +156,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                       |
 | [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                |
 | [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters |
+| [`require-exported-object-type`](docs/rules/require-exported-object-type.md)                     | Require exported object constants to declare an explicit type annotation |
 
 ### Code Quality
 

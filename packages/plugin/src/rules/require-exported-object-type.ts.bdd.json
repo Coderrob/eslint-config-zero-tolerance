@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-exported-object-type.ts",
+  "module": {
+    "name": "require-exported-object-type",
+    "description": "Require exported object constants to declare an explicit type annotation.",
+    "exports": ["requireExportedObjectType"]
+  },
+  "specifications": [
+    {
+      "feature": "Annotated exported object constants",
+      "scenarios": [
+        {
+          "name": "should allow a directly exported frozen object const with an explicit type annotation",
+          "given": "an export written as export const StatusMap: Readonly<Record<string, string>> = Object.freeze({ Active: 'active' })",
+          "when": "the rule evaluates the top-level declarations",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow an indirectly exported object const with an explicit type annotation",
+          "given": "a module written as const StatusMap: Record<string, string> = { Active: 'active' }; export { StatusMap }",
+          "when": "the rule evaluates the top-level declarations",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Missing exported object annotations",
+      "scenarios": [
+        {
+          "name": "should report a directly exported object literal const without a type annotation",
+          "given": "an export written as export const StatusMap = { Active: 'active' }",
+          "when": "the rule evaluates the top-level declarations",
+          "then": "a requireExportedObjectType violation is reported"
+        },
+        {
+          "name": "should report a directly exported frozen object const without a type annotation",
+          "given": "an export written as export const StatusMap = Object.freeze({ Active: 'active' })",
+          "when": "the rule evaluates the top-level declarations",
+          "then": "a requireExportedObjectType violation is reported"
+        },
+        {
+          "name": "should report an indirectly exported frozen object const without a type annotation",
+          "given": "a module written as const StatusMap = Object.freeze({ Active: 'active' }); export { StatusMap as StatusValues }",
+          "when": "the rule evaluates the top-level declarations",
+          "then": "a requireExportedObjectType violation is reported"
+        }
+      ]
+    }
+  ]
+}
