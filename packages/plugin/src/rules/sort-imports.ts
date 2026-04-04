@@ -18,17 +18,21 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isParentDirectoryImportPath } from '../helpers/import-path-helpers';
 import { createRule } from './support/rule-factory';
 
-const GROUP_SIDE_EFFECT = 0;
-const GROUP_BUILTIN = 1;
-const GROUP_EXTERNAL = 2;
-const GROUP_PARENT = 3;
-const GROUP_PEER = 4;
-const GROUP_INDEX = 5;
 const MIN_IMPORTS_TO_VALIDATE = 2;
 const CURRENT_DIRECTORY_DOT = '.';
 const RELATIVE_PATH_PREFIX = '.';
 const NODE_PROTOCOL_PREFIX = 'node:';
 const INDEX_IMPORT_PATTERN = /^\.\/index(\.\w+)?$/u;
+
+enum ImportGroup {
+  SideEffect = 0,
+  Builtin = 1,
+  External = 2,
+  Parent = 3,
+  Peer = 4,
+  Index = 5,
+}
+
 const GROUP_NAMES: [string, string, string, string, string, string] = [
   'side-effect',
   'builtin',
@@ -37,14 +41,6 @@ const GROUP_NAMES: [string, string, string, string, string, string] = [
   'peer',
   'index',
 ];
-
-type ImportGroup =
-  | typeof GROUP_SIDE_EFFECT
-  | typeof GROUP_BUILTIN
-  | typeof GROUP_EXTERNAL
-  | typeof GROUP_PARENT
-  | typeof GROUP_PEER
-  | typeof GROUP_INDEX;
 
 type ImportEntry = Readonly<{
   group: ImportGroup;
@@ -136,12 +132,12 @@ function getGroupName(group: ImportGroup): string {
  */
 function getImportGroup(importPath: string, isSideEffect: boolean): ImportGroup {
   if (isSideEffect) {
-    return GROUP_SIDE_EFFECT;
+    return ImportGroup.SideEffect;
   }
   if (importPath.startsWith(RELATIVE_PATH_PREFIX)) {
     return getRelativeImportGroup(importPath);
   }
-  return isBuiltinImportPath(importPath) ? GROUP_BUILTIN : GROUP_EXTERNAL;
+  return isBuiltinImportPath(importPath) ? ImportGroup.Builtin : ImportGroup.External;
 }
 
 /**
@@ -162,9 +158,9 @@ function getImportSourceValue(node: TSESTree.ImportDeclaration): string {
  */
 function getRelativeImportGroup(importPath: string): ImportGroup {
   if (isParentDirectoryImportPath(importPath)) {
-    return GROUP_PARENT;
+    return ImportGroup.Parent;
   }
-  return isIndexImportPath(importPath) ? GROUP_INDEX : GROUP_PEER;
+  return isIndexImportPath(importPath) ? ImportGroup.Index : ImportGroup.Peer;
 }
 
 /**
