@@ -1244,6 +1244,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/require-exported-object-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-exported-object-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2609,8 +2637,8 @@
 <ul>
 <li><strong>Naming conventions</strong> - prefix interfaces with <code>I</code>, sort imports and functions alphabetically</li>
 <li><strong>Documentation</strong> - require JSDoc on named functions and on anonymous non-test callbacks, and enforce sibling BDD spec files</li>
+<li><strong>Type safety</strong> - ban unsafe assertions, non-null <code>!</code> operators, literal unions, banned utility types, and inline destructured object literals, and require explicit annotations on exported object constants</li>
 <li><strong>Testing standards</strong> - enforce <code>should</code>-prefixed descriptions, ban imprecise Jest matchers and leaky mocks</li>
-<li><strong>Type safety</strong> - ban <code>as</code> assertions, non-null <code>!</code> operators, literal union types, banned utility types, and inline object type literals on destructured parameters</li>
 <li><strong>Code quality</strong> - limit function length and parameter count, eliminate magic numbers and strings</li>
 <li><strong>Error handling</strong> - require <code>new Error()</code> in throw statements, disallow empty catch blocks</li>
 <li><strong>Import hygiene</strong> - keep barrel files clean, ban parent-relative imports inside barrel files, optionally protect folders such as <code>src</code> from parent-relative access, ban dynamic imports, and prevent export aliases</li>

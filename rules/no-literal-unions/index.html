@@ -1350,6 +1350,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-exported-object-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-exported-object-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2836,7 +2864,7 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale</h2>
-<p>Literal union types (<code>"active" | "inactive"</code>) scatter magic strings throughout the codebase, are not refactor-safe, and provide no single place to enumerate valid values. TypeScript enums (or <code>const</code> objects with <code>as const</code>) give the values a canonical home, making them easy to discover, iterate over, and refactor.</p>
+<p>Literal union types (<code>"active" | "inactive"</code>) scatter magic strings throughout the codebase, are not refactor-safe, and provide no single place to enumerate valid values. The same problem exists when an exported type alias hides those values behind <code>typeof</code> references to literal-valued <code>const</code> declarations. TypeScript enums give the values a canonical home, making them easy to discover, iterate over, and refactor.</p>
 <h2 id="examples">Examples</h2>
 <h3 id="correct">✅ Correct</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">enum</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="p">{</span>
@@ -2857,6 +2885,11 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;north&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;south&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;east&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;west&#39;</span><span class="p">;</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;sm&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;md&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;lg&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;xl&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">ACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">const</span><span class="w"> </span><span class="nx">INACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">export</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">ACTIVE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">INACTIVE</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="exceptions">Exceptions</h2>
 <p>Pure boolean unions (<code>true | false</code>) are exempt because they represent the full boolean domain and do not benefit from an enum:</p>
@@ -2864,7 +2897,7 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Toggle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="autofix-behavior">Autofix Behavior</h2>
-<p>This rule can auto-convert simple string-literal union type aliases to enums.</p>
+<p>This rule can auto-convert simple string-literal union type aliases, including exported unions of <code>typeof</code> references to same-file string literal <code>const</code> declarations, to enums.</p>
 <h3 id="auto-fixable">Auto-fixable</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kr">type</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">// becomes:</span>
@@ -2872,6 +2905,16 @@
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">Active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">,</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">Inactive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">,</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">ACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">INACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">export</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">ACTIVE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">INACTIVE</span><span class="p">;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1">// becomes:</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">export</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="nx">Status</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="nx">ACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nx">INACTIVE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;inactive&#39;</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="not-auto-fixable">Not auto-fixable</h3>
 <ul>
@@ -2881,7 +2924,7 @@
 </ul>
 <h2 id="configuration">Configuration</h2>
 <p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s1">&#39;zero-tolerance/no-literal-unions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s1">&#39;zero-tolerance/no-literal-unions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
 </code></pre></div>
 
 
