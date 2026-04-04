@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-04-03
+
 ### Added
 
 - **`require-exported-object-type` rule**: Added a new built-in rule that requires exported object constants, including `Object.freeze({ ... })` patterns and indirect `export { Foo }` exports, to declare an explicit type annotation instead of leaking inferred structural types.
