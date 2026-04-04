@@ -348,7 +348,10 @@ function getResolvedConstLiteral(
   type: TSESTree.TypeNode,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): IResolvedConstLiteral | null {
-  if (type.type !== AST_NODE_TYPES.TSTypeQuery || type.exprName.type !== AST_NODE_TYPES.Identifier) {
+  if (
+    type.type !== AST_NODE_TYPES.TSTypeQuery ||
+    type.exprName.type !== AST_NODE_TYPES.Identifier
+  ) {
     return null;
   }
   return constLiteralMap.get(type.exprName.name) ?? null;
@@ -471,7 +474,9 @@ function hasBannedLiteralUnionMember(
   node: TSESTree.TSUnionType,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  return hasDirectLiteralUnionMember(node) || hasLiteralConstReferenceUnionMember(node, constLiteralMap);
+  return (
+    hasDirectLiteralUnionMember(node) || hasLiteralConstReferenceUnionMember(node, constLiteralMap)
+  );
 }
 
 /**
@@ -499,10 +504,7 @@ function hasConstLiteralReferenceKind(
  */
 function hasDirectLiteralUnionMember(node: TSESTree.TSUnionType): boolean {
   for (const unionMember of node.types) {
-    if (
-      isLiteralTypeNode(unionMember) &&
-      BANNED_LITERAL_NODE_TYPES.has(unionMember.literal.type)
-    ) {
+    if (isLiteralTypeNode(unionMember) && BANNED_LITERAL_NODE_TYPES.has(unionMember.literal.type)) {
       return true;
     }
   }
@@ -520,17 +522,17 @@ function hasExportPrefix(replacementNode: TSESTree.Node): boolean {
 }
 
 /**
- * Returns true when any union member is a const-reference literal in an exported alias.
+ * Returns true when any union member is a const-reference literal in a type alias.
  *
  * @param node - Union type node to inspect.
  * @param constLiteralMap - Resolved literal-valued const declarations in the file.
- * @returns True when the exported alias includes a literal const reference.
+ * @returns True when the type alias includes a literal const reference.
  */
 function hasLiteralConstReferenceUnionMember(
   node: TSESTree.TSUnionType,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  if (!isExportedTypeAliasUnion(node)) {
+  if (!isTypeAliasUnion(node)) {
     return false;
   }
   for (const unionMember of node.types) {
@@ -566,10 +568,9 @@ function isBooleanLiteralType(
   type: TSESTree.TypeNode,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  return isDirectBooleanLiteralType(type) || hasConstLiteralReferenceKind(
-    type,
-    constLiteralMap,
-    ResolvedLiteralKind.Boolean,
+  return (
+    isDirectBooleanLiteralType(type) ||
+    hasConstLiteralReferenceKind(type, constLiteralMap, ResolvedLiteralKind.Boolean)
   );
 }
 
@@ -604,20 +605,6 @@ function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
     type.literal.type === AST_NODE_TYPES.Literal &&
     isBoolean(type.literal.value)
   );
-}
-
-/**
- * Returns true when a union is assigned to an exported type alias declaration.
- *
- * @param node - Union type node to inspect.
- * @returns True when the containing type alias is exported.
- */
-function isExportedTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
-  const alias = getDirectTypeAliasDeclaration(node);
-  if (alias === null) {
-    return false;
-  }
-  return hasExportPrefix(getTypeAliasReplacementNode(alias));
 }
 
 /**
@@ -702,10 +689,7 @@ function isNoSubstitutionTemplateLiteral(
 ): expression is TSESTree.TemplateLiteral & {
   expressions: [];
 } {
-  return (
-    expression.type === AST_NODE_TYPES.TemplateLiteral &&
-    expression.expressions.length === 0
-  );
+  return expression.type === AST_NODE_TYPES.TemplateLiteral && expression.expressions.length === 0;
 }
 
 /**
@@ -754,6 +738,16 @@ function isStringLiteralTypeNode(
     type.literal.type === AST_NODE_TYPES.Literal &&
     isString(type.literal.value)
   );
+}
+
+/**
+ * Returns true when a union is assigned to a type alias declaration.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the containing type alias is a direct type alias declaration.
+ */
+function isTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
+  return getDirectTypeAliasDeclaration(node) !== null;
 }
 
 /**

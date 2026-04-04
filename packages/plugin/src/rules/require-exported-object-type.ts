@@ -136,7 +136,10 @@ function isFrozenObjectLiteralCall(expression: TSESTree.Expression): boolean {
     return false;
   }
   const firstArgument = getFirstCallExpressionArgument(expression);
-  return firstArgument !== null && unwrapTsExpression(firstArgument).type === AST_NODE_TYPES.ObjectExpression;
+  return (
+    firstArgument !== null &&
+    unwrapTsExpression(firstArgument).type === AST_NODE_TYPES.ObjectExpression
+  );
 }
 
 /**
@@ -170,8 +173,7 @@ function isIndirectlyExportedDeclarator(
   exportedBindings: ReadonlySet<string>,
 ): boolean {
   return (
-    declarator.id.type === AST_NODE_TYPES.Identifier &&
-    exportedBindings.has(declarator.id.name)
+    declarator.id.type === AST_NODE_TYPES.Identifier && exportedBindings.has(declarator.id.name)
   );
 }
 

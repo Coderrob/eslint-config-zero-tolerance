@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **`no-literal-unions` rule**: Removed the exported-only gate for `typeof` unions backed by same-file literal `const` declarations, so non-exported type aliases now report and autofix consistently with exported aliases while boolean aliases remain exempt.
 - **`no-literal-unions` rule**: Stopped coercing unresolved no-substitution template literal `const` values to empty strings during `typeof`-union analysis, so invalid or unreadable cooked template values no longer risk false positives or incorrect enum autofixes.
 
 ## [1.2.2] - 2026-04-02
