@@ -522,17 +522,17 @@ function hasExportPrefix(replacementNode: TSESTree.Node): boolean {
 }
 
 /**
- * Returns true when any union member is a const-reference literal in an exported alias.
+ * Returns true when any union member is a const-reference literal in a type alias.
  *
  * @param node - Union type node to inspect.
  * @param constLiteralMap - Resolved literal-valued const declarations in the file.
- * @returns True when the exported alias includes a literal const reference.
+ * @returns True when the type alias includes a literal const reference.
  */
 function hasLiteralConstReferenceUnionMember(
   node: TSESTree.TSUnionType,
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): boolean {
-  if (!isExportedTypeAliasUnion(node)) {
+  if (!isTypeAliasUnion(node)) {
     return false;
   }
   for (const unionMember of node.types) {
@@ -605,20 +605,6 @@ function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
     type.literal.type === AST_NODE_TYPES.Literal &&
     isBoolean(type.literal.value)
   );
-}
-
-/**
- * Returns true when a union is assigned to an exported type alias declaration.
- *
- * @param node - Union type node to inspect.
- * @returns True when the containing type alias is exported.
- */
-function isExportedTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
-  const alias = getDirectTypeAliasDeclaration(node);
-  if (alias === null) {
-    return false;
-  }
-  return hasExportPrefix(getTypeAliasReplacementNode(alias));
 }
 
 /**
@@ -752,6 +738,16 @@ function isStringLiteralTypeNode(
     type.literal.type === AST_NODE_TYPES.Literal &&
     isString(type.literal.value)
   );
+}
+
+/**
+ * Returns true when a union is assigned to a type alias declaration.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the containing type alias is a direct type alias declaration.
+ */
+function isTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
+  return getDirectTypeAliasDeclaration(node) !== null;
 }
 
 /**

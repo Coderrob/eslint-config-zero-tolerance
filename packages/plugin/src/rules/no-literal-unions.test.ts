@@ -278,6 +278,17 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
     {
+      code: "const ACTIVE = 'active'; const INACTIVE = 'inactive'; type Status = typeof ACTIVE | typeof INACTIVE;",
+      name: 'should report non-exported typeof unions that resolve to string literal const values',
+      output:
+        'const ACTIVE = \'active\'; const INACTIVE = \'inactive\'; enum Status { ACTIVE = "active", INACTIVE = "inactive" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
       code: "export const ACTIVE = 'active'; const INACTIVE = 'inactive'; export type Status = typeof ACTIVE | typeof INACTIVE;",
       name: 'should report typeof unions that resolve to exported string literal const values',
       output:
@@ -300,6 +311,16 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       ],
     },
     {
+      code: "const ACTIVE = 'active'; type Status = typeof ACTIVE | 'inactive';",
+      name: 'should autofix mixed string literals and typeof string literal const references to enums',
+      output: 'const ACTIVE = \'active\'; enum Status { ACTIVE = "active", Inactive = "inactive" }',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
       code: 'const ACTIVE = `active`; export type Status = typeof ACTIVE | "inactive";',
       name: 'should autofix typeof unions that resolve through no-substitution template literal const values',
       output:
@@ -313,6 +334,15 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'const DRAFT = 0; const PUBLISHED = 1; export type Status = typeof DRAFT | typeof PUBLISHED;',
       name: 'should report typeof unions that resolve to numeric literal const values without autofix',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'const DRAFT = 0; const PUBLISHED = 1; type Status = typeof DRAFT | typeof PUBLISHED;',
+      name: 'should report non-exported typeof unions that resolve to numeric literal const values without autofix',
       errors: [
         {
           messageId: 'noLiteralUnions',

@@ -42,13 +42,19 @@
         },
         {
           "name": "should report a union of typeof references that resolve to string literal const values",
+          "given": "const Active = 'active'; const Inactive = 'inactive'; type Status = typeof Active | typeof Inactive",
+          "when": "the rule evaluates the type alias",
+          "then": "a noLiteralUnions violation is reported"
+        },
+        {
+          "name": "should report an exported union of typeof references that resolve to string literal const values",
           "given": "const Active = 'active'; const Inactive = 'inactive'; export type Status = typeof Active | typeof Inactive",
           "when": "the rule evaluates the type alias",
           "then": "a noLiteralUnions violation is reported"
         },
         {
           "name": "should report a union of typeof references that resolve through no-substitution template literal const values",
-          "given": "const Active = `active`; export type Status = typeof Active | 'inactive'",
+          "given": "const Active = `active`; type Status = typeof Active | 'inactive'",
           "when": "the rule evaluates the type alias",
           "then": "a noLiteralUnions violation is reported"
         },
