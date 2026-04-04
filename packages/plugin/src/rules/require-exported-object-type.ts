@@ -292,7 +292,7 @@ export const requireExportedObjectType = createRule({
     },
     messages: {
       requireExportedObjectType:
-        'Exported object constants must declare an explicit type annotation, even when wrapped in Object.freeze().',
+        'Exported object constants must declare an explicit type annotation.',
     },
     schema: [],
   },
