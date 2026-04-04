@@ -2792,6 +2792,7 @@
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">StatusMap</span><span class="w"> </span><span class="p">};</span>
 </code></pre></div>
+<p>The rule only applies when the exported <code>const</code> initializer is an object literal or <code>Object.freeze({ ... })</code>. Calls such as <code>Object.freeze()</code> or <code>Object.freeze(...values)</code> are ignored because they do not expose a direct frozen object literal shape.</p>
 <h2 id="configuration">Configuration</h2>
 <p>This rule has no options:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s1">&#39;zero-tolerance/require-exported-object-type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
