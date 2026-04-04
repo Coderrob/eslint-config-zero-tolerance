@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **`no-literal-unions` rule**: Extended literal-union detection to report `typeof` union members that resolve to same-file literal `const` declarations and to autofix string-valued const-reference unions into enums when the conversion is safe.
 
+### Fixed
+
+- **`no-literal-unions` rule**: Stopped coercing unresolved no-substitution template literal `const` values to empty strings during `typeof`-union analysis, so invalid or unreadable cooked template values no longer risk false positives or incorrect enum autofixes.
+
 ## [1.2.2] - 2026-04-02
 
 ### Added

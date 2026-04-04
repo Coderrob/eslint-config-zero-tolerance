@@ -402,10 +402,7 @@ function getResolvedStringUnionMemberFromReference(
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
 ): IResolvedStringUnionMember | null {
   const resolvedLiteral = getResolvedConstLiteral(type, constLiteralMap);
-  if (!isResolvedConstLiteralKind(resolvedLiteral, ResolvedLiteralKind.String)) {
-    return null;
-  }
-  if (!isString(resolvedLiteral.value)) {
+  if (!isResolvedStringConstLiteral(resolvedLiteral)) {
     return null;
   }
   return {
@@ -434,6 +431,16 @@ function getResolvedStringUnionMembers(
     members.push(resolvedMember);
   }
   return members;
+}
+
+/**
+ * Returns the cooked string value from a no-substitution template literal.
+ *
+ * @param expression - Template literal to inspect.
+ * @returns Cooked string value, or null when unavailable.
+ */
+function getTemplateLiteralCookedValue(expression: TSESTree.TemplateLiteral): string | null {
+  return expression.quasis[0].value.cooked;
 }
 
 /**
@@ -716,6 +723,24 @@ function isResolvedConstLiteralKind(
 }
 
 /**
+ * Returns true when resolved const-literal metadata represents a string literal.
+ *
+ * @param resolvedLiteral - Resolved const-literal metadata.
+ * @returns True when the resolved literal is a string-valued const.
+ */
+function isResolvedStringConstLiteral(
+  resolvedLiteral: IResolvedConstLiteral | null,
+): resolvedLiteral is IResolvedConstLiteral & {
+  kind: ResolvedLiteralKind.String;
+  value: string;
+} {
+  return (
+    isResolvedConstLiteralKind(resolvedLiteral, ResolvedLiteralKind.String) &&
+    isString(resolvedLiteral.value)
+  );
+}
+
+/**
  * Returns true when literal type node is backed by a string literal.
  *
  * @param type - Type node to inspect.
@@ -824,9 +849,14 @@ function resolveTemplateLiteral(
   if (!isNoSubstitutionTemplateLiteral(expression)) {
     return null;
   }
+  const cookedValue = getTemplateLiteralCookedValue(expression);
+  /* istanbul ignore next -- invalid escapes are rejected for untagged template literals before this rule runs */
+  if (cookedValue === null) {
+    return null;
+  }
   return {
     kind: ResolvedLiteralKind.String,
-    value: expression.quasis[0]?.value.cooked ?? '',
+    value: cookedValue,
   };
 }
 

@@ -39,6 +39,18 @@ ruleTester.run('require-exported-object-type', requireExportedObjectType, {
       code: 'export const STATUS = createStatusMap();',
       name: 'should allow exported non-object factory results without a type annotation',
     },
+    {
+      code: 'export const STATUS = Object.freeze(...statusValues);',
+      name: 'should allow exported Object.freeze calls whose first argument is a spread expression',
+    },
+    {
+      code: 'export const STATUS = Object.freeze();',
+      name: 'should allow exported Object.freeze calls with no arguments',
+    },
+    {
+      code: "let STATUS = { Active: 'active' }; export { STATUS };",
+      name: 'should allow indirectly exported non-const object bindings without a type annotation',
+    },
   ],
   invalid: [
     {
