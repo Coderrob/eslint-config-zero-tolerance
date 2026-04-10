@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions instead of enum-backed property types.
+- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions, including string, number, bigint, boolean-mixed, and template-literal members, instead of enum-backed property types.
 
 ### Changed
 
