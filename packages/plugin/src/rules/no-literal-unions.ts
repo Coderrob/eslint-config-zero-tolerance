@@ -80,7 +80,7 @@ function checkUnionType(
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
   node: TSESTree.TSUnionType,
 ): void {
-  if (isBooleanLiteralUnion(node, constLiteralMap)) {
+  if (isDirectPropertyTypeAnnotationUnion(node) || isBooleanLiteralUnion(node, constLiteralMap)) {
     return;
   }
   if (!hasBannedLiteralUnionMember(node, constLiteralMap)) {
@@ -604,6 +604,25 @@ function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
     isLiteralTypeNode(type) &&
     type.literal.type === AST_NODE_TYPES.Literal &&
     isBoolean(type.literal.value)
+  );
+}
+
+/**
+ * Returns true when a union is the direct annotation of a property-like node.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the new property-specific rule owns the report.
+ */
+function isDirectPropertyTypeAnnotationUnion(node: TSESTree.TSUnionType): boolean {
+  const parentNode = node.parent;
+  if (parentNode.type !== AST_NODE_TYPES.TSTypeAnnotation) {
+    return false;
+  }
+  const annotatedNode = parentNode.parent;
+  return (
+    annotatedNode.type === AST_NODE_TYPES.PropertyDefinition ||
+    annotatedNode.type === AST_NODE_TYPES.TSAbstractPropertyDefinition ||
+    annotatedNode.type === AST_NODE_TYPES.TSPropertySignature
   );
 }
 

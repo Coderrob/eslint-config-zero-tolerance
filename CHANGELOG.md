@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions instead of enum-backed property types.
+
+### Changed
+
+- **`no-literal-unions` rule**: Direct property literal unions are now handled by `no-literal-property-unions`, avoiding duplicate reports from the default presets while preserving general literal-union enforcement for aliases and other non-property type annotations.
+
 ## [1.2.3] - 2026-04-03
 
 ### Added

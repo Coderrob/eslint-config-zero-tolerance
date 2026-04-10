@@ -63,6 +63,12 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['require-exported-object-type'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-literal-property-unions as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-literal-property-unions'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

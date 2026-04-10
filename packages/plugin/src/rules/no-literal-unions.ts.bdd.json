@@ -22,6 +22,12 @@
           "given": "type Value = string | number",
           "when": "the rule evaluates the type alias",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow property literal unions handled by the property-specific rule",
+          "given": "interface ISearchMatch { mode: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported by this rule"
         }
       ]
     },

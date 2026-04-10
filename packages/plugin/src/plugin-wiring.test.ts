@@ -44,8 +44,10 @@ const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdo
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
 const RULE_NO_PARENT_INTERNAL_ACCESS = `${PLUGIN_NAMESPACE}/no-parent-internal-access`;
 const RULE_REQUIRE_EXPORTED_OBJECT_TYPE = `${PLUGIN_NAMESPACE}/require-exported-object-type`;
+const RULE_NO_LITERAL_PROPERTY_UNIONS = `${PLUGIN_NAMESPACE}/no-literal-property-unions`;
 const RULE_KEY_SORT_IMPORTS = 'sort-imports';
 const RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL = 'no-destructured-parameter-type-literal';
+const RULE_KEY_NO_LITERAL_PROPERTY_UNIONS = 'no-literal-property-unions';
 const RULE_KEY_NO_LITERAL_UNIONS = 'no-literal-unions';
 const RULE_KEY_NO_BARREL_PARENT_IMPORTS = 'no-barrel-parent-imports';
 const RULE_KEY_NO_PARENT_INTERNAL_ACCESS = 'no-parent-internal-access';
@@ -74,6 +76,8 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('warn');
     expect(strictRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('error');
+    expect(recommendedRules[RULE_NO_LITERAL_PROPERTY_UNIONS]).toBe('warn');
+    expect(strictRules[RULE_NO_LITERAL_PROPERTY_UNIONS]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(strictRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
     expect(recommendedRules[RULE_NO_BARREL_PARENT_IMPORTS]).toBe('warn');
@@ -108,6 +112,7 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.meta?.version).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_SORT_IMPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_NO_LITERAL_PROPERTY_UNIONS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_LITERAL_UNIONS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_BARREL_PARENT_IMPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_PARENT_INTERNAL_ACCESS]).toBeDefined();

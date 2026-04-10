@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 52 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 53 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -110,6 +110,7 @@ export default [
 | `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions              |
 | `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator              |
 | `no-literal-unions`                      | Ban literal union types in favour of enums                               |
+| `no-literal-property-unions`             | Require property literal unions to use enums                             |
 | `no-banned-types`                        | Ban `ReturnType` and indexed access types                                |
 | `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                         |
 | `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters          |

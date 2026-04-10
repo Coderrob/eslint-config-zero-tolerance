@@ -82,6 +82,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` and `no-p
 | `no-banned-types`                        | warn           | error           |
 | `no-dynamic-import`                      | warn           | error           |
 | `no-literal-unions`                      | warn           | error           |
+| `no-literal-property-unions`             | warn           | error           |
 | `no-export-alias`                        | warn           | error           |
 | `no-jest-have-been-called`               | warn           | error           |
 | `no-mock-implementation`                 | warn           | error           |

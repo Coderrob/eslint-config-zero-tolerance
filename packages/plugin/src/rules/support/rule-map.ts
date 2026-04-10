@@ -45,6 +45,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'require-optional-chaining',
   'require-readonly-props',
   'no-type-assertion',
+  'no-literal-property-unions',
   'no-eslint-disable',
   'sort-imports',
   'sort-functions',

@@ -15,6 +15,8 @@ Ban literal union types in favour of enums.
 
 Literal union types (`"active" | "inactive"`) scatter magic values throughout the codebase, are not refactor-safe, and provide no single place to enumerate valid values. The same problem exists when a type alias hides those values behind `typeof` references to same-file literal-valued `const` declarations. TypeScript enums give string and number domains a canonical home, making them easy to discover, iterate over, and refactor.
 
+Property declarations are handled by `no-literal-property-unions`, which reports on the property name and keeps property value domains separate from general type aliases and parameters.
+
 ## Examples
 
 ### ✅ Correct
@@ -112,6 +114,7 @@ enum Status {
 
 - Generic aliases (for example `type Status<T> = 'active' | 'inactive'`)
 - Non-alias unions (for example function parameter unions)
+- Property declarations (handled by `no-literal-property-unions`)
 - Unions that contain number members, boolean members, or unresolved `typeof` members
 
 ## Configuration

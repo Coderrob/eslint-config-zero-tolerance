@@ -72,6 +72,14 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       name: 'should allow non-alias typeof unions that resolve to literal const values',
     },
     {
+      code: 'interface ISearchMatch { mode: "tree-sitter" | "text-hint"; }',
+      name: 'should allow property literal unions handled by the property-specific rule',
+    },
+    {
+      code: 'class SearchMatch { mode: "tree-sitter" | "text-hint"; }',
+      name: 'should allow class property literal unions handled by the property-specific rule',
+    },
+    {
       code: 'const ENABLED = true; const DISABLED = false; type Toggle = typeof ENABLED | typeof DISABLED;',
       name: 'should allow boolean literal unions hidden behind const typeof references',
     },

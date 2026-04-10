@@ -42,6 +42,7 @@ import noIdenticalExpressions from './rules/no-identical-expressions';
 import noInlineTypeImport from './rules/no-inline-type-import';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noLabels from './rules/no-labels';
+import noLiteralPropertyUnions from './rules/no-literal-property-unions';
 import noLiteralUnions from './rules/no-literal-unions';
 import noMagicNumbers from './rules/no-magic-numbers';
 import noMagicStrings from './rules/no-magic-strings';
@@ -110,6 +111,7 @@ const rules: Record<string, unknown> = {
   'no-inline-type-import': noInlineTypeImport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-labels': noLabels,
+  'no-literal-property-unions': noLiteralPropertyUnions,
   'no-literal-unions': noLiteralUnions,
   'no-magic-numbers': noMagicNumbers,
   'no-magic-strings': noMagicStrings,
