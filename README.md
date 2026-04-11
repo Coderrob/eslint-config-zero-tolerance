@@ -118,7 +118,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` and `no-parent-internal-access` are fully opt-in rules (off in all presets).
+Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are fully opt-in rules (off in all presets).
 
 `no-parent-internal-access` is a targeted boundary rule: it only checks parent-relative paths and only matches the first concrete directory reached after `..` traversal, such as `../src/foo`.
 
@@ -145,6 +145,10 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`require-test-description-style`](docs/rules/require-test-description-style.md) | Enforce that test descriptions start with `should`                                                            |
 | [`no-jest-have-been-called`](docs/rules/no-jest-have-been-called.md)             | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [`no-mock-implementation`](docs/rules/no-mock-implementation.md)                 | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
+| [`no-set-timeout-in-tests`](docs/rules/no-set-timeout-in-tests.md)               | Disallow `setTimeout` usage in test files                                                                     |
+| [`no-set-interval-in-tests`](docs/rules/no-set-interval-in-tests.md)             | Disallow `setInterval` usage in test files                                                                    |
+| [`no-fetch-in-tests`](docs/rules/no-fetch-in-tests.md)                           | Disallow `fetch` usage in test files                                                                          |
+| [`no-restricted-imports-in-tests`](docs/rules/no-restricted-imports-in-tests.md) | Disallow configured dependency imports in test files                                                          |
 
 ### Type Safety
 
@@ -153,7 +157,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions              |
 | [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator              |
 | [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                               |
-| [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md)                         | Require property literal unions to use enums                             |
+| [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md)                         | Require property literal unions to use named domain types                |
 | [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                                |
 | [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                         |
 | [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters          |

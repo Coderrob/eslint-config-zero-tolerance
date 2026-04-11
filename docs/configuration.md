@@ -62,7 +62,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-Nearly all core rules are included in every preset. `require-bdd-spec` and `no-parent-internal-access` are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
+Nearly all core rules are included in every preset. `require-bdd-spec`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
 
 | Rule                                     | Recommended    | Strict          |
 | ---------------------------------------- | -------------- | --------------- |
@@ -86,6 +86,10 @@ Nearly all core rules are included in every preset. `require-bdd-spec` and `no-p
 | `no-export-alias`                        | warn           | error           |
 | `no-jest-have-been-called`               | warn           | error           |
 | `no-mock-implementation`                 | warn           | error           |
+| `no-set-timeout-in-tests`                | warn           | error           |
+| `no-set-interval-in-tests`               | warn           | error           |
+| `no-fetch-in-tests`                      | off            | off             |
+| `no-restricted-imports-in-tests`         | off            | off             |
 | `no-type-assertion`                      | warn           | error           |
 | `no-inline-type-import`                  | warn           | error           |
 | `no-destructured-parameter-type-literal` | warn           | error           |
@@ -119,7 +123,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec` and `no-p
 | `require-optional-chaining`              | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 
-`require-bdd-spec` and `no-parent-internal-access` are available but intentionally not enabled by default in presets.
+`require-bdd-spec`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 
@@ -169,6 +173,17 @@ Multiple rules accept an options object:
 ```js
 'zero-tolerance/require-test-description-style': ['error', { prefix: 'should', ignoreSkip: true }]
 ```
+
+### `no-restricted-imports-in-tests`
+
+```js
+'zero-tolerance/no-restricted-imports-in-tests': [
+  'error',
+  { modules: ['fs', 'node:fs/*', 'child_process', 'axios', '@company/database'] },
+]
+```
+
+Configured module names are trimmed, lowercased, normalized by removing `node:`, and matched by module root. For example, `fs` matches `fs`, `fs/promises`, `node:fs`, and `node:fs/promises`.
 
 ### `no-throw-literal`
 

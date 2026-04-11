@@ -28,6 +28,18 @@
           "given": "interface ISearchMatch { mode: 'tree-sitter' | 'text-hint' }",
           "when": "the rule evaluates the property signature",
           "then": "no violation is reported by this rule"
+        },
+        {
+          "name": "should allow literal unions inside built-in TypeScript utility types",
+          "given": "type PublicUser = Omit<User, 'password' | 'token'> and type UsersByRole = Record<'admin' | 'guest', User>",
+          "when": "the rule evaluates literal unions inside known TypeScript utility type arguments",
+          "then": "no violation is reported because the literals describe utility-type keys or filters rather than enum domains"
+        },
+        {
+          "name": "should report literal unions inside custom generic type arguments",
+          "given": "type WrappedStatus = CustomUtility<'active' | 'inactive'>",
+          "when": "the rule evaluates the literal union inside the custom type argument",
+          "then": "a noLiteralUnions violation is reported because the exemption is limited to known TypeScript utility types"
         }
       ]
     },

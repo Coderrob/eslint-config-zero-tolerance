@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-restricted-imports-in-tests.ts",
+  "module": {
+    "name": "no-restricted-imports-in-tests",
+    "description": "Disallow configured dependency imports in recognized test files.",
+    "exports": ["noRestrictedImportsInTests"]
+  },
+  "specifications": [
+    {
+      "feature": "Restricted test imports",
+      "scenarios": [
+        {
+          "name": "should report default restricted package imports in test files",
+          "given": "import axios from 'axios' inside a .test.ts file",
+          "when": "the rule evaluates the import declaration",
+          "then": "a noRestrictedImportsInTests violation is reported"
+        },
+        {
+          "name": "should report default restricted Node imports in test files",
+          "given": "import { readFile } from 'node:fs/promises' inside a .spec.ts file",
+          "when": "the rule evaluates the import declaration",
+          "then": "a noRestrictedImportsInTests violation is reported for the fs module root"
+        },
+        {
+          "name": "should report restricted modules across import-like syntaxes",
+          "given": "require('http'), await import('node:net'), import fs = require('node:fs'), or export * from 'node:worker_threads' inside test files",
+          "when": "the rule evaluates the import-like node",
+          "then": "a noRestrictedImportsInTests violation is reported"
+        },
+        {
+          "name": "should allow restricted imports outside test files",
+          "given": "import fs from 'node:fs' inside a non-test source file",
+          "when": "the rule creates listeners for the file",
+          "then": "no listeners are registered and no violation is reported"
+        },
+        {
+          "name": "should allow unrestricted modules in test files",
+          "given": "import { render } from '@testing-library/react' inside a .test.ts file",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should honor custom restricted module options",
+          "given": "modules is set to ['@company/database', 'node:fs/*']",
+          "when": "the rule resolves options and evaluates imports in a test file",
+          "then": "the configured module roots are trimmed, normalized, deduplicated, and used for matching"
+        }
+      ]
+    }
+  ]
+}

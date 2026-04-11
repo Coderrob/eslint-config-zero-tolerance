@@ -64,6 +64,10 @@ nav:
           - require-test-description-style: rules/require-test-description-style.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
           - no-mock-implementation: rules/no-mock-implementation.md
+          - no-set-timeout-in-tests: rules/no-set-timeout-in-tests.md
+          - no-set-interval-in-tests: rules/no-set-interval-in-tests.md
+          - no-fetch-in-tests: rules/no-fetch-in-tests.md
+          - no-restricted-imports-in-tests: rules/no-restricted-imports-in-tests.md
       - Type Safety:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md

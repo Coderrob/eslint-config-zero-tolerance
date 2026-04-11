@@ -25,6 +25,10 @@
 | [require-test-description-style](require-test-description-style.md) | suggestion | Enforce that test descriptions start with `should`                                                            |
 | [no-jest-have-been-called](no-jest-have-been-called.md)             | suggestion | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [no-mock-implementation](no-mock-implementation.md)                 | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
+| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)               | suggestion | Disallow `setTimeout` usage in test files                                                                     |
+| [no-set-interval-in-tests](no-set-interval-in-tests.md)             | suggestion | Disallow `setInterval` usage in test files                                                                    |
+| [no-fetch-in-tests](no-fetch-in-tests.md)                           | suggestion | Disallow `fetch` usage in test files                                                                          |
+| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md) | suggestion | Disallow configured dependency imports in test files                                                          |
 
 ## Type Safety
 
@@ -33,7 +37,7 @@
 | [no-type-assertion](no-type-assertion.md)                                           | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions              |
 | [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator              |
 | [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                               |
-| [no-literal-property-unions](no-literal-property-unions.md)                         | suggestion | Require property literal unions to use enums                             |
+| [no-literal-property-unions](no-literal-property-unions.md)                         | suggestion | Require property literal unions to use named domain types                |
 | [no-banned-types](no-banned-types.md)                                               | problem    | Ban `ReturnType` and indexed access types                                |
 | [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                         |
 | [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters          |

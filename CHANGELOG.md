@@ -10,10 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions, including string, number, bigint, boolean-mixed, and template-literal members, instead of enum-backed property types.
+- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions, including string, number, bigint, boolean-mixed, and template-literal members, instead of named domain types.
+- **Test boundary rules**: Added `no-set-timeout-in-tests` and `no-set-interval-in-tests` as built-in preset rules, plus opt-in `no-fetch-in-tests` and `no-restricted-imports-in-tests` rules for teams that want stricter test isolation from HTTP, filesystem, subprocess, and network dependencies.
 
 ### Changed
 
+- **`no-literal-property-unions` rule**: Clarified the diagnostic and documentation to recommend named domain types generally, while keeping enums as the preferred option for string and number domains that TypeScript enums can represent.
+- **`no-literal-unions` rule**: Exempted literal unions inside built-in TypeScript utility type arguments such as `Omit`, `Pick`, `Record`, `Exclude`, and `Extract`, while keeping custom generic type arguments reportable.
 - **`no-literal-unions` rule**: Direct property literal unions are now handled by `no-literal-property-unions`, avoiding duplicate reports from the default presets while preserving general literal-union enforcement for aliases and other non-property type annotations.
 
 ## [1.2.3] - 2026-04-03

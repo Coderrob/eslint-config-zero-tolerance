@@ -72,6 +72,27 @@ const DISABLED = false;
 type Toggle = typeof ENABLED | typeof DISABLED;
 ```
 
+Literal unions inside built-in TypeScript utility types are also exempt because they commonly describe property keys, filters, or type transformations rather than enum domains:
+
+```typescript
+// Allowed: property-key selection
+type PublicUser = Omit<User, 'password' | 'token'>;
+type NamedUser = Pick<User, 'id' | 'name'>;
+type UsersByRole = Record<'admin' | 'guest', User>;
+
+// Allowed: utility filtering and transformation
+type NonDraftStatus = Exclude<Status, 'draft' | 'archived'>;
+type VisibleStatus = Extract<Status, 'published' | 'scheduled'>;
+type RequiredStatus = NonNullable<'active' | 'inactive' | null>;
+```
+
+The utility-type exemption is limited to known TypeScript utility types. Custom generics are still checked:
+
+```typescript
+// Still reported
+type WrappedStatus = CustomUtility<'active' | 'inactive'>;
+```
+
 ## Autofix Behavior
 
 This rule can auto-convert string-only type aliases to enums. That includes direct string literal unions and type aliases that reference same-file string literal `const` declarations through `typeof`.

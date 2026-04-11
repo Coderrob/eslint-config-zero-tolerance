@@ -253,18 +253,18 @@ function isNegativeNumberLiteralNode(node: TSESTree.Node): node is TSESTree.Unar
 }
 
 /**
- * ESLint rule that requires property literal unions to be represented by enums.
+ * ESLint rule that requires property literal unions to be represented by named domain types.
  */
 export const noLiteralPropertyUnions = createRule({
   name: 'no-literal-property-unions',
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Require property literal unions to use enums',
+      description: 'Require property literal unions to use named domain types',
     },
     messages: {
       noLiteralPropertyUnions:
-        'Property "{{name}}" defines literal union values. Use an enum for the property type instead.',
+        'Property "{{name}}" defines literal union values. Extract the domain to a named type; prefer enums for string or number domains.',
     },
     schema: [],
   },

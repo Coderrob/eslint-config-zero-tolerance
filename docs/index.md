@@ -14,7 +14,7 @@ Zero-tolerance ESLint plugin and config for enforcing strict code quality standa
 - **Naming conventions** - prefix interfaces with `I`, sort imports and functions alphabetically
 - **Documentation** - require JSDoc on named functions and on anonymous non-test callbacks, and enforce sibling BDD spec files
 - **Type safety** - ban unsafe assertions, non-null `!` operators, literal unions, property literal unions, banned utility types, and inline destructured object literals, and require explicit annotations on exported object constants
-- **Testing standards** - enforce `should`-prefixed descriptions, ban imprecise Jest matchers and leaky mocks
+- **Testing standards** - enforce `should`-prefixed descriptions, ban imprecise Jest matchers and leaky mocks, and tighten timer, fetch, and dependency-boundary usage in tests
 - **Code quality** - limit function length and parameter count, eliminate magic numbers and strings
 - **Error handling** - require `new Error()` in throw statements, disallow empty catch blocks
 - **Import hygiene** - keep barrel files clean, ban parent-relative imports inside barrel files, optionally protect folders such as `src` from parent-relative access, ban dynamic imports, and prevent export aliases

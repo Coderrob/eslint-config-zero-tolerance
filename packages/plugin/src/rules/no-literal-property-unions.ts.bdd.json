@@ -4,12 +4,12 @@
   "sourceFile": "packages/plugin/src/rules/no-literal-property-unions.ts",
   "module": {
     "name": "no-literal-property-unions",
-    "description": "Require property literal unions to use enums.",
+    "description": "Require property literal unions to use named domain types.",
     "exports": ["noLiteralPropertyUnions"]
   },
   "specifications": [
     {
-      "feature": "Enum-backed property value domains",
+      "feature": "Named property value domains",
       "scenarios": [
         {
           "name": "should allow properties typed with enum or named type references",

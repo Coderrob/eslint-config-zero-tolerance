@@ -1,6 +1,6 @@
 # no-literal-property-unions
 
-Require property literal unions to use enums.
+Require property literal unions to use named domain types.
 
 ## Rule Details
 
@@ -13,7 +13,9 @@ Require property literal unions to use enums.
 
 ## Rationale
 
-Property contracts that use literal unions hide enum-like domains inside object shapes. Defining the domain as an enum gives the allowed values a reusable name and keeps interface, type literal, and class property declarations from repeating raw values.
+Property contracts that use literal unions hide finite or constrained domains inside object shapes. Defining the domain as a named type gives the allowed values a reusable name and keeps interface, type literal, and class property declarations from repeating raw values.
+
+For string and number domains, prefer an enum. For domains TypeScript enums cannot represent, such as bigint values, template-literal patterns, or mixed boolean/string values, use a named domain object, parser, or validator so the property still points at one reusable domain concept.
 
 ## Examples
 
@@ -44,6 +46,19 @@ enum ExitCode {
 
 interface IProcessResult {
   exitCode: ExitCode;
+}
+```
+
+```typescript
+class RecordIdKind {
+  private constructor(readonly value: bigint) {}
+
+  static readonly Primary = new RecordIdKind(1n);
+  static readonly Secondary = new RecordIdKind(2n);
+}
+
+interface IRecord {
+  idKind: RecordIdKind;
 }
 ```
 
@@ -100,7 +115,7 @@ interface ISearchMatch {
 
 This rule checks interface property signatures, type literal property signatures, class properties, and abstract class properties. It ignores function parameters and type aliases because those are covered by `no-literal-unions`.
 
-Pure boolean property unions (`true | false`) are allowed because they represent the full boolean domain and do not benefit from an enum. Literal unions mixed with non-boolean members, widened types, or nullish members are still reported.
+Pure boolean property unions (`true | false`) are allowed because they represent the full boolean domain and do not benefit from a named domain. Literal unions mixed with non-boolean members, widened types, or nullish members are still reported.
 
 ## Configuration
 

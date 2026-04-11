@@ -34,6 +34,7 @@ import noDynamicImport from './rules/no-dynamic-import';
 import noEmptyCatch from './rules/no-empty-catch';
 import noEslintDisable from './rules/no-eslint-disable';
 import noExportAlias from './rules/no-export-alias';
+import noFetchInTests from './rules/no-fetch-in-tests';
 import noFlagArgument from './rules/no-flag-argument';
 import noFloatingPromises from './rules/no-floating-promises';
 import noForIn from './rules/no-for-in';
@@ -54,6 +55,9 @@ import noParentInternalAccess from './rules/no-parent-internal-access';
 import noQuerySideEffects from './rules/no-query-side-effects';
 import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
+import noRestrictedImportsInTests from './rules/no-restricted-imports-in-tests';
+import noSetIntervalInTests from './rules/no-set-interval-in-tests';
+import noSetTimeoutInTests from './rules/no-set-timeout-in-tests';
 import noThrowLiteral from './rules/no-throw-literal';
 import noTypeAssertion from './rules/no-type-assertion';
 import noWith from './rules/no-with';
@@ -103,6 +107,7 @@ const rules: Record<string, unknown> = {
   'no-empty-catch': noEmptyCatch,
   'no-eslint-disable': noEslintDisable,
   'no-export-alias': noExportAlias,
+  'no-fetch-in-tests': noFetchInTests,
   'no-flag-argument': noFlagArgument,
   'no-floating-promises': noFloatingPromises,
   'no-for-in': noForIn,
@@ -124,6 +129,9 @@ const rules: Record<string, unknown> = {
   'no-query-side-effects': noQuerySideEffects,
   'no-re-export': noReExport,
   'no-redundant-boolean': noRedundantBoolean,
+  'no-restricted-imports-in-tests': noRestrictedImportsInTests,
+  'no-set-interval-in-tests': noSetIntervalInTests,
+  'no-set-timeout-in-tests': noSetTimeoutInTests,
   'no-throw-literal': noThrowLiteral,
   'no-type-assertion': noTypeAssertion,
   'no-with': noWith,

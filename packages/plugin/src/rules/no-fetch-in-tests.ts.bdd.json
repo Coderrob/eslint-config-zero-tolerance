@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-fetch-in-tests.ts",
+  "module": {
+    "name": "no-fetch-in-tests",
+    "description": "Disallow fetch usage in recognized test files.",
+    "exports": ["noFetchInTests"]
+  },
+  "specifications": [
+    {
+      "feature": "Test-file fetch enforcement",
+      "scenarios": [
+        {
+          "name": "should report direct fetch calls in test files",
+          "given": "fetch(url) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "a noFetchInTests violation is reported"
+        },
+        {
+          "name": "should report global object fetch calls in test files",
+          "given": "globalThis.fetch(url) inside a .spec.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "a noFetchInTests violation is reported"
+        },
+        {
+          "name": "should allow fetch calls outside test files",
+          "given": "fetch(url) inside a non-test source file",
+          "when": "the rule creates listeners for the file",
+          "then": "no listeners are registered and no violation is reported"
+        },
+        {
+          "name": "should allow non-global fetch methods in test files",
+          "given": "client.fetch(url) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported because the object is not a recognized global fetch object"
+        }
+      ]
+    }
+  ]
+}
