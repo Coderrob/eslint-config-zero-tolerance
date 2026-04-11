@@ -68,6 +68,7 @@ nav:
           - no-set-interval-in-tests: rules/no-set-interval-in-tests.md
           - no-fetch-in-tests: rules/no-fetch-in-tests.md
           - no-restricted-imports-in-tests: rules/no-restricted-imports-in-tests.md
+          - no-test-interface-declaration: rules/no-test-interface-declaration.md
       - Type Safety:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md
@@ -101,6 +102,7 @@ nav:
           - no-barrel-parent-imports: rules/no-barrel-parent-imports.md
           - no-parent-internal-access: rules/no-parent-internal-access.md
           - no-re-export: rules/no-re-export.md
+          - require-node-protocol: rules/require-node-protocol.md
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md
           - no-identical-branches: rules/no-identical-branches.md

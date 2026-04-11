@@ -58,6 +58,7 @@ import noRedundantBoolean from './rules/no-redundant-boolean';
 import noRestrictedImportsInTests from './rules/no-restricted-imports-in-tests';
 import noSetIntervalInTests from './rules/no-set-interval-in-tests';
 import noSetTimeoutInTests from './rules/no-set-timeout-in-tests';
+import noTestInterfaceDeclaration from './rules/no-test-interface-declaration';
 import noThrowLiteral from './rules/no-throw-literal';
 import noTypeAssertion from './rules/no-type-assertion';
 import noWith from './rules/no-with';
@@ -73,6 +74,7 @@ import requireExportedObjectType from './rules/require-exported-object-type';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocAnonymousFunctions from './rules/require-jsdoc-anonymous-functions';
 import requireJsdocFunctions from './rules/require-jsdoc-functions';
+import requireNodeProtocol from './rules/require-node-protocol';
 import requireOptionalChaining from './rules/require-optional-chaining';
 import requireReadonlyProps from './rules/require-readonly-props';
 import requireTestDescriptionStyle from './rules/require-test-description-style';
@@ -132,6 +134,7 @@ const rules: Record<string, unknown> = {
   'no-restricted-imports-in-tests': noRestrictedImportsInTests,
   'no-set-interval-in-tests': noSetIntervalInTests,
   'no-set-timeout-in-tests': noSetTimeoutInTests,
+  'no-test-interface-declaration': noTestInterfaceDeclaration,
   'no-throw-literal': noThrowLiteral,
   'no-type-assertion': noTypeAssertion,
   'no-with': noWith,
@@ -147,6 +150,7 @@ const rules: Record<string, unknown> = {
   'require-bdd-spec': requireBddSpec,
   'require-jsdoc-anonymous-functions': requireJsdocAnonymousFunctions,
   'require-jsdoc-functions': requireJsdocFunctions,
+  'require-node-protocol': requireNodeProtocol,
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,

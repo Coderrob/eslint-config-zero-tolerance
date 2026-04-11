@@ -149,6 +149,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-set-interval-in-tests`](docs/rules/no-set-interval-in-tests.md)             | Disallow `setInterval` usage in test files                                                                    |
 | [`no-fetch-in-tests`](docs/rules/no-fetch-in-tests.md)                           | Disallow `fetch` usage in test files                                                                          |
 | [`no-restricted-imports-in-tests`](docs/rules/no-restricted-imports-in-tests.md) | Disallow configured dependency imports in test files                                                          |
+| [`no-test-interface-declaration`](docs/rules/no-test-interface-declaration.md)   | Disallow interface declarations in test files; import production types instead                                |
 
 ### Type Safety
 
@@ -198,6 +199,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-dynamic-import`](docs/rules/no-dynamic-import.md)                 | Ban dynamic `import()` and `require()` outside test files                            |
 | [`no-export-alias`](docs/rules/no-export-alias.md)                     | Prevent use of aliases in export statements                                          |
 | [`no-re-export`](docs/rules/no-re-export.md)                           | Disallow direct or pass-through re-export statements from parent/grandparent modules |
+| [`require-node-protocol`](docs/rules/require-node-protocol.md)         | Require Node.js built-in module imports to use the `node:` protocol prefix           |
 
 ### Bug Prevention
 

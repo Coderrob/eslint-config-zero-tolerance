@@ -29,6 +29,7 @@
 | [no-set-interval-in-tests](no-set-interval-in-tests.md)             | suggestion | Disallow `setInterval` usage in test files                                                                    |
 | [no-fetch-in-tests](no-fetch-in-tests.md)                           | suggestion | Disallow `fetch` usage in test files                                                                          |
 | [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md) | suggestion | Disallow configured dependency imports in test files                                                          |
+| [no-test-interface-declaration](no-test-interface-declaration.md)   | suggestion | Disallow interface declarations in test files; import production types instead                                |
 
 ## Type Safety
 
@@ -78,6 +79,7 @@
 | [no-barrel-parent-imports](no-barrel-parent-imports.md)   | suggestion | Disallow parent-directory traversal in barrel-file import paths                 |
 | [no-parent-internal-access](no-parent-internal-access.md) | suggestion | Disallow parent-relative access into protected internal directories such as src |
 | [no-re-export](no-re-export.md)                           | suggestion | Disallow direct or pass-through re-exports from parent/grandparent modules      |
+| [require-node-protocol](require-node-protocol.md)         | suggestion | Require Node.js built-in module imports to use the `node:` protocol prefix      |
 
 ## Bug Prevention
 

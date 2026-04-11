@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **`require-node-protocol` rule**: Added a new fixable rule that requires Node.js built-in module imports to use the `node:` protocol prefix (e.g., `node:fs` instead of `fs`).
+- **`no-test-interface-declaration` rule**: Added a new rule that disallows `interface` declarations in test files, flagging cases where production types should be exported and imported instead of redeclared locally.
 - **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions, including string, number, bigint, boolean-mixed, and template-literal members, instead of named domain types.
 - **Test boundary rules**: Added `no-set-timeout-in-tests` and `no-set-interval-in-tests` as built-in preset rules, plus opt-in `no-fetch-in-tests` and `no-restricted-imports-in-tests` rules for teams that want stricter test isolation from HTTP, filesystem, subprocess, and network dependencies.
 

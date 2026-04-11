@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- 57 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
+- 59 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
 - `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
 - ESLint 9 flat config and ESLint 8.x legacy config support
 - Built with `@typescript-eslint/utils` for TypeScript AST support
@@ -106,6 +106,7 @@ export default [
 | `no-set-interval-in-tests`       | Disallow `setInterval` usage in test files                                                                    |
 | `no-fetch-in-tests`              | Disallow `fetch` usage in test files                                                                          |
 | `no-restricted-imports-in-tests` | Disallow configured dependency imports in test files                                                          |
+| `no-test-interface-declaration`  | Disallow interface declarations in test files; import production types instead                                |
 
 ### Type Safety
 
@@ -157,6 +158,7 @@ export default [
 | `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |
 | `no-export-alias`           | Prevent use of aliases in export statements                                       |
 | `no-re-export`              | Disallow direct or pass-through re-exports from parent/grandparent modules        |
+| `require-node-protocol`     | Require Node.js built-in module imports to use the `node:` protocol prefix        |
 
 ### Bug Prevention
 
