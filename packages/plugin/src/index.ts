@@ -78,6 +78,7 @@ import requireNodeProtocol from './rules/require-node-protocol';
 import requireOptionalChaining from './rules/require-optional-chaining';
 import requireReadonlyProps from './rules/require-readonly-props';
 import requireTestDescriptionStyle from './rules/require-test-description-style';
+import requireUnionTypeAlias from './rules/require-union-type-alias';
 import sortFunctions from './rules/sort-functions';
 import sortImports from './rules/sort-imports';
 
@@ -154,6 +155,7 @@ const rules: Record<string, unknown> = {
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,
+  'require-union-type-alias': requireUnionTypeAlias,
   'sort-functions': sortFunctions,
   'sort-imports': sortImports,
 };

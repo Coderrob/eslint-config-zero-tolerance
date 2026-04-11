@@ -74,6 +74,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
+  'require-union-type-alias',
 ];
 
 const MAX_FUNCTION_LINES_RULE = 'max-function-lines';

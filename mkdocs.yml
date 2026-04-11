@@ -74,6 +74,7 @@ nav:
           - no-non-null-assertion: rules/no-non-null-assertion.md
           - no-literal-unions: rules/no-literal-unions.md
           - no-literal-property-unions: rules/no-literal-property-unions.md
+          - require-union-type-alias: rules/require-union-type-alias.md
           - no-banned-types: rules/no-banned-types.md
           - no-inline-type-import: rules/no-inline-type-import.md
           - no-destructured-parameter-type-literal: rules/no-destructured-parameter-type-literal.md

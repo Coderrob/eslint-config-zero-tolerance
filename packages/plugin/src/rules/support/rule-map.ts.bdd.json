@@ -112,6 +112,12 @@
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/no-literal-property-unions' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include require-union-type-alias in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-union-type-alias' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
         }
       ]
     }
