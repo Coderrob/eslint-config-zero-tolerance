@@ -34,6 +34,12 @@
           "given": "interface IToggle { enabled: true | false }",
           "when": "the rule evaluates the property signature",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow properties with bigint literal value options",
+          "given": "interface ISearchMatch { id: 1n | 2n }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported because TypeScript enums cannot represent bigint values"
         }
       ]
     },
@@ -73,12 +79,6 @@
         {
           "name": "should report properties with negative number literal value options",
           "given": "interface ISearchMatch { exitCode: -1 | 0 }",
-          "when": "the rule evaluates the property signature",
-          "then": "a noLiteralPropertyUnions violation is reported on the property name"
-        },
-        {
-          "name": "should report properties with bigint literal value options",
-          "given": "interface ISearchMatch { id: 1n | 2n }",
           "when": "the rule evaluates the property signature",
           "then": "a noLiteralPropertyUnions violation is reported on the property name"
         },

@@ -27,7 +27,6 @@ type PropertyNode =
   | TSESTree.TSPropertySignature;
 
 const NEGATIVE_NUMBER_OPERATOR = '-';
-const TYPEOF_BIGINT = 'bigint';
 
 /**
  * Checks one property declaration for literal unions.
@@ -169,7 +168,7 @@ function isBannedLiteralTypeNode(node: TSESTree.TypeNode): boolean {
  * @returns True for string, number, and boolean literal values.
  */
 function isBannedLiteralValue(value: boolean | bigint | number | RegExp | string | null): boolean {
-  return isString(value) || isNumber(value) || isBigInt(value) || isBoolean(value);
+  return isString(value) || isNumber(value) || isBoolean(value);
 }
 
 /**
@@ -180,16 +179,6 @@ function isBannedLiteralValue(value: boolean | bigint | number | RegExp | string
  */
 function isBannedPrimitiveLiteralNode(node: TSESTree.Node): boolean {
   return node.type === AST_NODE_TYPES.Literal && isBannedLiteralValue(node.value);
-}
-
-/**
- * Returns true when the runtime value is a bigint primitive.
- *
- * @param value - Value to inspect.
- * @returns True when the value is bigint.
- */
-function isBigInt(value: unknown): value is bigint {
-  return typeof value === TYPEOF_BIGINT;
 }
 
 /**

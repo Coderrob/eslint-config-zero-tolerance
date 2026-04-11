@@ -55,6 +55,10 @@ ruleTester.run('no-literal-property-unions', noLiteralPropertyUnions, {
       code: 'type SearchMode = "tree-sitter" | "text-hint";',
       name: 'should ignore type alias literal unions',
     },
+    {
+      code: 'interface ISearchMatch { id: 1n | 2n; }',
+      name: 'should allow interface properties with bigint literal value options',
+    },
   ],
   invalid: [
     {
@@ -104,16 +108,6 @@ ruleTester.run('no-literal-property-unions', noLiteralPropertyUnions, {
         {
           messageId: 'noLiteralPropertyUnions',
           data: { name: 'exitCode' },
-        },
-      ],
-    },
-    {
-      code: 'interface ISearchMatch { id: 1n | 2n; }',
-      name: 'should report interface properties with bigint literal value options',
-      errors: [
-        {
-          messageId: 'noLiteralPropertyUnions',
-          data: { name: 'id' },
         },
       ],
     },

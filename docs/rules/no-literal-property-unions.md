@@ -15,7 +15,7 @@ Require property literal unions to use named domain types.
 
 Property contracts that use literal unions hide finite or constrained domains inside object shapes. Defining the domain as a named type gives the allowed values a reusable name and keeps interface, type literal, and class property declarations from repeating raw values.
 
-For string and number domains, prefer an enum. For domains TypeScript enums cannot represent, such as bigint values, template-literal patterns, or mixed boolean/string values, use a named domain object, parser, or validator so the property still points at one reusable domain concept.
+For string and number domains, prefer an enum. Bigint literal unions are allowed because TypeScript enums cannot represent bigint values, and there is no universally accepted lightweight pattern to replace them.
 
 ## Examples
 
@@ -49,19 +49,6 @@ interface IProcessResult {
 }
 ```
 
-```typescript
-class RecordIdKind {
-  private constructor(readonly value: bigint) {}
-
-  static readonly Primary = new RecordIdKind(1n);
-  static readonly Secondary = new RecordIdKind(2n);
-}
-
-interface IRecord {
-  idKind: RecordIdKind;
-}
-```
-
 ### Incorrect
 
 ```typescript
@@ -78,12 +65,6 @@ export interface IAstLangSearchMatch {
 ```typescript
 interface IProcessResult {
   exitCode: 0 | 1;
-}
-```
-
-```typescript
-interface IRecord {
-  idKind: 1n | 2n;
 }
 ```
 
@@ -115,7 +96,7 @@ interface ISearchMatch {
 
 This rule checks interface property signatures, type literal property signatures, class properties, and abstract class properties. It ignores function parameters and type aliases because those are covered by `no-literal-unions`.
 
-Pure boolean property unions (`true | false`) are allowed because they represent the full boolean domain and do not benefit from a named domain. Literal unions mixed with non-boolean members, widened types, or nullish members are still reported.
+Pure boolean property unions (`true | false`) are allowed because they represent the full boolean domain and do not benefit from a named domain. Bigint literal unions are also allowed because TypeScript enums cannot represent bigint values. Literal unions mixed with non-boolean members, widened types, or nullish members are still reported.
 
 ## Configuration
 

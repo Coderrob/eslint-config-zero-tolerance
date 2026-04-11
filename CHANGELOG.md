@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **`no-literal-property-unions` rule**: Exempted bigint literal unions from being flagged because TypeScript enums cannot represent bigint values, making the "use enums" guidance unactionable for bigint domains.
 - **`no-literal-property-unions` rule**: Clarified the diagnostic and documentation to recommend named domain types generally, while keeping enums as the preferred option for string and number domains that TypeScript enums can represent.
 - **`no-literal-unions` rule**: Exempted literal unions inside built-in TypeScript utility type arguments such as `Omit`, `Pick`, `Record`, `Exclude`, and `Extract`, while keeping custom generic type arguments reportable.
 - **`no-literal-unions` rule**: Direct property literal unions are now handled by `no-literal-property-unions`, avoiding duplicate reports from the default presets while preserving general literal-union enforcement for aliases and other non-property type annotations.
