@@ -4,9 +4,12 @@ site_url: https://coderrob.github.io/eslint-config-zero-tolerance/
 repo_name: Coderrob/eslint-config-zero-tolerance
 repo_url: https://github.com/Coderrob/eslint-config-zero-tolerance
 edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2024 Coderrob
 
 theme:
   name: material
+  logo: img/zero-tolerance-icon.png
+  favicon: img/zero-tolerance-icon.png
   palette:
     - scheme: default
       primary: deep purple
@@ -21,6 +24,8 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - navigation.instant
+    - navigation.tracking
     - navigation.tabs
     - navigation.sections
     - navigation.expand
@@ -29,9 +34,17 @@ theme:
     - search.highlight
     - content.code.copy
     - content.action.edit
+    - content.tooltips
 
 plugins:
   - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Coderrob/eslint-config-zero-tolerance
+    - icon: fontawesome/brands/npm
+      link: https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance
 
 markdown_extensions:
   - admonition
@@ -45,6 +58,8 @@ markdown_extensions:
   - tables
   - attr_list
   - md_in_html
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md

@@ -19,7 +19,7 @@ This rule is opt-in and disabled by default in the built-in presets. It only run
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const client = createMockClient({
@@ -29,7 +29,7 @@ const client = createMockClient({
 await loadUser(client, '1');
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 await fetch('/users/1');

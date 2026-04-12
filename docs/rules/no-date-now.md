@@ -17,13 +17,13 @@ Direct time reads create non-deterministic code that is harder to test. Injectin
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const timestamp = clock.now();
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 const timestamp = Date.now();

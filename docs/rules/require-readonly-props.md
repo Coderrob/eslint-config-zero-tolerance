@@ -17,7 +17,7 @@ Component props are inputs and should be treated as immutable. Requiring readonl
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 type Props = { name: string };
@@ -33,7 +33,7 @@ function Greeting(props: { readonly name: string }) {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 type Props = { name: string };

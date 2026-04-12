@@ -1,16 +1,17 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns with zero exceptions.
+Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 
 ## Features
 
-- 60 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
-- `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
-- ESLint 9 flat config and ESLint 8.x legacy config support
-- Built with `@typescript-eslint/utils` for TypeScript AST support
+- **60 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
+- **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
+- **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
+- Built with `@typescript-eslint/utils` for full TypeScript AST support
 
 ## Requirements
 

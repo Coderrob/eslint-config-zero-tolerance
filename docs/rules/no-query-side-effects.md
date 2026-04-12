@@ -17,7 +17,7 @@ Query functions should answer questions without mutating state. Mixing reads and
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function getTotal(items: number[]): number {
@@ -25,7 +25,7 @@ function getTotal(items: number[]): number {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function getTotal(items: number[]): number {

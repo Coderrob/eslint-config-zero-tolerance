@@ -23,7 +23,7 @@ This rule complements `no-literal-unions` (which handles literal value unions li
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 type ImportSource = DirectoryImportSourceSelection | SourceType | undefined;
@@ -60,7 +60,7 @@ interface IConfig {
 type SourceKind = DirectoryImportSourceSelection | SourceType;
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 interface IConfig {
@@ -98,3 +98,11 @@ A union type is allowed when:
 
 - It is the direct right-hand side of a type alias declaration (`type X = A | B`).
 - It contains fewer than two type reference members. Keyword types (`string`, `number`, `boolean`, `undefined`, `null`, `void`, `never`, `unknown`, `any`), literal types (`"foo"`, `42`, `true`), and other non-reference type nodes do not count toward the threshold.
+
+## Configuration
+
+This rule has no options:
+
+```js
+'zero-tolerance/require-union-type-alias': 'error'
+```

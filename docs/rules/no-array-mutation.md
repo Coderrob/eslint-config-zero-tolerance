@@ -17,13 +17,13 @@ Mutating arrays in place creates hidden side effects. Immutable array operations
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const next = [...items, value];
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 items.push(value);

@@ -35,7 +35,7 @@ It only runs in recognized test files: `*.test.*`, `*.spec.*`, `*.e2e.*`, `*.int
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 import { createFixture } from './fixtures';
@@ -45,7 +45,7 @@ const client = createMockClient();
 const result = await runScenario(client);
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 import fs from 'fs';

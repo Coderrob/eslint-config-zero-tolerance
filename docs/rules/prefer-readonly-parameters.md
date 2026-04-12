@@ -17,7 +17,7 @@ Function parameters are inputs. Treating object and array parameters as readonly
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function format(user: Readonly<User>): string {
@@ -29,7 +29,7 @@ class Service {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function format(user: User): string {

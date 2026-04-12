@@ -17,13 +17,13 @@ Disallow `with` statements.
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const fullName = person.firstName + person.lastName;
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 with (person) {

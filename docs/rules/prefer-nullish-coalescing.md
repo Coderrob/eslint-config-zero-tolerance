@@ -17,14 +17,14 @@ A nullish guard ternary (`value != null ? value : fallback`) is functionally equ
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const userName = input ?? 'guest';
 const description = config?.description ?? 'Not provided';
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 const userName = input != null ? input : 'guest';

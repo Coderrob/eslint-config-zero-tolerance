@@ -1,6 +1,19 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides a suite of **custom rules** grouped into eight categories.
+`@coderrob/eslint-plugin-zero-tolerance` provides **60 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+
+| Category                                  | Rules | Focus                                               |
+| ----------------------------------------- | ----: | --------------------------------------------------- |
+| [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
+| [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
+| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Type Safety](#type-safety)               |     9 | Assertions, unions, imports, exported types         |
+| [Code Quality](#code-quality)             |    12 | Function size, magic values, immutability, sorting  |
+| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Imports](#imports)                       |     7 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention)         |    15 | Identical code, control flow, async safety          |
+
+---
 
 ## Naming Conventions
 

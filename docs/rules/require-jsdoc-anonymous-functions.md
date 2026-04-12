@@ -19,7 +19,7 @@ This rule is automatically skipped in test files (`.test.*` / `.spec.*`). It als
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 /**
@@ -43,7 +43,7 @@ describe('CLI knowledge-base command', () => {
 });
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 export default function () {

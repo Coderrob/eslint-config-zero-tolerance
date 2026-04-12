@@ -118,6 +118,18 @@
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-union-type-alias' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include no-test-interface-declaration in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-test-interface-declaration' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include require-node-protocol in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-node-protocol' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
         }
       ]
     }

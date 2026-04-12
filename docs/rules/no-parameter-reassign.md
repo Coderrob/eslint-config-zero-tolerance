@@ -17,7 +17,7 @@ Reassigning parameters is a common code smell that makes control flow harder to 
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function normalize(value: string): string {
@@ -27,7 +27,7 @@ function normalize(value: string): string {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function normalize(value: string): string {

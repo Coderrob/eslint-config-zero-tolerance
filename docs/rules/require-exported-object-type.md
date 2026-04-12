@@ -17,7 +17,7 @@ Exported object constants become part of a module's public contract. Requiring a
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 export const StatusMap: Readonly<Record<string, string>> = Object.freeze({
@@ -36,7 +36,7 @@ const StatusMap: StatusLookup = {
 export { StatusMap };
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 export const StatusMap = Object.freeze({

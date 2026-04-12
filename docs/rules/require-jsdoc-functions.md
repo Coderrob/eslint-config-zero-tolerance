@@ -19,7 +19,7 @@ Anonymous function-like constructs are enforced by the companion rule `require-j
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 /**
@@ -49,7 +49,7 @@ class DedupeFactory {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 async function fetchUser(id: string): Promise<IUser> {

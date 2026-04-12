@@ -17,7 +17,7 @@ Labels introduce goto-like control flow (`break label`, `continue label`) that m
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 for (const row of rows) {
@@ -27,7 +27,7 @@ for (const row of rows) {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 outer: for (const row of rows) {

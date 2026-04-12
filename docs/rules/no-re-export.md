@@ -22,7 +22,7 @@ Re-export statements that reach outside the current directory (`../`) create upw
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 // Direct exports
@@ -44,7 +44,7 @@ export { localValue };
 // export * from '../../parent';
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 // Re-exports from peers are not allowed in non-barrel files
@@ -65,4 +65,12 @@ export default parentDefault;
 // Re-exports from grandparents are not allowed
 export { grandparentFunction } from '../../../ancestor';
 export * as ns from '../../../../distant-ancestor';
+```
+
+## Configuration
+
+This rule has no options:
+
+```js
+'zero-tolerance/no-re-export': 'error'
 ```

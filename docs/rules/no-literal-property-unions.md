@@ -19,7 +19,7 @@ For string and number domains, prefer an enum. Bigint literal unions are allowed
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 enum SearchMode {
@@ -49,7 +49,7 @@ interface IProcessResult {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 export interface IAstLangSearchMatch {

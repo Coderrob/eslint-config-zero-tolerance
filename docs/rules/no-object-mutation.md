@@ -17,7 +17,7 @@ Mutating object properties in place introduces side effects and makes state tran
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const next = { ...state, count: state.count + 1 };
@@ -33,7 +33,7 @@ class AppError extends Error {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 state.count = state.count + 1;

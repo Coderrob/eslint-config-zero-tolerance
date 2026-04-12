@@ -74,6 +74,8 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
+  'no-test-interface-declaration',
+  'require-node-protocol',
   'require-union-type-alias',
 ];
 

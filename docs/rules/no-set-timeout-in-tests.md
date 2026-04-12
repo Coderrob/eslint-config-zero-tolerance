@@ -19,7 +19,7 @@ This rule only runs in recognized test files: `*.test.*`, `*.spec.*`, `*.e2e.*`,
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 vi.useFakeTimers();
@@ -31,7 +31,7 @@ await pending;
 await waitFor(() => expect(screen.getByText('Done')).toBeVisible());
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 setTimeout(assertLater, 100);

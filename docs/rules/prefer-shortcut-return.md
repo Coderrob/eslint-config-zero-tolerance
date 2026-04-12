@@ -17,7 +17,7 @@ When code branches only to return opposite boolean literals, the extra control f
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function isReady(value: unknown): boolean {
@@ -29,7 +29,7 @@ function isDisabled(value: unknown): boolean {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function isReady(value: unknown): boolean {

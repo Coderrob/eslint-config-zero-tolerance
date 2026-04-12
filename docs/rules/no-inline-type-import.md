@@ -17,7 +17,7 @@ Inline type import queries make dependencies harder to scan and enforce inconsis
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 import type { PipelineContext } from '../types/pipeline';
@@ -31,7 +31,7 @@ interface ISourceLoadResult {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 interface ISourceLoadResult {

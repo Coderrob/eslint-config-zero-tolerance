@@ -19,7 +19,7 @@ This rule only runs in recognized test files: `*.test.*`, `*.spec.*`, `*.e2e.*`,
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 vi.useFakeTimers();
@@ -29,7 +29,7 @@ vi.advanceTimersByTime(1000);
 subscription.stop();
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 setInterval(poll, 1000);
