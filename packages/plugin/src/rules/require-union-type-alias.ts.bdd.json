@@ -1,0 +1,112 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-union-type-alias.ts",
+  "module": {
+    "name": "require-union-type-alias",
+    "description": "Require inline union types with multiple type references to be extracted into named type aliases.",
+    "exports": ["requireUnionTypeAlias"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed inline union types",
+      "scenarios": [
+        {
+          "name": "should allow a type alias that is itself a union of type references",
+          "given": "type SourceKind = DirectoryImportSourceSelection | SourceType",
+          "when": "the rule evaluates the type alias declaration",
+          "then": "no violation is reported because the union is the direct value of a type alias"
+        },
+        {
+          "name": "should allow a single type reference with undefined",
+          "given": "interface IConfig { value: TypeA | undefined; }",
+          "when": "the rule evaluates the property type annotation",
+          "then": "no violation is reported because there is only one type reference member"
+        },
+        {
+          "name": "should allow keyword-only unions",
+          "given": "interface IConfig { value: string | number; }",
+          "when": "the rule evaluates the property type annotation",
+          "then": "no violation is reported because there are no type reference members"
+        },
+        {
+          "name": "should allow literal-only unions",
+          "given": "type Status = 'active' | 'inactive'",
+          "when": "the rule evaluates the type alias declaration",
+          "then": "no violation is reported because literal union members are not type references"
+        },
+        {
+          "name": "should allow a single type reference with null and undefined",
+          "given": "function run(x: TypeA | null | undefined): void {}",
+          "when": "the rule evaluates the function parameter type",
+          "then": "no violation is reported because there is only one type reference member"
+        }
+      ]
+    },
+    {
+      "feature": "Inline union types requiring extraction",
+      "scenarios": [
+        {
+          "name": "should report inline union of two type references in interface property",
+          "given": "interface IConfig { value: TypeA | TypeB; }",
+          "when": "the rule evaluates the property type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union of type references with undefined in property",
+          "given": "interface IConfig { sourceType: DirectoryImportSourceSelection | SourceType | undefined; }",
+          "when": "the rule evaluates the property type annotation",
+          "then": "a violation is reported because the union contains two or more type reference members"
+        },
+        {
+          "name": "should report inline union of type references in function parameter",
+          "given": "function process(input: TypeA | TypeB): void {}",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union of type references in function return type",
+          "given": "function get(): TypeA | TypeB",
+          "when": "the rule evaluates the return type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union of type references in variable declaration",
+          "given": "const x: TypeA | TypeB = getVal()",
+          "when": "the rule evaluates the variable type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union nested inside a generic type argument",
+          "given": "interface IConfig { value: Readonly<TypeA | TypeB>; }",
+          "when": "the rule evaluates the union type inside the generic argument",
+          "then": "a violation is reported because the inner union contains multiple type references"
+        },
+        {
+          "name": "should report inline union of three or more type references",
+          "given": "interface IConfig { value: TypeA | TypeB | TypeC; }",
+          "when": "the rule evaluates the property type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union of type references in class property",
+          "given": "class Service { handler: TypeA | TypeB = null!; }",
+          "when": "the rule evaluates the class property type annotation",
+          "then": "a violation is reported advising extraction to a named type alias"
+        },
+        {
+          "name": "should report inline union of generic type references",
+          "given": "function handle(items: Array<string> | Set<string>): void {}",
+          "when": "the rule evaluates the parameter type annotation",
+          "then": "a violation is reported because Array and Set are type references"
+        },
+        {
+          "name": "should report inline union of type references in type literal property",
+          "given": "type Config = { source: SourceA | SourceB; }",
+          "when": "the rule evaluates the property type annotation inside the type literal",
+          "then": "a violation is reported advising extraction to a named type alias"
+        }
+      ]
+    }
+  ]
+}

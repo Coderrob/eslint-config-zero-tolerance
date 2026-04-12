@@ -16,7 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { unwrapTsExpression } from '../helpers/ast/types';
+import { getTypeReferenceName, unwrapTsExpression } from '../helpers/ast/types';
 import { isBoolean, isNumber, isString } from '../helpers/type-guards';
 import { VARIABLE_KIND_CONST } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
@@ -46,6 +46,30 @@ const DUPLICATE_SUFFIX_START = 2;
 const ENUM_MEMBER_FALLBACK_PREFIX = 'Value';
 const EXPORT_PREFIX = 'export ';
 const NEGATIVE_NUMBER_OPERATOR = '-';
+const TYPESCRIPT_UTILITY_TYPE_NAMES = new Set([
+  'Awaited',
+  'Capitalize',
+  'ConstructorParameters',
+  'Exclude',
+  'Extract',
+  'InstanceType',
+  'Lowercase',
+  'NoInfer',
+  'NonNullable',
+  'Omit',
+  'OmitThisParameter',
+  'Parameters',
+  'Partial',
+  'Pick',
+  'Readonly',
+  'Record',
+  'Required',
+  'ReturnType',
+  'ThisParameterType',
+  'ThisType',
+  'Uncapitalize',
+  'Uppercase',
+]);
 
 /**
  * Adds resolved const-literal declarations from one declaration node.
@@ -80,7 +104,7 @@ function checkUnionType(
   constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
   node: TSESTree.TSUnionType,
 ): void {
-  if (isBooleanLiteralUnion(node, constLiteralMap)) {
+  if (isAllowedLiteralUnion(node, constLiteralMap)) {
     return;
   }
   if (!hasBannedLiteralUnionMember(node, constLiteralMap)) {
@@ -316,6 +340,23 @@ function getEnumDeclarationPrefix(
 }
 
 /**
+ * Returns the nearest containing type reference for a type node.
+ *
+ * @param node - Type node to inspect.
+ * @returns Nearest type reference ancestor, or null when absent.
+ */
+function getNearestTypeReference(node: TSESTree.TypeNode): TSESTree.TSTypeReference | null {
+  let currentNode = node.parent;
+  while (currentNode.type !== AST_NODE_TYPES.Program) {
+    if (currentNode.type === AST_NODE_TYPES.TSTypeReference) {
+      return currentNode;
+    }
+    currentNode = currentNode.parent;
+  }
+  return null;
+}
+
+/**
  * Returns resolved literal metadata for one const declarator.
  *
  * @param declarator - Variable declarator to inspect.
@@ -544,6 +585,24 @@ function hasLiteralConstReferenceUnionMember(
 }
 
 /**
+ * Returns true when a union is allowed without reporting.
+ *
+ * @param node - Union type node to inspect.
+ * @param constLiteralMap - Resolved literal-valued const declarations in the file.
+ * @returns True when another rule owns the union or it matches an explicit exemption.
+ */
+function isAllowedLiteralUnion(
+  node: TSESTree.TSUnionType,
+  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+): boolean {
+  return (
+    isDirectPropertyTypeAnnotationUnion(node) ||
+    isBooleanLiteralUnion(node, constLiteralMap) ||
+    isInsideTypeScriptUtilityType(node)
+  );
+}
+
+/**
  * Returns true when every union member can be converted into a string enum member.
  *
  * @param node - Union type node to inspect.
@@ -608,6 +667,25 @@ function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
 }
 
 /**
+ * Returns true when a union is the direct annotation of a property-like node.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the new property-specific rule owns the report.
+ */
+function isDirectPropertyTypeAnnotationUnion(node: TSESTree.TSUnionType): boolean {
+  const parentNode = node.parent;
+  if (parentNode.type !== AST_NODE_TYPES.TSTypeAnnotation) {
+    return false;
+  }
+  const annotatedNode = parentNode.parent;
+  return (
+    annotatedNode.type === AST_NODE_TYPES.PropertyDefinition ||
+    annotatedNode.type === AST_NODE_TYPES.TSAbstractPropertyDefinition ||
+    annotatedNode.type === AST_NODE_TYPES.TSPropertySignature
+  );
+}
+
+/**
  * Returns true when a statement directly exports a variable declaration.
  *
  * @param statement - Program statement to inspect.
@@ -622,6 +700,17 @@ function isExportedVariableDeclarationStatement(
     statement.type === AST_NODE_TYPES.ExportNamedDeclaration &&
     statement.declaration?.type === AST_NODE_TYPES.VariableDeclaration
   );
+}
+
+/**
+ * Returns true when a union is inside a built-in TypeScript utility type reference.
+ *
+ * @param node - Union type node to inspect.
+ * @returns True when the nearest enclosing type reference is a TypeScript utility type.
+ */
+function isInsideTypeScriptUtilityType(node: TSESTree.TSUnionType): boolean {
+  const typeReference = getNearestTypeReference(node);
+  return typeReference !== null && isTypeScriptUtilityTypeReference(typeReference);
 }
 
 /**
@@ -748,6 +837,17 @@ function isStringLiteralTypeNode(
  */
 function isTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
   return getDirectTypeAliasDeclaration(node) !== null;
+}
+
+/**
+ * Returns true when a type reference names a built-in TypeScript utility type.
+ *
+ * @param node - Type reference to inspect.
+ * @returns True when the type reference is a known TypeScript utility type.
+ */
+function isTypeScriptUtilityTypeReference(node: TSESTree.TSTypeReference): boolean {
+  const typeReferenceName = getTypeReferenceName(node);
+  return typeReferenceName !== null && TYPESCRIPT_UTILITY_TYPE_NAMES.has(typeReferenceName);
 }
 
 /**

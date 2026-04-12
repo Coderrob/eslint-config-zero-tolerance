@@ -72,6 +72,37 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
       name: 'should allow non-alias typeof unions that resolve to literal const values',
     },
     {
+      code: 'interface ISearchMatch { mode: "tree-sitter" | "text-hint"; }',
+      name: 'should allow property literal unions handled by the property-specific rule',
+    },
+    {
+      code: 'class SearchMatch { mode: "tree-sitter" | "text-hint"; }',
+      name: 'should allow class property literal unions handled by the property-specific rule',
+    },
+    {
+      code: [
+        'type PublicUser = Omit<User, "password" | "token">;',
+        'type NamedUser = Pick<User, "id" | "name">;',
+        'type UsersByRole = Record<"admin" | "guest", User>;',
+      ].join('\n'),
+      name: 'should allow literal unions inside property-key utility types',
+    },
+    {
+      code: [
+        'type NonDraftStatus = Exclude<Status, "draft" | "archived">;',
+        'type VisibleStatus = Extract<Status, "published" | "scheduled">;',
+        'type RequiredStatus = NonNullable<"active" | "inactive" | null>;',
+      ].join('\n'),
+      name: 'should allow literal unions inside filtering utility types',
+    },
+    {
+      code: [
+        'type CallbackArgs = Parameters<(mode: "fast" | "safe") => void>;',
+        'type CallbackResult = ReturnType<() => "success" | "failure">;',
+      ].join('\n'),
+      name: 'should allow literal unions inside function utility types',
+    },
+    {
       code: 'const ENABLED = true; const DISABLED = false; type Toggle = typeof ENABLED | typeof DISABLED;',
       name: 'should allow boolean literal unions hidden behind const typeof references',
     },
@@ -260,6 +291,15 @@ ruleTester.run('no-literal-unions', noLiteralUnions, {
     {
       code: 'function run(mode: "fast" | "safe") {}',
       name: 'should report non-alias literal unions without offering enum autofix',
+      errors: [
+        {
+          messageId: 'noLiteralUnions',
+        },
+      ],
+    },
+    {
+      code: 'type WrappedStatus = CustomUtility<"active" | "inactive">;',
+      name: 'should report literal unions inside custom generic type arguments',
       errors: [
         {
           messageId: 'noLiteralUnions',

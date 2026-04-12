@@ -41,10 +41,13 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-jest-have-been-called',
   'no-inline-type-import',
   'no-mock-implementation',
+  'no-set-interval-in-tests',
+  'no-set-timeout-in-tests',
   'require-jsdoc-functions',
   'require-optional-chaining',
   'require-readonly-props',
   'no-type-assertion',
+  'no-literal-property-unions',
   'no-eslint-disable',
   'sort-imports',
   'sort-functions',
@@ -71,6 +74,9 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-shortcut-return',
   'prefer-string-raw',
   'no-query-side-effects',
+  'no-test-interface-declaration',
+  'require-node-protocol',
+  'require-union-type-alias',
 ];
 
 const MAX_FUNCTION_LINES_RULE = 'max-function-lines';
@@ -180,6 +186,8 @@ const ruleEntries: RuleEntryTuple[] = [
   ),
   createRuleEntry('prefer-result-return', OFF_LEVEL, WARN_LEVEL),
   createRuleEntry('no-parent-internal-access', OFF_LEVEL, OFF_LEVEL),
+  createRuleEntry('no-fetch-in-tests', OFF_LEVEL, OFF_LEVEL),
+  createRuleEntry('no-restricted-imports-in-tests', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];

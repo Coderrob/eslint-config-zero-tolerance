@@ -17,7 +17,7 @@ Boolean flag arguments usually indicate a function doing more than one thing. Pr
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function renderPreview(): string {
@@ -29,7 +29,7 @@ function renderFull(): string {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function render(isPreview: boolean): string {

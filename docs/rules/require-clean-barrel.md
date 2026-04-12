@@ -43,6 +43,14 @@ const helper = () => {};
 export { helper };
 ```
 
+## Configuration
+
+This rule has no options:
+
+```js
+'zero-tolerance/require-clean-barrel': 'error'
+```
+
 ## Notes
 
 - The rule applies only to single-extension barrel files such as `index.ts`, `index.js`, and `index.mts`.

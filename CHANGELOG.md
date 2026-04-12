@@ -8,6 +8,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`require-node-protocol` rule**: Added a new fixable rule that requires Node.js built-in module imports to use the `node:` protocol prefix (e.g., `node:fs` instead of `fs`).
+- **`no-test-interface-declaration` rule**: Added a new rule that disallows `interface` declarations in test files, flagging cases where production types should be exported and imported instead of redeclared locally.
+- **`require-union-type-alias` rule**: Added a new rule that requires inline union types with two or more type reference members to be extracted into named type aliases, similar to SonarQube S4323.
+- **`no-literal-property-unions` rule**: Added a new built-in rule that reports interface, type literal, class, and abstract class properties whose value options are declared as literal unions, including string, number, bigint, boolean-mixed, and template-literal members, instead of named domain types.
+- **Test boundary rules**: Added `no-set-timeout-in-tests` and `no-set-interval-in-tests` as built-in preset rules, plus opt-in `no-fetch-in-tests` and `no-restricted-imports-in-tests` rules for teams that want stricter test isolation from HTTP, filesystem, subprocess, and network dependencies.
+
+### Fixed
+
+- **Preset registration**: Added `require-node-protocol` and `no-test-interface-declaration` to the default preset rule map so they are included in the recommended and strict config presets.
+- **Configuration docs**: Synced the preset table in `docs/configuration.md` with all 60 rules (was missing `require-exported-object-type`, `require-union-type-alias`, `no-test-interface-declaration`, and `require-node-protocol`).
+
+### Changed
+
+- **Documentation overhaul**: Polished all documentation as a customer-facing experience — root README hero section with badges and philosophy, plugin README feature summary, MkDocs home page category table, Getting Started admonitions, rules index summary table, and standardised all 60 rule doc pages with emoji headers and Configuration sections.
+- **mkdocs.yml enhancements**: Added project logo and favicon, instant navigation, URL tracking, permalink anchors via `toc` extension, content tooltips, copyright footer, and GitHub/npm social links.
+- **`no-literal-property-unions` rule**: Exempted bigint literal unions from being flagged because TypeScript enums cannot represent bigint values, making the "use enums" guidance unactionable for bigint domains.
+- **`no-literal-property-unions` rule**: Clarified the diagnostic and documentation to recommend named domain types generally, while keeping enums as the preferred option for string and number domains that TypeScript enums can represent.
+- **`no-literal-unions` rule**: Exempted literal unions inside built-in TypeScript utility type arguments such as `Omit`, `Pick`, `Record`, `Exclude`, and `Extract`, while keeping custom generic type arguments reportable.
+- **`no-literal-unions` rule**: Direct property literal unions are now handled by `no-literal-property-unions`, avoiding duplicate reports from the default presets while preserving general literal-union enforcement for aliases and other non-property type annotations.
+
 ## [1.2.3] - 2026-04-03
 
 ### Added

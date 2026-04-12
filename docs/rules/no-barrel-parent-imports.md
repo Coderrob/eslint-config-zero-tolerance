@@ -31,7 +31,7 @@ This rule applies only when the current file is a barrel file (`index.*`). In th
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 // feature.ts
@@ -46,7 +46,7 @@ export { parseUser } from './parse-user';
 export { helpers } from './helpers';
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 // index.ts
@@ -56,4 +56,12 @@ import '..';
 const helpers = await import('../helpers');
 const feature = require('../../feature');
 import legacyFeature = require('..');
+```
+
+## Configuration
+
+This rule has no options:
+
+```js
+'zero-tolerance/no-barrel-parent-imports': 'error'
 ```

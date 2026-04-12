@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-set-interval-in-tests.ts",
+  "module": {
+    "name": "no-set-interval-in-tests",
+    "description": "Disallow setInterval usage in recognized test files.",
+    "exports": ["noSetIntervalInTests"]
+  },
+  "specifications": [
+    {
+      "feature": "Test-file interval enforcement",
+      "scenarios": [
+        {
+          "name": "should report direct setInterval calls in test files",
+          "given": "setInterval(callback, 100) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "a noSetIntervalInTests violation is reported"
+        },
+        {
+          "name": "should report global object setInterval calls in test files",
+          "given": "global.setInterval(callback, 100) inside a .spec.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "a noSetIntervalInTests violation is reported"
+        },
+        {
+          "name": "should allow setInterval calls outside test files",
+          "given": "setInterval(callback, 100) inside a non-test source file",
+          "when": "the rule creates listeners for the file",
+          "then": "no listeners are registered and no violation is reported"
+        },
+        {
+          "name": "should allow non-global setInterval methods in test files",
+          "given": "clock.setInterval(callback, 100) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported because the object is not a recognized global timer object"
+        }
+      ]
+    }
+  ]
+}

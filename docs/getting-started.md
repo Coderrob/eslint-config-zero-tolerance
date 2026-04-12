@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide shows how to add `@coderrob/eslint-plugin-zero-tolerance` to a TypeScript project from scratch.
+Get from zero to linting in under five minutes. This guide covers installation, preset selection, and common project setups.
 
 ## Requirements
 
@@ -37,6 +37,9 @@ This guide shows how to add `@coderrob/eslint-plugin-zero-tolerance` to a TypeSc
 
 The recommended preset enables all rules at **warn** severity, making it easy to adopt incrementally.
 
+!!! tip "Start here"
+The recommended preset is the best starting point for existing projects. Warnings surface issues without breaking your build, giving your team time to address violations at a sustainable pace.
+
 ```js title="eslint.config.js"
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
@@ -49,6 +52,9 @@ export default [
 ### Strict preset
 
 The strict preset raises most rules to **error** severity and applies tighter limits (e.g. max function body: 25 lines); see the preset table for exact rule severities.
+
+!!! warning "Best for greenfield projects"
+The strict preset treats every violation as a build-breaking error. It is ideal for new projects or teams ready for full enforcement.
 
 ```js title="eslint.config.js"
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
@@ -147,6 +153,9 @@ export default tseslint.config(
 ## Configuring `tsconfig.json`
 
 No TypeScript-specific configuration is required by this plugin. All rules operate purely on the AST without requiring type information.
+
+!!! info "No type-aware linting required"
+Unlike some TypeScript-ESLint rules, zero-tolerance rules do not need `parserOptions.project` or `projectService`. This keeps lint times fast regardless of project size.
 
 ```json title="tsconfig.json"
 {

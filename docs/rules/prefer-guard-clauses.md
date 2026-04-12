@@ -17,7 +17,7 @@ When an `if` branch already returns or throws, keeping an `else` block adds unne
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 if (!user) {
@@ -26,7 +26,7 @@ if (!user) {
 processUser(user);
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 if (!user) {

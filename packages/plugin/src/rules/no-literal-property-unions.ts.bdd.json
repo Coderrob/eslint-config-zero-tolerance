@@ -1,0 +1,124 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-literal-property-unions.ts",
+  "module": {
+    "name": "no-literal-property-unions",
+    "description": "Require property literal unions to use named domain types.",
+    "exports": ["noLiteralPropertyUnions"]
+  },
+  "specifications": [
+    {
+      "feature": "Named property value domains",
+      "scenarios": [
+        {
+          "name": "should allow properties typed with enum or named type references",
+          "given": "interface ISearchMatch { mode: SearchMode }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore non-property literal unions",
+          "given": "function run(mode: 'tree-sitter' | 'text-hint') {}",
+          "when": "the rule evaluates the function parameter type",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow property unions without literal value members",
+          "given": "interface ISearchMatch { mode: SearchMode | undefined }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow boolean property unions that cover the boolean domain",
+          "given": "interface IToggle { enabled: true | false }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow properties with bigint literal value options",
+          "given": "interface ISearchMatch { id: 1n | 2n }",
+          "when": "the rule evaluates the property signature",
+          "then": "no violation is reported because TypeScript enums cannot represent bigint values"
+        }
+      ]
+    },
+    {
+      "feature": "Literal property unions",
+      "scenarios": [
+        {
+          "name": "should report interface properties with string literal value options",
+          "given": "interface ISearchMatch { mode: 'tree-sitter' | 'ripgrep-prefilter' | 'text-hint' }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report type literal properties with string literal value options",
+          "given": "type SearchMatch = { mode: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report class properties with string literal value options",
+          "given": "class SearchMatch { mode: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the property definition",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report abstract class properties with string literal value options",
+          "given": "abstract class SearchMatch { abstract mode: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the abstract property definition",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report properties with number literal value options",
+          "given": "interface ISearchMatch { exitCode: 0 | 1 | 2 }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report properties with negative number literal value options",
+          "given": "interface ISearchMatch { exitCode: -1 | 0 }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report properties with literal value options and nullish members",
+          "given": "interface ISearchMatch { mode: 'tree-sitter' | 'text-hint' | undefined }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report property unions with widened string members",
+          "given": "interface ISearchMatch { mode: 'tree-sitter' | string }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report property unions that mix boolean literals with other literal values",
+          "given": "interface ISearchMatch { value: true | 'yes' }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report property unions with template literal value options",
+          "given": "interface ISearchMatch { slug: `a-${string}` | `b-${string}` }",
+          "when": "the rule evaluates the property signature",
+          "then": "a noLiteralPropertyUnions violation is reported on the property name"
+        },
+        {
+          "name": "should report computed properties with literal value options",
+          "given": "const key = 'mode'; class SearchMatch { [key]: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the computed property definition",
+          "then": "a noLiteralPropertyUnions violation is reported on the computed key"
+        },
+        {
+          "name": "should report private properties with literal value options",
+          "given": "class SearchMatch { #mode: 'tree-sitter' | 'text-hint' }",
+          "when": "the rule evaluates the private property definition",
+          "then": "a noLiteralPropertyUnions violation is reported on the private property name"
+        }
+      ]
+    }
+  ]
+}

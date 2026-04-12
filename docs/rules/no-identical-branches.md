@@ -17,7 +17,7 @@ If both branches of an `if/else` or ternary expression are identical, the condit
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 if (enabled) {
@@ -27,7 +27,7 @@ if (enabled) {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 if (enabled) {

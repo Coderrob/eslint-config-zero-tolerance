@@ -1,16 +1,17 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns with zero exceptions.
+Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 
 ## Features
 
-- 52 custom ESLint rules covering type safety, code quality, testing, imports, and bug prevention
-- `recommended` preset (enabled default rules at `warn`) and `strict` preset (enabled default rules at `error`)
-- ESLint 9 flat config and ESLint 8.x legacy config support
-- Built with `@typescript-eslint/utils` for TypeScript AST support
+- **60 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
+- **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
+- **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
+- Built with `@typescript-eslint/utils` for full TypeScript AST support
 
 ## Requirements
 
@@ -102,18 +103,25 @@ export default [
 | `require-test-description-style` | Enforce that test descriptions start with `should`                                                            |
 | `no-jest-have-been-called`       | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | `no-mock-implementation`         | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
+| `no-set-timeout-in-tests`        | Disallow `setTimeout` usage in test files                                                                     |
+| `no-set-interval-in-tests`       | Disallow `setInterval` usage in test files                                                                    |
+| `no-fetch-in-tests`              | Disallow `fetch` usage in test files                                                                          |
+| `no-restricted-imports-in-tests` | Disallow configured dependency imports in test files                                                          |
+| `no-test-interface-declaration`  | Disallow interface declarations in test files; import production types instead                                |
 
 ### Type Safety
 
-| Rule                                     | Description                                                              |
-| ---------------------------------------- | ------------------------------------------------------------------------ |
-| `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions              |
-| `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator              |
-| `no-literal-unions`                      | Ban literal union types in favour of enums                               |
-| `no-banned-types`                        | Ban `ReturnType` and indexed access types                                |
-| `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                         |
-| `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters          |
-| `require-exported-object-type`           | Require exported object constants to declare an explicit type annotation |
+| Rule                                     | Description                                                                        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions                        |
+| `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator                        |
+| `no-literal-unions`                      | Ban literal union types in favour of enums                                         |
+| `no-literal-property-unions`             | Require property literal unions to use named domain types                          |
+| `require-union-type-alias`               | Require inline union types with multiple type references to use named type aliases |
+| `no-banned-types`                        | Ban `ReturnType` and indexed access types                                          |
+| `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                                   |
+| `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters                    |
+| `require-exported-object-type`           | Require exported object constants to declare an explicit type annotation           |
 
 ### Code Quality
 
@@ -152,6 +160,7 @@ export default [
 | `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |
 | `no-export-alias`           | Prevent use of aliases in export statements                                       |
 | `no-re-export`              | Disallow direct or pass-through re-exports from parent/grandparent modules        |
+| `require-node-protocol`     | Require Node.js built-in module imports to use the `node:` protocol prefix        |
 
 ### Bug Prevention
 

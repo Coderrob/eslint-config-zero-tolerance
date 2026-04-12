@@ -17,7 +17,7 @@ Boolean returns can be ambiguous at call sites. Public APIs should either use pr
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function isReady(user: User): boolean {
@@ -25,7 +25,7 @@ function isReady(user: User): boolean {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function validateUser(user: User): boolean {

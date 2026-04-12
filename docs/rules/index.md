@@ -1,6 +1,19 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides a suite of **custom rules** grouped into eight categories.
+`@coderrob/eslint-plugin-zero-tolerance` provides **60 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+
+| Category                                  | Rules | Focus                                               |
+| ----------------------------------------- | ----: | --------------------------------------------------- |
+| [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
+| [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
+| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Type Safety](#type-safety)               |     9 | Assertions, unions, imports, exported types         |
+| [Code Quality](#code-quality)             |    12 | Function size, magic values, immutability, sorting  |
+| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Imports](#imports)                       |     7 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention)         |    15 | Identical code, control flow, async safety          |
+
+---
 
 ## Naming Conventions
 
@@ -25,18 +38,25 @@
 | [require-test-description-style](require-test-description-style.md) | suggestion | Enforce that test descriptions start with `should`                                                            |
 | [no-jest-have-been-called](no-jest-have-been-called.md)             | suggestion | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [no-mock-implementation](no-mock-implementation.md)                 | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
+| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)               | suggestion | Disallow `setTimeout` usage in test files                                                                     |
+| [no-set-interval-in-tests](no-set-interval-in-tests.md)             | suggestion | Disallow `setInterval` usage in test files                                                                    |
+| [no-fetch-in-tests](no-fetch-in-tests.md)                           | suggestion | Disallow `fetch` usage in test files                                                                          |
+| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md) | suggestion | Disallow configured dependency imports in test files                                                          |
+| [no-test-interface-declaration](no-test-interface-declaration.md)   | suggestion | Disallow interface declarations in test files; import production types instead                                |
 
 ## Type Safety
 
-| Rule                                                                                | Type       | Description                                                              |
-| ----------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------ |
-| [no-type-assertion](no-type-assertion.md)                                           | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions              |
-| [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator              |
-| [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                               |
-| [no-banned-types](no-banned-types.md)                                               | problem    | Ban `ReturnType` and indexed access types                                |
-| [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                         |
-| [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters          |
-| [require-exported-object-type](require-exported-object-type.md)                     | suggestion | Require exported object constants to declare an explicit type annotation |
+| Rule                                                                                | Type       | Description                                                                        |
+| ----------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
+| [no-type-assertion](no-type-assertion.md)                                           | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions                        |
+| [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator                        |
+| [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                                         |
+| [no-literal-property-unions](no-literal-property-unions.md)                         | suggestion | Require property literal unions to use named domain types                          |
+| [require-union-type-alias](require-union-type-alias.md)                             | suggestion | Require inline union types with multiple type references to use named type aliases |
+| [no-banned-types](no-banned-types.md)                                               | problem    | Ban `ReturnType` and indexed access types                                          |
+| [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                                   |
+| [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters                    |
+| [require-exported-object-type](require-exported-object-type.md)                     | suggestion | Require exported object constants to declare an explicit type annotation           |
 
 ## Code Quality
 
@@ -73,6 +93,7 @@
 | [no-barrel-parent-imports](no-barrel-parent-imports.md)   | suggestion | Disallow parent-directory traversal in barrel-file import paths                 |
 | [no-parent-internal-access](no-parent-internal-access.md) | suggestion | Disallow parent-relative access into protected internal directories such as src |
 | [no-re-export](no-re-export.md)                           | suggestion | Disallow direct or pass-through re-exports from parent/grandparent modules      |
+| [require-node-protocol](require-node-protocol.md)         | suggestion | Require Node.js built-in module imports to use the `node:` protocol prefix      |
 
 ## Bug Prevention
 

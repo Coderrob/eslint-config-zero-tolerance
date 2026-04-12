@@ -4,9 +4,12 @@ site_url: https://coderrob.github.io/eslint-config-zero-tolerance/
 repo_name: Coderrob/eslint-config-zero-tolerance
 repo_url: https://github.com/Coderrob/eslint-config-zero-tolerance
 edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2024 Coderrob
 
 theme:
   name: material
+  logo: img/zero-tolerance-icon.png
+  favicon: img/zero-tolerance-icon.png
   palette:
     - scheme: default
       primary: deep purple
@@ -21,6 +24,8 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - navigation.instant
+    - navigation.tracking
     - navigation.tabs
     - navigation.sections
     - navigation.expand
@@ -29,9 +34,17 @@ theme:
     - search.highlight
     - content.code.copy
     - content.action.edit
+    - content.tooltips
 
 plugins:
   - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Coderrob/eslint-config-zero-tolerance
+    - icon: fontawesome/brands/npm
+      link: https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance
 
 markdown_extensions:
   - admonition
@@ -45,6 +58,8 @@ markdown_extensions:
   - tables
   - attr_list
   - md_in_html
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md
@@ -64,10 +79,17 @@ nav:
           - require-test-description-style: rules/require-test-description-style.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
           - no-mock-implementation: rules/no-mock-implementation.md
+          - no-set-timeout-in-tests: rules/no-set-timeout-in-tests.md
+          - no-set-interval-in-tests: rules/no-set-interval-in-tests.md
+          - no-fetch-in-tests: rules/no-fetch-in-tests.md
+          - no-restricted-imports-in-tests: rules/no-restricted-imports-in-tests.md
+          - no-test-interface-declaration: rules/no-test-interface-declaration.md
       - Type Safety:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md
           - no-literal-unions: rules/no-literal-unions.md
+          - no-literal-property-unions: rules/no-literal-property-unions.md
+          - require-union-type-alias: rules/require-union-type-alias.md
           - no-banned-types: rules/no-banned-types.md
           - no-inline-type-import: rules/no-inline-type-import.md
           - no-destructured-parameter-type-literal: rules/no-destructured-parameter-type-literal.md
@@ -96,6 +118,7 @@ nav:
           - no-barrel-parent-imports: rules/no-barrel-parent-imports.md
           - no-parent-internal-access: rules/no-parent-internal-access.md
           - no-re-export: rules/no-re-export.md
+          - require-node-protocol: rules/require-node-protocol.md
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md
           - no-identical-branches: rules/no-identical-branches.md

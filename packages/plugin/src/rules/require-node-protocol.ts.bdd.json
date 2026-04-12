@@ -1,0 +1,75 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-node-protocol.ts",
+  "module": {
+    "name": "require-node-protocol",
+    "description": "Require Node.js built-in module imports to use the node: protocol prefix.",
+    "exports": ["requireNodeProtocol"]
+  },
+  "specifications": [
+    {
+      "feature": "Imports with node: protocol prefix",
+      "scenarios": [
+        {
+          "name": "should allow import already using node: prefix",
+          "given": "import fs from 'node:fs'",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow non-builtin module import",
+          "given": "import express from 'express'",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow relative import",
+          "given": "import foo from './foo'",
+          "when": "the rule evaluates the import declaration",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Bare Node.js built-in imports",
+      "scenarios": [
+        {
+          "name": "should report bare builtin import and autofix with node: prefix",
+          "given": "import fs from 'fs'",
+          "when": "the rule evaluates the import declaration",
+          "then": "a requireNodeProtocol violation is reported and the fix rewrites the source to 'node:fs'"
+        },
+        {
+          "name": "should report bare builtin subpath import",
+          "given": "import { readFile } from 'fs/promises'",
+          "when": "the rule evaluates the import declaration",
+          "then": "a requireNodeProtocol violation is reported and the fix rewrites the source to 'node:fs/promises'"
+        },
+        {
+          "name": "should report type-only import of builtin without prefix",
+          "given": "import type { Stats } from 'fs'",
+          "when": "the rule evaluates the import declaration",
+          "then": "a requireNodeProtocol violation is reported and the fix adds the node: prefix"
+        }
+      ]
+    },
+    {
+      "feature": "Re-exports from Node.js built-ins",
+      "scenarios": [
+        {
+          "name": "should report named re-export from bare builtin",
+          "given": "export { foo } from 'path'",
+          "when": "the rule evaluates the export declaration",
+          "then": "a requireNodeProtocol violation is reported and the fix rewrites the source to 'node:path'"
+        },
+        {
+          "name": "should report wildcard re-export from bare builtin",
+          "given": "export * from 'events'",
+          "when": "the rule evaluates the export declaration",
+          "then": "a requireNodeProtocol violation is reported and the fix rewrites the source to 'node:events'"
+        }
+      ]
+    }
+  ]
+}

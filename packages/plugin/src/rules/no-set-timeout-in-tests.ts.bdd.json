@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-set-timeout-in-tests.ts",
+  "module": {
+    "name": "no-set-timeout-in-tests",
+    "description": "Disallow setTimeout usage in recognized test files.",
+    "exports": ["noSetTimeoutInTests"]
+  },
+  "specifications": [
+    {
+      "feature": "Test-file timer enforcement",
+      "scenarios": [
+        {
+          "name": "should report direct setTimeout calls in test files",
+          "given": "setTimeout(callback, 100) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "a noSetTimeoutInTests violation is reported"
+        },
+        {
+          "name": "should report global object setTimeout calls in test files",
+          "given": "window.setTimeout(callback, 100) inside a file under __tests__",
+          "when": "the rule evaluates the call expression",
+          "then": "a noSetTimeoutInTests violation is reported"
+        },
+        {
+          "name": "should allow setTimeout calls outside test files",
+          "given": "setTimeout(callback, 100) inside a non-test source file",
+          "when": "the rule creates listeners for the file",
+          "then": "no listeners are registered and no violation is reported"
+        },
+        {
+          "name": "should allow non-global setTimeout methods in test files",
+          "given": "clock.setTimeout(callback, 100) inside a .test.ts file",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported because the object is not a recognized global timer object"
+        }
+      ]
+    }
+  ]
+}

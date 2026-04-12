@@ -17,7 +17,7 @@ Destructured parameters already hide the original object shape at the call site.
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 interface IUiActions {
@@ -35,7 +35,7 @@ const updateLater = ({ set }: UiActions): void => {
 };
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function update({ set }: Readonly<{ set: UiStateSetter }>): void {

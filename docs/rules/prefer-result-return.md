@@ -17,7 +17,7 @@ Returning typed error values keeps failures explicit in function signatures and 
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 function parse(input: string) {
@@ -25,7 +25,7 @@ function parse(input: string) {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 function parse(input: string) {

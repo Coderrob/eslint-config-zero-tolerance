@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-test-interface-declaration.ts",
+  "module": {
+    "name": "no-test-interface-declaration",
+    "description": "Disallow interface declarations in test files; import production types instead.",
+    "exports": ["noTestInterfaceDeclaration"]
+  },
+  "specifications": [
+    {
+      "feature": "Interface declarations in test files",
+      "scenarios": [
+        {
+          "name": "should report an interface declared in a test file",
+          "given": "interface IUser { name: string; } inside a .test.ts file",
+          "when": "the rule evaluates the interface declaration",
+          "then": "a noTestInterfaceDeclaration violation is reported"
+        },
+        {
+          "name": "should report an interface declared in a __tests__ directory file",
+          "given": "interface IMockService { call(): void; } inside a file under __tests__",
+          "when": "the rule evaluates the interface declaration",
+          "then": "a noTestInterfaceDeclaration violation is reported"
+        },
+        {
+          "name": "should report multiple interfaces in a single test file",
+          "given": "two interface declarations inside a .test.ts file",
+          "when": "the rule evaluates each declaration",
+          "then": "a noTestInterfaceDeclaration violation is reported for each"
+        }
+      ]
+    },
+    {
+      "feature": "Interface declarations in non-test files",
+      "scenarios": [
+        {
+          "name": "should allow interface declarations in production files",
+          "given": "interface IUser { name: string; } inside a non-test source file",
+          "when": "the rule creates listeners for the file",
+          "then": "no listeners are registered and no violation is reported"
+        },
+        {
+          "name": "should allow type aliases in test files",
+          "given": "type MockData = { value: number } inside a .test.ts file",
+          "when": "the rule evaluates the type alias declaration",
+          "then": "no violation is reported because it is not an interface"
+        }
+      ]
+    }
+  ]
+}

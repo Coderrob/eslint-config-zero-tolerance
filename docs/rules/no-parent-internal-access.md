@@ -35,7 +35,7 @@ This rule checks:
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 import { feature } from '../shared/feature';
@@ -48,7 +48,7 @@ const localValue = parentValue;
 export { localValue };
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 import { feature } from '../src/feature';

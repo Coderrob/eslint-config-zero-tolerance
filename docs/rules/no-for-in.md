@@ -17,7 +17,7 @@ Disallow `for..in` loops.
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 for (const key of Object.keys(record)) {
@@ -29,7 +29,7 @@ for (const [key, value] of Object.entries(record)) {
 }
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 for (const key in record) {

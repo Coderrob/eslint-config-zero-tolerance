@@ -19,14 +19,14 @@ Strings containing escaped backslashes are harder to read and easier to get wron
 
 ## Examples
 
-### Correct
+### ✅ Correct
 
 ```typescript
 const path = String.raw`C:\Users\dev\repo`;
 const regexSource = String.raw`\d+\w+`;
 ```
 
-### Incorrect
+### ❌ Incorrect
 
 ```typescript
 const path = 'C:\\Users\\dev\\repo';

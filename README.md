@@ -2,31 +2,60 @@
   <img
     src="public/img/zero-tolerance-icon.png"
     alt="ESLint Plugin Zero Tolerance"
+    width="200"
   />
 </p>
 
-# @coderrob/eslint-plugin-zero-tolerance
+<h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
-Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
+<p align="center">
+  <strong>60 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+</p>
 
-[![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
-[![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-99.96%25-brightgreen)](packages/plugin/coverage/lcov-report/index.html)
+<p align="center">
+  <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
+  <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
+  <img src="https://img.shields.io/badge/coverage-99.96%25-brightgreen alt="Coverage" />
+  <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+</p>
 
-**Now supports ESLint 8.57+ (legacy config) and ESLint 9.x/10.x with Flat Config**
+---
 
-Documentation:
+> **Zero tolerance** means every rule earns its place. No warnings you learn to ignore. No exceptions you forget about. Every violation is a conversation about quality — and quality always wins.
 
-- Hosted docs: <https://coderrob.github.io/eslint-config-zero-tolerance/>
-- Repository docs fallback: [`docs/index.md`](docs/index.md)
-- Rules index fallback: [`docs/rules/index.md`](docs/rules/index.md)
+## Why Zero Tolerance?
+
+Most linting setups start strict and erode over time. A scattered `eslint-disable` here, an `any` cast there, and before long the rules exist in name only.
+
+This plugin takes the opposite approach:
+
+- **No `eslint-disable` comments** — fix the root cause, don't silence the symptom.
+- **No `any` smuggling** — type assertions and non-null assertions are flagged.
+- **No magic values** — every number and string earns a name.
+- **No leaky tests** — persistent mocks, imprecise matchers, and timer abuse are caught.
+- **No complexity hiding** — functions stay short, parameters stay few, imports stay clean.
+
+The result is a codebase where **the rules are the culture** and the culture is visible in every file.
+
+---
+
+## Documentation
+
+|                         |                                                            |
+| ----------------------- | ---------------------------------------------------------- |
+| **Hosted docs**         | <https://coderrob.github.io/eslint-config-zero-tolerance/> |
+| **Rules reference**     | [docs/rules/index.md](docs/rules/index.md)                 |
+| **Configuration guide** | [docs/configuration.md](docs/configuration.md)             |
 
 ## Packages
 
-This monorepo contains two packages:
+This monorepo publishes two packages:
 
-- `@coderrob/eslint-plugin-zero-tolerance` - ESLint plugin with custom rules
-- `@coderrob/eslint-config-zero-tolerance` - ESLint config that exports recommended and strict presets
+| Package                                                                                                          | Description                                         |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 60 custom rules                 |
+| [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built `recommended` and `strict` config presets |
 
 ## Requirements
 
@@ -118,9 +147,7 @@ module.exports = {
 
 ## Rules
 
-Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`error`) presets. `prefer-result-return` and `require-jsdoc-anonymous-functions` are enabled at `warn` in the `strict` preset only. `require-bdd-spec` and `no-parent-internal-access` are fully opt-in rules (off in all presets).
-
-`no-parent-internal-access` is a targeted boundary rule: it only checks parent-relative paths and only matches the first concrete directory reached after `..` traversal, such as `../src/foo`.
+All 60 rules are organized into eight categories. Nearly all are included in both the `recommended` (warn) and `strict` (error) presets. A handful are opt-in only — see the [Configuration](docs/configuration.md) guide for the full preset table.
 
 ### Naming Conventions
 
@@ -145,18 +172,25 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`require-test-description-style`](docs/rules/require-test-description-style.md) | Enforce that test descriptions start with `should`                                                            |
 | [`no-jest-have-been-called`](docs/rules/no-jest-have-been-called.md)             | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
 | [`no-mock-implementation`](docs/rules/no-mock-implementation.md)                 | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
+| [`no-set-timeout-in-tests`](docs/rules/no-set-timeout-in-tests.md)               | Disallow `setTimeout` usage in test files                                                                     |
+| [`no-set-interval-in-tests`](docs/rules/no-set-interval-in-tests.md)             | Disallow `setInterval` usage in test files                                                                    |
+| [`no-fetch-in-tests`](docs/rules/no-fetch-in-tests.md)                           | Disallow `fetch` usage in test files                                                                          |
+| [`no-restricted-imports-in-tests`](docs/rules/no-restricted-imports-in-tests.md) | Disallow configured dependency imports in test files                                                          |
+| [`no-test-interface-declaration`](docs/rules/no-test-interface-declaration.md)   | Disallow interface declarations in test files; import production types instead                                |
 
 ### Type Safety
 
-| Rule                                                                                             | Description                                                              |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions              |
-| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator              |
-| [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                               |
-| [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                                |
-| [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                         |
-| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters          |
-| [`require-exported-object-type`](docs/rules/require-exported-object-type.md)                     | Require exported object constants to declare an explicit type annotation |
+| Rule                                                                                             | Description                                                                        |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions                        |
+| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator                        |
+| [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                                         |
+| [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md)                         | Require property literal unions to use named domain types                          |
+| [`require-union-type-alias`](docs/rules/require-union-type-alias.md)                             | Require inline union types with multiple type references to use named type aliases |
+| [`no-banned-types`](docs/rules/no-banned-types.md)                                               | Ban `ReturnType` and indexed access types                                          |
+| [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | Disallow inline `import("...").Type` annotations                                   |
+| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | Disallow inline object type literals on destructured parameters                    |
+| [`require-exported-object-type`](docs/rules/require-exported-object-type.md)                     | Require exported object constants to declare an explicit type annotation           |
 
 ### Code Quality
 
@@ -193,6 +227,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 | [`no-dynamic-import`](docs/rules/no-dynamic-import.md)                 | Ban dynamic `import()` and `require()` outside test files                            |
 | [`no-export-alias`](docs/rules/no-export-alias.md)                     | Prevent use of aliases in export statements                                          |
 | [`no-re-export`](docs/rules/no-re-export.md)                           | Disallow direct or pass-through re-export statements from parent/grandparent modules |
+| [`require-node-protocol`](docs/rules/require-node-protocol.md)         | Require Node.js built-in module imports to use the `node:` protocol prefix           |
 
 ### Bug Prevention
 
@@ -216,7 +251,7 @@ Nearly all core rules are included in the `recommended` (`warn`) and `strict` (`
 
 ## Development
 
-This repository itself is a `pnpm` workspace. Use `pnpm install` at the repo root; `npm install` examples above are for consuming the published packages in another project, not for bootstrapping this monorepo.
+> This repository itself is a `pnpm` workspace and **dogfoods its own rules** through [`eslint.config.mjs`](eslint.config.mjs). Every source file in the plugin must pass the same rules it enforces on consumers.
 
 ### Setup
 
@@ -236,22 +271,7 @@ pnpm build
 pnpm test
 ```
 
-This also refreshes the coverage badge in `README.md` using coverage output in `packages/plugin/coverage/`.
-
-Coverage gates are enforced in CI with a minimum of **95%** on:
-
-- statements
-- branches
-- functions
-- lines
-
-### Dogfooding
-
-The repository lints itself using its own plugin rules through [`eslint.config.mjs`](eslint.config.mjs).
-
-```bash
-pnpm eslint packages/plugin/src/rules
-```
+Coverage gates are enforced per-file at **95%** minimum across statements, branches, functions, and lines. The test command also refreshes the coverage badge automatically.
 
 ### Type Checking
 

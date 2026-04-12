@@ -1,24 +1,34 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-Zero-tolerance ESLint plugin and config for enforcing strict code quality standards in TypeScript projects.
-
-**Supports ESLint 8.57+, 9.x, and 10.x**
+**60 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
 
-## What is this?
+**Supports ESLint 8.57+, 9.x, and 10.x**
 
-`@coderrob/eslint-plugin-zero-tolerance` is a collection of custom ESLint rules designed to enforce a zero-tolerance policy on common TypeScript code quality issues. The rules cover:
+---
 
-- **Naming conventions** - prefix interfaces with `I`, sort imports and functions alphabetically
-- **Documentation** - require JSDoc on named functions and on anonymous non-test callbacks, and enforce sibling BDD spec files
-- **Type safety** - ban unsafe assertions, non-null `!` operators, literal unions, banned utility types, and inline destructured object literals, and require explicit annotations on exported object constants
-- **Testing standards** - enforce `should`-prefixed descriptions, ban imprecise Jest matchers and leaky mocks
-- **Code quality** - limit function length and parameter count, eliminate magic numbers and strings
-- **Error handling** - require `new Error()` in throw statements, disallow empty catch blocks
-- **Import hygiene** - keep barrel files clean, ban parent-relative imports inside barrel files, optionally protect folders such as `src` from parent-relative access, ban dynamic imports, and prevent export aliases
-- **Bug prevention** - flag identical expressions, redundant boolean comparisons, shortcut-return opportunities, and `await` inside loops
+## Why Zero Tolerance?
+
+Most linting setups start strict and erode over time. A scattered `eslint-disable` here, an `any` cast there, and before long the rules exist in name only.
+
+This plugin takes the opposite approach. Every rule earns its place, every violation is actionable, and the codebase stays honest.
+
+## What It Covers
+
+`@coderrob/eslint-plugin-zero-tolerance` provides rules across **eight categories**:
+
+| Category           | What it enforces                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Type Safety**    | Ban unsafe assertions (`as`, `!`), literal unions, inline imports, and untyped exports                |
+| **Code Quality**   | Limit function size and parameters, eliminate magic values, enforce immutability and sort order       |
+| **Testing**        | Require `should`-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse    |
+| **Bug Prevention** | Flag identical expressions, redundant booleans, missing awaits, floating promises, and flag arguments |
+| **Error Handling** | Require `new Error()` throws, ban empty catches, encourage Result-style returns                       |
+| **Imports**        | Keep barrels clean, ban dynamic imports, prevent re-exports and parent-directory traversal            |
+| **Documentation**  | Require JSDoc on functions, enforce BDD specs, mandate optional chaining and readonly props           |
+| **Naming**         | Enforce `I`-prefixed interfaces                                                                       |
 
 ## Packages
 
