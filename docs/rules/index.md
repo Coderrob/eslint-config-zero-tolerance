@@ -1,6 +1,6 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **60 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **61 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
@@ -8,7 +8,7 @@
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
 | [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
 | [Type Safety](#type-safety)               |     9 | Assertions, unions, imports, exported types         |
-| [Code Quality](#code-quality)             |    12 | Function size, magic values, immutability, sorting  |
+| [Code Quality](#code-quality)             |    13 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
 | [Imports](#imports)                       |     7 | Barrels, re-exports, dynamic imports, node protocol |
 | [Bug Prevention](#bug-prevention)         |    15 | Identical code, control flow, async safety          |
@@ -74,6 +74,7 @@
 | [prefer-nullish-coalescing](prefer-nullish-coalescing.md)   | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
 | [prefer-readonly-parameters](prefer-readonly-parameters.md) | suggestion | Prefer readonly typing for object and array-like parameters                             |
 | [prefer-string-raw](prefer-string-raw.md)                   | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
+| [prefer-object-spread](prefer-object-spread.md)             | suggestion | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
 
 ## Error Handling
 

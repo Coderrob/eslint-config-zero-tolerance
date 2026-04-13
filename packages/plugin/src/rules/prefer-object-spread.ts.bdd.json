@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-object-spread.ts",
+  "module": {
+    "name": "prefer-object-spread",
+    "description": "Enforce object spread syntax instead of Object.assign with an object literal as the first argument.",
+    "exports": ["preferObjectSpread"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed Object.assign patterns",
+      "scenarios": [
+        {
+          "name": "should allow object spread syntax",
+          "given": "code using object spread `{ ...foo }`",
+          "when": "the rule evaluates the expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Object.assign with a non-empty first argument",
+          "given": "a call to Object.assign(target, source) where the first argument is not an empty object literal",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Object.assign on a different object",
+          "given": "a call to MyUtils.assign({}, source) where the callee is not Object.assign",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Object.assign with computed property access",
+          "given": "a call to Object[\"assign\"]({}, source) using computed member access",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Object.assign with empty object literal",
+      "scenarios": [
+        {
+          "name": "should report Object.assign with empty object and one source",
+          "given": "a call to Object.assign({}, source)",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to { ...source }"
+        },
+        {
+          "name": "should report Object.assign with empty object and multiple sources",
+          "given": "a call to Object.assign({}, foo, bar)",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to { ...foo, ...bar }"
+        },
+        {
+          "name": "should report Object.assign with empty object and an object literal source",
+          "given": "a call to Object.assign({}, { a: 1 })",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to { a: 1 } with properties inlined"
+        },
+        {
+          "name": "should report Object.assign with mixed object literal and variable sources",
+          "given": "a call to Object.assign({}, { x: 1 }, bar, { y: 2 })",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to { x: 1, ...bar, y: 2 }"
+        },
+        {
+          "name": "should report Object.assign with only an empty object literal",
+          "given": "a call to Object.assign({})",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to {}"
+        }
+      ]
+    }
+  ]
+}

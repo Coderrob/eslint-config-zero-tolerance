@@ -107,6 +107,7 @@ nav:
           - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
           - prefer-readonly-parameters: rules/prefer-readonly-parameters.md
           - prefer-string-raw: rules/prefer-string-raw.md
+          - prefer-object-spread: rules/prefer-object-spread.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md

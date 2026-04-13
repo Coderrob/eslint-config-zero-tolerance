@@ -64,6 +64,7 @@ import noTypeAssertion from './rules/no-type-assertion';
 import noWith from './rules/no-with';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
+import preferObjectSpread from './rules/prefer-object-spread';
 import preferReadonlyParameters from './rules/prefer-readonly-parameters';
 import preferResultReturn from './rules/prefer-result-return';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
@@ -126,6 +127,7 @@ const rules: Record<string, unknown> = {
   'no-mock-implementation': noMockImplementation,
   'no-non-null-assertion': noNonNullAssertion,
   'no-object-mutation': noObjectMutation,
+  'prefer-object-spread': preferObjectSpread,
   'no-parent-internal-access': noParentInternalAccess,
   'no-parameter-reassign': noParameterReassign,
   'no-barrel-parent-imports': noBarrelParentImports,

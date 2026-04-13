@@ -113,6 +113,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `prefer-result-return`                   | off            | warn            |
 | `prefer-shortcut-return`                 | warn           | error           |
 | `prefer-string-raw`                      | warn           | error           |
+| `prefer-object-spread`                   | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 | `require-clean-barrel`                   | warn           | error           |
 | `require-exported-object-type`           | warn           | error           |

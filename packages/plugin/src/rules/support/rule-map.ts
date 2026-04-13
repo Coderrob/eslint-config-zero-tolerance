@@ -70,6 +70,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',
+  'prefer-object-spread',
   'prefer-readonly-parameters',
   'prefer-shortcut-return',
   'prefer-string-raw',
