@@ -53,10 +53,16 @@ function collectSpreadParts(
   sourceCode: Readonly<TSESLint.SourceCode>,
   args: readonly TSESTree.Expression[],
 ): string[] {
-  return args.slice(1).map(
-    /** @param arg - Object.assign argument to convert. */
-    (arg) => argumentToSpreadText(sourceCode, arg),
-  );
+  return args
+    .slice(1)
+    .filter(
+      /** @param arg - Object.assign argument to evaluate. */
+      (arg) => !isEmptyObjectLiteral(arg),
+    )
+    .map(
+      /** @param arg - Object.assign argument to convert. */
+      (arg) => argumentToSpreadText(sourceCode, arg),
+    );
 }
 
 /**
@@ -72,11 +78,7 @@ function createObjectSpreadFix(
   node: TSESTree.CallExpression,
   fixer: TSESLint.RuleFixer,
 ): TSESLint.RuleFix {
-  const args = node.arguments.filter(
-    /** @param arg - Argument node to type-guard. */
-    (arg): arg is TSESTree.Expression => arg.type !== AST_NODE_TYPES.SpreadElement,
-  );
-  const spreadParts = collectSpreadParts(sourceCode, args);
+  const spreadParts = collectSpreadParts(sourceCode, node.arguments.filter(isExpressionArgument));
   const inner = spreadParts.length > 0 ? ` ${spreadParts.join(', ')} ` : '';
   return fixer.replaceText(node, `{${inner}}`);
 }
@@ -93,11 +95,28 @@ function createPreferObjectSpreadListeners(
   return {
     /** @param node - Call expression node to evaluate. */
     CallExpression(node: TSESTree.CallExpression): void {
-      if (isObjectAssignCall(node) && isEmptyObjectLiteral(node.arguments[0])) {
+      if (
+        isObjectAssignCall(node) &&
+        isEmptyObjectLiteral(node.arguments[0]) &&
+        !hasSpreadArgument(node)
+      ) {
         reportObjectAssign(context, node);
       }
     },
   };
+}
+
+/**
+ * Returns true when any Object.assign argument uses spread syntax.
+ *
+ * @param node - Call expression to inspect.
+ * @returns Whether the call has spread arguments.
+ */
+function hasSpreadArgument(node: TSESTree.CallExpression): boolean {
+  return node.arguments.some(
+    /** @param arg - Argument node to inspect. */
+    (arg) => arg.type === AST_NODE_TYPES.SpreadElement,
+  );
 }
 
 /**
@@ -118,6 +137,18 @@ function isAssignProperty(node: TSESTree.Expression | TSESTree.PrivateIdentifier
  */
 function isEmptyObjectLiteral(node: TSESTree.Node): boolean {
   return node.type === AST_NODE_TYPES.ObjectExpression && node.properties.length === 0;
+}
+
+/**
+ * Returns true when the call argument is a regular expression.
+ *
+ * @param node - Call argument to inspect.
+ * @returns Whether the argument is not a spread element.
+ */
+function isExpressionArgument(
+  node: TSESTree.CallExpressionArgument,
+): node is TSESTree.Expression {
+  return node.type !== AST_NODE_TYPES.SpreadElement;
 }
 
 /**
@@ -180,7 +211,7 @@ export const preferObjectSpread = createRule({
     fixable: 'code',
     docs: {
       description:
-        'Enforce object spread syntax instead of Object.assign with an object literal as the first argument',
+        'Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument',
     },
     messages: {
       preferObjectSpread:

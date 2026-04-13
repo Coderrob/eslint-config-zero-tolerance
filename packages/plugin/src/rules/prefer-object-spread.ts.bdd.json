@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/prefer-object-spread.ts",
   "module": {
     "name": "prefer-object-spread",
-    "description": "Enforce object spread syntax instead of Object.assign with an object literal as the first argument.",
+    "description": "Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument.",
     "exports": ["preferObjectSpread"]
   },
   "specifications": [
@@ -34,6 +34,18 @@
           "given": "a call to Object[\"assign\"]({}, source) using computed member access",
           "when": "the rule evaluates the call",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Object.assign with only spread sources",
+          "given": "a call to Object.assign({}, ...sources) using spread arguments",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because the call cannot be safely autofixed to object spread syntax"
+        },
+        {
+          "name": "should allow Object.assign with source and spread sources",
+          "given": "a call to Object.assign({}, foo, ...sources) using a spread argument after a regular source",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because the call cannot be safely autofixed to object spread syntax"
         }
       ]
     },
@@ -67,6 +79,18 @@
         {
           "name": "should report Object.assign with only an empty object literal",
           "given": "a call to Object.assign({})",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to {}"
+        },
+        {
+          "name": "should report Object.assign with empty object and skip empty object source",
+          "given": "a call to Object.assign({}, foo, {})",
+          "when": "the rule evaluates the call",
+          "then": "a preferObjectSpread violation is reported and autofixed to { ...foo } without a trailing empty fragment"
+        },
+        {
+          "name": "should report Object.assign with only empty object sources",
+          "given": "a call to Object.assign({}, {})",
           "when": "the rule evaluates the call",
           "then": "a preferObjectSpread violation is reported and autofixed to {}"
         }

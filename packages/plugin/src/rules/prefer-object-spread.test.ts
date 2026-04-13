@@ -43,6 +43,14 @@ ruleTester.run('prefer-object-spread', preferObjectSpread, {
       name: 'should allow Object.assign with a non-empty object first argument',
       code: 'const result = Object.assign({ a: 1 }, source);',
     },
+    {
+      name: 'should allow Object.assign with only spread sources',
+      code: 'const result = Object.assign({}, ...sources);',
+    },
+    {
+      name: 'should allow Object.assign with source and spread sources',
+      code: 'const result = Object.assign({}, foo, ...sources);',
+    },
   ],
   invalid: [
     {
@@ -80,6 +88,18 @@ ruleTester.run('prefer-object-spread', preferObjectSpread, {
       code: 'const result = Object.assign({}, a, b, c);',
       errors: [{ messageId: 'preferObjectSpread' }],
       output: 'const result = { ...a, ...b, ...c };',
+    },
+    {
+      name: 'should report Object.assign with empty object and skip empty object source',
+      code: 'const result = Object.assign({}, foo, {});',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: 'const result = { ...foo };',
+    },
+    {
+      name: 'should report Object.assign with only empty object sources',
+      code: 'const result = Object.assign({}, {});',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: 'const result = {};',
     },
     {
       name: 'should report Object.assign in nested expression',

@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **`prefer-object-spread` rule**: Avoided unsafe autofixes for `Object.assign` calls with spread arguments and skipped no-op empty object literal sources when generating object spread fixes.
 - **Preset registration**: Added `require-node-protocol` and `no-test-interface-declaration` to the default preset rule map so they are included in the recommended and strict config presets.
 - **Configuration docs**: Synced the preset table in `docs/configuration.md` with all 60 rules (was missing `require-exported-object-type`, `require-union-type-alias`, `no-test-interface-declaration`, and `require-node-protocol`).
 

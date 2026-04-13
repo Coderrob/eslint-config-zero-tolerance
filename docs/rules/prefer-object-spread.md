@@ -28,6 +28,9 @@ const extended = { ...foo, a: 1 };
 
 // Object.assign with a non-empty first argument is allowed
 const target = Object.assign(existingObj, { a: 1 });
+
+// Object.assign with spread arguments is allowed because it cannot be safely autofixed
+const dynamic = Object.assign({}, ...sources);
 ```
 
 ### ❌ Incorrect
@@ -57,3 +60,5 @@ The autofix converts `Object.assign({}, ...)` calls into object spread syntax:
 - Variable and expression arguments are spread: `Object.assign({}, foo)` → `{ ...foo }`
 - Object literal arguments are inlined: `Object.assign({}, { a: 1 })` → `{ a: 1 }`
 - Mixed arguments are handled correctly: `Object.assign({}, { x: 1 }, bar)` → `{ x: 1, ...bar }`
+- Empty object literal source arguments are skipped: `Object.assign({}, foo, {})` → `{ ...foo }`
+- Calls with spread arguments are not reported because there is no safe object-spread autofix for `Object.assign({}, ...sources)`
