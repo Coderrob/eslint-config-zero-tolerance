@@ -83,6 +83,12 @@
           "then": "a preferObjectSpread violation is reported and autofixed to {}"
         },
         {
+          "name": "should report Object.assign with null and undefined sources",
+          "given": "calls to Object.assign({}, null) and Object.assign({}, undefined)",
+          "when": "the rule evaluates the calls",
+          "then": "a preferObjectSpread violation is reported and autofixed to { ...null } and { ...undefined } because nullish sources are ignored in the empty-target merge pattern"
+        },
+        {
           "name": "should report Object.assign with empty object and skip empty object source",
           "given": "a call to Object.assign({}, foo, {})",
           "when": "the rule evaluates the call",

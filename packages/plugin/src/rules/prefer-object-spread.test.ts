@@ -126,6 +126,18 @@ ruleTester.run('prefer-object-spread', preferObjectSpread, {
       output: 'const result = { ...getDefaults() };',
     },
     {
+      name: 'should report Object.assign with a null source',
+      code: 'const result = Object.assign({}, null);',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: 'const result = { ...null };',
+    },
+    {
+      name: 'should report Object.assign with an undefined source',
+      code: 'const result = Object.assign({}, undefined);',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: 'const result = { ...undefined };',
+    },
+    {
       name: 'should parenthesize autofix in expression statements',
       code: 'Object.assign({}, source);',
       errors: [{ messageId: 'preferObjectSpread' }],
