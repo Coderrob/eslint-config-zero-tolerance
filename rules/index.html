@@ -1349,6 +1349,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-explicit-any/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-explicit-any
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-literal-unions/" class="md-nav__link">
         
   
@@ -1778,6 +1806,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-map-set-mutation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-map-set-mutation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-object-mutation/" class="md-nav__link">
         
   
@@ -1926,6 +1982,62 @@
     
   
     prefer-string-raw
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prefer-object-spread/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-object-spread
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="prefer-structured-clone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prefer-structured-clone
   
 
     
@@ -2673,6 +2785,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-math-random/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-math-random
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-eslint-disable/" class="md-nav__link">
         
   
@@ -2709,6 +2849,34 @@
     
   
     no-parameter-reassign
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-process-env-outside-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-process-env-outside-config
   
 
     
@@ -2821,6 +2989,34 @@
     
   
     no-query-side-effects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="require-exhaustive-switch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-exhaustive-switch
   
 
     
@@ -2989,7 +3185,7 @@
 
 
 <h1 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h1>
-<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>60 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
+<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>67 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
 <table>
 <thead>
 <tr>
@@ -3016,12 +3212,12 @@
 </tr>
 <tr>
 <td><a href="#type-safety">Type Safety</a></td>
-<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
 <td>Assertions, unions, imports, exported types</td>
 </tr>
 <tr>
 <td><a href="#code-quality">Code Quality</a></td>
-<td style="text-align: right;">12</td>
+<td style="text-align: right;">15</td>
 <td>Function size, magic values, immutability, sorting</td>
 </tr>
 <tr>
@@ -3036,7 +3232,7 @@
 </tr>
 <tr>
 <td><a href="#bug-prevention">Bug Prevention</a></td>
-<td style="text-align: right;">15</td>
+<td style="text-align: right;">18</td>
 <td>Identical code, control flow, async safety</td>
 </tr>
 </tbody>
@@ -3169,6 +3365,11 @@
 <td>Disallow non-null assertions using the <code>!</code> postfix operator</td>
 </tr>
 <tr>
+<td><a href="no-explicit-any/">no-explicit-any</a></td>
+<td>problem</td>
+<td>Disallow explicit <code>any</code>; require precise modeling or explicit narrowing</td>
+</tr>
+<tr>
 <td><a href="no-literal-unions/">no-literal-unions</a></td>
 <td>suggestion</td>
 <td>Ban literal union types in favour of enums</td>
@@ -3246,6 +3447,11 @@
 <td>Disallow magic strings in comparisons and switch cases</td>
 </tr>
 <tr>
+<td><a href="no-map-set-mutation/">no-map-set-mutation</a></td>
+<td>suggestion</td>
+<td>Disallow direct <code>Map</code> and <code>Set</code> mutation methods</td>
+</tr>
+<tr>
 <td><a href="no-object-mutation/">no-object-mutation</a></td>
 <td>suggestion</td>
 <td>Disallow direct object-property mutation</td>
@@ -3266,6 +3472,11 @@
 <td>Prefer nullish coalescing instead of repeated nullish guard ternaries</td>
 </tr>
 <tr>
+<td><a href="prefer-object-spread/">prefer-object-spread</a></td>
+<td>suggestion</td>
+<td>Enforce object spread syntax instead of <code>Object.assign</code> with an empty object literal</td>
+</tr>
+<tr>
 <td><a href="prefer-readonly-parameters/">prefer-readonly-parameters</a></td>
 <td>suggestion</td>
 <td>Prefer readonly typing for object and array-like parameters</td>
@@ -3274,6 +3485,11 @@
 <td><a href="prefer-string-raw/">prefer-string-raw</a></td>
 <td>suggestion</td>
 <td>Prefer <code>String.raw</code> for strings containing escaped backslashes</td>
+</tr>
+<tr>
+<td><a href="prefer-structured-clone/">prefer-structured-clone</a></td>
+<td>suggestion</td>
+<td>Prefer <code>structuredClone(...)</code> over <code>JSON.parse(JSON.stringify(...))</code> for deep cloning</td>
 </tr>
 </tbody>
 </table>
@@ -3407,6 +3623,11 @@
 <td>Disallow unhandled promise expressions; require explicit handling</td>
 </tr>
 <tr>
+<td><a href="no-math-random/">no-math-random</a></td>
+<td>problem</td>
+<td>Disallow <code>Math.random()</code>; inject a random source instead</td>
+</tr>
+<tr>
 <td><a href="no-eslint-disable/">no-eslint-disable</a></td>
 <td>suggestion</td>
 <td>Prevent use of <code>eslint-disable</code> comments</td>
@@ -3415,6 +3636,11 @@
 <td><a href="no-parameter-reassign/">no-parameter-reassign</a></td>
 <td>suggestion</td>
 <td>Disallow reassigning function parameters</td>
+</tr>
+<tr>
+<td><a href="no-process-env-outside-config/">no-process-env-outside-config</a></td>
+<td>problem</td>
+<td>Disallow <code>process.env</code> reads outside configuration modules</td>
 </tr>
 <tr>
 <td><a href="no-flag-argument/">no-flag-argument</a></td>
@@ -3435,6 +3661,11 @@
 <td><a href="no-query-side-effects/">no-query-side-effects</a></td>
 <td>suggestion</td>
 <td>Disallow side effects in query-style functions</td>
+</tr>
+<tr>
+<td><a href="require-exhaustive-switch/">require-exhaustive-switch</a></td>
+<td>suggestion</td>
+<td>Require exhaustive <code>switch</code> statements over finite discriminant types</td>
 </tr>
 </tbody>
 </table>
