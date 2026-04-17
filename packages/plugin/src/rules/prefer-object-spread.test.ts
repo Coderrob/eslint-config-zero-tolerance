@@ -125,5 +125,17 @@ ruleTester.run('prefer-object-spread', preferObjectSpread, {
       errors: [{ messageId: 'preferObjectSpread' }],
       output: 'const result = { ...getDefaults() };',
     },
+    {
+      name: 'should parenthesize autofix in expression statements',
+      code: 'Object.assign({}, source);',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: '({ ...source });',
+    },
+    {
+      name: 'should parenthesize autofix in concise arrow function bodies',
+      code: 'const clone = () => Object.assign({}, source);',
+      errors: [{ messageId: 'preferObjectSpread' }],
+      output: 'const clone = () => ({ ...source });',
+    },
   ],
 });

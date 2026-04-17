@@ -13,7 +13,7 @@ Enforce object spread syntax instead of `Object.assign` with an empty object lit
 
 ## Rationale
 
-`Object.assign({}, ...)` is functionally equivalent to object spread (`{ ... }`) when the first argument is an empty object literal. The spread syntax is more concise, more readable, and avoids an unnecessary function call. This aligns with SonarQube rule `typescript:S6661`.
+For the empty-target merge pattern this rule matches, `Object.assign({}, ...)` can be rewritten to object spread (`{ ... }`) without changing the intended result. The spread syntax is more concise, more readable, and avoids an unnecessary function call. This aligns with SonarQube rule `typescript:S6661`.
 
 ## Examples
 
@@ -62,3 +62,4 @@ The autofix converts `Object.assign({}, ...)` calls into object spread syntax:
 - Mixed arguments are handled correctly: `Object.assign({}, { x: 1 }, bar)` → `{ x: 1, ...bar }`
 - Empty object literal source arguments are skipped: `Object.assign({}, foo, {})` → `{ ...foo }`
 - Calls with spread arguments are not reported because there is no safe object-spread autofix for `Object.assign({}, ...sources)`
+- Autofixes are parenthesized in expression statements and concise arrow returns so the rewritten object literal stays valid syntax

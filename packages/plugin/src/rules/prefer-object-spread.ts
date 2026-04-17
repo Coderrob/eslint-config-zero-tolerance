@@ -80,7 +80,11 @@ function createObjectSpreadFix(
 ): TSESLint.RuleFix {
   const spreadParts = collectSpreadParts(sourceCode, node.arguments.filter(isExpressionArgument));
   const inner = spreadParts.length > 0 ? ` ${spreadParts.join(', ')} ` : '';
-  return fixer.replaceText(node, `{${inner}}`);
+  const objectLiteralText = `{${inner}}`;
+  const replacementText = requiresParenthesizedObjectSpread(node) ?
+    `(${objectLiteralText})` :
+    objectLiteralText;
+  return fixer.replaceText(node, replacementText);
 }
 
 /**
@@ -140,7 +144,7 @@ function isEmptyObjectLiteral(node: TSESTree.Node): boolean {
 }
 
 /**
- * Returns true when the call argument is a regular expression.
+ * Returns true when the call argument is a regular (non-spread) expression.
  *
  * @param node - Call argument to inspect.
  * @returns Whether the argument is not a spread element.
@@ -199,6 +203,23 @@ function reportObjectAssign(
     messageId: 'preferObjectSpread',
     fix: createObjectSpreadFix.bind(undefined, context.sourceCode, node),
   });
+}
+
+/**
+ * Returns true when replacing the call with an object literal requires parentheses.
+ *
+ * @param node - Call expression being replaced.
+ * @returns Whether the replacement must be parenthesized to remain valid syntax.
+ */
+function requiresParenthesizedObjectSpread(node: TSESTree.CallExpression): boolean {
+  const { parent } = node;
+  if (parent.type === AST_NODE_TYPES.ExpressionStatement) {
+    return true;
+  }
+  if (parent.type !== AST_NODE_TYPES.ArrowFunctionExpression) {
+    return false;
+  }
+  return parent.body === node;
 }
 
 /**

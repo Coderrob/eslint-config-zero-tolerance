@@ -93,6 +93,18 @@
           "given": "a call to Object.assign({}, {})",
           "when": "the rule evaluates the call",
           "then": "a preferObjectSpread violation is reported and autofixed to {}"
+        },
+        {
+          "name": "should parenthesize autofix in expression statements",
+          "given": "an expression statement containing Object.assign({}, source)",
+          "when": "the rule autofixes the call",
+          "then": "the replacement is parenthesized as ({ ...source }) so the statement remains valid syntax"
+        },
+        {
+          "name": "should parenthesize autofix in concise arrow function bodies",
+          "given": "a concise arrow function body containing Object.assign({}, source)",
+          "when": "the rule autofixes the call",
+          "then": "the replacement is parenthesized as ({ ...source }) so the arrow continues to return an object literal expression"
         }
       ]
     }
