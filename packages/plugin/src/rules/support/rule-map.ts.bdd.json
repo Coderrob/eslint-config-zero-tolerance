@@ -130,6 +130,12 @@
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-node-protocol' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include prefer-structured-clone in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/prefer-structured-clone' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
         }
       ]
     }

@@ -74,6 +74,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'prefer-readonly-parameters',
   'prefer-shortcut-return',
   'prefer-string-raw',
+  'prefer-structured-clone',
   'no-query-side-effects',
   'no-test-interface-declaration',
   'require-node-protocol',

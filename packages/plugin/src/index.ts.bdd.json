@@ -69,6 +69,12 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['no-literal-property-unions'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register prefer-structured-clone as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['prefer-structured-clone'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

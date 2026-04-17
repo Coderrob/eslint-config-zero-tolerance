@@ -114,6 +114,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `prefer-shortcut-return`                 | warn           | error           |
 | `prefer-string-raw`                      | warn           | error           |
 | `prefer-object-spread`                   | warn           | error           |
+| `prefer-structured-clone`                | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 | `require-clean-barrel`                   | warn           | error           |
 | `require-exported-object-type`           | warn           | error           |

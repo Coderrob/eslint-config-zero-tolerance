@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **61 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **62 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -137,9 +137,10 @@ export default [
 | `sort-imports`               | Require import declarations to be ordered by group and alphabetically within each group |
 | `sort-functions`             | Require top-level functions and const function expressions to be sorted alphabetically  |
 | `prefer-nullish-coalescing`  | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| `prefer-object-spread`       | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
 | `prefer-readonly-parameters` | Prefer readonly typing for object and array-like parameters                             |
 | `prefer-string-raw`          | Prefer `String.raw` for strings containing escaped backslashes                          |
-| `prefer-object-spread`       | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
+| `prefer-structured-clone`    | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
 
 ### Error Handling
 

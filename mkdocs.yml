@@ -108,6 +108,7 @@ nav:
           - prefer-readonly-parameters: rules/prefer-readonly-parameters.md
           - prefer-string-raw: rules/prefer-string-raw.md
           - prefer-object-spread: rules/prefer-object-spread.md
+          - prefer-structured-clone: rules/prefer-structured-clone.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md

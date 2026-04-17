@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **`prefer-structured-clone` rule**: Added a new fixable rule that prefers `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning, while intentionally ignoring `JSON.parse` revivers and `JSON.stringify` replacer/spacing variants.
 - **`prefer-object-spread` rule**: Added a new fixable rule that enforces object spread syntax (`{ ...foo }`) instead of `Object.assign({}, foo)`. When the first argument is an empty object literal, the autofix converts to spread syntax, correctly inlining object literal arguments and spreading variable/expression arguments.
 - **`require-node-protocol` rule**: Added a new fixable rule that requires Node.js built-in module imports to use the `node:` protocol prefix (e.g., `node:fs` instead of `fs`).
 - **`no-test-interface-declaration` rule**: Added a new rule that disallows `interface` declarations in test files, flagging cases where production types should be exported and imported instead of redeclared locally.

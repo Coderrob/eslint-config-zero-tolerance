@@ -9,7 +9,7 @@
 <h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
 <p align="center">
-  <strong>61 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+  <strong>62 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
 </p>
 
 <p align="center">
@@ -54,7 +54,7 @@ This monorepo publishes two packages:
 
 | Package                                                                                                          | Description                                         |
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 61 custom rules                 |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 62 custom rules                 |
 | [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built `recommended` and `strict` config presets |
 
 ## Requirements
@@ -147,7 +147,7 @@ module.exports = {
 
 ## Rules
 
-All 61 rules are organized into eight categories. Nearly all are included in both the `recommended` (warn) and `strict` (error) presets. A handful are opt-in only — see the [Configuration](docs/configuration.md) guide for the full preset table.
+All 62 rules are organized into eight categories. Nearly all are included in both the `recommended` (warn) and `strict` (error) presets. A handful are opt-in only — see the [Configuration](docs/configuration.md) guide for the full preset table.
 
 ### Naming Conventions
 
@@ -206,9 +206,10 @@ All 61 rules are organized into eight categories. Nearly all are included in bot
 | [`sort-imports`](docs/rules/sort-imports.md)                             | Require import declarations to be grouped and alphabetized            |
 | [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level functions to be sorted alphabetically               |
 | [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)   | Prefer nullish coalescing instead of repeated nullish guard ternaries |
+| [`prefer-object-spread`](docs/rules/prefer-object-spread.md)             | Enforce object spread instead of `Object.assign` with empty literal   |
 | [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters           |
 | [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                   | Prefer `String.raw` for strings containing escaped backslashes        |
-| [`prefer-object-spread`](docs/rules/prefer-object-spread.md)             | Enforce object spread instead of `Object.assign` with empty literal   |
+| [`prefer-structured-clone`](docs/rules/prefer-structured-clone.md)       | Prefer `structuredClone(...)` over JSON deep-clone round-tripping     |
 
 ### Error Handling
 
