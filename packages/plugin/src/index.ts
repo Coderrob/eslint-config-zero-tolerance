@@ -33,6 +33,7 @@ import noDestructuredParameterTypeLiteral from './rules/no-destructured-paramete
 import noDynamicImport from './rules/no-dynamic-import';
 import noEmptyCatch from './rules/no-empty-catch';
 import noEslintDisable from './rules/no-eslint-disable';
+import noExplicitAny from './rules/no-explicit-any';
 import noExportAlias from './rules/no-export-alias';
 import noFetchInTests from './rules/no-fetch-in-tests';
 import noFlagArgument from './rules/no-flag-argument';
@@ -47,11 +48,14 @@ import noLiteralPropertyUnions from './rules/no-literal-property-unions';
 import noLiteralUnions from './rules/no-literal-unions';
 import noMagicNumbers from './rules/no-magic-numbers';
 import noMagicStrings from './rules/no-magic-strings';
+import noMapSetMutation from './rules/no-map-set-mutation';
+import noMathRandom from './rules/no-math-random';
 import noMockImplementation from './rules/no-mock-implementation';
 import noNonNullAssertion from './rules/no-non-null-assertion';
 import noObjectMutation from './rules/no-object-mutation';
 import noParameterReassign from './rules/no-parameter-reassign';
 import noParentInternalAccess from './rules/no-parent-internal-access';
+import noProcessEnvOutsideConfig from './rules/no-process-env-outside-config';
 import noQuerySideEffects from './rules/no-query-side-effects';
 import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
@@ -72,6 +76,7 @@ import preferStringRaw from './rules/prefer-string-raw';
 import preferStructuredClone from './rules/prefer-structured-clone';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
+import requireExhaustiveSwitch from './rules/require-exhaustive-switch';
 import requireExportedObjectType from './rules/require-exported-object-type';
 import requireInterfacePrefix from './rules/require-interface-prefix';
 import requireJsdocAnonymousFunctions from './rules/require-jsdoc-anonymous-functions';
@@ -111,6 +116,7 @@ const rules: Record<string, unknown> = {
   'no-dynamic-import': noDynamicImport,
   'no-empty-catch': noEmptyCatch,
   'no-eslint-disable': noEslintDisable,
+  'no-explicit-any': noExplicitAny,
   'no-export-alias': noExportAlias,
   'no-fetch-in-tests': noFetchInTests,
   'no-flag-argument': noFlagArgument,
@@ -125,6 +131,8 @@ const rules: Record<string, unknown> = {
   'no-literal-unions': noLiteralUnions,
   'no-magic-numbers': noMagicNumbers,
   'no-magic-strings': noMagicStrings,
+  'no-map-set-mutation': noMapSetMutation,
+  'no-math-random': noMathRandom,
   'no-mock-implementation': noMockImplementation,
   'no-non-null-assertion': noNonNullAssertion,
   'no-object-mutation': noObjectMutation,
@@ -132,6 +140,7 @@ const rules: Record<string, unknown> = {
   'no-parent-internal-access': noParentInternalAccess,
   'no-parameter-reassign': noParameterReassign,
   'no-barrel-parent-imports': noBarrelParentImports,
+  'no-process-env-outside-config': noProcessEnvOutsideConfig,
   'no-query-side-effects': noQuerySideEffects,
   'no-re-export': noReExport,
   'no-redundant-boolean': noRedundantBoolean,
@@ -156,6 +165,7 @@ const rules: Record<string, unknown> = {
   'require-jsdoc-anonymous-functions': requireJsdocAnonymousFunctions,
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-node-protocol': requireNodeProtocol,
+  'require-exhaustive-switch': requireExhaustiveSwitch,
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,

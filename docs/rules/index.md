@@ -1,17 +1,17 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **62 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **67 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
 | [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
-| [Type Safety](#type-safety)               |     9 | Assertions, unions, imports, exported types         |
-| [Code Quality](#code-quality)             |    14 | Function size, magic values, immutability, sorting  |
+| [Type Safety](#type-safety)               |    10 | Assertions, unions, imports, exported types         |
+| [Code Quality](#code-quality)             |    15 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
 | [Imports](#imports)                       |     7 | Barrels, re-exports, dynamic imports, node protocol |
-| [Bug Prevention](#bug-prevention)         |    15 | Identical code, control flow, async safety          |
+| [Bug Prevention](#bug-prevention)         |    18 | Identical code, control flow, async safety          |
 
 ---
 
@@ -50,6 +50,7 @@
 | ----------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
 | [no-type-assertion](no-type-assertion.md)                                           | suggestion | Prevent use of TypeScript `as` and angle-bracket assertions                        |
 | [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator                        |
+| [no-explicit-any](no-explicit-any.md)                                               | problem    | Disallow explicit `any`; require precise modeling or explicit narrowing            |
 | [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                                         |
 | [no-literal-property-unions](no-literal-property-unions.md)                         | suggestion | Require property literal unions to use named domain types                          |
 | [require-union-type-alias](require-union-type-alias.md)                             | suggestion | Require inline union types with multiple type references to use named type aliases |
@@ -68,6 +69,7 @@
 | [no-date-now](no-date-now.md)                               | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
 | [no-magic-numbers](no-magic-numbers.md)                     | suggestion | Disallow magic numbers; use named constants instead                                     |
 | [no-magic-strings](no-magic-strings.md)                     | suggestion | Disallow magic strings in comparisons and switch cases                                  |
+| [no-map-set-mutation](no-map-set-mutation.md)               | suggestion | Disallow direct `Map` and `Set` mutation methods                                       |
 | [no-object-mutation](no-object-mutation.md)                 | suggestion | Disallow direct object-property mutation                                                |
 | [sort-imports](sort-imports.md)                             | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
 | [sort-functions](sort-functions.md)                         | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
@@ -110,9 +112,12 @@
 | [no-with](no-with.md)                                   | problem    | Disallow `with` statements                                                   |
 | [no-await-in-loop](no-await-in-loop.md)                 | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [no-floating-promises](no-floating-promises.md)         | problem    | Disallow unhandled promise expressions; require explicit handling            |
+| [no-math-random](no-math-random.md)                     | problem    | Disallow `Math.random()`; inject a random source instead                     |
 | [no-eslint-disable](no-eslint-disable.md)               | suggestion | Prevent use of `eslint-disable` comments                                     |
 | [no-parameter-reassign](no-parameter-reassign.md)       | suggestion | Disallow reassigning function parameters                                     |
+| [no-process-env-outside-config](no-process-env-outside-config.md) | problem | Disallow `process.env` reads outside configuration modules                   |
 | [no-flag-argument](no-flag-argument.md)                 | suggestion | Disallow boolean flag parameters in function signatures                      |
 | [prefer-guard-clauses](prefer-guard-clauses.md)         | suggestion | Prefer guard clauses by removing else blocks after terminating if branches   |
 | [prefer-shortcut-return](prefer-shortcut-return.md)     | suggestion | Prefer shortcut boolean returns over if branches that return true/false      |
 | [no-query-side-effects](no-query-side-effects.md)       | suggestion | Disallow side effects in query-style functions                               |
+| [require-exhaustive-switch](require-exhaustive-switch.md) | suggestion | Require exhaustive `switch` statements over finite discriminant types        |

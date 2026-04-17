@@ -114,9 +114,39 @@
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {
+          "name": "should include no-explicit-any in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-explicit-any' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include no-map-set-mutation in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-map-set-mutation' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include no-math-random in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-math-random' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include no-process-env-outside-config in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/no-process-env-outside-config' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
           "name": "should include require-union-type-alias in built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-union-type-alias' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
+          "name": "should include require-exhaustive-switch in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-exhaustive-switch' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {

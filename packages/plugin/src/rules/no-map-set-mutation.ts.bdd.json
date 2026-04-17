@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-map-set-mutation.ts",
+  "module": {
+    "name": "no-map-set-mutation",
+    "description": "Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place.",
+    "exports": ["noMapSetMutation"]
+  },
+  "specifications": [
+    {
+      "feature": "Map and Set mutation detection",
+      "scenarios": [
+        {
+          "name": "should allow non-mutating Map lookups",
+          "given": "a typed Map instance that calls .get(...)",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow custom objects with set methods",
+          "given": "a non-Map object type that happens to expose a set(...) method",
+          "when": "the rule evaluates the call expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should disallow Map set mutations",
+          "given": "a typed Map instance that calls .set(...)",
+          "when": "the rule evaluates the call expression",
+          "then": "a noMapSetMutation violation is reported"
+        },
+        {
+          "name": "should disallow Set add mutations",
+          "given": "a typed Set instance that calls .add(...)",
+          "when": "the rule evaluates the call expression",
+          "then": "a noMapSetMutation violation is reported"
+        }
+      ]
+    }
+  ]
+}

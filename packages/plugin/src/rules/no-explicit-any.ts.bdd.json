@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-explicit-any.ts",
+  "module": {
+    "name": "no-explicit-any",
+    "description": "Disallow explicit any; model unknown values precisely and narrow them explicitly.",
+    "exports": ["noExplicitAny"]
+  },
+  "specifications": [
+    {
+      "feature": "Explicit any detection",
+      "scenarios": [
+        {
+          "name": "should allow unknown annotations",
+          "given": "code that annotates a value as unknown",
+          "when": "the rule evaluates the type annotation",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should disallow any in function parameters",
+          "given": "a function parameter annotated as any",
+          "when": "the rule evaluates the TSAnyKeyword node",
+          "then": "a noExplicitAny violation is reported"
+        },
+        {
+          "name": "should disallow any in generic type arguments",
+          "given": "a type such as Array<any>",
+          "when": "the rule evaluates the TSAnyKeyword node",
+          "then": "a noExplicitAny violation is reported"
+        }
+      ]
+    }
+  ]
+}

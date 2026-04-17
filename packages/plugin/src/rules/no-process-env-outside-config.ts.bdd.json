@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-process-env-outside-config.ts",
+  "module": {
+    "name": "no-process-env-outside-config",
+    "description": "Disallow process.env reads outside configuration modules; import typed config instead.",
+    "exports": ["noProcessEnvOutsideConfig"]
+  },
+  "specifications": [
+    {
+      "feature": "Configuration boundary detection",
+      "scenarios": [
+        {
+          "name": "should allow process env in config files",
+          "given": "a file named config.ts that reads process.env.NODE_ENV",
+          "when": "the rule evaluates the member expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow process env in config directories",
+          "given": "a file under a /config/ directory that reads process.env",
+          "when": "the rule evaluates the member expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should disallow process env property reads in app code",
+          "given": "a non-config file that reads process.env.NODE_ENV",
+          "when": "the rule evaluates the inner process.env member expression",
+          "then": "a noProcessEnvOutsideConfig violation is reported"
+        },
+        {
+          "name": "should disallow computed process env reads outside config",
+          "given": "a non-config file that reads process[\"env\"]",
+          "when": "the rule evaluates the member expression",
+          "then": "a noProcessEnvOutsideConfig violation is reported"
+        }
+      ]
+    }
+  ]
+}
