@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **`no-explicit-any` rule**: Added a new rule that disallows explicit `any` annotations and casts so unsafe type erasure has to be replaced with concrete modeling, `unknown`, or explicit narrowing.
+- **`no-map-set-mutation` rule**: Added a new rule that disallows direct `Map` and `Set` mutation methods such as `.set()`, `.add()`, `.delete()`, and `.clear()` to keep collection updates explicit and immutable.
+- **`no-math-random` rule**: Added a new rule that disallows `Math.random()` and pushes callers toward injected random sources or deterministic generators.
+- **`no-process-env-outside-config` rule**: Added a new rule that disallows reading `process.env` outside recognized configuration modules so environment access stays centralized and testable.
+- **`require-exhaustive-switch` rule**: Added a new rule that requires exhaustive `switch` statements over finite discriminant types and reports missing cases when execution can fall through without handling every member.
+- **`prefer-structured-clone` rule**: Added a new fixable rule that prefers `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning, while intentionally ignoring `JSON.parse` revivers and `JSON.stringify` replacer/spacing variants.
+- **`prefer-object-spread` rule**: Added a new fixable rule that enforces object spread syntax (`{ ...foo }`) instead of `Object.assign({}, foo)`. When the first argument is an empty object literal, the autofix converts to spread syntax, correctly inlining object literal arguments and spreading variable/expression arguments.
 - **`require-node-protocol` rule**: Added a new fixable rule that requires Node.js built-in module imports to use the `node:` protocol prefix (e.g., `node:fs` instead of `fs`).
 - **`no-test-interface-declaration` rule**: Added a new rule that disallows `interface` declarations in test files, flagging cases where production types should be exported and imported instead of redeclared locally.
 - **`require-union-type-alias` rule**: Added a new rule that requires inline union types with two or more type reference members to be extracted into named type aliases, similar to SonarQube S4323.
@@ -18,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **`prefer-object-spread` rule**: Avoided unsafe autofixes for `Object.assign` calls with spread arguments and skipped no-op empty object literal sources when generating object spread fixes.
 - **Preset registration**: Added `require-node-protocol` and `no-test-interface-declaration` to the default preset rule map so they are included in the recommended and strict config presets.
 - **Configuration docs**: Synced the preset table in `docs/configuration.md` with all 60 rules (was missing `require-exported-object-type`, `require-union-type-alias`, `no-test-interface-declaration`, and `require-node-protocol`).
 

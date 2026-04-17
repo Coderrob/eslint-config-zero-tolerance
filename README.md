@@ -9,13 +9,13 @@
 <h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
 <p align="center">
-  <strong>60 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+  <strong>67 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
   <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
-  <img src="https://img.shields.io/badge/coverage-99.96%25-brightgreen alt="Coverage" />
+  <img src="https://img.shields.io/badge/coverage-99.97%25-brightgreen" alt="Coverage" />
   <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
@@ -54,7 +54,7 @@ This monorepo publishes two packages:
 
 | Package                                                                                                          | Description                                         |
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 60 custom rules                 |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 67 custom rules                 |
 | [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built `recommended` and `strict` config presets |
 
 ## Requirements
@@ -147,7 +147,7 @@ module.exports = {
 
 ## Rules
 
-All 60 rules are organized into eight categories. Nearly all are included in both the `recommended` (warn) and `strict` (error) presets. A handful are opt-in only — see the [Configuration](docs/configuration.md) guide for the full preset table.
+All 67 rules are organized into eight categories. Nearly all are included in both the `recommended` (warn) and `strict` (error) presets. A handful are opt-in only — see the [Configuration](docs/configuration.md) guide for the full preset table.
 
 ### Naming Conventions
 
@@ -184,6 +184,7 @@ All 60 rules are organized into eight categories. Nearly all are included in bot
 | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
 | [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | Prevent use of TypeScript `as` and angle-bracket assertions                        |
 | [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | Disallow non-null assertions using the `!` postfix operator                        |
+| [`no-explicit-any`](docs/rules/no-explicit-any.md)                                               | Disallow explicit `any`; require precise modeling or explicit narrowing            |
 | [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | Ban literal union types in favour of enums                                         |
 | [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md)                         | Require property literal unions to use named domain types                          |
 | [`require-union-type-alias`](docs/rules/require-union-type-alias.md)                             | Require inline union types with multiple type references to use named type aliases |
@@ -202,12 +203,15 @@ All 60 rules are organized into eight categories. Nearly all are included in bot
 | [`no-date-now`](docs/rules/no-date-now.md)                               | Disallow `Date.now()` and no-arg `new Date()` usage                   |
 | [`no-magic-numbers`](docs/rules/no-magic-numbers.md)                     | Disallow magic numbers; use named constants instead                   |
 | [`no-magic-strings`](docs/rules/no-magic-strings.md)                     | Disallow magic strings in comparisons and switch cases                |
+| [`no-map-set-mutation`](docs/rules/no-map-set-mutation.md)               | Disallow direct `Map` and `Set` mutation methods                      |
 | [`no-object-mutation`](docs/rules/no-object-mutation.md)                 | Disallow direct object-property mutation                              |
 | [`sort-imports`](docs/rules/sort-imports.md)                             | Require import declarations to be grouped and alphabetized            |
 | [`sort-functions`](docs/rules/sort-functions.md)                         | Require top-level functions to be sorted alphabetically               |
 | [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)   | Prefer nullish coalescing instead of repeated nullish guard ternaries |
+| [`prefer-object-spread`](docs/rules/prefer-object-spread.md)             | Enforce object spread instead of `Object.assign` with empty literal   |
 | [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | Prefer readonly typing for object and array-like parameters           |
 | [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                   | Prefer `String.raw` for strings containing escaped backslashes        |
+| [`prefer-structured-clone`](docs/rules/prefer-structured-clone.md)       | Prefer `structuredClone(...)` over JSON deep-clone round-tripping     |
 
 ### Error Handling
 
@@ -242,12 +246,15 @@ All 60 rules are organized into eight categories. Nearly all are included in bot
 | [`no-with`](docs/rules/no-with.md)                                   | Disallow `with` statements                                                   |
 | [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                 | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | [`no-floating-promises`](docs/rules/no-floating-promises.md)         | Disallow unhandled promise expressions; require explicit handling            |
+| [`no-math-random`](docs/rules/no-math-random.md)                     | Disallow `Math.random()`; inject a random source instead                     |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md)               | Prevent use of `eslint-disable` comments                                     |
 | [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)       | Disallow reassigning function parameters                                     |
+| [`no-process-env-outside-config`](docs/rules/no-process-env-outside-config.md) | Disallow `process.env` reads outside configuration modules                   |
 | [`no-flag-argument`](docs/rules/no-flag-argument.md)                 | Disallow boolean flag parameters in function signatures                      |
 | [`prefer-guard-clauses`](docs/rules/prefer-guard-clauses.md)         | Prefer guard clauses by removing else blocks after terminating if branches   |
 | [`prefer-shortcut-return`](docs/rules/prefer-shortcut-return.md)     | Prefer shortcut boolean returns over if branches that return true/false      |
 | [`no-query-side-effects`](docs/rules/no-query-side-effects.md)       | Disallow side effects in query-style functions                               |
+| [`require-exhaustive-switch`](docs/rules/require-exhaustive-switch.md) | Require exhaustive `switch` statements over finite discriminant types        |
 
 ## Development
 

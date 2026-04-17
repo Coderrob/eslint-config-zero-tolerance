@@ -87,6 +87,7 @@ nav:
       - Type Safety:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md
+          - no-explicit-any: rules/no-explicit-any.md
           - no-literal-unions: rules/no-literal-unions.md
           - no-literal-property-unions: rules/no-literal-property-unions.md
           - require-union-type-alias: rules/require-union-type-alias.md
@@ -101,12 +102,15 @@ nav:
           - no-date-now: rules/no-date-now.md
           - no-magic-numbers: rules/no-magic-numbers.md
           - no-magic-strings: rules/no-magic-strings.md
+          - no-map-set-mutation: rules/no-map-set-mutation.md
           - no-object-mutation: rules/no-object-mutation.md
           - sort-imports: rules/sort-imports.md
           - sort-functions: rules/sort-functions.md
           - prefer-nullish-coalescing: rules/prefer-nullish-coalescing.md
           - prefer-readonly-parameters: rules/prefer-readonly-parameters.md
           - prefer-string-raw: rules/prefer-string-raw.md
+          - prefer-object-spread: rules/prefer-object-spread.md
+          - prefer-structured-clone: rules/prefer-structured-clone.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
           - no-throw-literal: rules/no-throw-literal.md
@@ -129,9 +133,12 @@ nav:
           - no-with: rules/no-with.md
           - no-await-in-loop: rules/no-await-in-loop.md
           - no-floating-promises: rules/no-floating-promises.md
+          - no-math-random: rules/no-math-random.md
           - no-eslint-disable: rules/no-eslint-disable.md
           - no-parameter-reassign: rules/no-parameter-reassign.md
+          - no-process-env-outside-config: rules/no-process-env-outside-config.md
           - no-flag-argument: rules/no-flag-argument.md
           - prefer-guard-clauses: rules/prefer-guard-clauses.md
           - prefer-shortcut-return: rules/prefer-shortcut-return.md
           - no-query-side-effects: rules/no-query-side-effects.md
+          - require-exhaustive-switch: rules/require-exhaustive-switch.md

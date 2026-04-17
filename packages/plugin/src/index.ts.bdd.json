@@ -69,6 +69,42 @@
           "given": "the plugin default export is imported",
           "when": "plugin.rules['no-literal-property-unions'] is read",
           "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-explicit-any as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-explicit-any'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-map-set-mutation as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-map-set-mutation'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-math-random as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-math-random'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register no-process-env-outside-config as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['no-process-env-outside-config'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register prefer-structured-clone as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['prefer-structured-clone'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
+          "name": "should register require-exhaustive-switch as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['require-exhaustive-switch'] is read",
+          "then": "the rule implementation is defined"
         }
       ]
     },

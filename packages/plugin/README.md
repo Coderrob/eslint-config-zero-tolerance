@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **60 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **67 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -115,6 +115,7 @@ export default [
 | ---------------------------------------- | ---------------------------------------------------------------------------------- |
 | `no-type-assertion`                      | Prevent use of TypeScript `as` and angle-bracket assertions                        |
 | `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator                        |
+| `no-explicit-any`                        | Disallow explicit `any`; require precise modeling or explicit narrowing            |
 | `no-literal-unions`                      | Ban literal union types in favour of enums                                         |
 | `no-literal-property-unions`             | Require property literal unions to use named domain types                          |
 | `require-union-type-alias`               | Require inline union types with multiple type references to use named type aliases |
@@ -133,12 +134,15 @@ export default [
 | `no-date-now`                | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
 | `no-magic-numbers`           | Disallow magic numbers; use named constants instead                                     |
 | `no-magic-strings`           | Disallow magic strings in comparisons and switch cases                                  |
+| `no-map-set-mutation`        | Disallow direct `Map` and `Set` mutation methods                                       |
 | `no-object-mutation`         | Disallow direct object-property mutation                                                |
 | `sort-imports`               | Require import declarations to be ordered by group and alphabetically within each group |
 | `sort-functions`             | Require top-level functions and const function expressions to be sorted alphabetically  |
 | `prefer-nullish-coalescing`  | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| `prefer-object-spread`       | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
 | `prefer-readonly-parameters` | Prefer readonly typing for object and array-like parameters                             |
 | `prefer-string-raw`          | Prefer `String.raw` for strings containing escaped backslashes                          |
+| `prefer-structured-clone`    | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
 
 ### Error Handling
 
@@ -175,12 +179,15 @@ export default [
 | `no-with`                  | Disallow `with` statements                                                   |
 | `no-await-in-loop`         | Disallow `await` inside loops; use `Promise.all()` instead                   |
 | `no-floating-promises`     | Disallow unhandled promise expressions; require explicit handling            |
+| `no-math-random`           | Disallow `Math.random()`; inject a random source instead                     |
 | `no-eslint-disable`        | Prevent use of `eslint-disable` comments                                     |
 | `no-parameter-reassign`    | Disallow reassigning function parameters                                     |
+| `no-process-env-outside-config` | Disallow `process.env` reads outside configuration modules              |
 | `no-flag-argument`         | Disallow boolean flag parameters in function signatures                      |
 | `prefer-guard-clauses`     | Prefer guard clauses by removing else blocks after terminating if branches   |
 | `prefer-shortcut-return`   | Prefer shortcut boolean returns over if branches that return true/false      |
 | `no-query-side-effects`    | Disallow side effects in query-style functions                               |
+| `require-exhaustive-switch` | Require exhaustive `switch` statements over finite discriminant types       |
 
 ## Documentation
 

@@ -1,0 +1,88 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/prefer-structured-clone.ts",
+  "module": {
+    "name": "prefer-structured-clone",
+    "description": "Prefer structuredClone(...) over JSON.parse(JSON.stringify(...)) when creating a deep clone.",
+    "exports": ["preferStructuredClone"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed deep-clone patterns",
+      "scenarios": [
+        {
+          "name": "should allow structuredClone usage",
+          "given": "code that already uses structuredClone(value)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow JSON.parse calls that do not wrap JSON.stringify",
+          "given": "a call to JSON.parse(serializedValue)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow JSON.parse with a reviver",
+          "given": "a call to JSON.parse(JSON.stringify(value), reviveValue)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because the parse call has additional behavior"
+        },
+        {
+          "name": "should allow JSON.stringify with a replacer",
+          "given": "a call to JSON.parse(JSON.stringify(value, replacer))",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because the stringify call has additional behavior"
+        },
+        {
+          "name": "should allow computed JSON method access",
+          "given": "calls that use JSON[\"parse\"](...) or JSON[\"stringify\"](...)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because only direct JSON.parse(JSON.stringify(...)) is targeted"
+        },
+        {
+          "name": "should allow JSON.parse with a spread argument",
+          "given": "a call to JSON.parse(...args)",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because the parse call does not provide a direct single expression argument"
+        }
+      ]
+    },
+    {
+      "feature": "Canonical JSON deep clone pattern",
+      "scenarios": [
+        {
+          "name": "should report the canonical JSON deep clone pattern",
+          "given": "a call to JSON.parse(JSON.stringify(value))",
+          "when": "the rule evaluates the outer call",
+          "then": "a preferStructuredClone violation is reported and autofixed to structuredClone(value)"
+        },
+        {
+          "name": "should preserve outer call type arguments in the autofix",
+          "given": "a call to JSON.parse<MyType>(JSON.stringify(value))",
+          "when": "the rule evaluates the outer call",
+          "then": "a preferStructuredClone violation is reported and autofixed to structuredClone<MyType>(value)"
+        },
+        {
+          "name": "should report JSON deep clone in nested expressions",
+          "given": "a return statement containing JSON.parse(JSON.stringify(buildPayload()))",
+          "when": "the rule evaluates the outer call",
+          "then": "a preferStructuredClone violation is reported and autofixed to structuredClone(buildPayload())"
+        },
+        {
+          "name": "should report JSON deep clone of an object literal",
+          "given": "a call to JSON.parse(JSON.stringify({ nested: value }))",
+          "when": "the rule evaluates the outer call",
+          "then": "a preferStructuredClone violation is reported and autofixed to structuredClone({ nested: value })"
+        },
+        {
+          "name": "should preserve sequence expressions as a single structuredClone argument",
+          "given": "a call to JSON.parse(JSON.stringify((first(), second())))",
+          "when": "the rule evaluates the outer call",
+          "then": "a preferStructuredClone violation is reported and autofixed to structuredClone((first(), second()))"
+        }
+      ]
+    }
+  ]
+}

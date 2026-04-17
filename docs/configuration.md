@@ -78,6 +78,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `no-dynamic-import`                      | warn           | error           |
 | `no-empty-catch`                         | warn           | error           |
 | `no-eslint-disable`                      | warn           | error           |
+| `no-explicit-any`                        | warn           | error           |
 | `no-export-alias`                        | warn           | error           |
 | `no-fetch-in-tests`                      | off            | off             |
 | `no-flag-argument`                       | warn           | error           |
@@ -92,11 +93,14 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `no-literal-unions`                      | warn           | error           |
 | `no-magic-numbers`                       | warn           | error           |
 | `no-magic-strings`                       | warn           | error           |
+| `no-map-set-mutation`                    | warn           | error           |
+| `no-math-random`                         | warn           | error           |
 | `no-mock-implementation`                 | warn           | error           |
 | `no-non-null-assertion`                  | warn           | error           |
 | `no-object-mutation`                     | warn           | error           |
 | `no-parameter-reassign`                  | warn           | error           |
 | `no-parent-internal-access`              | off            | off             |
+| `no-process-env-outside-config`          | warn           | error           |
 | `no-query-side-effects`                  | warn           | error           |
 | `no-re-export`                           | warn           | error           |
 | `no-redundant-boolean`                   | warn           | error           |
@@ -113,9 +117,12 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `prefer-result-return`                   | off            | warn            |
 | `prefer-shortcut-return`                 | warn           | error           |
 | `prefer-string-raw`                      | warn           | error           |
+| `prefer-object-spread`                   | warn           | error           |
+| `prefer-structured-clone`                | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 | `require-clean-barrel`                   | warn           | error           |
 | `require-exported-object-type`           | warn           | error           |
+| `require-exhaustive-switch`              | warn           | error           |
 | `require-interface-prefix`               | warn           | error           |
 | `require-jsdoc-anonymous-functions`      | off            | warn            |
 | `require-jsdoc-functions`                | warn           | error           |

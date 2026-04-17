@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-exhaustive-switch.ts",
+  "module": {
+    "name": "require-exhaustive-switch",
+    "description": "Require exhaustive switch statements over finite union, enum, and boolean discriminants.",
+    "exports": ["requireExhaustiveSwitch"]
+  },
+  "specifications": [
+    {
+      "feature": "Finite discriminant switches",
+      "scenarios": [
+        {
+          "name": "should allow exhaustive string union switches",
+          "given": "a switch over a string literal union that handles every member explicitly",
+          "when": "the rule evaluates the switch statement",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow default clauses as explicit fallback",
+          "given": "a switch over a finite discriminant type that includes a default clause",
+          "when": "the rule evaluates the switch statement",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore open ended string switches",
+          "given": "a switch over the general string type",
+          "when": "the rule evaluates the switch statement",
+          "then": "no violation is reported because the type cannot be enumerated finitely"
+        },
+        {
+          "name": "should disallow non-exhaustive string union switches",
+          "given": "a switch over a string literal union that omits one or more members",
+          "when": "the rule evaluates the switch statement",
+          "then": "a requireExhaustiveSwitch violation is reported with the missing case texts"
+        },
+        {
+          "name": "should disallow non-exhaustive enum switches",
+          "given": "a switch over an enum type that omits one or more members",
+          "when": "the rule evaluates the switch statement",
+          "then": "a requireExhaustiveSwitch violation is reported with the missing enum member cases"
+        }
+      ]
+    }
+  ]
+}

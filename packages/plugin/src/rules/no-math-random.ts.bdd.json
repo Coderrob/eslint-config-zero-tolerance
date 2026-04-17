@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-math-random.ts",
+  "module": {
+    "name": "no-math-random",
+    "description": "Disallow Math.random(); inject randomness explicitly or use a dedicated random source.",
+    "exports": ["noMathRandom"]
+  },
+  "specifications": [
+    {
+      "feature": "Math.random detection",
+      "scenarios": [
+        {
+          "name": "should allow injected random generators",
+          "given": "code that calls a project-provided random generator such as rng.nextFloat()",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow computed Math random access",
+          "given": "a call to Math[\"random\"]()",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported because only direct Math.random member access is targeted"
+        },
+        {
+          "name": "should disallow direct Math.random calls",
+          "given": "a call to Math.random()",
+          "when": "the rule evaluates the call expression",
+          "then": "a noMathRandom violation is reported"
+        }
+      ]
+    }
+  ]
+}
