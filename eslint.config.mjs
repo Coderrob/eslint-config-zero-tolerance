@@ -140,10 +140,11 @@ const baseConfig = {
     'zero-tolerance/require-test-description-style': 'error',
 
     // Type safety and assertions
-    'zero-tolerance/no-banned-types': 'error',
+    'zero-tolerance/no-indexed-access-types': 'error',
     'zero-tolerance/no-literal-unions': 'error',
     'zero-tolerance/no-type-assertion': 'error',
     'zero-tolerance/no-non-null-assertion': 'error',
+    'zero-tolerance/no-return-type': 'error',
 
     // Import/export patterns
     'zero-tolerance/require-clean-barrel': 'error',

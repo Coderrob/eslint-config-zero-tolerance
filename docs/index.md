@@ -1,6 +1,6 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-**67 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
+**68 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
