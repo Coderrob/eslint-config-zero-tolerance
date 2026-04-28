@@ -1377,6 +1377,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-indexed-access-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-indexed-access-types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-literal-unions/" class="md-nav__link">
         
   
@@ -1433,62 +1461,6 @@
   
   
     <li class="md-nav__item">
-      <a href="require-union-type-alias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-union-type-alias
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="no-banned-types/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-banned-types
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="no-inline-type-import/" class="md-nav__link">
         
   
@@ -1497,6 +1469,62 @@
     
   
     no-inline-type-import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-return-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-return-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="require-union-type-alias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-union-type-alias
   
 
     
@@ -2264,6 +2292,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="require-barrel-relative-exports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-barrel-relative-exports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3185,7 +3241,7 @@
 
 
 <h1 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h1>
-<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>67 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
+<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>69 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
 <table>
 <thead>
 <tr>
@@ -3212,7 +3268,7 @@
 </tr>
 <tr>
 <td><a href="#type-safety">Type Safety</a></td>
-<td style="text-align: right;">10</td>
+<td style="text-align: right;">11</td>
 <td>Assertions, unions, imports, exported types</td>
 </tr>
 <tr>
@@ -3227,7 +3283,7 @@
 </tr>
 <tr>
 <td><a href="#imports">Imports</a></td>
-<td style="text-align: right;">7</td>
+<td style="text-align: right;">8</td>
 <td>Barrels, re-exports, dynamic imports, node protocol</td>
 </tr>
 <tr>
@@ -3370,6 +3426,11 @@
 <td>Disallow explicit <code>any</code>; require precise modeling or explicit narrowing</td>
 </tr>
 <tr>
+<td><a href="no-indexed-access-types/">no-indexed-access-types</a></td>
+<td>problem</td>
+<td>Disallow TypeScript indexed access types</td>
+</tr>
+<tr>
 <td><a href="no-literal-unions/">no-literal-unions</a></td>
 <td>suggestion</td>
 <td>Ban literal union types in favour of enums</td>
@@ -3380,19 +3441,19 @@
 <td>Require property literal unions to use named domain types</td>
 </tr>
 <tr>
-<td><a href="require-union-type-alias/">require-union-type-alias</a></td>
-<td>suggestion</td>
-<td>Require inline union types with multiple type references to use named type aliases</td>
-</tr>
-<tr>
-<td><a href="no-banned-types/">no-banned-types</a></td>
-<td>problem</td>
-<td>Ban <code>ReturnType</code> and indexed access types</td>
-</tr>
-<tr>
 <td><a href="no-inline-type-import/">no-inline-type-import</a></td>
 <td>problem</td>
 <td>Disallow inline <code>import("...")</code> type annotations</td>
+</tr>
+<tr>
+<td><a href="no-return-type/">no-return-type</a></td>
+<td>problem</td>
+<td>Disallow TypeScript <code>ReturnType</code> utility usage</td>
+</tr>
+<tr>
+<td><a href="require-union-type-alias/">require-union-type-alias</a></td>
+<td>suggestion</td>
+<td>Require inline union types with multiple type references to use named type aliases</td>
 </tr>
 <tr>
 <td><a href="no-destructured-parameter-type-literal/">no-destructured-parameter-type-literal</a></td>
@@ -3534,6 +3595,11 @@
 <td><a href="require-clean-barrel/">require-clean-barrel</a></td>
 <td>suggestion</td>
 <td>Require barrel files (index.*) to contain only module re-exports</td>
+</tr>
+<tr>
+<td><a href="require-barrel-relative-exports/">require-barrel-relative-exports</a></td>
+<td>suggestion</td>
+<td>Require barrel re-exports to use <code>./</code> descendant paths</td>
 </tr>
 <tr>
 <td><a href="no-dynamic-import/">no-dynamic-import</a></td>

@@ -1316,6 +1316,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-indexed-access-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-indexed-access-types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-literal-unions/" class="md-nav__link">
         
   
@@ -1372,62 +1400,6 @@
   
   
     <li class="md-nav__item">
-      <a href="rules/require-union-type-alias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-union-type-alias
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="rules/no-banned-types/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-banned-types
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="rules/no-inline-type-import/" class="md-nav__link">
         
   
@@ -1436,6 +1408,62 @@
     
   
     no-inline-type-import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-return-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-return-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/require-union-type-alias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-union-type-alias
   
 
     
@@ -2194,6 +2222,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/require-barrel-relative-exports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-barrel-relative-exports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3068,7 +3124,7 @@
 
 
 <h1 id="coderrobeslint-plugin-zero-tolerance">@coderrob/eslint-plugin-zero-tolerance<a class="headerlink" href="#coderrobeslint-plugin-zero-tolerance" title="Permanent link">&para;</a></h1>
-<p><strong>67 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
+<p><strong>69 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
 <p><a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img alt="npm version" src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" /></a>
 <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" /></a></p>
 <p><strong>Supports ESLint 8.57+, 9.x, and 10.x</strong></p>
@@ -3108,7 +3164,7 @@
 </tr>
 <tr>
 <td><strong>Imports</strong></td>
-<td>Keep barrels clean, ban dynamic imports, prevent re-exports and parent-directory traversal</td>
+<td>Keep barrels clean, require descendant-relative barrel re-exports, ban dynamic imports, and prevent upward traversal</td>
 </tr>
 <tr>
 <td><strong>Documentation</strong></td>

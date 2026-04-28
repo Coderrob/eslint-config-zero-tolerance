@@ -1242,6 +1242,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-indexed-access-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-indexed-access-types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-literal-unions/" class="md-nav__link">
         
   
@@ -1298,62 +1326,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../require-union-type-alias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-union-type-alias
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../no-banned-types/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-banned-types
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../no-inline-type-import/" class="md-nav__link">
         
   
@@ -1362,6 +1334,62 @@
     
   
     no-inline-type-import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-return-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-return-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-union-type-alias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-union-type-alias
   
 
     
@@ -2129,6 +2157,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-barrel-relative-exports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-barrel-relative-exports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3204,7 +3260,7 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
-<p>Re-export statements that reach outside the current directory (<code>../</code>) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as <code>export { foo } from '../foo'</code> and pass-through patterns such as <code>import { foo } from '../foo'; export { foo };</code>. Statement ordering does not matter: <code>export { foo }; import { foo } from '../foo';</code> is also reported. Only barrel files (<code>index.*</code>) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (<code>../sibling</code>) or ancestors (<code>../../parent</code>, <code>../../../grandparent</code>).</p>
+<p>Re-export statements that reach outside the current directory (<code>../</code>) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as <code>export { foo } from '../foo'</code> and pass-through patterns such as <code>import { foo } from '../foo'; export { foo };</code>. Statement ordering does not matter: <code>export { foo }; import { foo } from '../foo';</code> is also reported. Barrel files (<code>index.*</code>) remain exempt from this rule because their re-export path policy is enforced separately by <code>require-barrel-relative-exports</code>. All other files must not re-export from peer modules (<code>../sibling</code>) or ancestors (<code>../../parent</code>, <code>../../../grandparent</code>).</p>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The barrel-file exemption applies only to single-extension index files such as <code>index.ts</code>, <code>index.js</code>, and <code>index.mts</code>.</li>
@@ -3226,9 +3282,8 @@
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">localValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parentValue</span><span class="p">;</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">localValue</span><span class="w"> </span><span class="p">};</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1">// In a barrel file (index.ts), upward re-exports are allowed</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1">// export { peerFunction } from &#39;../sibling&#39;;</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1">// export * from &#39;../../parent&#39;;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1">// In a barrel file, this rule stays silent because</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1">// require-barrel-relative-exports owns barrel re-export path policy.</span>
 </code></pre></div>
 <h3 id="incorrect">❌ Incorrect<a class="headerlink" href="#incorrect" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Re-exports from peers are not allowed in non-barrel files</span>

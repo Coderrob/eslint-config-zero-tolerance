@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/require-clean-barrel/">
       
       
-        <link rel="prev" href="../prefer-result-return/">
+        <link rel="prev" href="../require-barrel-relative-exports/">
       
       
         <link rel="next" href="../no-dynamic-import/">
@@ -1242,6 +1242,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-indexed-access-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-indexed-access-types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-literal-unions/" class="md-nav__link">
         
   
@@ -1298,62 +1326,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../require-union-type-alias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    require-union-type-alias
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../no-banned-types/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    no-banned-types
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../no-inline-type-import/" class="md-nav__link">
         
   
@@ -1362,6 +1334,62 @@
     
   
     no-inline-type-import
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-return-type/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-return-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-union-type-alias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-union-type-alias
   
 
     
@@ -2129,6 +2157,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-barrel-relative-exports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-barrel-relative-exports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3211,6 +3267,7 @@
 <li><code>export * from './foo'</code></li>
 <li><code>export type { Foo } from './types'</code></li>
 </ul>
+<p>This rule validates barrel shape only. Re-export source paths inside barrels are governed separately by <code>require-barrel-relative-exports</code>.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="correct">✅ Correct<a class="headerlink" href="#correct" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;./create-client&#39;</span><span class="p">;</span>
