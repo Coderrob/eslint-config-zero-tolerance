@@ -1,0 +1,115 @@
+{
+  "categories": [
+    {
+      "title": "Naming Conventions",
+      "focus": "Interface naming standards",
+      "rules": ["require-interface-prefix"]
+    },
+    {
+      "title": "Documentation",
+      "focus": "JSDoc, BDD specs, optional chaining, readonly props",
+      "rules": [
+        "require-bdd-spec",
+        "require-jsdoc-anonymous-functions",
+        "require-jsdoc-functions",
+        "require-optional-chaining",
+        "require-readonly-props"
+      ]
+    },
+    {
+      "title": "Testing",
+      "focus": "Test descriptions, mocks, timers, fetch, interfaces",
+      "rules": [
+        "require-test-description-style",
+        "no-jest-have-been-called",
+        "no-mock-implementation",
+        "no-set-timeout-in-tests",
+        "no-set-interval-in-tests",
+        "no-fetch-in-tests",
+        "no-restricted-imports-in-tests",
+        "no-test-interface-declaration"
+      ]
+    },
+    {
+      "title": "Type Safety",
+      "focus": "Assertions, unions, imports, exported types",
+      "rules": [
+        "no-type-assertion",
+        "no-non-null-assertion",
+        "no-explicit-any",
+        "no-indexed-access-types",
+        "no-literal-unions",
+        "no-literal-property-unions",
+        "no-inline-type-import",
+        "no-return-type",
+        "require-union-type-alias",
+        "no-destructured-parameter-type-literal",
+        "require-exported-object-type"
+      ]
+    },
+    {
+      "title": "Code Quality",
+      "focus": "Function size, magic values, immutability, sorting",
+      "rules": [
+        "max-function-lines",
+        "max-params",
+        "no-array-mutation",
+        "no-date-now",
+        "no-magic-numbers",
+        "no-magic-strings",
+        "no-map-set-mutation",
+        "no-object-mutation",
+        "sort-imports",
+        "sort-functions",
+        "prefer-nullish-coalescing",
+        "prefer-object-spread",
+        "prefer-readonly-parameters",
+        "prefer-string-raw",
+        "prefer-structured-clone"
+      ]
+    },
+    {
+      "title": "Error Handling",
+      "focus": "Throw safety, empty catches, Result patterns",
+      "rules": ["no-empty-catch", "no-throw-literal", "prefer-result-return"]
+    },
+    {
+      "title": "Imports",
+      "focus": "Barrels, re-exports, dynamic imports, node protocol",
+      "rules": [
+        "require-clean-barrel",
+        "require-barrel-relative-exports",
+        "no-dynamic-import",
+        "no-export-alias",
+        "no-barrel-parent-imports",
+        "no-parent-internal-access",
+        "no-re-export",
+        "require-node-protocol"
+      ]
+    },
+    {
+      "title": "Bug Prevention",
+      "focus": "Identical code, control flow, async safety",
+      "rules": [
+        "no-identical-expressions",
+        "no-identical-branches",
+        "no-boolean-return-trap",
+        "no-redundant-boolean",
+        "no-for-in",
+        "no-labels",
+        "no-with",
+        "no-await-in-loop",
+        "no-floating-promises",
+        "no-math-random",
+        "no-eslint-disable",
+        "no-parameter-reassign",
+        "no-process-env-outside-config",
+        "no-flag-argument",
+        "prefer-guard-clauses",
+        "prefer-shortcut-return",
+        "no-query-side-effects",
+        "require-exhaustive-switch"
+      ]
+    }
+  ]
+}

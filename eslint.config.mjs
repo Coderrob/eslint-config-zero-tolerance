@@ -147,6 +147,7 @@ const baseConfig = {
     'zero-tolerance/no-return-type': 'error',
 
     // Import/export patterns
+    'zero-tolerance/require-barrel-relative-exports': 'error',
     'zero-tolerance/require-clean-barrel': 'error',
     'zero-tolerance/no-re-export': 'error',
     'zero-tolerance/no-dynamic-import': 'error',

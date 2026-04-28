@@ -104,7 +104,7 @@ These checks are mandatory whenever a rule is **added**, **updated**, or **remov
    - The `module.exports` array must match the current named exports of the rule file.
 3. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
 
-4. Run required validations and ensure they all pass: `pnpm validate:bdd`, `pnpm lint`, `pnpm test`, `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`, `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`, and `pnpm build`.
+4. Run required validations and ensure they all pass: `pnpm validate:bdd`, `pnpm validate:rules`, `pnpm validate:readme`, `pnpm lint`, `pnpm test`, `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`, `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`, and `pnpm build`.
 
 ### Rule Template
 
@@ -209,10 +209,12 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 Before considering any rule or behavior change complete:
 
 1. Run `pnpm validate:bdd` and ensure it passes.
-2. Run `pnpm lint` and ensure it passes.
-3. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
-4. Run type checks for plugin and config packages and ensure they pass.
-5. Run `pnpm build` and ensure it passes.
-6. Update `CHANGELOG.md` under `[Unreleased]`.
-7. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
-8. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.
+2. Run `pnpm validate:rules` and ensure it passes.
+3. Run `pnpm validate:readme` and ensure it passes.
+4. Run `pnpm lint` and ensure it passes.
+5. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
+6. Run type checks for plugin and config packages and ensure they pass.
+7. Run `pnpm build` and ensure it passes.
+8. Update `CHANGELOG.md` under `[Unreleased]`.
+9. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
+10. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.

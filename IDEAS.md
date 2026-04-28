@@ -1,2 +1,3 @@
 - integrate with project "prune"
 - Let's ensure the documentation for this project is as well crafted as if it were itself a customer experience to continue to improve to provide rich information written with an understanding that seeing is the first customer experience, the next comes the reading, and we need to ensure an exceptional experience.
+- fix the sort order to avoid continually sorting as function walks one block at a time

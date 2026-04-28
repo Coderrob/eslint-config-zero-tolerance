@@ -25,6 +25,7 @@ const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
+  'require-barrel-relative-exports',
   'require-clean-barrel',
   'require-exported-object-type',
   'require-interface-prefix',

@@ -90,6 +90,12 @@
           "then": "the rule is set to off in Recommended and warn in Strict"
         },
         {
+          "name": "should include require-barrel-relative-exports in built-in presets",
+          "given": "buildRules is called for the Recommended and Strict presets",
+          "when": "the 'zero-tolerance/require-barrel-relative-exports' entries are read",
+          "then": "the rule is set to warn in Recommended and error in Strict"
+        },
+        {
           "name": "should include require-clean-barrel in built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-clean-barrel' entries are read",

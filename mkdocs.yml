@@ -117,6 +117,7 @@ nav:
           - no-throw-literal: rules/no-throw-literal.md
           - prefer-result-return: rules/prefer-result-return.md
       - Imports:
+          - require-barrel-relative-exports: rules/require-barrel-relative-exports.md
           - require-clean-barrel: rules/require-clean-barrel.md
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md

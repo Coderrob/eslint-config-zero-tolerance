@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **68 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **69 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -160,6 +160,7 @@ export default [
 | Rule                        | Description                                                                       |
 | --------------------------- | --------------------------------------------------------------------------------- |
 | `require-clean-barrel`      | Require barrel files (`index.*`) to contain only module re-exports                |
+| `require-barrel-relative-exports` | Require barrel re-exports to use `./` descendant paths                      |
 | `no-barrel-parent-imports`  | Disallow parent-directory traversal in barrel-file import paths                   |
 | `no-parent-internal-access` | Disallow parent-relative access into protected internal directories such as `src` |
 | `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |

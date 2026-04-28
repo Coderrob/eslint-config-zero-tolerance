@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **Rule naming validation**: Added a `validate:rules` script that verifies each plugin rule keeps a consistent canonical name across its filename, exported camelCase constant, `createRule` name, default export, sibling test/BDD/docs files, and plugin registration.
+- **README synchronization**: Added `readme:sync` and `validate:readme` scripts that regenerate and verify the root `README.md` from deterministic rule catalog metadata, canonical rule source metadata, preset metadata, and docs page existence checks.
+- **`require-barrel-relative-exports` rule**: Added a new built-in rule that requires barrel-file re-export declarations to target only current-directory descendant paths beginning with `./`, closing the gap where barrels could stay syntactically clean while still re-exporting from parent, aliased, or package-rooted paths.
 - **`no-indexed-access-types` rule**: Added a new rule that disallows TypeScript indexed access types such as `T['key']`, `T[K]`, and `T[number]`, so callers must depend on explicit named contracts instead of structural reach-through.
 - **`no-explicit-any` rule**: Added a new rule that disallows explicit `any` annotations and casts so unsafe type erasure has to be replaced with concrete modeling, `unknown`, or explicit narrowing.
 - **`no-map-set-mutation` rule**: Added a new rule that disallows direct `Map` and `Set` mutation methods such as `.set()`, `.add()`, `.delete()`, and `.clear()` to keep collection updates explicit and immutable.

@@ -41,14 +41,17 @@
     "deps:graph": "madge --extensions ts packages/plugin/src/index.ts",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "pnpm build && eslint . && pnpm validate:bdd && pnpm validate:publint",
+    "lint": "pnpm build && eslint . && pnpm validate:bdd && pnpm validate:rules && pnpm validate:readme && pnpm validate:publint",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
     "publish:config": "pnpm --filter @coderrob/eslint-config-zero-tolerance publish",
     "publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance publish",
+    "readme:sync": "node scripts/sync-readme.mjs",
     "release:prepare": "node scripts/prepare-publish.mjs",
     "release:restore-workspace": "node scripts/restore-workspace.mjs",
     "test": "pnpm -r --if-present test && pnpm coverage:update-badge",
     "validate:bdd": "node scripts/validate-bdd-specs.mjs",
+    "validate:readme": "node scripts/sync-readme.mjs --check",
+    "validate:rules": "node scripts/validate-rule-naming.mjs",
     "validate:publint": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec publint && pnpm --filter @coderrob/eslint-config-zero-tolerance exec publint"
   },
   "version": "1.0.0"

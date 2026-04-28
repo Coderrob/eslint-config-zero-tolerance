@@ -1,6 +1,6 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **68 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **69 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
@@ -10,7 +10,7 @@
 | [Type Safety](#type-safety)               |    11 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    15 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
-| [Imports](#imports)                       |     7 | Barrels, re-exports, dynamic imports, node protocol |
+| [Imports](#imports)                       |     8 | Barrels, re-exports, dynamic imports, node protocol |
 | [Bug Prevention](#bug-prevention)         |    18 | Identical code, control flow, async safety          |
 
 ---
@@ -93,6 +93,7 @@
 | Rule                                                      | Type       | Description                                                                     |
 | --------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------- |
 | [require-clean-barrel](require-clean-barrel.md)           | suggestion | Require barrel files (index.\*) to contain only module re-exports               |
+| [require-barrel-relative-exports](require-barrel-relative-exports.md) | suggestion | Require barrel re-exports to use `./` descendant paths                          |
 | [no-dynamic-import](no-dynamic-import.md)                 | problem    | Ban dynamic `import()` and `require()` outside test files                       |
 | [no-export-alias](no-export-alias.md)                     | suggestion | Prevent use of aliases in export statements                                     |
 | [no-barrel-parent-imports](no-barrel-parent-imports.md)   | suggestion | Disallow parent-directory traversal in barrel-file import paths                 |

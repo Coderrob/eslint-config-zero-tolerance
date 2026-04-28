@@ -24,6 +24,8 @@ This rule applies only when the current file is a barrel file (`index.*`). In th
 - `require('...')`
 - TypeScript `import x = require('...')`
 
+Re-export declarations such as `export { foo } from '../foo'` are covered separately by `require-barrel-relative-exports`.
+
 ## Notes
 
 - The rule applies only to single-extension barrel files such as `index.ts`, `index.js`, and `index.mts`.

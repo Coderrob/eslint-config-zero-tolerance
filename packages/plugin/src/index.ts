@@ -75,6 +75,7 @@ import preferResultReturn from './rules/prefer-result-return';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
 import preferStringRaw from './rules/prefer-string-raw';
 import preferStructuredClone from './rules/prefer-structured-clone';
+import requireBarrelRelativeExports from './rules/require-barrel-relative-exports';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
 import requireExhaustiveSwitch from './rules/require-exhaustive-switch';
@@ -160,6 +161,7 @@ const rules: Record<string, unknown> = {
   'prefer-shortcut-return': preferShortcutReturn,
   'prefer-string-raw': preferStringRaw,
   'prefer-structured-clone': preferStructuredClone,
+  'require-barrel-relative-exports': requireBarrelRelativeExports,
   'require-clean-barrel': requireCleanBarrel,
   'require-exported-object-type': requireExportedObjectType,
   'require-interface-prefix': requireInterfacePrefix,

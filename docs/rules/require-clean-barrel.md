@@ -21,6 +21,8 @@ When an `index.*` file contains at least one module re-export declaration, this 
 - `export * from './foo'`
 - `export type { Foo } from './types'`
 
+This rule validates barrel shape only. Re-export source paths inside barrels are governed separately by `require-barrel-relative-exports`.
+
 ## Examples
 
 ### ✅ Correct

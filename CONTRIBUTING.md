@@ -60,9 +60,14 @@ Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md
 - Named non-test functions must have a JSDoc comment (`require-jsdoc-functions`)
 - Anonymous non-test function-like constructs must have a JSDoc comment (`require-jsdoc-anonymous-functions`)
 - Barrel files (`index.*`) must contain only module re-export declarations (`require-clean-barrel`)
+- Barrel re-export declarations must target descendant-relative `./` paths (`require-barrel-relative-exports`)
 - Import declarations must be ordered by group (side-effect -> builtin -> external -> parent -> peer -> index) and alphabetically within each group (`sort-imports`)
 - No parent-relative re-exports (`no-re-export`)
 - No `eslint-disable` comments — fix the underlying issue (`no-eslint-disable`)
+
+Rule naming is validated automatically by `pnpm validate:rules`. It verifies the rule filename, exported camelCase constant, `createRule({ name: ... })` value, default export, sibling test/BDD/docs filenames, and plugin registration all stay aligned.
+
+README synchronization is also automated. `pnpm readme:sync` regenerates the root `README.md` rule catalog from deterministic metadata and rule source metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
 
 ## Adding a New Rule
 
@@ -182,6 +187,8 @@ Add an entry under `## [Unreleased]` in `CHANGELOG.md`:
 ### 7. Verify
 
 ```bash
+pnpm validate:readme  # root README must match generated rule metadata
+pnpm validate:rules  # rule filenames, exports, docs, and registration must stay aligned
 pnpm test     # all tests must pass
 pnpm build    # TypeScript must compile cleanly
 ```

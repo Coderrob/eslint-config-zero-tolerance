@@ -1,6 +1,6 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-**68 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
+**69 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
@@ -26,7 +26,7 @@ This plugin takes the opposite approach. Every rule earns its place, every viola
 | **Testing**        | Require `should`-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse    |
 | **Bug Prevention** | Flag identical expressions, redundant booleans, missing awaits, floating promises, and flag arguments |
 | **Error Handling** | Require `new Error()` throws, ban empty catches, encourage Result-style returns                       |
-| **Imports**        | Keep barrels clean, ban dynamic imports, prevent re-exports and parent-directory traversal            |
+| **Imports**        | Keep barrels clean, require descendant-relative barrel re-exports, ban dynamic imports, and prevent upward traversal |
 | **Documentation**  | Require JSDoc on functions, enforce BDD specs, mandate optional chaining and readonly props           |
 | **Naming**         | Enforce `I`-prefixed interfaces                                                                       |
 

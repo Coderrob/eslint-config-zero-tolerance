@@ -44,6 +44,7 @@ const RULE_NO_MATH_RANDOM = `${PLUGIN_NAMESPACE}/no-math-random`;
 const RULE_PREFER_RESULT_RETURN = `${PLUGIN_NAMESPACE}/prefer-result-return`;
 const RULE_NO_PROCESS_ENV_OUTSIDE_CONFIG = `${PLUGIN_NAMESPACE}/no-process-env-outside-config`;
 const RULE_NO_RETURN_TYPE = `${PLUGIN_NAMESPACE}/no-return-type`;
+const RULE_REQUIRE_BARREL_RELATIVE_EXPORTS = `${PLUGIN_NAMESPACE}/require-barrel-relative-exports`;
 const RULE_REQUIRE_BDD_SPEC = `${PLUGIN_NAMESPACE}/require-bdd-spec`;
 const RULE_REQUIRE_CLEAN_BARREL = `${PLUGIN_NAMESPACE}/require-clean-barrel`;
 const RULE_REQUIRE_EXHAUSTIVE_SWITCH = `${PLUGIN_NAMESPACE}/require-exhaustive-switch`;
@@ -73,6 +74,7 @@ const RULE_KEY_NO_RESTRICTED_IMPORTS_IN_TESTS = 'no-restricted-imports-in-tests'
 const RULE_KEY_NO_RETURN_TYPE = 'no-return-type';
 const RULE_KEY_NO_SET_INTERVAL_IN_TESTS = 'no-set-interval-in-tests';
 const RULE_KEY_NO_SET_TIMEOUT_IN_TESTS = 'no-set-timeout-in-tests';
+const RULE_KEY_REQUIRE_BARREL_RELATIVE_EXPORTS = 'require-barrel-relative-exports';
 const RULE_KEY_REQUIRE_CLEAN_BARREL = 'require-clean-barrel';
 const RULE_KEY_REQUIRE_EXHAUSTIVE_SWITCH = 'require-exhaustive-switch';
 const RULE_KEY_REQUIRE_EXPORTED_OBJECT_TYPE = 'require-exported-object-type';
@@ -108,6 +110,8 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_NO_RETURN_TYPE]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
     expect(strictRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('warn');
+    expect(recommendedRules[RULE_REQUIRE_BARREL_RELATIVE_EXPORTS]).toBe('warn');
+    expect(strictRules[RULE_REQUIRE_BARREL_RELATIVE_EXPORTS]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('warn');
     expect(strictRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_EXHAUSTIVE_SWITCH]).toBe('warn');
@@ -174,6 +178,7 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.rules?.[RULE_KEY_NO_RETURN_TYPE]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_SET_INTERVAL_IN_TESTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_SET_TIMEOUT_IN_TESTS]).toBeDefined();
+    expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_BARREL_RELATIVE_EXPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_CLEAN_BARREL]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_EXHAUSTIVE_SWITCH]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_REQUIRE_EXPORTED_OBJECT_TYPE]).toBeDefined();
