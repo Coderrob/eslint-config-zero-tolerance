@@ -25,12 +25,12 @@ const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 const MAX_PARAMS_MAX = 4;
 
 const DEFAULT_RULE_NAMES: string[] = [
+  'require-barrel-relative-exports',
   'require-clean-barrel',
   'require-exported-object-type',
   'require-interface-prefix',
   'require-test-description-style',
   'no-array-mutation',
-  'no-banned-types',
   'no-boolean-return-trap',
   'no-date-now',
   'no-destructured-parameter-type-literal',
@@ -70,7 +70,9 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-for-in',
   'no-labels',
   'no-barrel-parent-imports',
+  'no-indexed-access-types',
   'no-process-env-outside-config',
+  'no-return-type',
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-indexed-access-types.ts",
+  "module": {
+    "name": "no-indexed-access-types",
+    "description": "Disallow TypeScript indexed access types.",
+    "exports": ["noIndexedAccessTypes"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted type usages",
+      "scenarios": [
+        {
+          "name": "should allow non-indexed-access type aliases",
+          "given": "a type alias that does not use indexed access syntax",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow object types with index signatures",
+          "given": "an object type that declares an index signature",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported because index signatures are not indexed access types"
+        }
+      ]
+    },
+    {
+      "feature": "Indexed access type usage",
+      "scenarios": [
+        {
+          "name": "should report indexed access types such as Obj['key']",
+          "given": "a type annotation using an indexed access type T['key']",
+          "when": "the rule evaluates the code",
+          "then": "a noIndexedAccessTypes violation is reported"
+        },
+        {
+          "name": "should report indexed access types such as Arr[number]",
+          "given": "a type annotation using an indexed access type T[number]",
+          "when": "the rule evaluates the code",
+          "then": "a noIndexedAccessTypes violation is reported"
+        }
+      ]
+    }
+  ]
+}

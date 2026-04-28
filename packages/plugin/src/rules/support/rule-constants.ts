@@ -47,7 +47,7 @@ export const TEST_FUNCTION_TEST = 'test';
 /** Jest/Vitest skip modifier name. */
 export const TEST_METHOD_SKIP = 'skip';
 
-/** TypeScript built-in `ReturnType` utility type name (no-banned-types rule). */
+/** TypeScript built-in `ReturnType` utility type name (no-return-type rule). */
 export const RETURN_TYPE_NAME = 'ReturnType';
 
 // ── Rule-specific string values ────────────────────────────────────────────

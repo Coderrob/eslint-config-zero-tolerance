@@ -1,0 +1,82 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-barrel-relative-exports.ts",
+  "module": {
+    "name": "require-barrel-relative-exports",
+    "description": "Require barrel re-export declarations to use current-directory descendant paths that start with './'.",
+    "exports": ["requireBarrelRelativeExports"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed barrel re-export paths",
+      "scenarios": [
+        {
+          "name": "should ignore non-barrel files",
+          "given": "a non-index source file containing a parent re-export declaration",
+          "when": "the rule evaluates the file",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow named and wildcard re-exports from current-directory descendants",
+          "given": "an index.ts file containing export { foo } from './foo' and export * from './feature/utils'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow type-only and namespace re-exports from current-directory descendants",
+          "given": "an index.ts file containing export type { Foo } from './types/foo' and export * as utils from './utils'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore local export declarations with no source",
+          "given": "an index.ts file containing export { foo } with no from source",
+          "when": "the rule evaluates the export declaration",
+          "then": "no violation is reported because only re-export declarations are checked"
+        },
+        {
+          "name": "should apply to single-extension JavaScript barrel files",
+          "given": "an index.js file containing export { foo } from './foo'",
+          "when": "the rule evaluates the barrel re-export declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore double-extension index files",
+          "given": "an index.test.ts or index.d.ts file containing a non-relative re-export declaration",
+          "when": "the rule evaluates the file",
+          "then": "no violation is reported because double-extension files are not treated as barrels"
+        }
+      ]
+    },
+    {
+      "feature": "Disallowed barrel re-export paths",
+      "scenarios": [
+        {
+          "name": "should report parent re-export paths in barrel files",
+          "given": "an index.ts file containing export { foo } from '../parent' or export * from '..'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "a relativeBarrelExport violation is reported for each non-relative path"
+        },
+        {
+          "name": "should report package, aliased, and absolute re-export paths in barrel files",
+          "given": "an index.ts file containing export { foo } from 'package-name', export type { Foo } from '@/types', or export * as ns from '/root/value'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "a relativeBarrelExport violation is reported for each path that does not start with './'"
+        },
+        {
+          "name": "should report the bare './' token in barrel files",
+          "given": "an index.ts file containing export * from './'",
+          "when": "the rule evaluates the barrel re-export declaration",
+          "then": "a relativeBarrelExport violation is reported because the path does not target a descendant module"
+        },
+        {
+          "name": "should report current-directory paths that traverse to a parent directory",
+          "given": "an index.ts file containing export { foo } from './../foo' or export * from './..'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "a relativeBarrelExport violation is reported because './' paths containing '..' segments do not remain within the descendant tree"
+        }
+      ]
+    }
+  ]
+}

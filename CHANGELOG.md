@@ -10,10 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **Rule naming validation**: Added a `validate:rules` script that verifies each plugin rule keeps a consistent canonical name across its filename, exported camelCase constant, `createRule` name, default export, sibling test/BDD/docs files, and plugin registration.
+- **README synchronization**: Added `readme:sync` and `validate:readme` scripts that regenerate and verify the root `README.md` from deterministic rule catalog metadata, canonical rule source metadata, preset metadata, and docs page existence checks.
+- **`require-barrel-relative-exports` rule**: Added a new built-in rule that requires barrel-file re-export declarations to target only current-directory descendant paths beginning with `./`, closing the gap where barrels could stay syntactically clean while still re-exporting from parent, aliased, or package-rooted paths.
+- **`no-indexed-access-types` rule**: Added a new rule that disallows TypeScript indexed access types such as `T['key']`, `T[K]`, and `T[number]`, so callers must depend on explicit named contracts instead of structural reach-through.
 - **`no-explicit-any` rule**: Added a new rule that disallows explicit `any` annotations and casts so unsafe type erasure has to be replaced with concrete modeling, `unknown`, or explicit narrowing.
 - **`no-map-set-mutation` rule**: Added a new rule that disallows direct `Map` and `Set` mutation methods such as `.set()`, `.add()`, `.delete()`, and `.clear()` to keep collection updates explicit and immutable.
 - **`no-math-random` rule**: Added a new rule that disallows `Math.random()` and pushes callers toward injected random sources or deterministic generators.
 - **`no-process-env-outside-config` rule**: Added a new rule that disallows reading `process.env` outside recognized configuration modules so environment access stays centralized and testable.
+- **`no-return-type` rule**: Added a new rule that disallows TypeScript `ReturnType` utility usage so result contracts stay explicit and do not silently track implementation changes.
 - **`require-exhaustive-switch` rule**: Added a new rule that requires exhaustive `switch` statements over finite discriminant types and reports missing cases when execution can fall through without handling every member.
 - **`prefer-structured-clone` rule**: Added a new fixable rule that prefers `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning, while intentionally ignoring `JSON.parse` revivers and `JSON.stringify` replacer/spacing variants.
 - **`prefer-object-spread` rule**: Added a new fixable rule that enforces object spread syntax (`{ ...foo }`) instead of `Object.assign({}, foo)`. When the first argument is an empty object literal, the autofix converts to spread syntax, correctly inlining object literal arguments and spreading variable/expression arguments.
@@ -25,13 +30,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **`require-barrel-relative-exports` rule**: Rejected `./` re-export paths containing `..` segments so barrel exports cannot escape the current directory while appearing to use descendant-relative syntax.
+- **README coverage badge**: Restored the missing closing quote on the coverage badge `src` attribute and tightened the badge updater so future coverage refreshes preserve valid HTML.
 - **`prefer-object-spread` rule**: Avoided unsafe autofixes for `Object.assign` calls with spread arguments and skipped no-op empty object literal sources when generating object spread fixes.
 - **Preset registration**: Added `require-node-protocol` and `no-test-interface-declaration` to the default preset rule map so they are included in the recommended and strict config presets.
 - **Configuration docs**: Synced the preset table in `docs/configuration.md` with all 60 rules (was missing `require-exported-object-type`, `require-union-type-alias`, `no-test-interface-declaration`, and `require-node-protocol`).
 
 ### Changed
 
-- **Documentation overhaul**: Polished all documentation as a customer-facing experience — root README hero section with badges and philosophy, plugin README feature summary, MkDocs home page category table, Getting Started admonitions, rules index summary table, and standardised all 60 rule doc pages with emoji headers and Configuration sections.
+- **`no-banned-types` decomposition**: Replaced the combined `no-banned-types` rule with two discrete rules, `no-indexed-access-types` and `no-return-type`, so teams can configure indexed-access bans independently from `ReturnType` bans.
+- **Documentation overhaul**: Polished all documentation as a customer-facing experience - root README hero section with badges and philosophy, plugin README feature summary, MkDocs home page category table, Getting Started admonitions, rules index summary table, and standardised all 60 rule doc pages with emoji headers and Configuration sections.
 - **mkdocs.yml enhancements**: Added project logo and favicon, instant navigation, URL tracking, permalink anchors via `toc` extension, content tooltips, copyright footer, and GitHub/npm social links.
 - **`no-literal-property-unions` rule**: Exempted bigint literal unions from being flagged because TypeScript enums cannot represent bigint values, making the "use enums" guidance unactionable for bigint domains.
 - **`no-literal-property-unions` rule**: Clarified the diagnostic and documentation to recommend named domain types generally, while keeping enums as the preferred option for string and number domains that TypeScript enums can represent.

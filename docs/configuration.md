@@ -70,7 +70,6 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `max-params`                             | warn (max: 4)  | error (max: 4)  |
 | `no-array-mutation`                      | warn           | error           |
 | `no-await-in-loop`                       | warn           | error           |
-| `no-banned-types`                        | warn           | error           |
 | `no-barrel-parent-imports`               | warn           | error           |
 | `no-boolean-return-trap`                 | warn           | error           |
 | `no-date-now`                            | warn           | error           |
@@ -86,6 +85,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `no-for-in`                              | warn           | error           |
 | `no-identical-branches`                  | warn           | error           |
 | `no-identical-expressions`               | warn           | error           |
+| `no-indexed-access-types`                | warn           | error           |
 | `no-inline-type-import`                  | warn           | error           |
 | `no-jest-have-been-called`               | warn           | error           |
 | `no-labels`                              | warn           | error           |
@@ -105,6 +105,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `no-re-export`                           | warn           | error           |
 | `no-redundant-boolean`                   | warn           | error           |
 | `no-restricted-imports-in-tests`         | off            | off             |
+| `no-return-type`                         | warn           | error           |
 | `no-set-interval-in-tests`               | warn           | error           |
 | `no-set-timeout-in-tests`                | warn           | error           |
 | `no-test-interface-declaration`          | warn           | error           |
@@ -119,6 +120,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `prefer-string-raw`                      | warn           | error           |
 | `prefer-object-spread`                   | warn           | error           |
 | `prefer-structured-clone`                | warn           | error           |
+| `require-barrel-relative-exports`        | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 | `require-clean-barrel`                   | warn           | error           |
 | `require-exported-object-type`           | warn           | error           |

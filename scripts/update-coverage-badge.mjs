@@ -34,7 +34,7 @@ const COVERAGE_SUMMARY_PATH = resolve(
 );
 const LCOV_PATH = resolve(repoRoot, 'packages', 'plugin', 'coverage', 'lcov.info');
 
-const BADGE_PATTERN = /https:\/\/img\.shields\.io\/badge\/coverage-[^)\s]+/;
+const BADGE_PATTERN = /https:\/\/img\.shields\.io\/badge\/coverage-[^)"\s]+/;
 
 /**
  * Returns a shields color based on coverage percentage.

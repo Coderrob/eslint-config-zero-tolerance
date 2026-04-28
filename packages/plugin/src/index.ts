@@ -25,7 +25,6 @@ import maxFunctionLines from './rules/max-function-lines';
 import maxParams from './rules/max-params';
 import noArrayMutation from './rules/no-array-mutation';
 import noAwaitInLoop from './rules/no-await-in-loop';
-import noBannedTypes from './rules/no-banned-types';
 import noBarrelParentImports from './rules/no-barrel-parent-imports';
 import noBooleanReturnTrap from './rules/no-boolean-return-trap';
 import noDateNow from './rules/no-date-now';
@@ -41,6 +40,7 @@ import noFloatingPromises from './rules/no-floating-promises';
 import noForIn from './rules/no-for-in';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
+import noIndexedAccessTypes from './rules/no-indexed-access-types';
 import noInlineTypeImport from './rules/no-inline-type-import';
 import noJestHaveBeenCalled from './rules/no-jest-have-been-called';
 import noLabels from './rules/no-labels';
@@ -60,6 +60,7 @@ import noQuerySideEffects from './rules/no-query-side-effects';
 import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
 import noRestrictedImportsInTests from './rules/no-restricted-imports-in-tests';
+import noReturnType from './rules/no-return-type';
 import noSetIntervalInTests from './rules/no-set-interval-in-tests';
 import noSetTimeoutInTests from './rules/no-set-timeout-in-tests';
 import noTestInterfaceDeclaration from './rules/no-test-interface-declaration';
@@ -74,6 +75,7 @@ import preferResultReturn from './rules/prefer-result-return';
 import preferShortcutReturn from './rules/prefer-shortcut-return';
 import preferStringRaw from './rules/prefer-string-raw';
 import preferStructuredClone from './rules/prefer-structured-clone';
+import requireBarrelRelativeExports from './rules/require-barrel-relative-exports';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
 import requireExhaustiveSwitch from './rules/require-exhaustive-switch';
@@ -109,7 +111,6 @@ const rules: Record<string, unknown> = {
   'max-params': maxParams,
   'no-array-mutation': noArrayMutation,
   'no-await-in-loop': noAwaitInLoop,
-  'no-banned-types': noBannedTypes,
   'no-boolean-return-trap': noBooleanReturnTrap,
   'no-date-now': noDateNow,
   'no-destructured-parameter-type-literal': noDestructuredParameterTypeLiteral,
@@ -124,6 +125,7 @@ const rules: Record<string, unknown> = {
   'no-for-in': noForIn,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
+  'no-indexed-access-types': noIndexedAccessTypes,
   'no-inline-type-import': noInlineTypeImport,
   'no-jest-have-been-called': noJestHaveBeenCalled,
   'no-labels': noLabels,
@@ -145,6 +147,7 @@ const rules: Record<string, unknown> = {
   'no-re-export': noReExport,
   'no-redundant-boolean': noRedundantBoolean,
   'no-restricted-imports-in-tests': noRestrictedImportsInTests,
+  'no-return-type': noReturnType,
   'no-set-interval-in-tests': noSetIntervalInTests,
   'no-set-timeout-in-tests': noSetTimeoutInTests,
   'no-test-interface-declaration': noTestInterfaceDeclaration,
@@ -158,6 +161,7 @@ const rules: Record<string, unknown> = {
   'prefer-shortcut-return': preferShortcutReturn,
   'prefer-string-raw': preferStringRaw,
   'prefer-structured-clone': preferStructuredClone,
+  'require-barrel-relative-exports': requireBarrelRelativeExports,
   'require-clean-barrel': requireCleanBarrel,
   'require-exported-object-type': requireExportedObjectType,
   'require-interface-prefix': requireInterfacePrefix,

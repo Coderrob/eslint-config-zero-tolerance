@@ -13,7 +13,7 @@ Disallow direct and pass-through re-export statements from parent or ancestor mo
 
 ## Rationale
 
-Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as `export { foo } from '../foo'` and pass-through patterns such as `import { foo } from '../foo'; export { foo };`. Statement ordering does not matter: `export { foo }; import { foo } from '../foo';` is also reported. Only barrel files (`index.*`) are exempt, as their sole purpose is to aggregate exports. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
+Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as `export { foo } from '../foo'` and pass-through patterns such as `import { foo } from '../foo'; export { foo };`. Statement ordering does not matter: `export { foo }; import { foo } from '../foo';` is also reported. Barrel files (`index.*`) remain exempt from this rule because their re-export path policy is enforced separately by `require-barrel-relative-exports`. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
 
 ## Notes
 
@@ -39,9 +39,8 @@ import { parentValue } from '../parent';
 const localValue = parentValue;
 export { localValue };
 
-// In a barrel file (index.ts), upward re-exports are allowed
-// export { peerFunction } from '../sibling';
-// export * from '../../parent';
+// In a barrel file, this rule stays silent because
+// require-barrel-relative-exports owns barrel re-export path policy.
 ```
 
 ### ❌ Incorrect

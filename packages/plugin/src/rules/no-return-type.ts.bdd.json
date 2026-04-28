@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-return-type.ts",
+  "module": {
+    "name": "no-return-type",
+    "description": "Disallow TypeScript ReturnType utility usage.",
+    "exports": ["noReturnType"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted type usages",
+      "scenarios": [
+        {
+          "name": "should allow explicit named return contract aliases",
+          "given": "a type alias that names a return contract directly",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow non-ReturnType generic references",
+          "given": "a type reference such as Promise<Result>",
+          "when": "the rule evaluates the code",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "ReturnType usage",
+      "scenarios": [
+        {
+          "name": "should report the use of ReturnType<typeof fn>",
+          "given": "a type annotation using ReturnType<typeof someFunction>",
+          "when": "the rule evaluates the code",
+          "then": "a noReturnType violation is reported"
+        },
+        {
+          "name": "should report nested ReturnType usage",
+          "given": "a type annotation using nested ReturnType utility references",
+          "when": "the rule evaluates the code",
+          "then": "each ReturnType usage is reported"
+        }
+      ]
+    }
+  ]
+}

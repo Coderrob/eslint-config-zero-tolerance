@@ -35,6 +35,12 @@
           "then": "the rule implementation is defined"
         },
         {
+          "name": "should register require-barrel-relative-exports as a standalone rule",
+          "given": "the plugin default export is imported",
+          "when": "plugin.rules['require-barrel-relative-exports'] is read",
+          "then": "the rule implementation is defined"
+        },
+        {
           "name": "should register require-clean-barrel as a standalone rule",
           "given": "the plugin default export is imported",
           "when": "plugin.rules['require-clean-barrel'] is read",

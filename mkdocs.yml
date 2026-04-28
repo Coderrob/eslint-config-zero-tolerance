@@ -88,11 +88,12 @@ nav:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md
           - no-explicit-any: rules/no-explicit-any.md
+          - no-indexed-access-types: rules/no-indexed-access-types.md
           - no-literal-unions: rules/no-literal-unions.md
           - no-literal-property-unions: rules/no-literal-property-unions.md
-          - require-union-type-alias: rules/require-union-type-alias.md
-          - no-banned-types: rules/no-banned-types.md
           - no-inline-type-import: rules/no-inline-type-import.md
+          - no-return-type: rules/no-return-type.md
+          - require-union-type-alias: rules/require-union-type-alias.md
           - no-destructured-parameter-type-literal: rules/no-destructured-parameter-type-literal.md
           - require-exported-object-type: rules/require-exported-object-type.md
       - Code Quality:
@@ -116,6 +117,7 @@ nav:
           - no-throw-literal: rules/no-throw-literal.md
           - prefer-result-return: rules/prefer-result-return.md
       - Imports:
+          - require-barrel-relative-exports: rules/require-barrel-relative-exports.md
           - require-clean-barrel: rules/require-clean-barrel.md
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
