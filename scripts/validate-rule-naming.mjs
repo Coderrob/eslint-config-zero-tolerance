@@ -42,7 +42,15 @@ const REPO_ROOT = resolve(__dirname, '..');
 const RULES_DIR = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules');
 const DOCS_RULES_DIR = join(REPO_ROOT, 'docs', 'rules');
 const PLUGIN_INDEX_PATH = join(REPO_ROOT, 'packages', 'plugin', 'src', 'index.ts');
-const RULE_MAP_PATH = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules', 'support', 'rule-map.ts');
+const RULE_MAP_PATH = join(
+  REPO_ROOT,
+  'packages',
+  'plugin',
+  'src',
+  'rules',
+  'support',
+  'rule-map.ts',
+);
 const RULE_SOURCE_SUFFIX = '.ts';
 const RULE_TEST_SUFFIX = '.test.ts';
 const RULE_BDD_SUFFIX = '.ts.bdd.json';
@@ -198,7 +206,7 @@ function hasRuleMapEntry(ruleMapContent, ruleName) {
  */
 function hasNamedRuleImport(testContent, ruleName, exportName) {
   const pattern = new RegExp(
-    `import\\s*\\{[\\s\\S]*?\\b${exportName}\\b[\\s\\S]*?\\}\\s*from\\s*'\\./${ruleName}';`,
+    String.raw`import\s*\{[\s\S]*?\b${exportName}\b[\s\S]*?\}\s*from\s*'\./${ruleName}';`,
     'u',
   );
   return pattern.test(testContent);
@@ -212,7 +220,7 @@ function hasNamedRuleImport(testContent, ruleName, exportName) {
  * @returns {boolean} True when at least one suite name starts with the canonical rule name.
  */
 function hasCanonicalRuleTesterRun(testContent, ruleName) {
-  const pattern = new RegExp(`\\.run\\('${ruleName}(?:'|\\s)`, 'u');
+  const pattern = new RegExp(String.raw`\.run\('${ruleName}(?:'|\s)`, 'u');
   return pattern.test(testContent);
 }
 
@@ -259,9 +267,7 @@ function validateRule(rulePath, pluginIndexContent, ruleMapContent) {
     );
   }
 
-  if (!existsSync(testPath)) {
-    failures.push(`${filename}: missing sibling test file "${ruleName}${RULE_TEST_SUFFIX}"`);
-  } else {
+  if (existsSync(testPath)) {
     const testContent = readFileSync(testPath, 'utf8');
     if (!hasNamedRuleImport(testContent, ruleName, expectedExportName)) {
       failures.push(
@@ -273,19 +279,21 @@ function validateRule(rulePath, pluginIndexContent, ruleMapContent) {
         `${filename}: test file must register at least one rule tester suite whose name starts with "${ruleName}"`,
       );
     }
+  } else {
+    failures.push(`${filename}: missing sibling test file "${ruleName}${RULE_TEST_SUFFIX}"`);
   }
 
   if (!existsSync(bddPath)) {
     failures.push(`${filename}: missing sibling BDD spec "${ruleName}${RULE_BDD_SUFFIX}"`);
   }
 
-  if (!existsSync(docsPath)) {
-    failures.push(`${filename}: missing docs page "docs/rules/${ruleName}.md"`);
-  } else {
+  if (existsSync(docsPath)) {
     const docsHeading = extractFirstHeading(readFileSync(docsPath, 'utf8'));
     if (docsHeading !== ruleName) {
       failures.push(`${filename}: docs page heading must be "# ${ruleName}"`);
     }
+  } else {
+    failures.push(`${filename}: missing docs page "docs/rules/${ruleName}.md"`);
   }
 
   if (!hasPluginIndexImport(pluginIndexContent, ruleName, expectedExportName)) {
