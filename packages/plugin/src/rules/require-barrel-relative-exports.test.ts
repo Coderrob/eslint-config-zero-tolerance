@@ -81,5 +81,17 @@ ruleTester.run('require-barrel-relative-exports', requireBarrelRelativeExports, 
       filename: 'src/index.ts',
       errors: [{ messageId: 'relativeBarrelExport' }],
     },
+    {
+      code: "export { foo } from './../foo';",
+      name: 'should report current-directory re-exports that traverse to a parent directory',
+      filename: 'src/index.ts',
+      errors: [{ messageId: 'relativeBarrelExport' }],
+    },
+    {
+      code: "export * from './..';",
+      name: 'should report current-directory re-exports that target the parent directory',
+      filename: 'src/index.ts',
+      errors: [{ messageId: 'relativeBarrelExport' }],
+    },
   ],
 });

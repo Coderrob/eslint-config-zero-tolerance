@@ -69,6 +69,12 @@
           "given": "an index.ts file containing export * from './'",
           "when": "the rule evaluates the barrel re-export declaration",
           "then": "a relativeBarrelExport violation is reported because the path does not target a descendant module"
+        },
+        {
+          "name": "should report current-directory paths that traverse to a parent directory",
+          "given": "an index.ts file containing export { foo } from './../foo' or export * from './..'",
+          "when": "the rule evaluates the barrel re-export declarations",
+          "then": "a relativeBarrelExport violation is reported because './' paths containing '..' segments do not remain within the descendant tree"
         }
       ]
     }

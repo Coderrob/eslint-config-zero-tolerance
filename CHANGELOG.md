@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **`require-barrel-relative-exports` rule**: Rejected `./` re-export paths containing `..` segments so barrel exports cannot escape the current directory while appearing to use descendant-relative syntax.
+- **README coverage badge**: Restored the missing closing quote on the coverage badge `src` attribute and tightened the badge updater so future coverage refreshes preserve valid HTML.
 - **`prefer-object-spread` rule**: Avoided unsafe autofixes for `Object.assign` calls with spread arguments and skipped no-op empty object literal sources when generating object spread fixes.
 - **Preset registration**: Added `require-node-protocol` and `no-test-interface-declaration` to the default preset rule map so they are included in the recommended and strict config presets.
 - **Configuration docs**: Synced the preset table in `docs/configuration.md` with all 60 rules (was missing `require-exported-object-type`, `require-union-type-alias`, `no-test-interface-declaration`, and `require-node-protocol`).

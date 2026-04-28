@@ -19,6 +19,7 @@ import { isBarrelFile } from '../helpers/import-path-helpers';
 import { createRule } from './support/rule-factory';
 
 const CURRENT_DIRECTORY_PREFIX = './';
+const PARENT_DIRECTORY_SEGMENT = '..';
 
 type RequireBarrelRelativeExportsContext = Readonly<
   TSESLint.RuleContext<'relativeBarrelExport', []>
@@ -65,10 +66,15 @@ function createRequireBarrelRelativeExportsListeners(
  * Returns true when a barrel re-export path stays within the current directory tree.
  *
  * @param exportPath - Re-export path to evaluate.
- * @returns True when the path starts with './' and is not the bare './' token.
+ * @returns True when the path starts with './', is not the bare './' token, and does not traverse upward.
  */
 function isRelativeBarrelExportPath(exportPath: string): boolean {
-  return exportPath.startsWith(CURRENT_DIRECTORY_PREFIX) && exportPath !== CURRENT_DIRECTORY_PREFIX;
+  if (!exportPath.startsWith(CURRENT_DIRECTORY_PREFIX) || exportPath === CURRENT_DIRECTORY_PREFIX) {
+    return false;
+  }
+
+  const descendantPath = exportPath.slice(CURRENT_DIRECTORY_PREFIX.length);
+  return !descendantPath.split('/').includes(PARENT_DIRECTORY_SEGMENT);
 }
 
 /**
