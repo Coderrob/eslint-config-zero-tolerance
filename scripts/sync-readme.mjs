@@ -39,7 +39,15 @@ const __dirname = dirname(__filename);
 const REPO_ROOT = resolve(__dirname, '..');
 const README_PATH = join(REPO_ROOT, 'README.md');
 const RULES_DIR = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules');
-const RULE_MAP_PATH = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules', 'support', 'rule-map.ts');
+const RULE_MAP_PATH = join(
+  REPO_ROOT,
+  'packages',
+  'plugin',
+  'src',
+  'rules',
+  'support',
+  'rule-map.ts',
+);
 const CATALOG_PATH = join(REPO_ROOT, 'scripts', 'metadata', 'readme-rule-catalog.json');
 const DOCS_RULES_DIR = join(REPO_ROOT, 'docs', 'rules');
 const GENERATED_START = '<!-- GENERATED:README_RULES_START -->';
@@ -47,7 +55,8 @@ const GENERATED_END = '<!-- GENERATED:README_RULES_END -->';
 const CHECK_MODE = process.argv.includes('--check');
 const PLUGIN_PACKAGE_ROW_PATTERN =
   /(\| \[`@coderrob\/eslint-plugin-zero-tolerance`\]\(https:\/\/www\.npmjs\.com\/package\/@coderrob\/eslint-plugin-zero-tolerance\) \| The ESLint plugin . )\d+( custom rules\s+\|)/u;
-const HERO_COUNT_PATTERN = /(<strong>)\d+( opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality\.<\/strong>)/u;
+const HERO_COUNT_PATTERN =
+  /(<strong>)\d+( opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality\.<\/strong>)/u;
 
 /**
  * Returns bold console text.
@@ -127,7 +136,10 @@ function evaluateStaticString(expression, stringConstants) {
   if (ts.isParenthesizedExpression(expression)) {
     return evaluateStaticString(expression.expression, stringConstants);
   }
-  if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+  if (
+    ts.isBinaryExpression(expression) &&
+    expression.operatorToken.kind === ts.SyntaxKind.PlusToken
+  ) {
     const left = evaluateStaticString(expression.left, stringConstants);
     const right = evaluateStaticString(expression.right, stringConstants);
     return left === null || right === null ? null : `${left}${right}`;
@@ -160,10 +172,7 @@ function collectTopLevelStringConstants(sourceFile) {
       continue;
     }
     for (const declaration of statement.declarationList.declarations) {
-      if (
-        ts.isIdentifier(declaration.name) &&
-        declaration.initializer !== undefined
-      ) {
+      if (ts.isIdentifier(declaration.name) && declaration.initializer !== undefined) {
         const value = evaluateStaticString(declaration.initializer, stringConstants);
         if (value !== null) {
           stringConstants.set(declaration.name.text, value);
@@ -240,7 +249,9 @@ function parseRuleSourceMetadata(ruleName) {
       const type = evaluateStaticString(typeProperty.initializer, stringConstants);
       const description = evaluateStaticString(descriptionProperty.initializer, stringConstants);
       if (type === null || description === null) {
-        throw new Error(`Rule ${ruleName} uses non-static metadata that README sync cannot evaluate`);
+        throw new Error(
+          `Rule ${ruleName} uses non-static metadata that README sync cannot evaluate`,
+        );
       }
 
       const docsPath = `docs/rules/${ruleName}.md`;
@@ -276,7 +287,9 @@ function resolveRuleName(expression, stringConstants) {
 function resolveSeverity(expression, stringConstants) {
   if (ts.isArrayLiteralExpression(expression) && expression.elements.length > 0) {
     const [firstElement] = expression.elements;
-    return ts.isExpression(firstElement) ? evaluateStaticString(firstElement, stringConstants) : null;
+    return ts.isExpression(firstElement)
+      ? evaluateStaticString(firstElement, stringConstants)
+      : null;
   }
   return evaluateStaticString(expression, stringConstants);
 }
@@ -343,7 +356,10 @@ function parseRulePresetMetadata() {
             }
             continue;
           }
-          if (!ts.isCallExpression(element) || !isIdentifierNamed(element.expression, 'createRuleEntry')) {
+          if (
+            !ts.isCallExpression(element) ||
+            !isIdentifierNamed(element.expression, 'createRuleEntry')
+          ) {
             continue;
           }
           const [nameArgument, recommendedArgument, strictArgument] = element.arguments;
@@ -376,11 +392,7 @@ function parseRulePresetMetadata() {
  */
 function loadCatalogMetadata() {
   const catalog = JSON.parse(readFileSync(CATALOG_PATH, 'utf8'));
-  if (
-    typeof catalog !== 'object' ||
-    catalog === null ||
-    !Array.isArray(catalog.categories)
-  ) {
+  if (typeof catalog !== 'object' || catalog === null || !Array.isArray(catalog.categories)) {
     throw new Error(`Invalid README catalog metadata at ${CATALOG_PATH}`);
   }
   return catalog;
@@ -411,7 +423,9 @@ function buildRulesSection(catalog, ruleMetadata, presets) {
     return `| [${category.title}](#${category.title.toLowerCase().replace(/\s+/gu, '-')}) | ${String(category.rules.length).padStart(5, ' ')} | ${category.focus} |`;
   });
 
-  const missingFromCatalog = [...discoveredRuleNames].filter((ruleName) => !catalogRuleNames.has(ruleName));
+  const missingFromCatalog = [...discoveredRuleNames].filter(
+    (ruleName) => !catalogRuleNames.has(ruleName),
+  );
   if (missingFromCatalog.length > 0) {
     throw new Error(`README catalog is missing rules: ${missingFromCatalog.join(', ')}`);
   }
@@ -469,14 +483,18 @@ function applyGeneratedRulesSection(readmeContent, rulesSection) {
   const generatedBlock = `${GENERATED_START}\n${rulesSection}\n${GENERATED_END}`;
   if (readmeContent.includes(GENERATED_START) && readmeContent.includes(GENERATED_END)) {
     return readmeContent.replace(
-      new RegExp(`${GENERATED_START}[\\s\\S]*?${GENERATED_END}`, 'u'),
+      new RegExp(String.raw`${GENERATED_START}[\s\S]*?${GENERATED_END}`, 'u'),
       generatedBlock,
     );
   }
 
   const rulesHeadingIndex = readmeContent.indexOf('## Rules');
   const developmentHeadingIndex = readmeContent.indexOf('## Development');
-  if (rulesHeadingIndex === -1 || developmentHeadingIndex === -1 || developmentHeadingIndex <= rulesHeadingIndex) {
+  if (
+    rulesHeadingIndex === -1 ||
+    developmentHeadingIndex === -1 ||
+    developmentHeadingIndex <= rulesHeadingIndex
+  ) {
     throw new Error('README.md is missing the expected "## Rules" or "## Development" headings');
   }
 
@@ -507,7 +525,9 @@ function applyRuleCountReplacements(readmeContent, ruleCount) {
  * Main entrypoint for README synchronization.
  */
 function main() {
-  console.log(bold(`${CHECK_MODE ? 'Checking' : 'Synchronizing'} README.md from deterministic metadata...`));
+  console.log(
+    bold(`${CHECK_MODE ? 'Checking' : 'Synchronizing'} README.md from deterministic metadata...`),
+  );
 
   const catalog = loadCatalogMetadata();
   const presets = parseRulePresetMetadata();
@@ -523,7 +543,9 @@ function main() {
   );
 
   if (syncedReadme === currentReadme) {
-    console.log(green(`\n✓ README.md already matches deterministic rule metadata (${ruleCount} rules).`));
+    console.log(
+      green(`\n✓ README.md already matches deterministic rule metadata (${ruleCount} rules).`),
+    );
     return;
   }
 
@@ -534,7 +556,9 @@ function main() {
   }
 
   writeFileSync(README_PATH, syncedReadme);
-  console.log(green(`\n✓ Updated README.md from deterministic rule metadata (${ruleCount} rules).`));
+  console.log(
+    green(`\n✓ Updated README.md from deterministic rule metadata (${ruleCount} rules).`),
+  );
 }
 
 main();
