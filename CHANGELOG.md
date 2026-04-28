@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **Plugin publishing**: Minified the plugin JavaScript build output so `publish:public` and package prepack publish minified artifacts.
 - **`require-barrel-relative-exports` rule**: Rejected `./` re-export paths containing `..` segments so barrel exports cannot escape the current directory while appearing to use descendant-relative syntax.
 - **README coverage badge**: Restored the missing closing quote on the coverage badge `src` attribute and tightened the badge updater so future coverage refreshes preserve valid HTML.
 - **`prefer-object-spread` rule**: Avoided unsafe autofixes for `Object.assign` calls with spread arguments and skipped no-op empty object literal sources when generating object spread fixes.

@@ -72,7 +72,7 @@
     "url": "git+https://github.com/Coderrob/eslint-config-zero-tolerance.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean && node ../../scripts/sync-dts-variants.mjs index",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --minify && node ../../scripts/sync-dts-variants.mjs index",
     "clean": "rimraf dist",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
