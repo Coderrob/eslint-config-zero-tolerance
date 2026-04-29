@@ -41,9 +41,9 @@ type InlineTypeImportFixTarget = Readonly<{
  * @param fixInputs - Fix inputs.
  */
 function addMissingImportType(
-  program: TSESTree.Program,
-  missingImportTypes: Map<string, Set<string>>,
-  fixInputs: InlineTypeImportFixInputs,
+  program: Readonly<TSESTree.Program>,
+  missingImportTypes: Readonly<Map<string, Set<string>>>,
+  fixInputs: Readonly<InlineTypeImportFixInputs>,
 ): void {
   if (hasReusableTypeImport(program, fixInputs)) {
     return;
@@ -60,7 +60,7 @@ function addMissingImportType(
  * @param key - Property key.
  * @param value - Property value.
  */
-function collectChildNodeValue(childNodes: TSESTree.Node[], key: string, value: unknown): void {
+function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string, value: unknown): void {
   if (key === PARENT_PROPERTY_KEY) {
     return;
   }
@@ -79,7 +79,7 @@ function collectChildNodeValue(childNodes: TSESTree.Node[], key: string, value: 
  * @param childNodes - Mutable child node collection.
  * @param values - Property array values.
  */
-function collectChildNodeValues(childNodes: TSESTree.Node[], values: readonly unknown[]): void {
+function collectChildNodeValues(childNodes: readonly TSESTree.Node[], values: readonly unknown[]): void {
   for (const value of values) {
     if (isNodeLike(value)) {
       childNodes.push(value);
@@ -96,8 +96,8 @@ function collectChildNodeValues(childNodes: TSESTree.Node[], values: readonly un
  */
 function collectInlineTypeImportFixTargets(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
-  targets: InlineTypeImportFixTarget[],
+  node: Readonly<TSESTree.Node>,
+  targets: readonly InlineTypeImportFixTarget[],
 ): void {
   if (node.type === AST_NODE_TYPES.TSImportType) {
     const fixInputs = getInlineTypeImportFixInputs(sourceCode, node);
@@ -132,7 +132,7 @@ function createImportDeclarationText(moduleName: string, typeNames: readonly str
 function createImportTypeInsertion(
   sourceCode: Readonly<TSESLint.SourceCode>,
   importText: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const lastImport = getLastImportDeclaration(sourceCode.ast);
   if (lastImport === null) {
@@ -152,7 +152,7 @@ function createImportTypeInsertion(
 function createImportTypeInsertionFixes(
   sourceCode: Readonly<TSESLint.SourceCode>,
   targets: readonly InlineTypeImportFixTarget[],
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): readonly TSESLint.RuleFix[] {
   const importText = createMissingImportTypeText(sourceCode.ast, targets);
   return importText === '' ? [] : [createImportTypeInsertion(sourceCode, importText, fixer)];
@@ -167,7 +167,7 @@ function createImportTypeInsertionFixes(
  */
 function createInlineTypeImportFixes(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix[] {
   const targets = getSafeInlineTypeImportFixTargets(sourceCode);
   const fixes = [...createImportTypeInsertionFixes(sourceCode, targets, fixer)];
@@ -185,7 +185,7 @@ function createInlineTypeImportFixes(
  * @returns Import declaration text.
  */
 function createMissingImportTypeText(
-  program: TSESTree.Program,
+  program: Readonly<TSESTree.Program>,
   targets: readonly InlineTypeImportFixTarget[],
 ): string {
   const declarations: string[] = [];
@@ -202,7 +202,7 @@ function createMissingImportTypeText(
  * @returns Listener map for the rule.
  */
 function createNoInlineTypeImportListeners(
-  context: NoInlineTypeImportContext,
+  context: Readonly<NoInlineTypeImportContext>,
 ): TSESLint.RuleListener {
   return {
     TSImportType: reportInlineTypeImport.bind(undefined, context),
@@ -220,8 +220,8 @@ function createNoInlineTypeImportListeners(
  */
 function fixInlineTypeImport(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  fixInputs: InlineTypeImportFixInputs,
-  fixer: TSESLint.RuleFixer,
+  fixInputs: Readonly<InlineTypeImportFixInputs>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix[] | null {
   if (!isSafeInlineTypeImportFix(sourceCode.ast, fixInputs)) {
     return null;
@@ -235,7 +235,7 @@ function fixInlineTypeImport(
  * @param node - Node to inspect.
  * @returns Child nodes.
  */
-function getChildNodes(node: TSESTree.Node): TSESTree.Node[] {
+function getChildNodes(node: Readonly<TSESTree.Node>): TSESTree.Node[] {
   const childNodes: TSESTree.Node[] = [];
   for (const [key, value] of Object.entries(node)) {
     collectChildNodeValue(childNodes, key, value);
@@ -249,7 +249,7 @@ function getChildNodes(node: TSESTree.Node): TSESTree.Node[] {
  * @param statement - Import declaration to inspect.
  * @returns Local binding names.
  */
-function getImportSpecifierLocalNames(statement: TSESTree.ImportDeclaration): readonly string[] {
+function getImportSpecifierLocalNames(statement: Readonly<TSESTree.ImportDeclaration>): readonly string[] {
   const names: string[] = [];
   for (const specifier of statement.specifiers) {
     names.push(specifier.local.name);
@@ -266,7 +266,7 @@ function getImportSpecifierLocalNames(statement: TSESTree.ImportDeclaration): re
  */
 function getInlineTypeImportFixInputs(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSImportType,
+  node: Readonly<TSESTree.TSImportType>,
 ): InlineTypeImportFixInputs | null {
   const match = /^import\("([^"]+)"\)\.([A-Za-z_$][\w$]*)$/u.exec(sourceCode.getText(node));
   if (match === null) {
@@ -298,7 +298,7 @@ function getInlineTypeImportFixTargets(
  * @param program - Program node.
  * @returns Last import declaration, or null when none exist.
  */
-function getLastImportDeclaration(program: TSESTree.Program): TSESTree.ImportDeclaration | null {
+function getLastImportDeclaration(program: Readonly<TSESTree.Program>): TSESTree.ImportDeclaration | null {
   let lastImport: TSESTree.ImportDeclaration | null = null;
   for (const statement of program.body) {
     if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
@@ -316,7 +316,7 @@ function getLastImportDeclaration(program: TSESTree.Program): TSESTree.ImportDec
  * @returns Module/type-name entries.
  */
 function getMissingImportTypesByModule(
-  program: TSESTree.Program,
+  program: Readonly<TSESTree.Program>,
   targets: readonly InlineTypeImportFixTarget[],
 ): ReadonlyMap<string, readonly string[]> {
   const missingImportTypes = new Map<string, Set<string>>();
@@ -354,7 +354,7 @@ function getSafeInlineTypeImportFixTargets(
  * @param statement - Program statement to inspect.
  * @returns Binding names.
  */
-function getTopLevelBindingNames(statement: TSESTree.ProgramStatement): readonly string[] {
+function getTopLevelBindingNames(statement: Readonly<TSESTree.ProgramStatement>): readonly string[] {
   if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
     return getImportSpecifierLocalNames(statement);
   }
@@ -374,7 +374,7 @@ function getTopLevelBindingNames(statement: TSESTree.ProgramStatement): readonly
  * @param typeName - Local type name to find.
  * @returns True when a matching specifier exists.
  */
-function hasImportSpecifier(statement: TSESTree.ImportDeclaration, typeName: string): boolean {
+function hasImportSpecifier(statement: Readonly<TSESTree.ImportDeclaration>, typeName: string): boolean {
   for (const specifier of statement.specifiers) {
     if (specifier.local.name === typeName) {
       return true;
@@ -391,8 +391,8 @@ function hasImportSpecifier(statement: TSESTree.ImportDeclaration, typeName: str
  * @returns True when an import type specifier can be reused.
  */
 function hasReusableTypeImport(
-  program: TSESTree.Program,
-  fixInputs: InlineTypeImportFixInputs,
+  program: Readonly<TSESTree.Program>,
+  fixInputs: Readonly<InlineTypeImportFixInputs>,
 ): boolean {
   for (const statement of program.body) {
     if (isReusableTypeImport(statement, fixInputs)) {
@@ -409,7 +409,7 @@ function hasReusableTypeImport(
  * @param typeName - Type name to inspect.
  * @returns True when the name is already bound.
  */
-function hasTopLevelBinding(program: TSESTree.Program, typeName: string): boolean {
+function hasTopLevelBinding(program: Readonly<TSESTree.Program>, typeName: string): boolean {
   for (const statement of program.body) {
     if (getTopLevelBindingNames(statement).includes(typeName)) {
       return true;
@@ -441,8 +441,8 @@ function isNodeLike(value: unknown): value is TSESTree.Node {
  * @returns True when the statement imports the type.
  */
 function isReusableTypeImport(
-  statement: TSESTree.ProgramStatement,
-  fixInputs: InlineTypeImportFixInputs,
+  statement: Readonly<TSESTree.ProgramStatement>,
+  fixInputs: Readonly<InlineTypeImportFixInputs>,
 ): boolean {
   return (
     statement.type === AST_NODE_TYPES.ImportDeclaration &&
@@ -460,8 +460,8 @@ function isReusableTypeImport(
  * @returns True when the import can be reused or inserted collision-free.
  */
 function isSafeInlineTypeImportFix(
-  program: TSESTree.Program,
-  fixInputs: InlineTypeImportFixInputs,
+  program: Readonly<TSESTree.Program>,
+  fixInputs: Readonly<InlineTypeImportFixInputs>,
 ): boolean {
   return (
     hasReusableTypeImport(program, fixInputs) || !hasTopLevelBinding(program, fixInputs.typeName)
@@ -475,8 +475,8 @@ function isSafeInlineTypeImportFix(
  * @param node - TS import type node to report.
  */
 function reportInlineTypeImport(
-  context: NoInlineTypeImportContext,
-  node: TSESTree.TSImportType,
+  context: Readonly<NoInlineTypeImportContext>,
+  node: Readonly<TSESTree.TSImportType>,
 ): void {
   const fixInputs = getInlineTypeImportFixInputs(context.sourceCode, node);
   context.report({

@@ -36,7 +36,7 @@ const FUNCTION_NODE_TYPES = new Set([
  * @returns Matching ancestor, or null when none exists.
  */
 export function findAncestor<T extends TSESTree.Node>(
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
   predicate: (candidate: TSESTree.Node) => candidate is T,
 ): T | null {
   let currentNode = node.parent;
@@ -55,7 +55,7 @@ export function findAncestor<T extends TSESTree.Node>(
  * @param node - Starting node.
  * @returns Enclosing function-like node, or null when none exists.
  */
-export function findEnclosingFunction(node: TSESTree.Node): FunctionNode | null {
+export function findEnclosingFunction(node: Readonly<TSESTree.Node>): FunctionNode | null {
   let currentNode = node.parent;
   while (currentNode !== undefined) {
     if (isFunctionNode(currentNode)) {
@@ -74,8 +74,8 @@ export function findEnclosingFunction(node: TSESTree.Node): FunctionNode | null 
  * @returns Following statement, or null when none exists.
  */
 export function getNextStatementInBlock(
-  blockStatement: TSESTree.BlockStatement,
-  node: TSESTree.Statement,
+  blockStatement: Readonly<TSESTree.BlockStatement>,
+  node: Readonly<TSESTree.Statement>,
 ): TSESTree.Statement | null {
   const nextIndex = blockStatement.body.indexOf(node) + 1;
   return blockStatement.body[nextIndex] ?? null;
@@ -87,7 +87,7 @@ export function getNextStatementInBlock(
  * @param node - Statement node.
  * @returns Parent block statement, or null when the parent is not a block.
  */
-export function getParentBlockStatement(node: TSESTree.Statement): TSESTree.BlockStatement | null {
+export function getParentBlockStatement(node: Readonly<TSESTree.Statement>): TSESTree.BlockStatement | null {
   const parent = node.parent;
   return parent.type === AST_NODE_TYPES.BlockStatement ? parent : null;
 }
@@ -98,7 +98,7 @@ export function getParentBlockStatement(node: TSESTree.Statement): TSESTree.Bloc
  * @param node - Node to inspect.
  * @returns True for function-like nodes handled by shared rule helpers.
  */
-function isFunctionNode(node: TSESTree.Node): node is FunctionNode {
+function isFunctionNode(node: Readonly<TSESTree.Node>): node is FunctionNode {
   return FUNCTION_NODE_TYPES.has(node.type);
 }
 
@@ -116,8 +116,8 @@ function isFunctionNode(node: TSESTree.Node): node is FunctionNode {
  */
 export function isInsideBoundary(
   ancestors: ReadonlyArray<TSESTree.Node>,
-  matchTypes: ReadonlySet<AST_NODE_TYPES>,
-  stopTypes: ReadonlySet<AST_NODE_TYPES>,
+  matchTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
+  stopTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
 ): boolean {
   for (let index = ancestors.length - 1; index >= 0; index -= 1) {
     const ancestorType = ancestors[index].type;

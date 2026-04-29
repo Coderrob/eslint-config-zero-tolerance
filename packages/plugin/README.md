@@ -7,7 +7,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **69 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **76 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -124,6 +124,7 @@ export default [
 | `no-return-type`                         | Disallow TypeScript `ReturnType` utility usage                                     |
 | `no-destructured-parameter-type-literal` | Disallow inline object type literals on destructured parameters                    |
 | `require-exported-object-type`           | Require exported object constants to declare an explicit type annotation           |
+| `no-unsafe-json-parse`                   | Disallow treating JSON.parse results as typed data without validation              |
 
 ### Code Quality
 
@@ -133,6 +134,7 @@ export default [
 | `max-params`                 | Enforce a maximum number of function parameters                                         |
 | `no-array-mutation`          | Disallow mutating array methods                                                         |
 | `no-date-now`                | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
+| `no-placeholder-implementation` | Disallow placeholder, stub, TODO, and not implemented production code                 |
 | `no-magic-numbers`           | Disallow magic numbers; use named constants instead                                     |
 | `no-magic-strings`           | Disallow magic strings in comparisons and switch cases                                  |
 | `no-map-set-mutation`        | Disallow direct `Map` and `Set` mutation methods                                        |
@@ -165,7 +167,11 @@ export default [
 | `no-parent-internal-access` | Disallow parent-relative access into protected internal directories such as `src` |
 | `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |
 | `no-export-alias`           | Prevent use of aliases in export statements                                       |
+| `no-hardcoded-secrets`      | Disallow hardcoded secrets, credentials, tokens, and secret env defaults          |
+| `no-raw-sql-interpolation`  | Disallow interpolated raw SQL and unsafe raw query helpers                        |
 | `no-re-export`              | Disallow direct or pass-through re-exports from parent/grandparent modules        |
+| `no-shell-command-construction` | Disallow shell command construction through subprocess APIs                    |
+| `no-unsafe-code-generation` | Disallow eval, Function constructors, string timers, and vm execution APIs        |
 | `require-node-protocol`     | Require Node.js built-in module imports to use the `node:` protocol prefix        |
 
 ### Bug Prevention
@@ -189,6 +195,7 @@ export default [
 | `prefer-guard-clauses`          | Prefer guard clauses by removing else blocks after terminating if branches   |
 | `prefer-shortcut-return`        | Prefer shortcut boolean returns over if branches that return true/false      |
 | `no-query-side-effects`         | Disallow side effects in query-style functions                               |
+| `require-timeout-for-io`        | Require timeout or cancellation options for external IO calls                |
 | `require-exhaustive-switch`     | Require exhaustive `switch` statements over finite discriminant types        |
 
 ## Documentation

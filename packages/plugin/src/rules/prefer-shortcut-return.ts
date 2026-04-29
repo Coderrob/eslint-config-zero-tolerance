@@ -71,7 +71,7 @@ interface IIfThenBooleanPair {
  */
 function buildShortcutReturnText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  condition: TSESTree.Expression,
+  condition: Readonly<TSESTree.Expression>,
   whenTrue: boolean,
   whenFalse: boolean,
 ): string | null {
@@ -91,7 +91,7 @@ function buildShortcutReturnText(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createListeners(context: PreferShortcutReturnContext): TSESLint.RuleListener {
+function createListeners(context: Readonly<PreferShortcutReturnContext>): TSESLint.RuleListener {
   return {
     IfStatement: reportIfShortcutReturn.bind(undefined, context),
   };
@@ -106,9 +106,9 @@ function createListeners(context: PreferShortcutReturnContext): TSESLint.RuleLis
  * @returns Single replacement fix.
  */
 function createReportFix(
-  node: TSESTree.IfStatement,
-  replacement: IReplacementPlan,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.IfStatement>,
+  replacement: Readonly<IReplacementPlan>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceTextRange(
     [node.range[RANGE_START_INDEX], replacement.endNode.range[RANGE_END_INDEX]],
@@ -123,7 +123,7 @@ function createReportFix(
  * @returns Next boolean return statement, or null.
  */
 function getFollowingBooleanReturnStatement(
-  node: TSESTree.IfStatement,
+  node: Readonly<TSESTree.IfStatement>,
 ): TSESTree.ReturnStatement | null {
   const parent = getParentBlockStatement(node);
   if (parent === null) {
@@ -142,7 +142,7 @@ function getFollowingBooleanReturnStatement(
  */
 function getIfElseReplacement(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.IfStatement,
+  node: Readonly<TSESTree.IfStatement>,
 ): IReplacementPlan | null {
   const booleanPair = zIfElseBooleanPair(node);
   return booleanPair === null
@@ -165,7 +165,7 @@ function getIfElseReplacement(
  */
 function getIfThenReturnReplacement(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.IfStatement,
+  node: Readonly<TSESTree.IfStatement>,
 ): IReplacementPlan | null {
   if (node.alternate !== null) {
     return null;
@@ -211,8 +211,8 @@ function hasMatchingBooleanPair(whenTrue: boolean, whenFalse: boolean): boolean 
  * @param node - If statement node.
  */
 function reportIfShortcutReturn(
-  context: PreferShortcutReturnContext,
-  node: TSESTree.IfStatement,
+  context: Readonly<PreferShortcutReturnContext>,
+  node: Readonly<TSESTree.IfStatement>,
 ): void {
   const replacement = resolveReplacement(context.sourceCode, node);
   if (replacement === null) {
@@ -234,7 +234,7 @@ function reportIfShortcutReturn(
  */
 function resolveReplacement(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.IfStatement,
+  node: Readonly<TSESTree.IfStatement>,
 ): IReplacementPlan | null {
   return getIfElseReplacement(sourceCode, node) ?? getIfThenReturnReplacement(sourceCode, node);
 }
@@ -246,7 +246,7 @@ function resolveReplacement(
  * @param node - If statement node.
  * @returns Replacement plan, or null when no pattern matches.
  */
-function resolveReplacementForBooleanPair(input: IReplacementInput): IReplacementPlan | null {
+function resolveReplacementForBooleanPair(input: Readonly<IReplacementInput>): IReplacementPlan | null {
   const shortcutReturnText = buildShortcutReturnText(
     input.sourceCode,
     input.condition,
@@ -262,7 +262,7 @@ function resolveReplacementForBooleanPair(input: IReplacementInput): IReplacemen
  * @param node - If statement node.
  * @returns Boolean pair data, or null when pattern does not match.
  */
-function resolveReplacementForIfBooleanPair(input: IIfBooleanPairInput): IReplacementPlan | null {
+function resolveReplacementForIfBooleanPair(input: Readonly<IIfBooleanPairInput>): IReplacementPlan | null {
   return resolveReplacementForBooleanPair({
     sourceCode: input.sourceCode,
     condition: input.ifNode.test,
@@ -282,7 +282,7 @@ function resolveReplacementForIfBooleanPair(input: IIfBooleanPairInput): IReplac
  * @param endNode - Node where replacement should end.
  * @returns Replacement plan, or null when pair is not transformable.
  */
-function zIfElseBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | null {
+function zIfElseBooleanPair(node: Readonly<TSESTree.IfStatement>): IIfThenBooleanPair | null {
   if (node.alternate === null) {
     return null;
   }
@@ -301,7 +301,7 @@ function zIfElseBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | nu
  * @param whenFalse - Boolean returned when condition is falsy.
  * @returns Replacement plan, or null when pair is not transformable.
  */
-function zIfThenBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | null {
+function zIfThenBooleanPair(node: Readonly<TSESTree.IfStatement>): IIfThenBooleanPair | null {
   const whenTrue = getBooleanLiteralReturnValue(node.consequent);
   const trailingReturn = zTrailingBooleanReturn(node);
   if (whenTrue === null || trailingReturn === null) {
@@ -316,7 +316,7 @@ function zIfThenBooleanPair(node: TSESTree.IfStatement): IIfThenBooleanPair | nu
  * @param node - If statement node.
  * @returns Trailing return data, or null.
  */
-function zTrailingBooleanReturn(node: TSESTree.IfStatement): ITrailingBooleanReturn | null {
+function zTrailingBooleanReturn(node: Readonly<TSESTree.IfStatement>): ITrailingBooleanReturn | null {
   const nextReturn = getFollowingBooleanReturnStatement(node);
   if (nextReturn === null) {
     return null;

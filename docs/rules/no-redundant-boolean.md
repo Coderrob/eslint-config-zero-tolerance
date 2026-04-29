@@ -17,6 +17,10 @@ Comparing a boolean expression to `true` or `false` adds noise without adding me
 
 **Checked operators:** `===`, `!==`
 
+## Autofix
+
+The fixer removes redundant boolean comparisons, simplifies `condition ? true : false` and `condition ? false : true`, and removes `!!` only when the wrapped expression is syntactically known to already produce a boolean.
+
 ## Examples
 
 ### ✅ Correct

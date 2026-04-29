@@ -9,7 +9,7 @@ describe('import-path-helpers', () => {
     });
 
     it('should return the file name from a Windows path', () => {
-      expect(getFilename('C:\\src\\rules\\no-export-alias.ts')).toBe('no-export-alias.ts');
+      expect(getFilename(String.raw`C:\src\rules\no-export-alias.ts`)).toBe('no-export-alias.ts');
     });
 
     it('should return the file name when no directory separator is present', () => {

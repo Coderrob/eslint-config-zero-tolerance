@@ -27,7 +27,7 @@ type PreferResultReturnContext = Readonly<TSESLint.RuleContext<'preferResultRetu
  * @returns Rule listener map.
  */
 function createPreferResultReturnListeners(
-  context: PreferResultReturnContext,
+  context: Readonly<PreferResultReturnContext>,
 ): TSESLint.RuleListener {
   if (isTestFile(context.filename)) {
     return {};
@@ -44,8 +44,8 @@ function createPreferResultReturnListeners(
  * @param node - Throw statement node.
  */
 function reportThrowStatement(
-  context: PreferResultReturnContext,
-  node: TSESTree.ThrowStatement,
+  context: Readonly<PreferResultReturnContext>,
+  node: Readonly<TSESTree.ThrowStatement>,
 ): void {
   context.report({
     node,

@@ -14,7 +14,7 @@ afterAll(() => {
 });
 
 /** Absolute path to a fixture source file. Creates the file with the given content. */
-function buildValidBddSpec(sourceFilePath: string, namedExports: string[]): unknown {
+function buildValidBddSpec(sourceFilePath: string, namedExports: readonly string[]): unknown {
   return {
     $schema: '../../../../bdd-spec.schema.json',
     schemaVersion: '1.0.0',

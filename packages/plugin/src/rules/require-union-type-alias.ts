@@ -20,6 +20,7 @@ import { createRule } from './support/rule-factory';
 
 type RequireUnionTypeAliasContext = Readonly<TSESLint.RuleContext<'requireUnionTypeAlias', []>>;
 
+const MIN_UNION_MEMBERS = 3;
 const MIN_TYPE_REFERENCES = 2;
 
 /**
@@ -29,14 +30,27 @@ const MIN_TYPE_REFERENCES = 2;
  * @param context - ESLint rule execution context.
  * @param node - The union type node to inspect.
  */
-function checkUnionType(context: RequireUnionTypeAliasContext, node: TSESTree.TSUnionType): void {
+function checkUnionType(context: Readonly<RequireUnionTypeAliasContext>, node: Readonly<TSESTree.TSUnionType>): void {
   if (isDirectTypeAlias(node)) {
     return;
   }
-  if (countTypeReferences(node.types) < MIN_TYPE_REFERENCES) {
+  if (
+    countNonNullishUnionMembers(node.types) < MIN_UNION_MEMBERS ||
+    countTypeReferences(node.types) < MIN_TYPE_REFERENCES
+  ) {
     return;
   }
   context.report({ node, messageId: 'requireUnionTypeAlias' });
+}
+
+/**
+ * Counts union members excluding nullish absence markers.
+ *
+ * @param types - Union type members to inspect.
+ * @returns Number of non-nullish union members.
+ */
+function countNonNullishUnionMembers(types: readonly TSESTree.TypeNode[]): number {
+  return types.filter(isNonNullishUnionMember).length;
 }
 
 /**
@@ -56,13 +70,24 @@ function countTypeReferences(types: readonly TSESTree.TypeNode[]): number {
 }
 
 /**
+ * Returns true when a union member is only a nullish absence marker.
+ *
+ * @param member - Union member to inspect.
+ * @returns True when the member is null or undefined.
+ */
+function isNonNullishUnionMember(member: Readonly<TSESTree.TypeNode>): boolean {
+  return member.type !== AST_NODE_TYPES.TSNullKeyword &&
+    member.type !== AST_NODE_TYPES.TSUndefinedKeyword;
+}
+
+/**
  * Creates listeners for inline union type alias checks.
  *
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
 function createRequireUnionTypeAliasListeners(
-  context: RequireUnionTypeAliasContext,
+  context: Readonly<RequireUnionTypeAliasContext>,
 ): TSESLint.RuleListener {
   return {
     TSUnionType: checkUnionType.bind(undefined, context),
@@ -75,12 +100,12 @@ function createRequireUnionTypeAliasListeners(
  * @param node - Union type node to inspect.
  * @returns True when the union is already extracted to a type alias.
  */
-function isDirectTypeAlias(node: TSESTree.TSUnionType): boolean {
+function isDirectTypeAlias(node: Readonly<TSESTree.TSUnionType>): boolean {
   return node.parent.type === AST_NODE_TYPES.TSTypeAliasDeclaration;
 }
 
 /**
- * ESLint rule that requires inline union types with multiple type references
+ * ESLint rule that requires inline union types with three or more members
  * to be extracted into named type aliases.
  */
 export const requireUnionTypeAlias = createRule({
@@ -89,7 +114,7 @@ export const requireUnionTypeAlias = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Require inline union types with multiple type references to be extracted into named type aliases',
+        'Require inline union types with three or more members and multiple type references to be extracted into named type aliases',
     },
     messages: {
       requireUnionTypeAlias: 'Replace this inline union type with a named type alias.',

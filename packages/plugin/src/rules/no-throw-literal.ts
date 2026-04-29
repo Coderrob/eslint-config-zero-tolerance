@@ -53,9 +53,9 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
  * @param node - Throw statement node.
  */
 function checkThrowStatement(
-  context: NoThrowLiteralContext,
-  options: IResolvedNoThrowLiteralOptions,
-  node: TSESTree.ThrowStatement,
+  context: Readonly<NoThrowLiteralContext>,
+  options: Readonly<IResolvedNoThrowLiteralOptions>,
+  node: Readonly<TSESTree.ThrowStatement>,
 ): void {
   const throwArgument = node.argument;
   if (isAllowedThrowArgument(throwArgument, options)) {
@@ -74,7 +74,7 @@ function checkThrowStatement(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoThrowLiteralListeners(context: NoThrowLiteralContext): TSESLint.RuleListener {
+function createNoThrowLiteralListeners(context: Readonly<NoThrowLiteralContext>): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
     ThrowStatement: checkThrowStatement.bind(undefined, context, options),
@@ -101,7 +101,7 @@ function formatNodeType(nodeType: string): string {
  * @param node - AST node in the ancestry chain.
  * @returns Catch parameter name, or null.
  */
-function getCatchParameterName(node: TSESTree.Node): string | null {
+function getCatchParameterName(node: Readonly<TSESTree.Node>): string | null {
   if (node.type !== AST_NODE_TYPES.CatchClause) {
     return null;
   }
@@ -115,7 +115,7 @@ function getCatchParameterName(node: TSESTree.Node): string | null {
  * @param identifierName - Identifier being thrown.
  * @returns Boolean decision, or null when walk should continue.
  */
-function getCatchScopeDecision(node: TSESTree.Node, identifierName: string): boolean | null {
+function getCatchScopeDecision(node: Readonly<TSESTree.Node>, identifierName: string): boolean | null {
   if (isFunctionBoundaryNode(node)) {
     return false;
   }
@@ -129,7 +129,7 @@ function getCatchScopeDecision(node: TSESTree.Node, identifierName: string): boo
  * @param options - Resolved rule options.
  * @returns Lookup of node type to option-enabled allowance.
  */
-function getThrowNodeOptionLookup(options: IResolvedNoThrowLiteralOptions): Map<string, boolean> {
+function getThrowNodeOptionLookup(options: Readonly<IResolvedNoThrowLiteralOptions>): Map<string, boolean> {
   return new Map([
     [AST_NODE_TYPES.AwaitExpression, options.allowThrowingAwaitExpressions],
     [AST_NODE_TYPES.CallExpression, options.allowThrowingCallExpressions],
@@ -145,8 +145,8 @@ function getThrowNodeOptionLookup(options: IResolvedNoThrowLiteralOptions): Map<
  * @returns True if the throw argument is allowed.
  */
 function isAllowedThrowArgument(
-  node: TSESTree.Node,
-  options: IResolvedNoThrowLiteralOptions,
+  node: Readonly<TSESTree.Node>,
+  options: Readonly<IResolvedNoThrowLiteralOptions>,
 ): boolean {
   if (node.type === AST_NODE_TYPES.NewExpression) {
     return true;
@@ -163,7 +163,7 @@ function isAllowedThrowArgument(
  * @param node - Identifier node being thrown.
  * @returns True when identifier directly re-throws a catch parameter.
  */
-function isCatchParameterIdentifier(node: TSESTree.Identifier): boolean {
+function isCatchParameterIdentifier(node: Readonly<TSESTree.Identifier>): boolean {
   let currentNode: TSESTree.Node | null = node.parent;
   while (currentNode !== null) {
     const decision = getCatchScopeDecision(currentNode, node.name);
@@ -181,7 +181,7 @@ function isCatchParameterIdentifier(node: TSESTree.Identifier): boolean {
  * @param node - AST node.
  * @returns True when node introduces a new function scope.
  */
-function isFunctionBoundaryNode(node: TSESTree.Node): boolean {
+function isFunctionBoundaryNode(node: Readonly<TSESTree.Node>): boolean {
   return FUNCTION_BOUNDARY_TYPES.has(node.type);
 }
 
@@ -193,8 +193,8 @@ function isFunctionBoundaryNode(node: TSESTree.Node): boolean {
  * @returns True when option-enabled throw node type is allowed.
  */
 function isOptionAllowedThrowNode(
-  node: TSESTree.Node,
-  options: IResolvedNoThrowLiteralOptions,
+  node: Readonly<TSESTree.Node>,
+  options: Readonly<IResolvedNoThrowLiteralOptions>,
 ): boolean {
   const optionLookup = getThrowNodeOptionLookup(options);
   const allowNode = optionLookup.get(node.type);
@@ -207,7 +207,7 @@ function isOptionAllowedThrowNode(
  * @param options - Raw options.
  * @returns Resolved boolean option value.
  */
-function resolveAllowThrowingAwaitExpressions(options: INoThrowLiteralOptions): boolean {
+function resolveAllowThrowingAwaitExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
   return resolveBooleanOption(options.allowThrowingAwaitExpressions, false);
 }
 
@@ -217,7 +217,7 @@ function resolveAllowThrowingAwaitExpressions(options: INoThrowLiteralOptions): 
  * @param options - Raw options.
  * @returns Resolved boolean option value.
  */
-function resolveAllowThrowingCallExpressions(options: INoThrowLiteralOptions): boolean {
+function resolveAllowThrowingCallExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
   return resolveBooleanOption(options.allowThrowingCallExpressions, false);
 }
 
@@ -227,7 +227,7 @@ function resolveAllowThrowingCallExpressions(options: INoThrowLiteralOptions): b
  * @param options - Raw options.
  * @returns Resolved boolean option value.
  */
-function resolveAllowThrowingMemberExpressions(options: INoThrowLiteralOptions): boolean {
+function resolveAllowThrowingMemberExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
   return resolveBooleanOption(options.allowThrowingMemberExpressions, false);
 }
 
@@ -248,7 +248,7 @@ function resolveBooleanOption(value: boolean | undefined, fallback: boolean): bo
  * @param options - Raw rule options.
  * @returns Fully-resolved boolean options.
  */
-function resolveOptions(options: RuleOptions): IResolvedNoThrowLiteralOptions {
+function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoThrowLiteralOptions {
   const rawOptions = options[0] ?? DEFAULT_OPTIONS;
   return {
     allowThrowingAwaitExpressions: resolveAllowThrowingAwaitExpressions(rawOptions),

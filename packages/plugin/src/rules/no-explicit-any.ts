@@ -25,7 +25,7 @@ type NoExplicitAnyContext = Readonly<TSESLint.RuleContext<'noExplicitAny', []>>;
  * @param context - ESLint rule execution context.
  * @param node - `any` keyword node.
  */
-function checkTsAnyKeyword(context: NoExplicitAnyContext, node: TSESTree.TSAnyKeyword): void {
+function checkTsAnyKeyword(context: Readonly<NoExplicitAnyContext>, node: Readonly<TSESTree.TSAnyKeyword>): void {
   context.report({
     node,
     messageId: 'noExplicitAny',
@@ -38,7 +38,7 @@ function checkTsAnyKeyword(context: NoExplicitAnyContext, node: TSESTree.TSAnyKe
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoExplicitAnyListeners(context: NoExplicitAnyContext): TSESLint.RuleListener {
+function createNoExplicitAnyListeners(context: Readonly<NoExplicitAnyContext>): TSESLint.RuleListener {
   return {
     TSAnyKeyword: checkTsAnyKeyword.bind(undefined, context),
   };

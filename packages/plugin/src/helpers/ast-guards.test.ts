@@ -19,7 +19,7 @@ import {
   isVariableDeclaratorNode,
 } from './ast-guards';
 
-function createNode(type: AST_NODE_TYPES): TSESTree.Node {
+function createNode(type: Readonly<AST_NODE_TYPES>): TSESTree.Node {
   return { type } as unknown as TSESTree.Node;
 }
 
@@ -132,7 +132,7 @@ describe('isTestFile', () => {
 
   it('should return true for __tests__ directory paths', () => {
     expect(isTestFile('src/__tests__/foo.ts')).toBe(true);
-    expect(isTestFile('src\\__tests__\\foo.ts')).toBe(true);
+    expect(isTestFile(String.raw`src\__tests__\foo.ts`)).toBe(true);
   });
 
   it('should return false for non-test files', () => {

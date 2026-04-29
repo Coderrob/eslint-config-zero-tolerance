@@ -56,9 +56,9 @@ type QueryScopeStack = QueryScopeInfo[];
  * @param node - Assignment expression node.
  */
 function checkAssignmentExpression(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
-  node: TSESTree.AssignmentExpression,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<TSESTree.AssignmentExpression>,
 ): void {
   reportIfQueryScope(context, functionStack, node, ASSIGNMENT_KIND);
 }
@@ -71,9 +71,9 @@ function checkAssignmentExpression(
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   const method = getMatchingCallMemberMethodName(node, MUTATING_METHODS);
   if (method === null) {
@@ -90,9 +90,9 @@ function checkCallExpression(
  * @param node - Unary expression node.
  */
 function checkUnaryExpression(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
-  node: TSESTree.UnaryExpression,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<TSESTree.UnaryExpression>,
 ): void {
   if (!isDeleteUnary(node)) {
     return;
@@ -108,9 +108,9 @@ function checkUnaryExpression(
  * @param node - Update expression node.
  */
 function checkUpdateExpression(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
-  node: TSESTree.UpdateExpression,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<TSESTree.UpdateExpression>,
 ): void {
   reportIfQueryScope(context, functionStack, node, UPDATE_KIND);
 }
@@ -123,8 +123,8 @@ function checkUpdateExpression(
  * @returns Assignment expression visitor.
  */
 function createAssignmentVisitor(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
 ): (node: TSESTree.AssignmentExpression) => void {
   return checkAssignmentExpression.bind(undefined, context, functionStack);
 }
@@ -137,8 +137,8 @@ function createAssignmentVisitor(
  * @returns Call expression visitor.
  */
 function createCallVisitor(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
 ): (node: TSESTree.CallExpression) => void {
   return checkCallExpression.bind(undefined, context, functionStack);
 }
@@ -150,7 +150,7 @@ function createCallVisitor(
  * @returns Rule listener map.
  */
 function createNoQuerySideEffectsListeners(
-  context: NoQuerySideEffectsContext,
+  context: Readonly<NoQuerySideEffectsContext>,
 ): TSESLint.RuleListener {
   const functionStack: QueryScopeStack = [];
   return {
@@ -173,8 +173,8 @@ function createNoQuerySideEffectsListeners(
  * @returns Unary visitor.
  */
 function createUnaryVisitor(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
 ): (node: TSESTree.UnaryExpression) => void {
   return checkUnaryExpression.bind(undefined, context, functionStack);
 }
@@ -187,8 +187,8 @@ function createUnaryVisitor(
  * @returns Update visitor.
  */
 function createUpdateVisitor(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
 ): (node: TSESTree.UpdateExpression) => void {
   return checkUpdateExpression.bind(undefined, context, functionStack);
 }
@@ -199,7 +199,7 @@ function createUpdateVisitor(
  * @param functionStack - Function scope stack.
  * @param node - Function node entering scope.
  */
-function enterFunctionScope(functionStack: QueryScopeStack, node: FunctionNode): void {
+function enterFunctionScope(functionStack: Readonly<QueryScopeStack>, node: Readonly<FunctionNode>): void {
   const name = resolveFunctionName(node);
   functionStack.push({
     name,
@@ -213,7 +213,7 @@ function enterFunctionScope(functionStack: QueryScopeStack, node: FunctionNode):
  * @param functionStack - Function scope stack.
  * @param _node - Function node being exited.
  */
-function exitFunctionScope(functionStack: QueryScopeStack, _node: FunctionNode): void {
+function exitFunctionScope(functionStack: Readonly<QueryScopeStack>, _node: Readonly<FunctionNode>): void {
   functionStack.pop();
 }
 
@@ -223,7 +223,7 @@ function exitFunctionScope(functionStack: QueryScopeStack, _node: FunctionNode):
  * @param functionStack - Function scope stack.
  * @returns Current scope info, or null.
  */
-function getCurrentScope(functionStack: QueryScopeStack): QueryScopeInfo | null {
+function getCurrentScope(functionStack: Readonly<QueryScopeStack>): QueryScopeInfo | null {
   return functionStack.at(-1) ?? null;
 }
 
@@ -233,7 +233,7 @@ function getCurrentScope(functionStack: QueryScopeStack): QueryScopeInfo | null 
  * @param node - Unary expression node.
  * @returns True for delete unary expression.
  */
-function isDeleteUnary(node: TSESTree.UnaryExpression): boolean {
+function isDeleteUnary(node: Readonly<TSESTree.UnaryExpression>): boolean {
   return node.operator === DELETE_OPERATOR;
 }
 
@@ -256,9 +256,9 @@ function isQueryName(name: string): boolean {
  * @param kind - Side effect kind label.
  */
 function reportIfQueryScope(
-  context: NoQuerySideEffectsContext,
-  functionStack: QueryScopeStack,
-  node: TSESTree.Node,
+  context: Readonly<NoQuerySideEffectsContext>,
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<TSESTree.Node>,
   kind: string,
 ): void {
   const current = getCurrentScope(functionStack);

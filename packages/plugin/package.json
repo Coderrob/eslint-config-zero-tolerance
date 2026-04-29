@@ -78,7 +78,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "prepack": "npm run build",
     "publish:public": "npm publish --access public",
-    "test": "jest --coverage"
+    "test": "jest --coverage --runInBand"
   },
   "types": "dist/index.d.ts",
   "type": "commonjs",

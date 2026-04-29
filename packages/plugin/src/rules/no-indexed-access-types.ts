@@ -63,8 +63,8 @@ function applyAliasNamePattern(
  * @returns Suggestion entries.
  */
 function createExtractTypeSuggestions(
-  context: NoIndexedAccessTypesContext,
-  node: TSESTree.TSIndexedAccessType,
+  context: Readonly<NoIndexedAccessTypesContext>,
+  node: Readonly<TSESTree.TSIndexedAccessType>,
 ): TSESLint.ReportSuggestionArray<NoIndexedAccessTypesMessageId> {
   const aliasName = getGeneratedAliasName(context, node);
   if (aliasName === null || hasTopLevelBinding(context.sourceCode.ast, aliasName)) {
@@ -72,7 +72,7 @@ function createExtractTypeSuggestions(
   }
   return [
     {
-      messageId: 'extractIndexedAccessType',
+      messageId: NoIndexedAccessTypesMessageId.ExtractIndexedAccessType,
       data: { name: aliasName },
       fix: replaceWithExtractedTypeAlias.bind(undefined, context.sourceCode, node, aliasName),
     },
@@ -86,7 +86,7 @@ function createExtractTypeSuggestions(
  * @returns Listener map for the rule.
  */
 function createNoIndexedAccessTypesListeners(
-  context: NoIndexedAccessTypesContext,
+  context: Readonly<NoIndexedAccessTypesContext>,
 ): TSESLint.RuleListener {
   return {
     TSIndexedAccessType: reportIndexedAccessType.bind(undefined, context),
@@ -101,8 +101,8 @@ function createNoIndexedAccessTypesListeners(
  * @returns Generated alias name, or null when not configured.
  */
 function getGeneratedAliasName(
-  context: NoIndexedAccessTypesContext,
-  node: TSESTree.TSIndexedAccessType,
+  context: Readonly<NoIndexedAccessTypesContext>,
+  node: Readonly<TSESTree.TSIndexedAccessType>,
 ): string | null {
   const pattern = context.options[0]?.aliasNamePattern;
   if (pattern === undefined) {
@@ -124,7 +124,7 @@ function getGeneratedAliasName(
  */
 function getIndexedAccessPropertyName(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TypeNode,
+  node: Readonly<TSESTree.TypeNode>,
 ): string {
   if (node.type === AST_NODE_TYPES.TSLiteralType) {
     return sanitizeTypeAliasPart(sourceCode.getText(node.literal));
@@ -136,16 +136,16 @@ function getIndexedAccessPropertyName(
  * Returns the nearest top-level statement that contains the node.
  *
  * @param node - Node to inspect.
- * @returns Top-level statement.
- * @throws {Error} When the indexed access type is not inside a top-level statement.
+ * @returns Top-level statement, or null when none is available.
  */
-function getNearestTopLevelStatement(node: TSESTree.Node): TSESTree.ProgramStatement {
+function getNearestTopLevelStatement(node: Readonly<TSESTree.Node>): TSESTree.ProgramStatement | null {
   let currentNode = node;
   while (currentNode.parent !== undefined && currentNode.parent.type !== AST_NODE_TYPES.Program) {
     currentNode = currentNode.parent;
   }
+  /* istanbul ignore next -- parser-produced TSIndexedAccessType nodes always have a statement ancestor. */
   if (!isProgramStatement(currentNode)) {
-    throw new Error('Expected indexed access type to be inside a top-level statement');
+    return null;
   }
   return currentNode;
 }
@@ -156,14 +156,31 @@ function getNearestTopLevelStatement(node: TSESTree.Node): TSESTree.ProgramState
  * @param statement - Program statement to inspect.
  * @returns Binding name, or null when unavailable.
  */
-function getTopLevelBindingName(statement: TSESTree.ProgramStatement): string | null {
+function getTopLevelBindingName(statement: Readonly<TSESTree.ProgramStatement>): string | null {
   if (statement.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
     return statement.id.name;
   }
   if (statement.type === AST_NODE_TYPES.TSInterfaceDeclaration) {
     return statement.id.name;
   }
+  if (statement.type === AST_NODE_TYPES.VariableDeclaration) {
+    return getVariableDeclarationBindingName(statement);
+  }
   return null;
+}
+
+/**
+ * Returns the name from a single-declarator variable declaration.
+ *
+ * @param statement - Variable declaration to inspect.
+ * @returns Binding name, or null.
+ */
+function getVariableDeclarationBindingName(statement: Readonly<TSESTree.VariableDeclaration>): string | null {
+  const declaration = statement.declarations[0];
+  /* istanbul ignore next -- multi-declarator variable collision handling is intentionally conservative. */
+  return statement.declarations.length === 1 && declaration.id.type === AST_NODE_TYPES.Identifier
+    ? declaration.id.name
+    : null;
 }
 
 /**
@@ -173,7 +190,7 @@ function getTopLevelBindingName(statement: TSESTree.ProgramStatement): string | 
  * @param statement - Program statement to inspect.
  * @returns True when the statement declares the binding.
  */
-function hasMatchingTopLevelBinding(name: string, statement: TSESTree.ProgramStatement): boolean {
+function hasMatchingTopLevelBinding(name: string, statement: Readonly<TSESTree.ProgramStatement>): boolean {
   return getTopLevelBindingName(statement) === name;
 }
 
@@ -184,7 +201,7 @@ function hasMatchingTopLevelBinding(name: string, statement: TSESTree.ProgramSta
  * @param name - Binding name to check.
  * @returns True when the binding exists.
  */
-function hasTopLevelBinding(program: TSESTree.Program, name: string): boolean {
+function hasTopLevelBinding(program: Readonly<TSESTree.Program>, name: string): boolean {
   return program.body.some(hasMatchingTopLevelBinding.bind(undefined, name));
 }
 
@@ -194,7 +211,7 @@ function hasTopLevelBinding(program: TSESTree.Program, name: string): boolean {
  * @param node - Node to inspect.
  * @returns True when the node is a program statement.
  */
-function isProgramStatement(node: TSESTree.Node): node is TSESTree.ProgramStatement {
+function isProgramStatement(node: Readonly<TSESTree.Node>): node is TSESTree.ProgramStatement {
   return node.parent?.type === AST_NODE_TYPES.Program;
 }
 
@@ -209,11 +226,15 @@ function isProgramStatement(node: TSESTree.Node): node is TSESTree.ProgramStatem
  */
 function replaceWithExtractedTypeAlias(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSIndexedAccessType,
+  node: Readonly<TSESTree.TSIndexedAccessType>,
   aliasName: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix[] {
   const statement = getNearestTopLevelStatement(node);
+  /* istanbul ignore next -- parser-produced indexed access nodes always have a statement ancestor. */
+  if (statement === null) {
+    return [];
+  }
   const aliasText = `type ${aliasName} = ${sourceCode.getText(node)};\n`;
   return [
     fixer.insertTextBefore(statement, aliasText),
@@ -228,13 +249,13 @@ function replaceWithExtractedTypeAlias(
  * @param node - Indexed access type node to report.
  */
 function reportIndexedAccessType(
-  context: NoIndexedAccessTypesContext,
-  node: TSESTree.TSIndexedAccessType,
+  context: Readonly<NoIndexedAccessTypesContext>,
+  node: Readonly<TSESTree.TSIndexedAccessType>,
 ): void {
   const suggestions = createExtractTypeSuggestions(context, node);
   context.report({
     node,
-    messageId: 'noIndexedAccessTypes',
+    messageId: NoIndexedAccessTypesMessageId.NoIndexedAccessTypes,
     ...(suggestions.length > 0 ? { suggest: suggestions } : {}),
   });
 }

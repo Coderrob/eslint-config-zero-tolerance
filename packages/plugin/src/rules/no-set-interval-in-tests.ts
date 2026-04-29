@@ -35,8 +35,8 @@ type NoSetIntervalInTestsContext = Readonly<
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoSetIntervalInTestsContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoSetIntervalInTestsContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!isRestrictedSetIntervalCall(node)) {
     return;
@@ -55,7 +55,7 @@ function checkCallExpression(
  * @returns Listener map for the rule.
  */
 function createNoSetIntervalInTestsListeners(
-  context: NoSetIntervalInTestsContext,
+  context: Readonly<NoSetIntervalInTestsContext>,
 ): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
@@ -96,7 +96,7 @@ function isGlobalSetIntervalCall(calleePath: ReadonlyArray<string>): boolean {
  * @param node - Call expression node.
  * @returns True when the callee resolves to setInterval or a known global timer object.
  */
-function isRestrictedSetIntervalCall(node: TSESTree.CallExpression): boolean {
+function isRestrictedSetIntervalCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const calleePath = getCalleeNamePath(node.callee);
   if (calleePath === null) {
     return false;

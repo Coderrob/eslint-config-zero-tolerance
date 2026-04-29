@@ -29,7 +29,7 @@ type NoTestInterfaceDeclarationContext = Readonly<
  * @returns Listener map for the rule.
  */
 function createNoTestInterfaceDeclarationListeners(
-  context: NoTestInterfaceDeclarationContext,
+  context: Readonly<NoTestInterfaceDeclarationContext>,
 ): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
@@ -47,8 +47,8 @@ function createNoTestInterfaceDeclarationListeners(
  * @param node - The interface declaration node.
  */
 function reportInterfaceDeclaration(
-  context: NoTestInterfaceDeclarationContext,
-  node: TSESTree.TSInterfaceDeclaration,
+  context: Readonly<NoTestInterfaceDeclarationContext>,
+  node: Readonly<TSESTree.TSInterfaceDeclaration>,
 ): void {
   context.report({
     node: node.id,

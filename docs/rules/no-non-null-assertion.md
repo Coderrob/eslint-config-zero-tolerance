@@ -15,6 +15,10 @@ Disallow non-null assertions using the `!` postfix operator.
 
 The `!` postfix operator tells TypeScript to treat an expression as non-null without any runtime check. If the value is actually `null` or `undefined` at runtime, the assertion causes a crash rather than a handled error. Use optional chaining (`?.`), nullish coalescing (`??`), or an explicit null check instead.
 
+## Suggestions
+
+The rule offers optional-chaining suggestions for safe member and call forms such as `value!.prop`, `value![key]`, and `value!()`. Suggestions are withheld for assignment/update targets and other contexts where optional chaining would change behavior or require a larger rewrite.
+
 ## Examples
 
 ### ✅ Correct

@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isBarrelFile } from '../helpers/import-path-helpers';
+import { isString } from '../helpers/type-guards';
 import { createRule } from './support/rule-factory';
 
 const CURRENT_DIRECTORY_PREFIX = './';
@@ -35,8 +36,8 @@ type BarrelReExportNode = TSESTree.ExportAllDeclaration | TSESTree.ExportNamedDe
  * @param node - Re-export declaration to validate.
  */
 function checkBarrelReExport(
-  context: RequireBarrelRelativeExportsContext,
-  node: BarrelReExportNode,
+  context: Readonly<RequireBarrelRelativeExportsContext>,
+  node: Readonly<BarrelReExportNode>,
 ): void {
   if (node.source === null) {
     return;
@@ -54,8 +55,8 @@ function checkBarrelReExport(
  * @returns Fix callback, or null when the target cannot be verified.
  */
 function createRelativeBarrelExportFix(
-  context: RequireBarrelRelativeExportsContext,
-  node: BarrelReExportNode,
+  context: Readonly<RequireBarrelRelativeExportsContext>,
+  node: Readonly<BarrelReExportNode>,
 ): TSESLint.ReportFixFunction | null {
   const exportPath = getBareSameDirectoryExportPath(node);
   if (exportPath === null) {
@@ -74,7 +75,7 @@ function createRelativeBarrelExportFix(
  * @returns Rule listeners.
  */
 function createRequireBarrelRelativeExportsListeners(
-  context: RequireBarrelRelativeExportsContext,
+  context: Readonly<RequireBarrelRelativeExportsContext>,
 ): TSESLint.RuleListener {
   if (!isBarrelFile(context.filename)) {
     return {};
@@ -91,9 +92,10 @@ function createRequireBarrelRelativeExportsListeners(
  * @param node - Re-export declaration to inspect.
  * @returns Bare export path, or null.
  */
-function getBareSameDirectoryExportPath(node: BarrelReExportNode): string | null {
+function getBareSameDirectoryExportPath(node: Readonly<BarrelReExportNode>): string | null {
   const exportPath = node.source?.value;
-  if (typeof exportPath !== 'string') {
+  /* istanbul ignore next -- caller only asks for fixes on re-export declarations with a source. */
+  if (!isString(exportPath)) {
     return null;
   }
   return isBareSameDirectoryExportPath(exportPath) ? exportPath : null;
@@ -163,16 +165,16 @@ function isRelativeBarrelExportPath(exportPath: string): boolean {
  * @param node - Re-export declaration to fix.
  * @param replacementPath - Replacement export path.
  * @param fixer - ESLint fixer.
- * @returns Generated replacement fix.
- * @throws {Error} When the re-export source is unexpectedly unavailable during fix application.
+ * @returns Generated replacement fix, or null when the source is unavailable.
  */
 function replaceExportPath(
-  node: BarrelReExportNode,
+  node: Readonly<BarrelReExportNode>,
   replacementPath: string,
-  fixer: TSESLint.RuleFixer,
-): TSESLint.RuleFix {
+  fixer: Readonly<TSESLint.RuleFixer>,
+): TSESLint.RuleFix | null {
+  /* istanbul ignore next -- fix callbacks are only created for re-export declarations with a source. */
   if (node.source === null) {
-    throw new Error('Expected barrel re-export source to exist.');
+    return null;
   }
   return fixer.replaceText(node.source, `'${replacementPath}'`);
 }
@@ -184,8 +186,8 @@ function replaceExportPath(
  * @param node - Re-export declaration to report.
  */
 function reportInvalidBarrelExportPath(
-  context: RequireBarrelRelativeExportsContext,
-  node: BarrelReExportNode,
+  context: Readonly<RequireBarrelRelativeExportsContext>,
+  node: Readonly<BarrelReExportNode>,
 ): void {
   context.report({
     node,

@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-ts-nocheck.ts",
+  "module": {
+    "name": "no-ts-nocheck",
+    "description": "Prevent use of @ts-nocheck comments.",
+    "exports": ["noTsNocheck"]
+  },
+  "specifications": [
+    {
+      "feature": "Allowed TypeScript comments",
+      "scenarios": [
+        {
+          "name": "should allow files without TypeScript directive comments",
+          "given": "a source file without @ts-nocheck",
+          "when": "the rule evaluates the comments",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow ts-check comments",
+          "given": "a source file with // @ts-check",
+          "when": "the rule evaluates the comments",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow ts-expect-error comments",
+          "given": "a source file with // @ts-expect-error",
+          "when": "the rule evaluates the comments",
+          "then": "no noTsNocheck violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Disallowed TypeScript nocheck comments",
+      "scenarios": [
+        {
+          "name": "should report ts-nocheck line comments",
+          "given": "a source file with // @ts-nocheck",
+          "when": "the rule evaluates the comments",
+          "then": "a noTsNocheck violation is reported"
+        },
+        {
+          "name": "should report ts-nocheck block comments",
+          "given": "a source file with /* @ts-nocheck */",
+          "when": "the rule evaluates the comments",
+          "then": "a noTsNocheck violation is reported"
+        }
+      ]
+    }
+  ]
+}

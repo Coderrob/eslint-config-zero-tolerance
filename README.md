@@ -9,13 +9,13 @@
 <h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
 <p align="center">
-  <strong>69 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+  <strong>77 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
   <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
-  <img src="https://img.shields.io/badge/coverage-99.93%25-brightgreen" alt="Coverage" />
+  <img src="https://img.shields.io/badge/coverage-99.84%25-brightgreen" alt="Coverage" />
   <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
@@ -54,7 +54,7 @@ This monorepo publishes two packages:
 
 | Package                                                                                                          | Description                                         |
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 69 custom rules                 |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 77 custom rules                 |
 | [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built `recommended` and `strict` config presets |
 
 ## Requirements
@@ -148,7 +148,7 @@ module.exports = {
 <!-- GENERATED:README_RULES_START -->
 ## Rules
 
-The plugin ships **69 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
+The plugin ships **77 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
 
 Preset legend:
 
@@ -161,11 +161,11 @@ Preset legend:
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards |
 | [Documentation](#documentation) |     5 | JSDoc, BDD specs, optional chaining, readonly props |
 | [Testing](#testing) |     8 | Test descriptions, mocks, timers, fetch, interfaces |
-| [Type Safety](#type-safety) |    11 | Assertions, unions, imports, exported types |
-| [Code Quality](#code-quality) |    15 | Function size, magic values, immutability, sorting |
+| [Type Safety](#type-safety) |    12 | Assertions, unions, imports, exported types |
+| [Code Quality](#code-quality) |    16 | Function size, magic values, immutability, sorting |
 | [Error Handling](#error-handling) |     3 | Throw safety, empty catches, Result patterns |
-| [Imports](#imports) |     8 | Barrels, re-exports, dynamic imports, node protocol |
-| [Bug Prevention](#bug-prevention) |    18 | Identical code, control flow, async safety |
+| [Imports](#imports) |    12 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention) |    20 | Identical code, control flow, async safety |
 
 ### Naming Conventions
 
@@ -208,9 +208,10 @@ Preset legend:
 | [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md) | `suggestion` | Both | Require property literal unions to use named domain types |
 | [`no-inline-type-import`](docs/rules/no-inline-type-import.md) | `problem` | Both | Disallow TypeScript inline type imports using import("...") |
 | [`no-return-type`](docs/rules/no-return-type.md) | `problem` | Both | Disallow TypeScript ReturnType utility usage |
-| [`require-union-type-alias`](docs/rules/require-union-type-alias.md) | `suggestion` | Both | Require inline union types with multiple type references to be extracted into named type aliases |
+| [`require-union-type-alias`](docs/rules/require-union-type-alias.md) | `suggestion` | Both | Require inline union types with three or more members and multiple type references to be extracted into named type aliases |
 | [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | `suggestion` | Both | Disallow inline object type literals on destructured parameters; require a named type instead |
 | [`require-exported-object-type`](docs/rules/require-exported-object-type.md) | `suggestion` | Both | Require exported object constants to declare an explicit type annotation |
+| [`no-unsafe-json-parse`](docs/rules/no-unsafe-json-parse.md) | `problem` | Both | Disallow treating JSON.parse results as typed data without validation |
 
 ### Code Quality
 
@@ -220,6 +221,7 @@ Preset legend:
 | [`max-params`](docs/rules/max-params.md) | `suggestion` | Both | Enforce a maximum number of function parameters |
 | [`no-array-mutation`](docs/rules/no-array-mutation.md) | `suggestion` | Both | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted |
 | [`no-date-now`](docs/rules/no-date-now.md) | `suggestion` | Both | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior |
+| [`no-placeholder-implementation`](docs/rules/no-placeholder-implementation.md) | `problem` | Both | Disallow placeholder, stub, TODO, and not implemented production code |
 | [`no-magic-numbers`](docs/rules/no-magic-numbers.md) | `suggestion` | Both | Disallow magic numbers; use named constants instead of raw numeric literals |
 | [`no-magic-strings`](docs/rules/no-magic-strings.md) | `suggestion` | Both | Disallow magic strings in comparisons and switch cases; use named constants instead |
 | [`no-map-set-mutation`](docs/rules/no-map-set-mutation.md) | `suggestion` | Both | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place |
@@ -248,9 +250,13 @@ Preset legend:
 | [`require-barrel-relative-exports`](docs/rules/require-barrel-relative-exports.md) | `suggestion` | Both | Require barrel re-export declarations to use current-directory descendant paths that start with './' |
 | [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | `problem` | Both | Ban await import() and require() except in test files |
 | [`no-export-alias`](docs/rules/no-export-alias.md) | `suggestion` | Both | Prevent use of alias in export statements |
+| [`no-hardcoded-secrets`](docs/rules/no-hardcoded-secrets.md) | `problem` | Both | Disallow hardcoded secrets, credentials, tokens, and secret env defaults |
+| [`no-raw-sql-interpolation`](docs/rules/no-raw-sql-interpolation.md) | `problem` | Both | Disallow interpolated raw SQL and unsafe raw query helpers |
 | [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md) | `suggestion` | Both | Disallow parent-directory imports (`..` and `../*`) inside barrel files (`index.*`) across import declarations, import expressions, require calls, and import-equals declarations |
 | [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md) | `suggestion` | Opt-in | Disallow parent-relative access into protected internal directories such as src |
 | [`no-re-export`](docs/rules/no-re-export.md) | `suggestion` | Both | Disallow direct or indirect re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction |
+| [`no-shell-command-construction`](docs/rules/no-shell-command-construction.md) | `problem` | Both | Disallow shell command construction through subprocess APIs |
+| [`no-unsafe-code-generation`](docs/rules/no-unsafe-code-generation.md) | `problem` | Both | Disallow eval, Function constructors, string timers, and vm code execution APIs |
 | [`require-node-protocol`](docs/rules/require-node-protocol.md) | `suggestion` | Both | Require Node.js built-in module imports to use the `node:` protocol prefix |
 
 ### Bug Prevention
@@ -268,12 +274,14 @@ Preset legend:
 | [`no-floating-promises`](docs/rules/no-floating-promises.md) | `problem` | Both | Disallow floating promises; explicitly handle with await, void, or rejection handlers |
 | [`no-math-random`](docs/rules/no-math-random.md) | `problem` | Both | Disallow Math.random(); inject randomness explicitly or use a dedicated random source |
 | [`no-eslint-disable`](docs/rules/no-eslint-disable.md) | `suggestion` | Both | Prevent use of eslint-disable comments |
+| [`no-ts-nocheck`](docs/rules/no-ts-nocheck.md) | `problem` | Both | Prevent use of @ts-nocheck comments |
 | [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md) | `suggestion` | Both | Disallow assignments and updates to function parameters; use a new local variable instead |
 | [`no-process-env-outside-config`](docs/rules/no-process-env-outside-config.md) | `problem` | Both | Disallow process.env reads outside configuration modules; import typed config instead |
 | [`no-flag-argument`](docs/rules/no-flag-argument.md) | `suggestion` | Both | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects |
 | [`prefer-guard-clauses`](docs/rules/prefer-guard-clauses.md) | `suggestion` | Both | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow |
 | [`prefer-shortcut-return`](docs/rules/prefer-shortcut-return.md) | `suggestion` | Both | Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions |
 | [`no-query-side-effects`](docs/rules/no-query-side-effects.md) | `suggestion` | Both | Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier |
+| [`require-timeout-for-io`](docs/rules/require-timeout-for-io.md) | `problem` | Both | Require timeout or cancellation options for external IO calls |
 | [`require-exhaustive-switch`](docs/rules/require-exhaustive-switch.md) | `suggestion` | Both | Require exhaustive switch statements over finite union, enum, and boolean discriminants |
 <!-- GENERATED:README_RULES_END -->
 

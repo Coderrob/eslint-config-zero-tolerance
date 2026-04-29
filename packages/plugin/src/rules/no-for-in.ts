@@ -29,8 +29,8 @@ type NoForInContext = Readonly<TSESLint.RuleContext<'noForIn', []>>;
  */
 function createForInFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ForInStatement,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.ForInStatement>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const leftText = sourceCode.getText(node.left);
   const rightText = sourceCode.getText(node.right);
@@ -44,7 +44,7 @@ function createForInFix(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoForInListeners(context: NoForInContext): TSESLint.RuleListener {
+function createNoForInListeners(context: Readonly<NoForInContext>): TSESLint.RuleListener {
   return {
     ForInStatement: reportForInUsage.bind(undefined, context),
   };
@@ -56,7 +56,7 @@ function createNoForInListeners(context: NoForInContext): TSESLint.RuleListener 
  * @param context - ESLint rule execution context.
  * @param node - For-in statement node.
  */
-function reportForInUsage(context: NoForInContext, node: TSESTree.ForInStatement): void {
+function reportForInUsage(context: Readonly<NoForInContext>, node: Readonly<TSESTree.ForInStatement>): void {
   context.report({
     node,
     messageId: 'noForIn',

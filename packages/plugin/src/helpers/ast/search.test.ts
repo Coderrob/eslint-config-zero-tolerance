@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import { findDescendant, someDescendant } from './search';
+import { findDescendant, hasDescendant } from './search';
 
 describe('ast search helpers', () => {
   const sourceCode = {
@@ -46,7 +46,7 @@ describe('ast search helpers', () => {
     });
   });
 
-  describe('someDescendant', () => {
+  describe('hasDescendant', () => {
     it('should return true when any descendant matches the predicate', () => {
       const identifier = { type: AST_NODE_TYPES.Identifier, name: 'value' };
       const root = {
@@ -55,7 +55,7 @@ describe('ast search helpers', () => {
       } as any;
 
       expect(
-        someDescendant(
+        hasDescendant(
           root,
           sourceCode,
           (candidate): candidate is typeof identifier =>
@@ -71,7 +71,7 @@ describe('ast search helpers', () => {
       } as any;
 
       expect(
-        someDescendant(
+        hasDescendant(
           root,
           sourceCode,
           (candidate): candidate is any => candidate.type === AST_NODE_TYPES.Identifier,

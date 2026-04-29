@@ -33,8 +33,8 @@ type RequireInterfacePrefixContext = Readonly<TSESLint.RuleContext<'interfacePre
  * @param node - The TSInterfaceDeclaration node to check.
  */
 function checkTSInterfaceDeclaration(
-  context: RequireInterfacePrefixContext,
-  node: TSESTree.TSInterfaceDeclaration,
+  context: Readonly<RequireInterfacePrefixContext>,
+  node: Readonly<TSESTree.TSInterfaceDeclaration>,
 ): void {
   const interfaceName = node.id.name;
   if (isValidInterfaceName(interfaceName)) {
@@ -55,7 +55,7 @@ function checkTSInterfaceDeclaration(
  * @param key - Property key.
  * @param value - Property value.
  */
-function collectChildNodeValue(childNodes: TSESTree.Node[], key: string, value: unknown): void {
+function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string, value: unknown): void {
   if (key === PARENT_PROPERTY_KEY) {
     return;
   }
@@ -74,7 +74,7 @@ function collectChildNodeValue(childNodes: TSESTree.Node[], key: string, value: 
  * @param childNodes - Mutable child node collection.
  * @param values - Property array values.
  */
-function collectChildNodeValues(childNodes: TSESTree.Node[], values: readonly unknown[]): void {
+function collectChildNodeValues(childNodes: readonly TSESTree.Node[], values: readonly unknown[]): void {
   for (const value of values) {
     if (isNodeLike(value)) {
       childNodes.push(value);
@@ -90,9 +90,9 @@ function collectChildNodeValues(childNodes: TSESTree.Node[], values: readonly un
  * @param references - Mutable reference collection.
  */
 function collectInterfaceNameReferenceNodes(
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
   currentName: string,
-  references: TSESTree.Identifier[],
+  references: readonly TSESTree.Identifier[],
 ): void {
   if (isInterfaceNameReferenceNode(node, currentName)) {
     references.push(node);
@@ -111,7 +111,7 @@ function collectInterfaceNameReferenceNodes(
  */
 function createInterfacePrefixFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSInterfaceDeclaration,
+  node: Readonly<TSESTree.TSInterfaceDeclaration>,
 ): TSESLint.ReportFixFunction | null {
   const replacementName = `${INTERFACE_REQUIRED_PREFIX}${node.id.name}`;
   if (!isPotentialInterfacePrefixFix(node.id.name) || hasTopLevelName(sourceCode.ast, replacementName)) {
@@ -127,7 +127,7 @@ function createInterfacePrefixFix(
  * @returns Rule listeners.
  */
 function createRequireInterfacePrefixListeners(
-  context: RequireInterfacePrefixContext,
+  context: Readonly<RequireInterfacePrefixContext>,
 ): TSESLint.RuleListener {
   return {
     TSInterfaceDeclaration: checkTSInterfaceDeclaration.bind(undefined, context),
@@ -140,7 +140,7 @@ function createRequireInterfacePrefixListeners(
  * @param node - Node to inspect.
  * @returns Child nodes.
  */
-function getChildNodes(node: TSESTree.Node): TSESTree.Node[] {
+function getChildNodes(node: Readonly<TSESTree.Node>): TSESTree.Node[] {
   const childNodes: TSESTree.Node[] = [];
   for (const [key, value] of Object.entries(node)) {
     collectChildNodeValue(childNodes, key, value);
@@ -156,7 +156,7 @@ function getChildNodes(node: TSESTree.Node): TSESTree.Node[] {
  * @returns Matching identifier nodes.
  */
 function getInterfaceNameReferenceNodes(
-  program: TSESTree.Program,
+  program: Readonly<TSESTree.Program>,
   currentName: string,
 ): TSESTree.Identifier[] {
   const references: TSESTree.Identifier[] = [];
@@ -170,7 +170,7 @@ function getInterfaceNameReferenceNodes(
  * @param statement - Program statement.
  * @returns Top-level declaration name, or null.
  */
-function getTopLevelName(statement: TSESTree.ProgramStatement): string | null {
+function getTopLevelName(statement: Readonly<TSESTree.ProgramStatement>): string | null {
   if (statement.type === AST_NODE_TYPES.TSInterfaceDeclaration) {
     return statement.id.name;
   }
@@ -187,7 +187,7 @@ function getTopLevelName(statement: TSESTree.ProgramStatement): string | null {
  * @param name - Name to check.
  * @returns True when the name exists.
  */
-function hasTopLevelName(program: TSESTree.Program, name: string): boolean {
+function hasTopLevelName(program: Readonly<TSESTree.Program>, name: string): boolean {
   for (const statement of program.body) {
     if (getTopLevelName(statement) === name) {
       return true;
@@ -204,8 +204,8 @@ function hasTopLevelName(program: TSESTree.Program, name: string): boolean {
  * @returns True when the identifier declares the interface name.
  */
 function isInterfaceDeclarationIdentifier(
-  parent: TSESTree.Node,
-  node: TSESTree.Identifier,
+  parent: Readonly<TSESTree.Node>,
+  node: Readonly<TSESTree.Identifier>,
 ): boolean {
   return parent.type === AST_NODE_TYPES.TSInterfaceDeclaration && parent.id === node;
 }
@@ -217,7 +217,7 @@ function isInterfaceDeclarationIdentifier(
  * @param node - Identifier node.
  * @returns True when the identifier is an interface heritage expression.
  */
-function isInterfaceHeritageReference(parent: TSESTree.Node, node: TSESTree.Identifier): boolean {
+function isInterfaceHeritageReference(parent: Readonly<TSESTree.Node>, node: Readonly<TSESTree.Identifier>): boolean {
   return (
     parent.type === TS_INTERFACE_HERITAGE_NODE_TYPE &&
     'expression' in parent &&
@@ -233,7 +233,7 @@ function isInterfaceHeritageReference(parent: TSESTree.Node, node: TSESTree.Iden
  * @returns True when the identifier should be renamed.
  */
 function isInterfaceNameReferenceNode(
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
   currentName: string,
 ): node is TSESTree.Identifier {
   if (node.type !== AST_NODE_TYPES.Identifier || node.name !== currentName) {
@@ -250,7 +250,7 @@ function isInterfaceNameReferenceNode(
  * @param node - Identifier node.
  * @returns True when the identifier references the interface in a type position.
  */
-function isInterfaceTypeReference(parent: TSESTree.Node, node: TSESTree.Identifier): boolean {
+function isInterfaceTypeReference(parent: Readonly<TSESTree.Node>, node: Readonly<TSESTree.Identifier>): boolean {
   return (
     (parent.type === AST_NODE_TYPES.TSTypeReference && parent.typeName === node) ||
     isInterfaceHeritageReference(parent, node)
@@ -308,10 +308,10 @@ function isValidInterfaceName(interfaceName: string): boolean {
  * @returns Generated replacement fixes.
  */
 function replaceInterfaceNameReferences(
-  program: TSESTree.Program,
+  program: Readonly<TSESTree.Program>,
   currentName: string,
   replacementName: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix[] {
   const fixes: TSESLint.RuleFix[] = [];
   for (const identifier of getInterfaceNameReferenceNodes(program, currentName)) {

@@ -28,7 +28,7 @@ type NoNonNullAssertionContext = Readonly<TSESLint.RuleContext<NoNonNullAssertio
  * @returns Rule listeners.
  */
 function createNoNonNullAssertionListeners(
-  context: NoNonNullAssertionContext,
+  context: Readonly<NoNonNullAssertionContext>,
 ): TSESLint.RuleListener {
   return {
     TSNonNullExpression: reportNonNullAssertion.bind(undefined, context),
@@ -42,14 +42,14 @@ function createNoNonNullAssertionListeners(
  * @returns Optional-chaining suggestion entries.
  */
 function createOptionalChainingSuggestions(
-  node: TSESTree.TSNonNullExpression,
+  node: Readonly<TSESTree.TSNonNullExpression>,
 ): TSESLint.ReportSuggestionArray<NoNonNullAssertionMessageId> {
   if (!isSafeOptionalChainingTarget(node)) {
     return [];
   }
   return [
     {
-      messageId: 'useOptionalChaining',
+      messageId: NoNonNullAssertionMessageId.UseOptionalChaining,
       fix: replaceNonNullAssertionWithOptionalChain.bind(undefined, node),
     },
   ];
@@ -61,7 +61,7 @@ function createOptionalChainingSuggestions(
  * @param node - Member expression using the non-null assertion as object.
  * @returns Optional-chain token text.
  */
-function getMemberOptionalChainText(node: TSESTree.MemberExpression): string {
+function getMemberOptionalChainText(node: Readonly<TSESTree.MemberExpression>): string {
   return node.computed ? '?.' : '?';
 }
 
@@ -71,7 +71,7 @@ function getMemberOptionalChainText(node: TSESTree.MemberExpression): string {
  * @param node - TS non-null expression node.
  * @returns True when the parent expression supports optional chaining.
  */
-function isSafeOptionalChainingTarget(node: TSESTree.TSNonNullExpression): boolean {
+function isSafeOptionalChainingTarget(node: Readonly<TSESTree.TSNonNullExpression>): boolean {
   const parent = node.parent;
   if (parent.type === AST_NODE_TYPES.MemberExpression && parent.object === node) {
     return !isUnsafeMemberUsage(parent);
@@ -85,7 +85,7 @@ function isSafeOptionalChainingTarget(node: TSESTree.TSNonNullExpression): boole
  * @param node - Member expression using the non-null assertion as object.
  * @returns True when the member usage is unsafe to suggest.
  */
-function isUnsafeMemberUsage(node: TSESTree.MemberExpression): boolean {
+function isUnsafeMemberUsage(node: Readonly<TSESTree.MemberExpression>): boolean {
   const parent = node.parent;
   return (
     (parent.type === AST_NODE_TYPES.AssignmentExpression && parent.left === node) ||
@@ -101,8 +101,8 @@ function isUnsafeMemberUsage(node: TSESTree.MemberExpression): boolean {
  * @returns Generated replacement fix.
  */
 function replaceNonNullAssertionWithOptionalChain(
-  node: TSESTree.TSNonNullExpression,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.TSNonNullExpression>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const replacementText =
     node.parent.type === AST_NODE_TYPES.MemberExpression && node.parent.object === node
@@ -118,13 +118,13 @@ function replaceNonNullAssertionWithOptionalChain(
  * @param node - TS non-null expression node.
  */
 function reportNonNullAssertion(
-  context: NoNonNullAssertionContext,
-  node: TSESTree.TSNonNullExpression,
+  context: Readonly<NoNonNullAssertionContext>,
+  node: Readonly<TSESTree.TSNonNullExpression>,
 ): void {
   const suggestions = createOptionalChainingSuggestions(node);
   context.report({
     node,
-    messageId: 'noNonNullAssertion',
+    messageId: NoNonNullAssertionMessageId.NoNonNullAssertion,
     ...(suggestions.length > 0 ? { suggest: suggestions } : {}),
   });
 }

@@ -70,9 +70,9 @@ function buildOptionalChainReplacement(leftText: string, rightText: string): str
  * @param node - Logical expression node to evaluate.
  */
 function checkLogicalExpression(
-  context: RequireOptionalChainingContext,
+  context: Readonly<RequireOptionalChainingContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.LogicalExpression,
+  node: Readonly<TSESTree.LogicalExpression>,
 ): void {
   const replacement = getOptionalChainReplacement(node, sourceCode);
   if (replacement === null) {
@@ -93,7 +93,7 @@ function checkLogicalExpression(
  * @returns ESLint fix callback.
  */
 function createLogicalExpressionFix(
-  node: TSESTree.LogicalExpression,
+  node: Readonly<TSESTree.LogicalExpression>,
   replacement: string,
 ): TSESLint.ReportFixFunction {
   return fixLogicalExpression.bind(undefined, node, replacement);
@@ -106,7 +106,7 @@ function createLogicalExpressionFix(
  * @returns Rule listeners.
  */
 function createRequireOptionalChainingListeners(
-  context: RequireOptionalChainingContext,
+  context: Readonly<RequireOptionalChainingContext>,
 ): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
   return {
@@ -123,9 +123,9 @@ function createRequireOptionalChainingListeners(
  * @returns The generated fix.
  */
 function fixLogicalExpression(
-  node: TSESTree.LogicalExpression,
+  node: Readonly<TSESTree.LogicalExpression>,
   replacement: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceText(node, replacement);
 }
@@ -138,7 +138,7 @@ function fixLogicalExpression(
  * @returns Replacement code, or null when no rewrite is applicable.
  */
 function getOptionalChainReplacement(
-  node: TSESTree.LogicalExpression,
+  node: Readonly<TSESTree.LogicalExpression>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string | null {
   if (node.operator !== LOGICAL_AND_OPERATOR) {
@@ -157,7 +157,7 @@ function getOptionalChainReplacement(
  * @param expression - The expression to inspect.
  * @returns The wrapped inner expression or null when not wrapped.
  */
-function getWrappedExpression(expression: TSESTree.Expression): TSESTree.Expression | null {
+function getWrappedExpression(expression: Readonly<TSESTree.Expression>): TSESTree.Expression | null {
   if (expression.type === AST_NODE_TYPES.ChainExpression) {
     return expression.expression;
   }
@@ -189,7 +189,7 @@ function isSafeComputedKey(property: TSESTree.Expression | TSESTree.PrivateIdent
  * @param expression - The guard expression to validate.
  * @returns True when the expression is a safe guard candidate.
  */
-function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
+function isSafeGuardExpression(expression: Readonly<TSESTree.Expression>): boolean {
   const node = unwrapExpression(expression);
   if (SIMPLE_GUARD_NODE_TYPES.has(node.type)) {
     return true;
@@ -206,7 +206,7 @@ function isSafeGuardExpression(expression: TSESTree.Expression): boolean {
  * @param node - The MemberExpression node.
  * @returns True when safe.
  */
-function isSafeMemberExpression(node: TSESTree.MemberExpression): boolean {
+function isSafeMemberExpression(node: Readonly<TSESTree.MemberExpression>): boolean {
   if (node.computed && !isSafeComputedKey(node.property)) {
     return false;
   }
@@ -227,7 +227,7 @@ function isSafeMemberExpression(node: TSESTree.MemberExpression): boolean {
  * @param expression - The expression to unwrap.
  * @returns The inner expression when wrapped; otherwise the original node.
  */
-function unwrapExpression(expression: TSESTree.Expression): TSESTree.Expression {
+function unwrapExpression(expression: Readonly<TSESTree.Expression>): TSESTree.Expression {
   const wrappedExpression = getWrappedExpression(expression);
   if (wrappedExpression === null) {
     return expression;

@@ -47,7 +47,7 @@ const READONLY_TYPE_NAME = 'Readonly';
  * @param node - Function node being entered.
  * @returns Initialized function state.
  */
-function buildFunctionState(node: FunctionNode): IFunctionState {
+function buildFunctionState(node: Readonly<FunctionNode>): IFunctionState {
   const componentName = getComponentName(node);
   if (!isPascalCaseName(componentName)) {
     return { node, hasJsxReturn: false, propsNode: null };
@@ -70,7 +70,7 @@ function buildFunctionState(node: FunctionNode): IFunctionState {
  * @returns Listener map for rule traversal.
  */
 function createRequireReadonlyPropsListeners(
-  context: RequireReadonlyPropsContext,
+  context: Readonly<RequireReadonlyPropsContext>,
 ): TSESLint.RuleListener {
   const stateStack: IFunctionState[] = [];
   return {
@@ -88,7 +88,7 @@ function createRequireReadonlyPropsListeners(
  * @param node - Function-like node.
  * @returns Component name, or null when unavailable.
  */
-function getComponentName(node: FunctionNode): string | null {
+function getComponentName(node: Readonly<FunctionNode>): string | null {
   return node.type === AST_NODE_TYPES.FunctionDeclaration
     ? getFunctionDeclarationName(node)
     : getFunctionVariableName(node);
@@ -102,7 +102,7 @@ function getComponentName(node: FunctionNode): string | null {
  * @param params - Function parameter list.
  * @returns First non-`this` parameter, or undefined when none exists.
  */
-function getFirstPropsParam(params: TSESTree.Parameter[]): TSESTree.Parameter | undefined {
+function getFirstPropsParam(params: readonly TSESTree.Parameter[]): TSESTree.Parameter | undefined {
   return getFirstNonThisParameter(params);
 }
 
@@ -127,7 +127,7 @@ function getMutablePropsNode(
  * @param node - Type-literal node.
  * @returns True when all members are readonly properties.
  */
-function hasReadonlyTypeMembers(node: TSESTree.TSTypeLiteral): boolean {
+function hasReadonlyTypeMembers(node: Readonly<TSESTree.TSTypeLiteral>): boolean {
   return hasAllReadonlyPropertyMembers(node);
 }
 
@@ -137,7 +137,7 @@ function hasReadonlyTypeMembers(node: TSESTree.TSTypeLiteral): boolean {
  * @param expression - Candidate expression.
  * @returns True when expression is JSX.
  */
-function isJsxExpression(expression: TSESTree.Expression): boolean {
+function isJsxExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (
     expression.type === AST_NODE_TYPES.JSXElement ||
     expression.type === AST_NODE_TYPES.JSXFragment
@@ -157,7 +157,7 @@ function isJsxExpression(expression: TSESTree.Expression): boolean {
  * @param param - Parameter node.
  * @returns True when parameter is mutable.
  */
-function isMutablePropsParameter(param: TSESTree.Parameter): boolean {
+function isMutablePropsParameter(param: Readonly<TSESTree.Parameter>): boolean {
   const typeAnnotation = getParameterTypeAnnotation(param);
   if (typeAnnotation === null) {
     return true;
@@ -181,7 +181,7 @@ function isPascalCaseName(name: string | null): boolean {
  * @param node - Type node to evaluate.
  * @returns True when props are readonly.
  */
-function isReadonlyPropsType(node: TSESTree.TypeNode): boolean {
+function isReadonlyPropsType(node: Readonly<TSESTree.TypeNode>): boolean {
   if (node.type === AST_NODE_TYPES.TSTypeLiteral) {
     return hasReadonlyTypeMembers(node);
   }
@@ -197,7 +197,7 @@ function isReadonlyPropsType(node: TSESTree.TypeNode): boolean {
  * @param node - Type-reference node.
  * @returns True when node references `Readonly<T>`.
  */
-function isReadonlyTypeReference(node: TSESTree.TSTypeReference): boolean {
+function isReadonlyTypeReference(node: Readonly<TSESTree.TSTypeReference>): boolean {
   return hasNamedTypeReferenceWithTypeArguments(node, READONLY_TYPE_NAME);
 }
 
@@ -207,7 +207,7 @@ function isReadonlyTypeReference(node: TSESTree.TSTypeReference): boolean {
  * @param stateStack - Active function-state stack.
  * @param node - Return statement node.
  */
-function markJsxReturn(stateStack: IFunctionState[], node: TSESTree.ReturnStatement): void {
+function markJsxReturn(stateStack: readonly IFunctionState[], node: Readonly<TSESTree.ReturnStatement>): void {
   const currentState = stateStack.at(-1);
   if (currentState === undefined || node.argument === null) {
     return;
@@ -223,7 +223,7 @@ function markJsxReturn(stateStack: IFunctionState[], node: TSESTree.ReturnStatem
  * @param stateStack - Active function-state stack.
  * @param node - Arrow function node.
  */
-function onFunctionEnter(stateStack: IFunctionState[], node: FunctionNode): void {
+function onFunctionEnter(stateStack: readonly IFunctionState[], node: Readonly<FunctionNode>): void {
   stateStack.push(buildFunctionState(node));
 }
 
@@ -235,9 +235,9 @@ function onFunctionEnter(stateStack: IFunctionState[], node: FunctionNode): void
  * @param node - Arrow function node.
  */
 function onFunctionExit(
-  context: RequireReadonlyPropsContext,
-  stateStack: IFunctionState[],
-  node: FunctionNode,
+  context: Readonly<RequireReadonlyPropsContext>,
+  stateStack: readonly IFunctionState[],
+  node: Readonly<FunctionNode>,
 ): void {
   popAndReportReadonlyViolation(context, stateStack, node);
 }
@@ -248,7 +248,7 @@ function onFunctionExit(
  * @param stateStack - Active function-state stack.
  * @param node - Return statement node.
  */
-function onReturnStatement(stateStack: IFunctionState[], node: TSESTree.ReturnStatement): void {
+function onReturnStatement(stateStack: readonly IFunctionState[], node: Readonly<TSESTree.ReturnStatement>): void {
   markJsxReturn(stateStack, node);
 }
 
@@ -260,9 +260,9 @@ function onReturnStatement(stateStack: IFunctionState[], node: TSESTree.ReturnSt
  * @param node - Function node exiting traversal.
  */
 function popAndReportReadonlyViolation(
-  context: RequireReadonlyPropsContext,
-  stateStack: IFunctionState[],
-  node: FunctionNode,
+  context: Readonly<RequireReadonlyPropsContext>,
+  stateStack: readonly IFunctionState[],
+  node: Readonly<FunctionNode>,
 ): void {
   const currentState = stateStack.pop();
   if (!shouldReportReadonlyViolation(currentState, node)) {
@@ -282,7 +282,7 @@ function popAndReportReadonlyViolation(
  */
 function shouldReportReadonlyViolation(
   state: IFunctionState | undefined,
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
 ): state is IFunctionState {
   if (state === undefined || !state.hasJsxReturn) {
     return false;

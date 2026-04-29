@@ -36,7 +36,7 @@ type NoReturnTypeContext = Readonly<TSESLint.RuleContext<NoReturnTypeMessageId, 
  * @param context - ESLint rule execution context.
  * @param node - Type reference node to inspect.
  */
-function checkTypeReference(context: NoReturnTypeContext, node: TSESTree.TSTypeReference): void {
+function checkTypeReference(context: Readonly<NoReturnTypeContext>, node: Readonly<TSESTree.TSTypeReference>): void {
   if (!isReturnTypeReference(node)) {
     return;
   }
@@ -53,7 +53,7 @@ function checkTypeReference(context: NoReturnTypeContext, node: TSESTree.TSTypeR
  */
 function createExplicitReturnTypeSuggestions(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSTypeReference,
+  node: Readonly<TSESTree.TSTypeReference>,
 ): TSESLint.ReportSuggestionArray<NoReturnTypeMessageId> {
   const returnTypeText = getSameFileReturnTypeText(sourceCode, node);
   if (returnTypeText === null) {
@@ -61,7 +61,7 @@ function createExplicitReturnTypeSuggestions(
   }
   return [
     {
-      messageId: 'useExplicitReturnType',
+      messageId: NoReturnTypeMessageId.UseExplicitReturnType,
       data: { type: returnTypeText },
       fix: replaceReturnTypeReference.bind(undefined, node, returnTypeText),
     },
@@ -74,7 +74,7 @@ function createExplicitReturnTypeSuggestions(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoReturnTypeListeners(context: NoReturnTypeContext): TSESLint.RuleListener {
+function createNoReturnTypeListeners(context: Readonly<NoReturnTypeContext>): TSESLint.RuleListener {
   return {
     TSTypeReference: checkTypeReference.bind(undefined, context),
   };
@@ -88,7 +88,7 @@ function createNoReturnTypeListeners(context: NoReturnTypeContext): TSESLint.Rul
  * @returns Function-like node, or null when unavailable.
  */
 function findSameFileFunctionDeclaration(
-  program: TSESTree.Program,
+  program: Readonly<TSESTree.Program>,
   functionName: string,
 ): FunctionLikeNode | null {
   for (const statement of program.body) {
@@ -101,12 +101,29 @@ function findSameFileFunctionDeclaration(
 }
 
 /**
+ * Returns a named function declaration when it matches the query.
+ *
+ * @param statement - Program statement to inspect.
+ * @param functionName - Function name to match.
+ * @returns Function declaration, or null.
+ */
+function getNamedFunctionDeclaration(
+  statement: Readonly<TSESTree.ProgramStatement>,
+  functionName: string,
+): TSESTree.FunctionDeclaration | null {
+  if (statement.type !== AST_NODE_TYPES.FunctionDeclaration) {
+    return null;
+  }
+  return statement.id.name === functionName ? statement : null;
+}
+
+/**
  * Returns the function name from ReturnType<typeof fn>.
  *
  * @param node - ReturnType reference node.
  * @returns Function name, or null when the shape is unsupported.
  */
-function getReturnTypeFunctionName(node: TSESTree.TSTypeReference): string | null {
+function getReturnTypeFunctionName(node: Readonly<TSESTree.TSTypeReference>): string | null {
   const typeArgument = node.typeArguments?.params[0] ?? null;
   if (!isTypeQueryArgument(typeArgument)) {
     return null;
@@ -123,7 +140,7 @@ function getReturnTypeFunctionName(node: TSESTree.TSTypeReference): string | nul
  */
 function getSameFileReturnTypeText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSTypeReference,
+  node: Readonly<TSESTree.TSTypeReference>,
 ): string | null {
   const functionName = getReturnTypeFunctionName(node);
   if (functionName === null) {
@@ -144,11 +161,12 @@ function getSameFileReturnTypeText(
  * @returns Function-like node, or null when not matched.
  */
 function getTopLevelFunctionNode(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
   functionName: string,
 ): FunctionLikeNode | null {
-  if (isNamedFunctionDeclaration(statement, functionName)) {
-    return statement;
+  const functionDeclaration = getNamedFunctionDeclaration(statement, functionName);
+  if (functionDeclaration !== null) {
+    return functionDeclaration;
   }
   if (statement.type === AST_NODE_TYPES.VariableDeclaration) {
     return getVariableFunctionNode(statement, functionName);
@@ -162,7 +180,7 @@ function getTopLevelFunctionNode(
  * @param node - Type query node to inspect.
  * @returns Identifier name, or null when unsupported.
  */
-function getTypeQueryIdentifierName(node: TSESTree.TSTypeQuery): string | null {
+function getTypeQueryIdentifierName(node: Readonly<TSESTree.TSTypeQuery>): string | null {
   if (node.exprName.type !== AST_NODE_TYPES.Identifier) {
     return null;
   }
@@ -177,7 +195,7 @@ function getTypeQueryIdentifierName(node: TSESTree.TSTypeQuery): string | null {
  * @returns Function-like initializer, or null when not matched.
  */
 function getVariableFunctionNode(
-  statement: TSESTree.VariableDeclaration,
+  statement: Readonly<TSESTree.VariableDeclaration>,
   functionName: string,
 ): TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression | null {
   for (const declaration of statement.declarations) {
@@ -204,23 +222,6 @@ function isFunctionExpression(
 }
 
 /**
- * Returns true when a declaration is the named function being queried.
- *
- * @param statement - Program statement to inspect.
- * @param functionName - Function name to match.
- * @returns True when the statement declares the function.
- */
-function isNamedFunctionDeclaration(
-  statement: TSESTree.ProgramStatement,
-  functionName: string,
-): statement is TSESTree.FunctionDeclaration {
-  return (
-    statement.type === AST_NODE_TYPES.FunctionDeclaration &&
-    statement.id.name === functionName
-  );
-}
-
-/**
  * Returns true when a variable declarator initializes the named function value.
  *
  * @param declaration - Variable declarator to inspect.
@@ -228,7 +229,7 @@ function isNamedFunctionDeclaration(
  * @returns True when the declaration matches.
  */
 function isNamedFunctionVariableDeclarator(
-  declaration: TSESTree.VariableDeclarator,
+  declaration: Readonly<TSESTree.VariableDeclarator>,
   functionName: string,
 ): declaration is TSESTree.VariableDeclarator & {
   id: TSESTree.Identifier;
@@ -247,7 +248,7 @@ function isNamedFunctionVariableDeclarator(
  * @param node - Type reference node to inspect.
  * @returns Whether the type reference is ReturnType.
  */
-function isReturnTypeReference(node: TSESTree.TSTypeReference): boolean {
+function isReturnTypeReference(node: Readonly<TSESTree.TSTypeReference>): boolean {
   return isNamedIdentifierNode(node.typeName, RETURN_TYPE_NAME);
 }
 
@@ -272,9 +273,9 @@ function isTypeQueryArgument(
  * @returns Generated replacement fix.
  */
 function replaceReturnTypeReference(
-  node: TSESTree.TSTypeReference,
+  node: Readonly<TSESTree.TSTypeReference>,
   returnTypeText: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceText(node, returnTypeText);
 }
@@ -285,11 +286,11 @@ function replaceReturnTypeReference(
  * @param context - ESLint rule execution context.
  * @param node - Type reference node to report.
  */
-function reportReturnType(context: NoReturnTypeContext, node: TSESTree.TSTypeReference): void {
+function reportReturnType(context: Readonly<NoReturnTypeContext>, node: Readonly<TSESTree.TSTypeReference>): void {
   const suggestions = createExplicitReturnTypeSuggestions(context.sourceCode, node);
   context.report({
     node,
-    messageId: 'noReturnType',
+    messageId: NoReturnTypeMessageId.NoReturnType,
     ...(suggestions.length > 0 ? { suggest: suggestions } : {}),
   });
 }

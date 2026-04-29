@@ -29,9 +29,9 @@ type ExportAliasInfo = { local: string; alias: string };
  * @param node - Named export declaration to inspect.
  */
 function checkExportNamedDeclaration(
-  context: NoExportAliasContext,
+  context: Readonly<NoExportAliasContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ExportNamedDeclaration,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   for (const specifier of node.specifiers) {
     reportAliasSpecifier(context, sourceCode, specifier);
@@ -44,7 +44,7 @@ function checkExportNamedDeclaration(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.RuleListener {
+function createNoExportAliasListeners(context: Readonly<NoExportAliasContext>): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
 
   return {
@@ -57,7 +57,7 @@ function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.R
  * @param specifier - The export specifier to analyze.
  * @returns Object with local and alias names if it's an alias, null otherwise.
  */
-function getAliasInfo(specifier: TSESTree.ExportSpecifier): ExportAliasInfo | null {
+function getAliasInfo(specifier: Readonly<TSESTree.ExportSpecifier>): ExportAliasInfo | null {
   const localName = getSpecifierName(specifier.local);
   const exportedName = getSpecifierName(specifier.exported);
 
@@ -87,9 +87,9 @@ function getSpecifierName(node: TSESTree.Identifier | TSESTree.StringLiteral): s
  * @param specifier - Export specifier to inspect.
  */
 function reportAliasSpecifier(
-  context: NoExportAliasContext,
+  context: Readonly<NoExportAliasContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): void {
   const aliasInfo = getAliasInfo(specifier);
   if (aliasInfo === null) {

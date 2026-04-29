@@ -32,8 +32,8 @@ type NoObjectMutationContext = Readonly<TSESLint.RuleContext<'noObjectMutation',
  * @param node - Assignment expression node.
  */
 function checkAssignmentExpression(
-  context: NoObjectMutationContext,
-  node: TSESTree.AssignmentExpression,
+  context: Readonly<NoObjectMutationContext>,
+  node: Readonly<TSESTree.AssignmentExpression>,
 ): void {
   if (!isMemberExpressionNode(node.left) || isConstructorThisInitialization(node.left)) {
     return;
@@ -48,8 +48,8 @@ function checkAssignmentExpression(
  * @param node - Unary expression node.
  */
 function checkUnaryExpression(
-  context: NoObjectMutationContext,
-  node: TSESTree.UnaryExpression,
+  context: Readonly<NoObjectMutationContext>,
+  node: Readonly<TSESTree.UnaryExpression>,
 ): void {
   if (node.operator !== DELETE_OPERATOR || !isMemberExpressionNode(node.argument)) {
     return;
@@ -64,8 +64,8 @@ function checkUnaryExpression(
  * @param node - Update expression node.
  */
 function checkUpdateExpression(
-  context: NoObjectMutationContext,
-  node: TSESTree.UpdateExpression,
+  context: Readonly<NoObjectMutationContext>,
+  node: Readonly<TSESTree.UpdateExpression>,
 ): void {
   if (!isMemberExpressionNode(node.argument)) {
     return;
@@ -79,7 +79,7 @@ function checkUpdateExpression(
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoObjectMutationListeners(context: NoObjectMutationContext): TSESLint.RuleListener {
+function createNoObjectMutationListeners(context: Readonly<NoObjectMutationContext>): TSESLint.RuleListener {
   return {
     AssignmentExpression: checkAssignmentExpression.bind(undefined, context),
     UnaryExpression: checkUnaryExpression.bind(undefined, context),
@@ -93,7 +93,7 @@ function createNoObjectMutationListeners(context: NoObjectMutationContext): TSES
  * @param node - Member expression on the left-hand side of an assignment.
  * @returns True when the mutation is constructor initialization.
  */
-function isConstructorThisInitialization(node: TSESTree.MemberExpression): boolean {
+function isConstructorThisInitialization(node: Readonly<TSESTree.MemberExpression>): boolean {
   return isThisMemberExpression(node) && isInsideConstructor(node);
 }
 
@@ -103,7 +103,7 @@ function isConstructorThisInitialization(node: TSESTree.MemberExpression): boole
  * @param node - AST node to inspect.
  * @returns True when enclosed by a constructor method definition.
  */
-function isInsideConstructor(node: TSESTree.Node): boolean {
+function isInsideConstructor(node: Readonly<TSESTree.Node>): boolean {
   const functionParent = findEnclosingFunction(node);
   if (functionParent === null || functionParent.type !== AST_NODE_TYPES.FunctionExpression) {
     return false;
@@ -120,7 +120,7 @@ function isInsideConstructor(node: TSESTree.Node): boolean {
  * @param node - Member expression to inspect.
  * @returns True when the object is this.
  */
-function isThisMemberExpression(node: TSESTree.MemberExpression): boolean {
+function isThisMemberExpression(node: Readonly<TSESTree.MemberExpression>): boolean {
   return node.object.type === AST_NODE_TYPES.ThisExpression;
 }
 
@@ -132,8 +132,8 @@ function isThisMemberExpression(node: TSESTree.MemberExpression): boolean {
  * @param kind - Mutation kind label.
  */
 function reportObjectMutation(
-  context: NoObjectMutationContext,
-  node: TSESTree.Node,
+  context: Readonly<NoObjectMutationContext>,
+  node: Readonly<TSESTree.Node>,
   kind: string,
 ): void {
   context.report({

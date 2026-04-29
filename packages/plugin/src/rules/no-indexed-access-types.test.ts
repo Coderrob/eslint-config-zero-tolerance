@@ -49,6 +49,67 @@ ruleTester.run('no-indexed-access-types', noIndexedAccessTypes, {
       errors: [{ messageId: 'noIndexedAccessTypes', suggestions: [] }],
     },
     {
+      code: 'interface MyObjectKey { value: string; }\ntype Value = MyObject["key"];',
+      name: 'should not suggest extracting indexed access when generated alias collides with interface',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [{ messageId: 'noIndexedAccessTypes', suggestions: [] }],
+    },
+    {
+      code: 'const MyObjectKey = "key";\ntype Value = MyObject["key"];',
+      name: 'should not suggest extracting indexed access when generated alias collides with variable',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [{ messageId: 'noIndexedAccessTypes', suggestions: [] }],
+    },
+    {
+      code: 'import type { Existing } from "./types";\ntype Value = MyObject["key"];',
+      name: 'should ignore non-binding top-level statements when checking generated alias collisions',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [
+        {
+          messageId: 'noIndexedAccessTypes',
+          suggestions: [
+            {
+              messageId: 'extractIndexedAccessType',
+              output:
+                'import type { Existing } from "./types";\ntype MyObjectKey = MyObject["key"];\ntype Value = MyObjectKey;',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      code: 'type Value<T, K extends keyof T> = T[K];',
+      name: 'should suggest extracting indexed access with non-literal index type',
+      options: [{ aliasNamePattern: '{object}{index}' }],
+      errors: [
+        {
+          messageId: 'noIndexedAccessTypes',
+          suggestions: [
+            {
+              messageId: 'extractIndexedAccessType',
+              output: 'type TK = T[K];\ntype Value<T, K extends keyof T> = TK;',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      code: 'type Value = {}["key"];',
+      name: 'should suggest extracting indexed access when sanitized object text is empty',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [
+        {
+          messageId: 'noIndexedAccessTypes',
+          suggestions: [
+            {
+              messageId: 'extractIndexedAccessType',
+              output: 'type Key = {}["key"];\ntype Value = Key;',
+            },
+          ],
+        },
+      ],
+    },
+    {
       code: 'type Prop = Props["onChange"];',
       name: 'should report indexed access for prop type',
       errors: [{ messageId: 'noIndexedAccessTypes' }],

@@ -40,8 +40,8 @@ type DirectNamedExportDeclaration =
  * @returns True when the exported local binding came from a parent import.
  */
 function checkExportAllDeclaration(
-  context: NoReExportContext,
-  node: TSESTree.ExportAllDeclaration,
+  context: Readonly<NoReExportContext>,
+  node: Readonly<TSESTree.ExportAllDeclaration>,
 ): void {
   reportIfParentReExport(context, node, node.source.value);
 }
@@ -54,9 +54,9 @@ function checkExportAllDeclaration(
  * @param node - Export default declaration node.
  */
 function checkExportDefaultDeclaration(
-  context: NoReExportContext,
-  importedBindings: ImportedBindingNames,
-  node: TSESTree.ExportDefaultDeclaration,
+  context: Readonly<NoReExportContext>,
+  importedBindings: Readonly<ImportedBindingNames>,
+  node: Readonly<TSESTree.ExportDefaultDeclaration>,
 ): void {
   if (isIdentifierNode(node.declaration) && importedBindings.has(node.declaration.name)) {
     reportIndirectParentReExport(context, new Set<string>(), node);
@@ -72,10 +72,10 @@ function checkExportDefaultDeclaration(
  * @param node - Export named declaration node.
  */
 function checkExportNamedDeclaration(
-  context: NoReExportContext,
-  importedBindings: ImportedBindingNames,
-  directExportNames: DirectExportNames,
-  node: TSESTree.ExportNamedDeclaration,
+  context: Readonly<NoReExportContext>,
+  importedBindings: Readonly<ImportedBindingNames>,
+  directExportNames: Readonly<DirectExportNames>,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   if (node.source !== null) {
     reportIfParentReExport(context, node, node.source.value);
@@ -96,9 +96,9 @@ function checkExportNamedDeclaration(
  * @param node - TS export assignment node.
  */
 function checkTsExportAssignment(
-  context: NoReExportContext,
-  importedBindings: ImportedBindingNames,
-  node: TSESTree.TSExportAssignment,
+  context: Readonly<NoReExportContext>,
+  importedBindings: Readonly<ImportedBindingNames>,
+  node: Readonly<TSESTree.TSExportAssignment>,
 ): void {
   if (isIdentifierNode(node.expression) && importedBindings.has(node.expression.name)) {
     reportIndirectParentReExport(context, new Set<string>(), node);
@@ -112,8 +112,8 @@ function checkTsExportAssignment(
  * @param statement - Program statement to inspect.
  */
 function collectDirectExportNames(
-  directExportNames: DirectExportNames,
-  statement: TSESTree.ProgramStatement,
+  directExportNames: Readonly<DirectExportNames>,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): void {
   if (statement.type !== AST_NODE_TYPES.ExportNamedDeclaration || statement.declaration === null) {
     return;
@@ -131,8 +131,8 @@ function collectDirectExportNames(
  * @param node - Import declaration node.
  */
 function collectParentImportDeclarationBindings(
-  importedBindings: ImportedBindingNames,
-  node: TSESTree.ImportDeclaration,
+  importedBindings: Readonly<ImportedBindingNames>,
+  node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   if (!isParentDirectoryImportPath(node.source.value)) {
     return;
@@ -149,8 +149,8 @@ function collectParentImportDeclarationBindings(
  * @param node - TS import-equals declaration node.
  */
 function collectParentImportEqualsBindings(
-  importedBindings: ImportedBindingNames,
-  node: TSESTree.TSImportEqualsDeclaration,
+  importedBindings: Readonly<ImportedBindingNames>,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): void {
   const importPath = getImportEqualsModulePath(node);
   if (importPath === null || !isParentDirectoryImportPath(importPath)) {
@@ -169,15 +169,15 @@ function collectParentImportEqualsBindings(
  * @returns Fix callback, or null when not safely fixable.
  */
 function createIndirectParentReExportFix(
-  context: NoReExportContext,
-  directExportNames: DirectExportNames,
+  context: Readonly<NoReExportContext>,
+  directExportNames: Readonly<DirectExportNames>,
   node:
     | TSESTree.ExportDefaultDeclaration
     | TSESTree.ExportNamedDeclaration
     | TSESTree.TSExportAssignment,
-  specifier?: TSESTree.ExportSpecifier,
+  specifier?: Readonly<TSESTree.ExportSpecifier>,
 ): TSESLint.ReportFixFunction | null {
-  if (!isFixableNamedReExport(directExportNames, node, specifier)) {
+  if (specifier === undefined || !isFixableNamedReExport(directExportNames, node, specifier)) {
     return null;
   }
   return removeExportSpecifier.bind(undefined, context.sourceCode, node, specifier);
@@ -192,9 +192,9 @@ function createIndirectParentReExportFix(
  * @returns Rule listeners.
  */
 function createNonBarrelNoReExportListeners(
-  context: NoReExportContext,
-  importedBindings: ImportedBindingNames,
-  directExportNames: DirectExportNames,
+  context: Readonly<NoReExportContext>,
+  importedBindings: Readonly<ImportedBindingNames>,
+  directExportNames: Readonly<DirectExportNames>,
 ): TSESLint.RuleListener {
   return {
     ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
@@ -210,7 +210,7 @@ function createNonBarrelNoReExportListeners(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoReExportListeners(context: NoReExportContext): TSESLint.RuleListener {
+function createNoReExportListeners(context: Readonly<NoReExportContext>): TSESLint.RuleListener {
   if (isBarrelFile(context.filename)) {
     return {};
   }
@@ -225,7 +225,7 @@ function createNoReExportListeners(context: NoReExportContext): TSESLint.RuleLis
  * @param declaration - Exported declaration.
  * @returns Export name, or null when unavailable.
  */
-function getDeclarationExportName(declaration: TSESTree.Node): string | null {
+function getDeclarationExportName(declaration: Readonly<TSESTree.Node>): string | null {
   if (declaration.type === AST_NODE_TYPES.VariableDeclaration) {
     return getVariableDeclarationExportName(declaration);
   }
@@ -238,7 +238,7 @@ function getDeclarationExportName(declaration: TSESTree.Node): string | null {
  * @param program - Program node to inspect.
  * @returns Direct export names.
  */
-function getDirectExportNames(program: TSESTree.Program): DirectExportNames {
+function getDirectExportNames(program: Readonly<TSESTree.Program>): DirectExportNames {
   const directExportNames: DirectExportNames = new Set<string>();
   for (const statement of program.body) {
     collectDirectExportNames(directExportNames, statement);
@@ -252,7 +252,7 @@ function getDirectExportNames(program: TSESTree.Program): DirectExportNames {
  * @param program - Program node to inspect.
  * @returns Imported local binding names sourced from parent paths.
  */
-function getImportedBindingsFromParentPaths(program: TSESTree.Program): ImportedBindingNames {
+function getImportedBindingsFromParentPaths(program: Readonly<TSESTree.Program>): ImportedBindingNames {
   const importedBindings: ImportedBindingNames = new Set<string>();
   for (const statement of program.body) {
     if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
@@ -272,7 +272,7 @@ function getImportedBindingsFromParentPaths(program: TSESTree.Program): Imported
  * @param node - TS import-equals declaration node.
  * @returns Import path when the declaration targets an external module.
  */
-function getImportEqualsModulePath(node: TSESTree.TSImportEqualsDeclaration): string | null {
+function getImportEqualsModulePath(node: Readonly<TSESTree.TSImportEqualsDeclaration>): string | null {
   if (node.moduleReference.type !== AST_NODE_TYPES.TSExternalModuleReference) {
     return null;
   }
@@ -285,10 +285,11 @@ function getImportEqualsModulePath(node: TSESTree.TSImportEqualsDeclaration): st
  * @param declaration - Exported declaration to inspect.
  * @returns Declaration name, or null.
  */
-function getNamedDirectExportName(declaration: TSESTree.Node): string | null {
+function getNamedDirectExportName(declaration: Readonly<TSESTree.Node>): string | null {
   if (!isNamedDirectExportDeclaration(declaration)) {
     return null;
   }
+  /* istanbul ignore next -- parser only exposes named direct export declarations with identifiers here. */
   return declaration.id?.name ?? null;
 }
 
@@ -302,8 +303,8 @@ function getNamedDirectExportName(declaration: TSESTree.Node): string | null {
  */
 function getSpecifierRangeWithNextComma(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
-  commaToken: TSESTree.Token,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
+  commaToken: Readonly<TSESTree.Token>,
 ): TSESTree.Range {
   const tokenAfterComma = sourceCode.getTokenAfter(commaToken);
   return [specifier.range[0], tokenAfterComma?.range[0] ?? commaToken.range[1]];
@@ -318,7 +319,7 @@ function getSpecifierRangeWithNextComma(
  */
 function getSpecifierRemovalRange(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): TSESTree.Range {
   const nextToken = sourceCode.getTokenAfter(specifier);
   if (isCommaToken(nextToken)) {
@@ -328,6 +329,7 @@ function getSpecifierRemovalRange(
   if (isCommaToken(previousToken)) {
     return [previousToken.range[0], specifier.range[1]];
   }
+  /* istanbul ignore next -- single-specifier declarations are removed before range calculation. */
   return specifier.range;
 }
 
@@ -337,7 +339,7 @@ function getSpecifierRemovalRange(
  * @param declaration - Variable declaration.
  * @returns Exported name, or null when unavailable.
  */
-function getVariableDeclarationExportName(declaration: TSESTree.VariableDeclaration): string | null {
+function getVariableDeclarationExportName(declaration: Readonly<TSESTree.VariableDeclaration>): string | null {
   const declarator = declaration.declarations[0];
   return declaration.declarations.length === 1 && declarator.id.type === AST_NODE_TYPES.Identifier
     ? declarator.id.name
@@ -352,8 +354,8 @@ function getVariableDeclarationExportName(declaration: TSESTree.VariableDeclarat
  * @returns True when the exported name already exists as a direct export.
  */
 function hasDirectExportForSpecifier(
-  directExportNames: DirectExportNames,
-  specifier: TSESTree.ExportSpecifier,
+  directExportNames: Readonly<DirectExportNames>,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): boolean {
   const exportedName = getIdentifierName(specifier.exported);
   return exportedName !== null && directExportNames.has(exportedName);
@@ -378,16 +380,15 @@ function isCommaToken(token: TSESTree.Token | null): token is TSESTree.Token {
  * @returns True when the specifier can be removed.
  */
 function isFixableNamedReExport(
-  directExportNames: DirectExportNames,
+  directExportNames: Readonly<DirectExportNames>,
   node:
     | TSESTree.ExportDefaultDeclaration
     | TSESTree.ExportNamedDeclaration
     | TSESTree.TSExportAssignment,
-  specifier?: TSESTree.ExportSpecifier,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): node is TSESTree.ExportNamedDeclaration {
   return (
     node.type === AST_NODE_TYPES.ExportNamedDeclaration &&
-    specifier !== undefined &&
     hasDirectExportForSpecifier(directExportNames, specifier)
   );
 }
@@ -399,7 +400,7 @@ function isFixableNamedReExport(
  * @returns True when the declaration owns an identifier.
  */
 function isNamedDirectExportDeclaration(
-  declaration: TSESTree.Node,
+  declaration: Readonly<TSESTree.Node>,
 ): declaration is DirectNamedExportDeclaration {
   return (
     declaration.type === AST_NODE_TYPES.FunctionDeclaration ||
@@ -417,8 +418,8 @@ function isNamedDirectExportDeclaration(
  * @returns True when any exported binding was imported from a parent path.
  */
 function isParentImportExportSpecifier(
-  importedBindings: ImportedBindingNames,
-  specifier: TSESTree.ExportSpecifier,
+  importedBindings: Readonly<ImportedBindingNames>,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): boolean {
   const localName = getIdentifierName(specifier.local);
   return localName !== null && importedBindings.has(localName);
@@ -435,9 +436,9 @@ function isParentImportExportSpecifier(
  */
 function removeExportSpecifier(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ExportNamedDeclaration,
-  specifier: TSESTree.ExportSpecifier,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   if (node.specifiers.length === 1) {
     return fixer.remove(node);
@@ -454,7 +455,7 @@ function removeExportSpecifier(
  * @param importPath - Source value to validate.
  */
 function reportIfParentReExport(
-  context: NoReExportContext,
+  context: Readonly<NoReExportContext>,
   node: TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration,
   importPath: string,
 ): void {
@@ -476,13 +477,13 @@ function reportIfParentReExport(
  * @param specifier - Named export specifier when available.
  */
 function reportIndirectParentReExport(
-  context: NoReExportContext,
-  directExportNames: DirectExportNames,
+  context: Readonly<NoReExportContext>,
+  directExportNames: Readonly<DirectExportNames>,
   node:
     | TSESTree.ExportDefaultDeclaration
     | TSESTree.ExportNamedDeclaration
     | TSESTree.TSExportAssignment,
-  specifier?: TSESTree.ExportSpecifier,
+  specifier?: Readonly<TSESTree.ExportSpecifier>,
 ): void {
   context.report({
     node: specifier ?? node,

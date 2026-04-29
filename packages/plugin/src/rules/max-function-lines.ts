@@ -31,7 +31,7 @@ type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>
  * @param body - The block statement to count lines for.
  * @returns The number of lines in the block statement.
  */
-function countBodyLines(body: TSESTree.BlockStatement): number {
+function countBodyLines(body: Readonly<TSESTree.BlockStatement>): number {
   return body.loc.end.line - body.loc.start.line + 1;
 }
 
@@ -41,7 +41,7 @@ function countBodyLines(body: TSESTree.BlockStatement): number {
  * @param node - Function node to inspect.
  * @returns Block body when present, otherwise null.
  */
-function getBlockBody(node: FunctionNode): TSESTree.BlockStatement | null {
+function getBlockBody(node: Readonly<FunctionNode>): TSESTree.BlockStatement | null {
   return isBlockStatementNode(node.body) ? node.body : null;
 }
 
@@ -51,7 +51,7 @@ function getBlockBody(node: FunctionNode): TSESTree.BlockStatement | null {
  * @param options - Raw rule options.
  * @returns Configured maximum, or the default.
  */
-function getConfiguredMaxValue(options: unknown[]): number {
+function getConfiguredMaxValue(options: readonly unknown[]): number {
   const firstOption = options[0];
   const maxValue = getOptionMaxValue(firstOption);
   return isNumber(maxValue) && maxValue > 0 ? maxValue : DEFAULT_MAX_FUNCTION_LINES;
@@ -66,8 +66,8 @@ function getConfiguredMaxValue(options: unknown[]): number {
  * @param maxLines - Configured maximum line count.
  */
 function reportFunctionLineViolation(
-  context: MaxFunctionLinesContext,
-  node: FunctionNode,
+  context: Readonly<MaxFunctionLinesContext>,
+  node: Readonly<FunctionNode>,
   lineCount: number,
   maxLines: number,
 ): void {
@@ -86,9 +86,9 @@ function reportFunctionLineViolation(
  * @param node - Function-like node to check.
  */
 function reportIfFunctionExceedsLimit(
-  context: MaxFunctionLinesContext,
+  context: Readonly<MaxFunctionLinesContext>,
   maxLines: number,
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
 ): void {
   const blockBody = getBlockBody(node);
   if (blockBody === null) {
@@ -106,7 +106,7 @@ function reportIfFunctionExceedsLimit(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function resolveListeners(context: MaxFunctionLinesContext): TSESLint.RuleListener {
+function resolveListeners(context: Readonly<MaxFunctionLinesContext>): TSESLint.RuleListener {
   const maxLines = getConfiguredMaxValue(context.options);
   return createFunctionNodeListeners(
     reportIfFunctionExceedsLimit.bind(undefined, context, maxLines),

@@ -39,6 +39,12 @@
           "given": "an expression getItem()!.name",
           "when": "the rule evaluates the TSNonNullExpression",
           "then": "a noNonNullAssertion violation is reported"
+        },
+        {
+          "name": "should suggest optional chaining for safe member and call forms",
+          "given": "expressions such as value!.prop, value![key], and value!()",
+          "when": "the non-null assertion is not used as an assignment or update target",
+          "then": "a noNonNullAssertion violation is reported with an optional-chaining suggestion"
         }
       ]
     }

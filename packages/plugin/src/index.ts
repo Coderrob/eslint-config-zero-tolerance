@@ -15,6 +15,7 @@
  */
 
 import packageJson from '../package.json';
+import type { IPluginFlatConfig } from './configs/recommended';
 import {
   createRecommendedConfig,
   createStrictConfig,
@@ -38,6 +39,7 @@ import noFetchInTests from './rules/no-fetch-in-tests';
 import noFlagArgument from './rules/no-flag-argument';
 import noFloatingPromises from './rules/no-floating-promises';
 import noForIn from './rules/no-for-in';
+import noHardcodedSecrets from './rules/no-hardcoded-secrets';
 import noIdenticalBranches from './rules/no-identical-branches';
 import noIdenticalExpressions from './rules/no-identical-expressions';
 import noIndexedAccessTypes from './rules/no-indexed-access-types';
@@ -55,17 +57,23 @@ import noNonNullAssertion from './rules/no-non-null-assertion';
 import noObjectMutation from './rules/no-object-mutation';
 import noParameterReassign from './rules/no-parameter-reassign';
 import noParentInternalAccess from './rules/no-parent-internal-access';
+import noPlaceholderImplementation from './rules/no-placeholder-implementation';
 import noProcessEnvOutsideConfig from './rules/no-process-env-outside-config';
 import noQuerySideEffects from './rules/no-query-side-effects';
+import noRawSqlInterpolation from './rules/no-raw-sql-interpolation';
 import noReExport from './rules/no-re-export';
 import noRedundantBoolean from './rules/no-redundant-boolean';
 import noRestrictedImportsInTests from './rules/no-restricted-imports-in-tests';
 import noReturnType from './rules/no-return-type';
 import noSetIntervalInTests from './rules/no-set-interval-in-tests';
 import noSetTimeoutInTests from './rules/no-set-timeout-in-tests';
+import noShellCommandConstruction from './rules/no-shell-command-construction';
 import noTestInterfaceDeclaration from './rules/no-test-interface-declaration';
 import noThrowLiteral from './rules/no-throw-literal';
+import noTsNocheck from './rules/no-ts-nocheck';
 import noTypeAssertion from './rules/no-type-assertion';
+import noUnsafeCodeGeneration from './rules/no-unsafe-code-generation';
+import noUnsafeJsonParse from './rules/no-unsafe-json-parse';
 import noWith from './rules/no-with';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
@@ -87,6 +95,7 @@ import requireNodeProtocol from './rules/require-node-protocol';
 import requireOptionalChaining from './rules/require-optional-chaining';
 import requireReadonlyProps from './rules/require-readonly-props';
 import requireTestDescriptionStyle from './rules/require-test-description-style';
+import requireTimeoutForIo from './rules/require-timeout-for-io';
 import requireUnionTypeAlias from './rules/require-union-type-alias';
 import sortFunctions from './rules/sort-functions';
 import sortImports from './rules/sort-imports';
@@ -99,8 +108,15 @@ interface IBasePlugin {
   rules: Record<string, unknown>;
 }
 
+interface IPluginConfigs {
+  recommended: IPluginFlatConfig;
+  strict: IPluginFlatConfig;
+  'legacy-recommended': unknown;
+  'legacy-strict': unknown;
+}
+
 interface IPluginExport extends IBasePlugin {
-  configs: Record<string, unknown>;
+  configs: IPluginConfigs;
 }
 
 /**
@@ -123,6 +139,7 @@ const rules: Record<string, unknown> = {
   'no-flag-argument': noFlagArgument,
   'no-floating-promises': noFloatingPromises,
   'no-for-in': noForIn,
+  'no-hardcoded-secrets': noHardcodedSecrets,
   'no-identical-branches': noIdenticalBranches,
   'no-identical-expressions': noIdenticalExpressions,
   'no-indexed-access-types': noIndexedAccessTypes,
@@ -142,17 +159,23 @@ const rules: Record<string, unknown> = {
   'no-parent-internal-access': noParentInternalAccess,
   'no-parameter-reassign': noParameterReassign,
   'no-barrel-parent-imports': noBarrelParentImports,
+  'no-placeholder-implementation': noPlaceholderImplementation,
   'no-process-env-outside-config': noProcessEnvOutsideConfig,
   'no-query-side-effects': noQuerySideEffects,
+  'no-raw-sql-interpolation': noRawSqlInterpolation,
   'no-re-export': noReExport,
   'no-redundant-boolean': noRedundantBoolean,
   'no-restricted-imports-in-tests': noRestrictedImportsInTests,
   'no-return-type': noReturnType,
   'no-set-interval-in-tests': noSetIntervalInTests,
   'no-set-timeout-in-tests': noSetTimeoutInTests,
+  'no-shell-command-construction': noShellCommandConstruction,
   'no-test-interface-declaration': noTestInterfaceDeclaration,
   'no-throw-literal': noThrowLiteral,
+  'no-ts-nocheck': noTsNocheck,
   'no-type-assertion': noTypeAssertion,
+  'no-unsafe-code-generation': noUnsafeCodeGeneration,
+  'no-unsafe-json-parse': noUnsafeJsonParse,
   'no-with': noWith,
   'prefer-guard-clauses': preferGuardClauses,
   'prefer-nullish-coalescing': preferNullishCoalescing,
@@ -173,6 +196,7 @@ const rules: Record<string, unknown> = {
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,
+  'require-timeout-for-io': requireTimeoutForIo,
   'require-union-type-alias': requireUnionTypeAlias,
   'sort-functions': sortFunctions,
   'sort-imports': sortImports,

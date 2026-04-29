@@ -1,17 +1,17 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **69 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **76 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
 | [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
-| [Type Safety](#type-safety)               |    11 | Assertions, unions, imports, exported types         |
-| [Code Quality](#code-quality)             |    15 | Function size, magic values, immutability, sorting  |
+| [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
+| [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
-| [Imports](#imports)                       |     8 | Barrels, re-exports, dynamic imports, node protocol |
-| [Bug Prevention](#bug-prevention)         |    18 | Identical code, control flow, async safety          |
+| [Imports](#imports)                       |    13 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention)         |    19 | Identical code, control flow, async safety          |
 
 ---
 
@@ -59,6 +59,7 @@
 | [require-union-type-alias](require-union-type-alias.md)                             | suggestion | Require inline union types with multiple type references to use named type aliases |
 | [no-destructured-parameter-type-literal](no-destructured-parameter-type-literal.md) | suggestion | Disallow inline object type literals on destructured parameters                    |
 | [require-exported-object-type](require-exported-object-type.md)                     | suggestion | Require exported object constants to declare an explicit type annotation           |
+| [no-unsafe-json-parse](no-unsafe-json-parse.md)                                     | problem    | Disallow treating JSON.parse results as typed data without validation              |
 
 ## Code Quality
 
@@ -68,6 +69,7 @@
 | [max-params](max-params.md)                                 | suggestion | Enforce a maximum number of function parameters                                         |
 | [no-array-mutation](no-array-mutation.md)                   | suggestion | Disallow mutating array methods                                                         |
 | [no-date-now](no-date-now.md)                               | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
+| [no-placeholder-implementation](no-placeholder-implementation.md) | problem | Disallow placeholder, stub, TODO, and not implemented production code |
 | [no-magic-numbers](no-magic-numbers.md)                     | suggestion | Disallow magic numbers; use named constants instead                                     |
 | [no-magic-strings](no-magic-strings.md)                     | suggestion | Disallow magic strings in comparisons and switch cases                                  |
 | [no-map-set-mutation](no-map-set-mutation.md)               | suggestion | Disallow direct `Map` and `Set` mutation methods                                        |
@@ -96,9 +98,13 @@
 | [require-barrel-relative-exports](require-barrel-relative-exports.md) | suggestion | Require barrel re-exports to use `./` descendant paths                          |
 | [no-dynamic-import](no-dynamic-import.md)                 | problem    | Ban dynamic `import()` and `require()` outside test files                       |
 | [no-export-alias](no-export-alias.md)                     | suggestion | Prevent use of aliases in export statements                                     |
+| [no-hardcoded-secrets](no-hardcoded-secrets.md)           | problem    | Disallow hardcoded secrets, credentials, tokens, and secret env defaults        |
+| [no-raw-sql-interpolation](no-raw-sql-interpolation.md)   | problem    | Disallow interpolated raw SQL and unsafe raw query helpers                      |
 | [no-barrel-parent-imports](no-barrel-parent-imports.md)   | suggestion | Disallow parent-directory traversal in barrel-file import paths                 |
 | [no-parent-internal-access](no-parent-internal-access.md) | suggestion | Disallow parent-relative access into protected internal directories such as src |
 | [no-re-export](no-re-export.md)                           | suggestion | Disallow direct or pass-through re-exports from parent/grandparent modules      |
+| [no-shell-command-construction](no-shell-command-construction.md) | problem | Disallow shell command construction through subprocess APIs |
+| [no-unsafe-code-generation](no-unsafe-code-generation.md) | problem    | Disallow eval, Function constructors, string timers, and vm execution APIs      |
 | [require-node-protocol](require-node-protocol.md)         | suggestion | Require Node.js built-in module imports to use the `node:` protocol prefix      |
 
 ## Bug Prevention
@@ -122,4 +128,5 @@
 | [prefer-guard-clauses](prefer-guard-clauses.md)                   | suggestion | Prefer guard clauses by removing else blocks after terminating if branches   |
 | [prefer-shortcut-return](prefer-shortcut-return.md)               | suggestion | Prefer shortcut boolean returns over if branches that return true/false      |
 | [no-query-side-effects](no-query-side-effects.md)                 | suggestion | Disallow side effects in query-style functions                               |
+| [require-timeout-for-io](require-timeout-for-io.md)               | problem    | Require timeout or cancellation options for external IO calls                |
 | [require-exhaustive-switch](require-exhaustive-switch.md)         | suggestion | Require exhaustive `switch` statements over finite discriminant types        |

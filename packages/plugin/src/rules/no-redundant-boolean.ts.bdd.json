@@ -45,6 +45,18 @@
           "given": "if (enabled !== true) { ... }",
           "when": "the rule evaluates the binary expression",
           "then": "a noRedundantBoolean violation is reported"
+        },
+        {
+          "name": "should report and fix redundant boolean ternary branches",
+          "given": "const value = condition ? true : false",
+          "when": "the rule evaluates the conditional expression",
+          "then": "a noRedundantBoolean violation is reported with a fix to use condition directly"
+        },
+        {
+          "name": "should report and fix double negation of a boolean expression",
+          "given": "const value = !!(count > 0)",
+          "when": "the rule evaluates the unary expression",
+          "then": "a noRedundantBoolean violation is reported with a fix to remove the redundant double negation"
         }
       ]
     }

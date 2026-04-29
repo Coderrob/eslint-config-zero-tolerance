@@ -34,7 +34,7 @@ type NoDateNowContext = Readonly<TSESLint.RuleContext<NoDateNowMessageId, []>>;
  * @param context - ESLint rule execution context.
  * @param node - Call expression node.
  */
-function checkCallExpression(context: NoDateNowContext, node: TSESTree.CallExpression): void {
+function checkCallExpression(context: Readonly<NoDateNowContext>, node: Readonly<TSESTree.CallExpression>): void {
   if (!isDateNowCall(node)) {
     return;
   }
@@ -50,7 +50,7 @@ function checkCallExpression(context: NoDateNowContext, node: TSESTree.CallExpre
  * @param context - ESLint rule execution context.
  * @param node - New expression node.
  */
-function checkNewExpression(context: NoDateNowContext, node: TSESTree.NewExpression): void {
+function checkNewExpression(context: Readonly<NoDateNowContext>, node: Readonly<TSESTree.NewExpression>): void {
   if (!isNoArgDateConstructor(node)) {
     return;
   }
@@ -66,7 +66,7 @@ function checkNewExpression(context: NoDateNowContext, node: TSESTree.NewExpress
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoDateNowListeners(context: NoDateNowContext): TSESLint.RuleListener {
+function createNoDateNowListeners(context: Readonly<NoDateNowContext>): TSESLint.RuleListener {
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
     NewExpression: checkNewExpression.bind(undefined, context),
@@ -79,11 +79,8 @@ function createNoDateNowListeners(context: NoDateNowContext): TSESLint.RuleListe
  * @param node - Call expression node.
  * @returns True for Date.now call.
  */
-function isDateNowCall(node: TSESTree.CallExpression): boolean {
-  if (!isDateNowMember(node.callee)) {
-    return false;
-  }
-  return true;
+function isDateNowCall(node: Readonly<TSESTree.CallExpression>): boolean {
+  return isDateNowMember(node.callee);
 }
 
 /**
@@ -92,7 +89,7 @@ function isDateNowCall(node: TSESTree.CallExpression): boolean {
  * @param node - Call-expression callee.
  * @returns True when member is Date.now.
  */
-function isDateNowMember(node: TSESTree.Expression): boolean {
+function isDateNowMember(node: Readonly<TSESTree.Expression>): boolean {
   if (!isUncomputedMemberExpressionNode(node)) {
     return false;
   }
@@ -105,7 +102,7 @@ function isDateNowMember(node: TSESTree.Expression): boolean {
  * @param node - Member object node.
  * @returns True when object is Date.
  */
-function isDateNowObject(node: TSESTree.Expression): boolean {
+function isDateNowObject(node: Readonly<TSESTree.Expression>): boolean {
   return isNamedIdentifierNode(node, DATE_IDENTIFIER);
 }
 
@@ -115,7 +112,7 @@ function isDateNowObject(node: TSESTree.Expression): boolean {
  * @param node - New expression node.
  * @returns True for no-arg Date constructor.
  */
-function isNoArgDateConstructor(node: TSESTree.NewExpression): boolean {
+function isNoArgDateConstructor(node: Readonly<TSESTree.NewExpression>): boolean {
   if (!isNamedIdentifierNode(node.callee, DATE_IDENTIFIER)) {
     return false;
   }

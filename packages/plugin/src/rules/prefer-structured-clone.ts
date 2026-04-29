@@ -39,7 +39,7 @@ type PreferStructuredCloneContext = Readonly<TSESLint.RuleContext<'preferStructu
  */
 function buildStructuredCloneReplacement(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.CallExpression,
+  node: Readonly<TSESTree.CallExpression>,
 ): string | null {
   const clonedValue = getClonedValue(node);
   /* istanbul ignore next -- fixer is created only after the node matches exactly */
@@ -59,8 +59,8 @@ function buildStructuredCloneReplacement(
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: PreferStructuredCloneContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<PreferStructuredCloneContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!isJsonParseOfJsonStringify(node)) {
     return;
@@ -82,8 +82,8 @@ function checkCallExpression(
  */
 function createPreferStructuredCloneFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.CallExpression,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.CallExpression>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix | null {
   const replacement = buildStructuredCloneReplacement(sourceCode, node);
   /* istanbul ignore next -- replacement creation is guarded by the reporting predicate */
@@ -100,7 +100,7 @@ function createPreferStructuredCloneFix(
  * @returns Rule listeners.
  */
 function createPreferStructuredCloneListeners(
-  context: PreferStructuredCloneContext,
+  context: Readonly<PreferStructuredCloneContext>,
 ): TSESLint.RuleListener {
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
@@ -113,7 +113,7 @@ function createPreferStructuredCloneListeners(
  * @param node - Candidate JSON.parse call.
  * @returns The cloned value expression, or null when the shape does not match.
  */
-function getClonedValue(node: TSESTree.CallExpression): TSESTree.Expression | null {
+function getClonedValue(node: Readonly<TSESTree.CallExpression>): TSESTree.Expression | null {
   const jsonStringifyCall = getNestedJsonStringifyCall(node);
   /* istanbul ignore next -- clone values are only read after the pattern match succeeds */
   return jsonStringifyCall === null ? null : getOnlyExpressionArgument(jsonStringifyCall);
@@ -126,7 +126,7 @@ function getClonedValue(node: TSESTree.CallExpression): TSESTree.Expression | nu
  * @returns Nested JSON.stringify call when the shape matches exactly.
  */
 function getNestedJsonStringifyCall(
-  node: TSESTree.CallExpression,
+  node: Readonly<TSESTree.CallExpression>,
 ): TSESTree.CallExpression | null {
   const parsedValue = getOnlyExpressionArgument(node);
   return isJsonStringifyCloneSource(parsedValue) ? parsedValue : null;
@@ -138,7 +138,7 @@ function getNestedJsonStringifyCall(
  * @param node - Call expression to inspect.
  * @returns The sole expression argument, or null.
  */
-function getOnlyExpressionArgument(node: TSESTree.CallExpression): TSESTree.Expression | null {
+function getOnlyExpressionArgument(node: Readonly<TSESTree.CallExpression>): TSESTree.Expression | null {
   if (node.arguments.length !== 1) {
     return null;
   }
@@ -157,7 +157,7 @@ function getOnlyExpressionArgument(node: TSESTree.CallExpression): TSESTree.Expr
  */
 function getStructuredCloneArgumentText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Expression,
+  node: Readonly<TSESTree.Expression>,
 ): string {
   const argumentText = sourceCode.getText(node);
   if (node.type !== AST_NODE_TYPES.SequenceExpression) {
@@ -179,7 +179,7 @@ function getStructuredCloneArgumentText(
  */
 function getTypeArgumentsText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.CallExpression,
+  node: Readonly<TSESTree.CallExpression>,
 ): string {
   return node.typeArguments === undefined ? '' : sourceCode.getText(node.typeArguments);
 }
@@ -190,7 +190,7 @@ function getTypeArgumentsText(
  * @param node - Call expression to inspect.
  * @returns True when the call has a single expression argument.
  */
-function hasOnlyExpressionArgument(node: TSESTree.CallExpression): boolean {
+function hasOnlyExpressionArgument(node: Readonly<TSESTree.CallExpression>): boolean {
   return getOnlyExpressionArgument(node) !== null;
 }
 
@@ -201,7 +201,7 @@ function hasOnlyExpressionArgument(node: TSESTree.CallExpression): boolean {
  * @param methodName - Expected JSON method name.
  * @returns True when the callee matches JSON.<methodName>.
  */
-function isJsonMethodCall(node: TSESTree.CallExpression, methodName: string): boolean {
+function isJsonMethodCall(node: Readonly<TSESTree.CallExpression>, methodName: string): boolean {
   if (!isUncomputedMemberExpressionNode(node.callee)) {
     return false;
   }
@@ -217,7 +217,7 @@ function isJsonMethodCall(node: TSESTree.CallExpression, methodName: string): bo
  * @param node - Call expression to inspect.
  * @returns True when the callee is JSON.parse.
  */
-function isJsonParseCall(node: TSESTree.CallExpression): boolean {
+function isJsonParseCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return isJsonMethodCall(node, JSON_PARSE_METHOD);
 }
 
@@ -227,7 +227,7 @@ function isJsonParseCall(node: TSESTree.CallExpression): boolean {
  * @param node - Call expression to inspect.
  * @returns True when the outer and inner JSON calls both match exactly.
  */
-function isJsonParseOfJsonStringify(node: TSESTree.CallExpression): boolean {
+function isJsonParseOfJsonStringify(node: Readonly<TSESTree.CallExpression>): boolean {
   return isJsonParseCall(node) && getNestedJsonStringifyCall(node) !== null;
 }
 
@@ -237,7 +237,7 @@ function isJsonParseOfJsonStringify(node: TSESTree.CallExpression): boolean {
  * @param node - Call expression to inspect.
  * @returns True when the callee is JSON.stringify.
  */
-function isJsonStringifyCall(node: TSESTree.CallExpression): boolean {
+function isJsonStringifyCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return isJsonMethodCall(node, JSON_STRINGIFY_METHOD);
 }
 

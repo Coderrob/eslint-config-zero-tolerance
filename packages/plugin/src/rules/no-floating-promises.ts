@@ -36,8 +36,8 @@ type NoFloatingPromisesContext = Readonly<TSESLint.RuleContext<'noFloatingPromis
  * @param node - Expression statement to inspect.
  */
 function checkExpressionStatement(
-  context: NoFloatingPromisesContext,
-  node: TSESTree.ExpressionStatement,
+  context: Readonly<NoFloatingPromisesContext>,
+  node: Readonly<TSESTree.ExpressionStatement>,
 ): void {
   if (isHandledPromiseExpression(node.expression)) {
     return;
@@ -55,7 +55,7 @@ function checkExpressionStatement(
  * @returns Rule listeners.
  */
 function createNoFloatingPromisesListeners(
-  context: NoFloatingPromisesContext,
+  context: Readonly<NoFloatingPromisesContext>,
 ): TSESLint.RuleListener {
   return {
     ExpressionStatement: checkExpressionStatement.bind(undefined, context),
@@ -68,7 +68,7 @@ function createNoFloatingPromisesListeners(
  * @param node - Call expression node.
  * @returns Parent call expression in chain, or null.
  */
-function getChainedObjectCall(node: TSESTree.CallExpression): TSESTree.CallExpression | null {
+function getChainedObjectCall(node: Readonly<TSESTree.CallExpression>): TSESTree.CallExpression | null {
   if (!isMemberExpressionNode(node.callee)) {
     return null;
   }
@@ -84,7 +84,7 @@ function getChainedObjectCall(node: TSESTree.CallExpression): TSESTree.CallExpre
  * @param node - Call expression to inspect.
  * @returns True when rejection is handled in the chain.
  */
-function hasRejectionHandlerInChain(node: TSESTree.CallExpression): boolean {
+function hasRejectionHandlerInChain(node: Readonly<TSESTree.CallExpression>): boolean {
   if (isCatchWithHandler(node) || isThenWithRejectionHandler(node)) {
     return true;
   }
@@ -98,7 +98,7 @@ function hasRejectionHandlerInChain(node: TSESTree.CallExpression): boolean {
  * @param node - Call expression node.
  * @returns True when invoking an async function expression immediately.
  */
-function isAsyncIifeCall(node: TSESTree.CallExpression): boolean {
+function isAsyncIifeCall(node: Readonly<TSESTree.CallExpression>): boolean {
   if (
     node.callee.type !== AST_NODE_TYPES.ArrowFunctionExpression &&
     node.callee.type !== AST_NODE_TYPES.FunctionExpression
@@ -114,7 +114,7 @@ function isAsyncIifeCall(node: TSESTree.CallExpression): boolean {
  * @param node - Call expression node.
  * @returns True when catch has at least one handler argument.
  */
-function isCatchWithHandler(node: TSESTree.CallExpression): boolean {
+function isCatchWithHandler(node: Readonly<TSESTree.CallExpression>): boolean {
   return getCallMemberMethodName(node) === CATCH_METHOD && node.arguments.length > 0;
 }
 
@@ -124,7 +124,7 @@ function isCatchWithHandler(node: TSESTree.CallExpression): boolean {
  * @param expression - Expression to inspect.
  * @returns True when expression is a handled promise chain.
  */
-function isHandledPromiseChainExpression(expression: TSESTree.Expression): boolean {
+function isHandledPromiseChainExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (expression.type !== AST_NODE_TYPES.CallExpression) {
     return false;
   }
@@ -137,7 +137,7 @@ function isHandledPromiseChainExpression(expression: TSESTree.Expression): boole
  * @param expression - Expression to inspect.
  * @returns True when expression handles promise rejection.
  */
-function isHandledPromiseExpression(expression: TSESTree.Expression): boolean {
+function isHandledPromiseExpression(expression: Readonly<TSESTree.Expression>): boolean {
   return (
     expression.type === AST_NODE_TYPES.AwaitExpression ||
     isHandledVoidPromiseExpression(expression) ||
@@ -151,7 +151,7 @@ function isHandledPromiseExpression(expression: TSESTree.Expression): boolean {
  * @param expression - Expression to inspect.
  * @returns True for intentional fire-and-forget promise expressions.
  */
-function isHandledVoidPromiseExpression(expression: TSESTree.Expression): boolean {
+function isHandledVoidPromiseExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (expression.type !== AST_NODE_TYPES.UnaryExpression) {
     return false;
   }
@@ -167,7 +167,7 @@ function isHandledVoidPromiseExpression(expression: TSESTree.Expression): boolea
  * @param node - Call expression node.
  * @returns True for then/catch/finally calls.
  */
-function isPromiseChainCall(node: TSESTree.CallExpression): boolean {
+function isPromiseChainCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const method = getCallMemberMethodName(node);
   return method !== null && PROMISE_CHAIN_METHODS.has(method);
 }
@@ -178,7 +178,7 @@ function isPromiseChainCall(node: TSESTree.CallExpression): boolean {
  * @param expression - Expression to inspect.
  * @returns True for Promise constructor expressions.
  */
-function isPromiseConstructorExpression(expression: TSESTree.Expression): boolean {
+function isPromiseConstructorExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (expression.type !== AST_NODE_TYPES.NewExpression) {
     return false;
   }
@@ -191,7 +191,7 @@ function isPromiseConstructorExpression(expression: TSESTree.Expression): boolea
  * @param expression - Expression to inspect.
  * @returns True when call expression is promise-like.
  */
-function isPromiseLikeCallExpression(expression: TSESTree.Expression): boolean {
+function isPromiseLikeCallExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (expression.type !== AST_NODE_TYPES.CallExpression) {
     return false;
   }
@@ -206,7 +206,7 @@ function isPromiseLikeCallExpression(expression: TSESTree.Expression): boolean {
  * @param expression - Expression to inspect.
  * @returns True when expression is promise-like.
  */
-function isPromiseLikeExpression(expression: TSESTree.Expression): boolean {
+function isPromiseLikeExpression(expression: Readonly<TSESTree.Expression>): boolean {
   if (expression.type === AST_NODE_TYPES.ImportExpression) {
     return true;
   }
@@ -222,7 +222,7 @@ function isPromiseLikeExpression(expression: TSESTree.Expression): boolean {
  * @param node - Call expression node.
  * @returns True for known Promise static methods.
  */
-function isPromiseStaticCall(node: TSESTree.CallExpression): boolean {
+function isPromiseStaticCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const method = getCallMemberMethodName(node);
   return (
     method !== null && PROMISE_STATIC_METHODS.has(method) && isPromiseStaticCallee(node.callee)
@@ -235,7 +235,7 @@ function isPromiseStaticCall(node: TSESTree.CallExpression): boolean {
  * @param callee - Call expression callee node.
  * @returns True when callee object is Promise.
  */
-function isPromiseStaticCallee(callee: TSESTree.Expression): boolean {
+function isPromiseStaticCallee(callee: Readonly<TSESTree.Expression>): boolean {
   return isMemberExpressionNode(callee) && isNamedIdentifierNode(callee.object, PROMISE_IDENTIFIER);
 }
 
@@ -245,7 +245,7 @@ function isPromiseStaticCallee(callee: TSESTree.Expression): boolean {
  * @param node - Call expression node.
  * @returns True when then has a rejection handler.
  */
-function isThenWithRejectionHandler(node: TSESTree.CallExpression): boolean {
+function isThenWithRejectionHandler(node: Readonly<TSESTree.CallExpression>): boolean {
   return getCallMemberMethodName(node) === THEN_METHOD && node.arguments.length > 1;
 }
 

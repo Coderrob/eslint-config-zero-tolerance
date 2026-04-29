@@ -28,7 +28,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
  * @returns Identifier bound by the pattern, or null when unsupported.
  */
 export function getAssignmentPatternIdentifier(
-  param: TSESTree.AssignmentPattern,
+  param: Readonly<TSESTree.AssignmentPattern>,
 ): TSESTree.Identifier | null {
   return param.left.type === AST_NODE_TYPES.Identifier ? param.left : null;
 }
@@ -42,7 +42,7 @@ export function getAssignmentPatternIdentifier(
  * @param param - Function parameter node.
  * @returns Bound identifier, or null when the parameter is destructured.
  */
-export function getNamedParameterIdentifier(param: TSESTree.Parameter): TSESTree.Identifier | null {
+export function getNamedParameterIdentifier(param: Readonly<TSESTree.Parameter>): TSESTree.Identifier | null {
   if (param.type === AST_NODE_TYPES.Identifier) {
     return param;
   }
@@ -61,7 +61,7 @@ export function getNamedParameterIdentifier(param: TSESTree.Parameter): TSESTree
  * @param param - Function parameter node.
  * @returns Parameter name, or null when the parameter is destructured.
  */
-export function getNamedParameterName(param: TSESTree.Parameter): string | null {
+export function getNamedParameterName(param: Readonly<TSESTree.Parameter>): string | null {
   const identifier = getNamedParameterIdentifier(param);
   return identifier?.name ?? null;
 }
@@ -72,6 +72,6 @@ export function getNamedParameterName(param: TSESTree.Parameter): string | null 
  * @param param - Rest parameter node.
  * @returns Identifier bound by the rest parameter, or null when unsupported.
  */
-export function getRestElementIdentifier(param: TSESTree.RestElement): TSESTree.Identifier | null {
+export function getRestElementIdentifier(param: Readonly<TSESTree.RestElement>): TSESTree.Identifier | null {
   return param.argument.type === AST_NODE_TYPES.Identifier ? param.argument : null;
 }

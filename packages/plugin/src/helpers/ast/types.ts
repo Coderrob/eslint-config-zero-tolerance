@@ -27,7 +27,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
  * @param node - Type-reference node.
  * @returns First type argument when present, otherwise null.
  */
-export function getFirstTypeArgument(node: TSESTree.TSTypeReference): TSESTree.TypeNode | null {
+export function getFirstTypeArgument(node: Readonly<TSESTree.TSTypeReference>): TSESTree.TypeNode | null {
   return node.typeArguments?.params[0] ?? null;
 }
 
@@ -37,7 +37,7 @@ export function getFirstTypeArgument(node: TSESTree.TSTypeReference): TSESTree.T
  * @param node - Type-reference node.
  * @returns Identifier name for simple type references, or null for qualified names.
  */
-export function getTypeReferenceName(node: TSESTree.TSTypeReference): string | null {
+export function getTypeReferenceName(node: Readonly<TSESTree.TSTypeReference>): string | null {
   return node.typeName.type === AST_NODE_TYPES.Identifier ? node.typeName.name : null;
 }
 
@@ -47,7 +47,7 @@ export function getTypeReferenceName(node: TSESTree.TSTypeReference): string | n
  * @param node - Type-literal node.
  * @returns True when all members are readonly properties.
  */
-export function hasAllReadonlyPropertyMembers(node: TSESTree.TSTypeLiteral): boolean {
+export function hasAllReadonlyPropertyMembers(node: Readonly<TSESTree.TSTypeLiteral>): boolean {
   for (const member of node.members) {
     if (member.type !== AST_NODE_TYPES.TSPropertySignature || !member.readonly) {
       return false;
@@ -64,7 +64,7 @@ export function hasAllReadonlyPropertyMembers(node: TSESTree.TSTypeLiteral): boo
  * @returns True when the type reference name matches and type arguments are present.
  */
 export function hasNamedTypeReferenceWithTypeArguments(
-  node: TSESTree.TSTypeReference,
+  node: Readonly<TSESTree.TSTypeReference>,
   expectedName: string,
 ): node is TSESTree.TSTypeReference & {
   typeArguments: TSESTree.TSTypeParameterInstantiation & {
@@ -80,7 +80,7 @@ export function hasNamedTypeReferenceWithTypeArguments(
  * @param node - Type-reference node.
  * @returns True when type arguments exist.
  */
-export function hasTypeArguments(node: TSESTree.TSTypeReference): boolean {
+export function hasTypeArguments(node: Readonly<TSESTree.TSTypeReference>): boolean {
   return node.typeArguments !== undefined && node.typeArguments.params.length > 0;
 }
 
@@ -92,7 +92,7 @@ export function hasTypeArguments(node: TSESTree.TSTypeReference): boolean {
  * @returns True when the type reference is a simple identifier with the expected name.
  */
 export function isNamedTypeReference(
-  node: TSESTree.TSTypeReference,
+  node: Readonly<TSESTree.TSTypeReference>,
   expectedName: string,
 ): boolean {
   return getTypeReferenceName(node) === expectedName;
@@ -105,7 +105,7 @@ export function isNamedTypeReference(
  * @returns True when the expression wraps another runtime expression.
  */
 function isTsWrapperExpression(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): expression is
   | TSESTree.TSAsExpression
   | TSESTree.TSNonNullExpression
@@ -125,7 +125,7 @@ function isTsWrapperExpression(
  * @param expression - Expression to unwrap.
  * @returns Innermost wrapped runtime expression.
  */
-export function unwrapTsExpression(expression: TSESTree.Expression): TSESTree.Expression {
+export function unwrapTsExpression(expression: Readonly<TSESTree.Expression>): TSESTree.Expression {
   let currentExpression = expression;
   while (isTsWrapperExpression(currentExpression)) {
     currentExpression = currentExpression.expression;

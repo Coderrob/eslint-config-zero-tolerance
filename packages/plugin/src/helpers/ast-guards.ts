@@ -49,7 +49,7 @@ export function isBinaryExpressionNode(
  * @param node - The node to check.
  * @returns True if the node is a BlockStatement, false otherwise.
  */
-export function isBlockStatementNode(node: TSESTree.Node): node is TSESTree.BlockStatement {
+export function isBlockStatementNode(node: Readonly<TSESTree.Node>): node is TSESTree.BlockStatement {
   return node.type === AST_NODE_TYPES.BlockStatement;
 }
 
@@ -72,7 +72,7 @@ export function isCallExpressionNode(
  * @returns True if the node is a FunctionDeclaration, false otherwise.
  */
 export function isFunctionDeclarationNode(
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
 ): node is TSESTree.FunctionDeclaration {
   return node.type === AST_NODE_TYPES.FunctionDeclaration;
 }

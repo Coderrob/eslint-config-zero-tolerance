@@ -17,6 +17,10 @@ Type assertions tell the TypeScript compiler to trust you over the type system. 
 
 The rule allows `as unknown` and `<unknown>` in test files (`.test.*`, `.spec.*`, `.e2e.*`, `.integration.*`, and files under `__tests__/`) because this pattern is common in test utilities and rule tester setups.
 
+## Suggestions
+
+For `as` assertions used directly as variable initializers, the rule suggests `expr satisfies Type`. Angle-bracket assertions and nested assertion expressions remain report-only because the rewrite is not always equivalent.
+
 ## Examples
 
 ### ✅ Correct

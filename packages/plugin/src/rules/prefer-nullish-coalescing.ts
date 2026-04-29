@@ -48,7 +48,7 @@ type PreferNullishCoalescingContext = Readonly<TSESLint.RuleContext<typeof MESSA
  * @returns Replacement expression text.
  */
 function buildCoalesceText(
-  candidate: NullishCandidate,
+  candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
   return `${sourceCode.getText(candidate.expression)} ?? ${sourceCode.getText(candidate.fallback)}`;
@@ -62,9 +62,9 @@ function buildCoalesceText(
  * @param node - Conditional expression node.
  */
 function checkConditionalExpression(
-  context: PreferNullishCoalescingContext,
+  context: Readonly<PreferNullishCoalescingContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ConditionalExpression,
+  node: Readonly<TSESTree.ConditionalExpression>,
 ): void {
   const candidate = getNullishCandidate(node, sourceCode);
   if (candidate === null) {
@@ -86,8 +86,8 @@ function checkConditionalExpression(
  * @returns ESLint fix callback.
  */
 function createConditionalExpressionFix(
-  node: TSESTree.ConditionalExpression,
-  candidate: NullishCandidate,
+  node: Readonly<TSESTree.ConditionalExpression>,
+  candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): TSESLint.ReportFixFunction {
   return replaceWithCoalesce.bind(undefined, node, candidate, sourceCode);
@@ -100,7 +100,7 @@ function createConditionalExpressionFix(
  * @returns Rule listeners.
  */
 function createPreferNullishCoalescingListeners(
-  context: PreferNullishCoalescingContext,
+  context: Readonly<PreferNullishCoalescingContext>,
 ): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
   return {
@@ -117,8 +117,8 @@ function createPreferNullishCoalescingListeners(
  * @returns True when expressions are textually equivalent.
  */
 function expressionsMatch(
-  first: TSESTree.Expression,
-  second: TSESTree.Expression,
+  first: Readonly<TSESTree.Expression>,
+  second: Readonly<TSESTree.Expression>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
   return sourceCode.getText(first) === sourceCode.getText(second);
@@ -131,7 +131,7 @@ function expressionsMatch(
  * @param rightExpression - Right-side expression.
  * @returns Nullish-check metadata.
  */
-function getLeftNullishCheck(operator: string, rightExpression: TSESTree.Expression): NullishCheck {
+function getLeftNullishCheck(operator: string, rightExpression: Readonly<TSESTree.Expression>): NullishCheck {
   return { expression: rightExpression, positiveCheck: operator === OPERATOR_LOOSE_NOT_EQUAL };
 }
 
@@ -143,7 +143,7 @@ function getLeftNullishCheck(operator: string, rightExpression: TSESTree.Express
  * @returns Nullish replacement candidate, or null.
  */
 function getNullishCandidate(
-  node: TSESTree.ConditionalExpression,
+  node: Readonly<TSESTree.ConditionalExpression>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): NullishCandidate | null {
   if (node.test.type !== AST_NODE_TYPES.BinaryExpression) {
@@ -167,7 +167,7 @@ function getNullishCandidate(
  * @param node - Binary expression node.
  * @returns Nullish-check metadata, or null.
  */
-function getNullishCheck(node: TSESTree.BinaryExpression): NullishCheck | null {
+function getNullishCheck(node: Readonly<TSESTree.BinaryExpression>): NullishCheck | null {
   if (!isLooseNullishBinaryExpression(node)) {
     return null;
   }
@@ -182,8 +182,8 @@ function getNullishCheck(node: TSESTree.BinaryExpression): NullishCheck | null {
  * @returns Expression branch that should mirror the guarded expression.
  */
 function getNullishExpressionBranch(
-  node: TSESTree.ConditionalExpression,
-  check: NullishCheck,
+  node: Readonly<TSESTree.ConditionalExpression>,
+  check: Readonly<NullishCheck>,
 ): TSESTree.Expression {
   return check.positiveCheck ? node.consequent : node.alternate;
 }
@@ -198,8 +198,8 @@ function getNullishExpressionBranch(
  */
 function getRightNullishCheck(
   operator: string,
-  leftExpression: TSESTree.Expression,
-  rightOperand: TSESTree.Expression,
+  leftExpression: Readonly<TSESTree.Expression>,
+  rightOperand: Readonly<TSESTree.Expression>,
 ): NullishCheck | null {
   if (!isNullLiteral(rightOperand)) {
     return null;
@@ -214,7 +214,7 @@ function getRightNullishCheck(
  * @returns True when node operator is `==` or `!=`.
  */
 function isLooseNullishBinaryExpression(
-  node: TSESTree.BinaryExpression,
+  node: Readonly<TSESTree.BinaryExpression>,
 ): node is LooseNullishBinaryExpression {
   return isLooseNullishOperator(node.operator);
 }
@@ -235,7 +235,7 @@ function isLooseNullishOperator(operator: string): boolean {
  * @param node - Expression node.
  * @returns True when node is a null literal.
  */
-function isNullLiteral(node: TSESTree.Expression): node is TSESTree.Literal {
+function isNullLiteral(node: Readonly<TSESTree.Expression>): node is TSESTree.Literal {
   return node.type === AST_NODE_TYPES.Literal && node.value === null;
 }
 
@@ -249,10 +249,10 @@ function isNullLiteral(node: TSESTree.Expression): node is TSESTree.Literal {
  * @returns ESLint text replacement fix.
  */
 function replaceWithCoalesce(
-  node: TSESTree.ConditionalExpression,
-  candidate: NullishCandidate,
+  node: Readonly<TSESTree.ConditionalExpression>,
+  candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceText(node, buildCoalesceText(candidate, sourceCode));
 }
@@ -267,8 +267,8 @@ function replaceWithCoalesce(
  */
 function resolveNullishCheckFromLeft(
   operator: string,
-  leftExpression: TSESTree.Expression,
-  rightOperand: TSESTree.Expression,
+  leftExpression: Readonly<TSESTree.Expression>,
+  rightOperand: Readonly<TSESTree.Expression>,
 ): NullishCheck | null {
   if (!isNullLiteral(leftExpression)) {
     return getRightNullishCheck(operator, leftExpression, rightOperand);
@@ -285,8 +285,8 @@ function resolveNullishCheckFromLeft(
  * @returns True when expressions are textually equivalent.
  */
 function zCheckNullishBranchMatch(
-  expression: TSESTree.Expression,
-  branch: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
+  branch: Readonly<TSESTree.Expression>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
   return expressionsMatch(expression, branch, sourceCode);
@@ -300,8 +300,8 @@ function zCheckNullishBranchMatch(
  * @returns Fallback branch expression.
  */
 function zNullishFallbackBranch(
-  node: TSESTree.ConditionalExpression,
-  check: NullishCheck,
+  node: Readonly<TSESTree.ConditionalExpression>,
+  check: Readonly<NullishCheck>,
 ): TSESTree.Expression {
   return check.positiveCheck ? node.alternate : node.consequent;
 }

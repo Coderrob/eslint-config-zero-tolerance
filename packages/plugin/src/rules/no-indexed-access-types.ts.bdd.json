@@ -39,6 +39,18 @@
           "given": "a type annotation using an indexed access type T[number]",
           "when": "the rule evaluates the code",
           "then": "a noIndexedAccessTypes violation is reported"
+        },
+        {
+          "name": "should suggest extracting a configured collision-free indexed access alias",
+          "given": "a configured aliasNamePattern and a type annotation using T['key'] with no generated-name collision",
+          "when": "the rule evaluates the indexed access type",
+          "then": "a noIndexedAccessTypes violation is reported with a suggestion to insert a named type alias and replace the indexed access"
+        },
+        {
+          "name": "should skip extraction when no top-level statement is available",
+          "given": "an indexed access type node cannot be associated with a top-level statement",
+          "when": "the suggestion fixer is evaluated",
+          "then": "no replacement fixes are emitted"
         }
       ]
     }

@@ -28,7 +28,7 @@ type RequireCleanBarrelContext = Readonly<TSESLint.RuleContext<'cleanBarrelOnlyR
  * @param context - ESLint rule execution context.
  * @param program - Program node.
  */
-function checkProgram(context: RequireCleanBarrelContext, program: TSESTree.Program): void {
+function checkProgram(context: Readonly<RequireCleanBarrelContext>, program: Readonly<TSESTree.Program>): void {
   if (!containsModuleReExport(program.body)) {
     return;
   }
@@ -56,7 +56,7 @@ function containsModuleReExport(statements: ReadonlyArray<TSESTree.ProgramStatem
  * @returns Rule listeners.
  */
 function createRequireCleanBarrelListeners(
-  context: RequireCleanBarrelContext,
+  context: Readonly<RequireCleanBarrelContext>,
 ): TSESLint.RuleListener {
   if (!isBarrelFile(context.filename)) {
     return {};
@@ -72,7 +72,7 @@ function createRequireCleanBarrelListeners(
  * @param statement - Program statement node.
  * @returns True when the statement is a permitted re-export declaration.
  */
-function isAllowedBarrelStatement(statement: TSESTree.ProgramStatement): boolean {
+function isAllowedBarrelStatement(statement: Readonly<TSESTree.ProgramStatement>): boolean {
   if (statement.type === AST_NODE_TYPES.ExportAllDeclaration) {
     return true;
   }
@@ -89,8 +89,8 @@ function isAllowedBarrelStatement(statement: TSESTree.ProgramStatement): boolean
  * @param statement - Statement to report.
  */
 function reportDisallowedBarrelStatement(
-  context: RequireCleanBarrelContext,
-  statement: TSESTree.ProgramStatement,
+  context: Readonly<RequireCleanBarrelContext>,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): void {
   context.report({
     node: statement,

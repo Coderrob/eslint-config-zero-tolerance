@@ -20,7 +20,10 @@ import { isTestFile } from '../helpers/ast-guards';
 import { TYPE_ASSERTION_ALLOWED_IN_TESTS } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
-enum NoTypeAssertionMessageId { NoTypeAssertion = "noTypeAssertion", UseSatisfies = "useSatisfies" }
+enum NoTypeAssertionMessageId {
+  NoTypeAssertion = 'noTypeAssertion',
+  UseSatisfies = 'useSatisfies',
+}
 type NoTypeAssertionContext = Readonly<TSESLint.RuleContext<NoTypeAssertionMessageId, []>>;
 
 /**
@@ -30,7 +33,7 @@ type NoTypeAssertionContext = Readonly<TSESLint.RuleContext<NoTypeAssertionMessa
  * @param node - Type assertion node to inspect.
  */
 function checkTypeAssertion(
-  context: NoTypeAssertionContext,
+  context: Readonly<NoTypeAssertionContext>,
   node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
 ): void {
   const typeText = context.sourceCode.getText(node.typeAnnotation);
@@ -40,7 +43,7 @@ function checkTypeAssertion(
   const suggestions = createSatisfiesSuggestions(context.sourceCode, node);
   context.report({
     node,
-    messageId: 'noTypeAssertion',
+    messageId: NoTypeAssertionMessageId.NoTypeAssertion,
     data: { assertion: getAssertionSyntax(node, typeText) },
     ...(suggestions.length > 0 ? { suggest: suggestions } : {}),
   });
@@ -52,7 +55,7 @@ function checkTypeAssertion(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoTypeAssertionListeners(context: NoTypeAssertionContext): TSESLint.RuleListener {
+function createNoTypeAssertionListeners(context: Readonly<NoTypeAssertionContext>): TSESLint.RuleListener {
   return {
     TSAsExpression: checkTypeAssertion.bind(undefined, context),
     TSTypeAssertion: checkTypeAssertion.bind(undefined, context),
@@ -75,7 +78,7 @@ function createSatisfiesSuggestions(
   }
   return [
     {
-      messageId: 'useSatisfies',
+      messageId: NoTypeAssertionMessageId.UseSatisfies,
       fix: replaceTypeAssertionWithSatisfies.bind(undefined, sourceCode, node),
     },
   ];
@@ -120,8 +123,8 @@ function isSatisfiesSuggestionTarget(
  */
 function replaceTypeAssertionWithSatisfies(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TSAsExpression,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.TSAsExpression>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const expressionText = sourceCode.getText(node.expression);
   const typeText = sourceCode.getText(node.typeAnnotation);

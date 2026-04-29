@@ -29,7 +29,7 @@ type NoFlagArgumentContext = Readonly<TSESLint.RuleContext<'noFlagArgument', []>
  * @param context - ESLint rule context.
  * @param node - Function node to inspect.
  */
-function checkFunctionNode(context: NoFlagArgumentContext, node: FunctionNode): void {
+function checkFunctionNode(context: Readonly<NoFlagArgumentContext>, node: Readonly<FunctionNode>): void {
   for (const parameter of node.params) {
     const parameterIdentifier = getNamedParameterIdentifier(parameter);
     if (parameterIdentifier === null || !hasBooleanTypeAnnotation(parameterIdentifier)) {
@@ -45,7 +45,7 @@ function checkFunctionNode(context: NoFlagArgumentContext, node: FunctionNode): 
  * @param context - ESLint rule context.
  * @returns Rule visitor map.
  */
-function createNoFlagArgumentListeners(context: NoFlagArgumentContext): TSESLint.RuleListener {
+function createNoFlagArgumentListeners(context: Readonly<NoFlagArgumentContext>): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 
@@ -55,7 +55,7 @@ function createNoFlagArgumentListeners(context: NoFlagArgumentContext): TSESLint
  * @param identifier - Identifier node.
  * @returns True if identifier type is boolean.
  */
-function hasBooleanTypeAnnotation(identifier: TSESTree.Identifier): boolean {
+function hasBooleanTypeAnnotation(identifier: Readonly<TSESTree.Identifier>): boolean {
   return identifier.typeAnnotation?.typeAnnotation.type === AST_NODE_TYPES.TSBooleanKeyword;
 }
 
@@ -67,8 +67,8 @@ function hasBooleanTypeAnnotation(identifier: TSESTree.Identifier): boolean {
  * @param parameterName - Boolean parameter name.
  */
 function reportFlagParameter(
-  context: NoFlagArgumentContext,
-  parameter: TSESTree.Parameter,
+  context: Readonly<NoFlagArgumentContext>,
+  parameter: Readonly<TSESTree.Parameter>,
   parameterName: string,
 ): void {
   context.report({

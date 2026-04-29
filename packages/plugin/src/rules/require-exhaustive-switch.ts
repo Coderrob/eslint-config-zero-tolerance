@@ -45,8 +45,8 @@ interface ITypeContext {
  * @param node - Switch statement node.
  */
 function checkSwitchStatement(
-  context: RequireExhaustiveSwitchContext,
-  node: TSESTree.SwitchStatement,
+  context: Readonly<RequireExhaustiveSwitchContext>,
+  node: Readonly<TSESTree.SwitchStatement>,
 ): void {
   const switchAnalysis = getSwitchAnalysis(context, node);
   if (switchAnalysis === null) {
@@ -70,7 +70,7 @@ function checkSwitchStatement(
  * @returns Rule listener map.
  */
 function createRequireExhaustiveSwitchListeners(
-  context: RequireExhaustiveSwitchContext,
+  context: Readonly<RequireExhaustiveSwitchContext>,
 ): TSESLint.RuleListener {
   return {
     SwitchStatement: checkSwitchStatement.bind(undefined, context),
@@ -83,7 +83,7 @@ function createRequireExhaustiveSwitchListeners(
  * @param value - TypeScript bigint literal value.
  * @returns Bigint literal text.
  */
-function formatBigIntValue(value: ts.PseudoBigInt): string {
+function formatBigIntValue(value: Readonly<ts.PseudoBigInt>): string {
   return `${value.negative ? '-' : ''}${value.base10Value}n`;
 }
 
@@ -94,7 +94,7 @@ function formatBigIntValue(value: ts.PseudoBigInt): string {
  * @param type - TypeScript type to inspect.
  * @returns Boolean case texts, or null when the type is not boolean.
  */
-function getBooleanCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] | null {
+function getBooleanCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
   return checker.typeToString(type) === BOOLEAN_TYPE_TEXT
     ? [FALSE_LITERAL, TRUE_LITERAL]
     : null;
@@ -108,7 +108,7 @@ function getBooleanCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] |
  * @returns Unique case texts, or null when any member is open-ended.
  */
 function getCaseTextsFromUnionMembers(
-  checker: ts.TypeChecker,
+  checker: Readonly<ts.TypeChecker>,
   types: readonly ts.Type[],
 ): string[] | null {
   const caseTexts: string[] = [];
@@ -129,7 +129,7 @@ function getCaseTextsFromUnionMembers(
  * @param type - TypeScript type to inspect.
  * @returns Direct case texts, or null when another strategy is required.
  */
-function getDirectCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] | null {
+function getDirectCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
   const booleanCaseTexts = getBooleanCaseTexts(checker, type);
   if (booleanCaseTexts !== null) {
     return booleanCaseTexts;
@@ -143,7 +143,7 @@ function getDirectCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] | 
  * @param type - TypeScript type to inspect.
  * @returns Enum case texts, or null when the type is not an enum.
  */
-function getEnumCaseTexts(type: ts.Type): string[] | null {
+function getEnumCaseTexts(type: Readonly<ts.Type>): string[] | null {
   return isEnumType(type) ? getEnumMemberCaseTexts(type.getSymbol()) : null;
 }
 
@@ -173,8 +173,8 @@ function getEnumMemberCaseTexts(symbol: ts.Symbol | undefined): string[] | null 
  * @returns Expected finite case texts, or an empty array when the type is open-ended.
  */
 function getExpectedCaseTexts(
-  context: RequireExhaustiveSwitchContext,
-  node: TSESTree.Expression,
+  context: Readonly<RequireExhaustiveSwitchContext>,
+  node: Readonly<TSESTree.Expression>,
 ): string[] {
   const typeContext = getTypeContext(context, node);
   if (typeContext === null) {
@@ -190,7 +190,7 @@ function getExpectedCaseTexts(
  * @param type - TypeScript type to inspect.
  * @returns One finite case text, or null when not representable.
  */
-function getFiniteCaseText(checker: ts.TypeChecker, type: ts.Type): string | null {
+function getFiniteCaseText(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string | null {
   const literalCaseText = getLiteralCaseText(type);
   if (literalCaseText !== null) {
     return literalCaseText;
@@ -207,7 +207,7 @@ function getFiniteCaseText(checker: ts.TypeChecker, type: ts.Type): string | nul
  * @param type - TypeScript type to inspect.
  * @returns Finite case texts, or an empty array when the type cannot be enumerated.
  */
-function getFiniteCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] {
+function getFiniteCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] {
   const directCaseTexts = getDirectCaseTexts(checker, type);
   if (directCaseTexts !== null) {
     return directCaseTexts;
@@ -225,7 +225,7 @@ function getFiniteCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] {
  * @param node - Switch statement node.
  * @returns True when any case has a null test.
  */
-function getHasDefaultCase(node: TSESTree.SwitchStatement): boolean {
+function getHasDefaultCase(node: Readonly<TSESTree.SwitchStatement>): boolean {
   return node.cases.some(
     /** @param switchCase - Case to inspect. */
     (switchCase) => switchCase.test === null,
@@ -238,7 +238,7 @@ function getHasDefaultCase(node: TSESTree.SwitchStatement): boolean {
  * @param type - TypeScript type to inspect.
  * @returns Literal case text, or null when the type is not a supported literal.
  */
-function getLiteralCaseText(type: ts.Type): string | null {
+function getLiteralCaseText(type: Readonly<ts.Type>): string | null {
   if (isStringLiteralType(type)) {
     return JSON.stringify(type.value);
   }
@@ -270,7 +270,7 @@ function getMissingCaseTexts(switchAnalysis: Readonly<ISwitchAnalysis>): string[
  */
 function getPresentCaseTexts(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.SwitchStatement,
+  node: Readonly<TSESTree.SwitchStatement>,
 ): Set<string> {
   return new Set(
     node.cases
@@ -294,8 +294,8 @@ function getPresentCaseTexts(
  * @returns Expected and present cases, or null when the switch is out of scope.
  */
 function getSwitchAnalysis(
-  context: RequireExhaustiveSwitchContext,
-  node: TSESTree.SwitchStatement,
+  context: Readonly<RequireExhaustiveSwitchContext>,
+  node: Readonly<TSESTree.SwitchStatement>,
 ): Readonly<ISwitchAnalysis> | null {
   if (getHasDefaultCase(node)) {
     return null;
@@ -318,8 +318,8 @@ function getSwitchAnalysis(
  * @returns Checker and resolved type, or null when unavailable.
  */
 function getTypeContext(
-  context: RequireExhaustiveSwitchContext,
-  node: TSESTree.Expression,
+  context: Readonly<RequireExhaustiveSwitchContext>,
+  node: Readonly<TSESTree.Expression>,
 ): ITypeContext | null {
   try {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -341,7 +341,7 @@ function getTypeContext(
  * @param type - TypeScript type to inspect.
  * @returns Union case texts, or null when any member is open-ended.
  */
-function getUnionCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] | null {
+function getUnionCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
   return isUnionType(type) ? getCaseTextsFromUnionMembers(checker, type.types) : null;
 }
 
@@ -351,7 +351,7 @@ function getUnionCaseTexts(checker: ts.TypeChecker, type: ts.Type): string[] | n
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a bigint literal.
  */
-function isBigIntLiteralType(type: ts.Type): type is ts.BigIntLiteralType {
+function isBigIntLiteralType(type: Readonly<ts.Type>): type is ts.BigIntLiteralType {
   return (type.flags & ts.TypeFlags.BigIntLiteral) !== 0;
 }
 
@@ -371,7 +371,7 @@ function isCaseTestExpression(node: TSESTree.Expression | null): node is TSESTre
  * @param type - TypeScript type to inspect.
  * @returns True when the type is an enum literal.
  */
-function isEnumLiteralType(type: ts.Type): boolean {
+function isEnumLiteralType(type: Readonly<ts.Type>): boolean {
   return (type.flags & ts.TypeFlags.EnumLiteral) !== 0;
 }
 
@@ -381,7 +381,7 @@ function isEnumLiteralType(type: ts.Type): boolean {
  * @param type - TypeScript type to inspect.
  * @returns True when the type symbol is an enum.
  */
-function isEnumType(type: ts.Type): boolean {
+function isEnumType(type: Readonly<ts.Type>): boolean {
   const symbol = type.getSymbol();
   return symbol !== undefined && (symbol.flags & ts.SymbolFlags.Enum) !== 0;
 }
@@ -392,7 +392,7 @@ function isEnumType(type: ts.Type): boolean {
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a boolean literal.
  */
-function isFiniteBooleanLiteralType(type: ts.Type): boolean {
+function isFiniteBooleanLiteralType(type: Readonly<ts.Type>): boolean {
   return (type.flags & ts.TypeFlags.BooleanLiteral) !== 0;
 }
 
@@ -402,7 +402,7 @@ function isFiniteBooleanLiteralType(type: ts.Type): boolean {
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a number literal.
  */
-function isNumberLiteralType(type: ts.Type): type is ts.NumberLiteralType {
+function isNumberLiteralType(type: Readonly<ts.Type>): type is ts.NumberLiteralType {
   return (type.flags & ts.TypeFlags.NumberLiteral) !== 0;
 }
 
@@ -412,7 +412,7 @@ function isNumberLiteralType(type: ts.Type): type is ts.NumberLiteralType {
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a string literal.
  */
-function isStringLiteralType(type: ts.Type): type is ts.StringLiteralType {
+function isStringLiteralType(type: Readonly<ts.Type>): type is ts.StringLiteralType {
   return (type.flags & ts.TypeFlags.StringLiteral) !== 0;
 }
 
@@ -422,7 +422,7 @@ function isStringLiteralType(type: ts.Type): type is ts.StringLiteralType {
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a union.
  */
-function isUnionType(type: ts.Type): type is ts.UnionType {
+function isUnionType(type: Readonly<ts.Type>): type is ts.UnionType {
   return (type.flags & ts.TypeFlags.Union) !== 0;
 }
 
@@ -435,7 +435,7 @@ function isUnionType(type: ts.Type): type is ts.UnionType {
  */
 function normalizeCaseText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Expression,
+  node: Readonly<TSESTree.Expression>,
 ): string {
   if (node.type === AST_NODE_TYPES.Literal && typeof node.value === 'string') {
     return JSON.stringify(node.value);

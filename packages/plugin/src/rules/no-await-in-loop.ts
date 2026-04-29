@@ -42,8 +42,8 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
  * @param node - Await expression node to evaluate.
  */
 function reportAwaitExpressionInLoop(
-  context: NoAwaitInLoopContext,
-  node: TSESTree.AwaitExpression,
+  context: Readonly<NoAwaitInLoopContext>,
+  node: Readonly<TSESTree.AwaitExpression>,
 ): void {
   const ancestors = context.sourceCode.getAncestors(node);
   if (isInsideBoundary(ancestors, LOOP_TYPES, FUNCTION_BOUNDARY_TYPES)) {
@@ -57,7 +57,7 @@ function reportAwaitExpressionInLoop(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function resolveListeners(context: NoAwaitInLoopContext): TSESLint.RuleListener {
+function resolveListeners(context: Readonly<NoAwaitInLoopContext>): TSESLint.RuleListener {
   return {
     AwaitExpression: reportAwaitExpressionInLoop.bind(undefined, context),
   };

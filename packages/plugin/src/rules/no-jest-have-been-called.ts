@@ -36,8 +36,8 @@ type NoJestHaveBeenCalledContext = Readonly<TSESLint.RuleContext<'noHaveBeenCall
  * @param node - Member expression node to inspect.
  */
 function checkMemberExpression(
-  context: NoJestHaveBeenCalledContext,
-  node: TSESTree.MemberExpression,
+  context: Readonly<NoJestHaveBeenCalledContext>,
+  node: Readonly<TSESTree.MemberExpression>,
 ): void {
   const bannedMatcher = getMappedMemberPropertyName(node, BANNED_MATCHERS);
   if (bannedMatcher === null) {
@@ -61,7 +61,7 @@ function checkMemberExpression(
  * @returns Rule listeners.
  */
 function createNoJestHaveBeenCalledListeners(
-  context: NoJestHaveBeenCalledContext,
+  context: Readonly<NoJestHaveBeenCalledContext>,
 ): TSESLint.RuleListener {
   return {
     MemberExpression: checkMemberExpression.bind(undefined, context),

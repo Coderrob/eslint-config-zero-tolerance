@@ -48,9 +48,9 @@ type RuleOptions = [INoParentInternalAccessOptions];
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
@@ -70,9 +70,9 @@ function checkCallExpression(
  * @param node - Export-all declaration node.
  */
 function checkExportAllDeclaration(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.ExportAllDeclaration,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.ExportAllDeclaration>,
 ): void {
   reportIfProtectedParentImport(context, options, node.source, node.source.value);
 }
@@ -85,9 +85,9 @@ function checkExportAllDeclaration(
  * @param node - Export named declaration node.
  */
 function checkExportNamedDeclaration(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.ExportNamedDeclaration,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   if (node.source !== null) {
     reportIfProtectedParentImport(context, options, node.source, node.source.value);
@@ -102,9 +102,9 @@ function checkExportNamedDeclaration(
  * @param node - Import declaration node.
  */
 function checkImportDeclaration(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.ImportDeclaration,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   reportIfProtectedParentImport(context, options, node.source, node.source.value);
 }
@@ -117,9 +117,9 @@ function checkImportDeclaration(
  * @param node - Import expression node.
  */
 function checkImportExpression(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.ImportExpression,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.ImportExpression>,
 ): void {
   const importPath = getLiteralStringNodeValue(node.source);
   if (importPath !== null) {
@@ -135,9 +135,9 @@ function checkImportExpression(
  * @param node - TS import-equals declaration node.
  */
 function checkTsImportEqualsDeclaration(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.TSImportEqualsDeclaration,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): void {
   const moduleReference = getExternalModuleReference(node);
   const importPath = moduleReference === null ? null : getLiteralStringNodeValue(moduleReference);
@@ -153,7 +153,7 @@ function checkTsImportEqualsDeclaration(
  * @returns Listener map for the rule.
  */
 function createNoParentInternalAccessListeners(
-  context: NoParentInternalAccessContext,
+  context: Readonly<NoParentInternalAccessContext>,
 ): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
@@ -173,7 +173,7 @@ function createNoParentInternalAccessListeners(
  * @returns String-literal expression when it targets an external module.
  */
 function getExternalModuleReference(
-  node: TSESTree.TSImportEqualsDeclaration,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): TSESTree.Expression | null {
   if (node.moduleReference.type !== AST_NODE_TYPES.TSExternalModuleReference) {
     return null;
@@ -223,7 +223,7 @@ function getProtectedDirectories(protectedDirectories: readonly string[] | undef
  */
 function getProtectedDirectoryFromParentPath(
   importPath: string,
-  options: IResolvedNoParentInternalAccessOptions,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
 ): string | null {
   if (!isParentDirectoryImportPath(importPath)) {
     return null;
@@ -255,9 +255,9 @@ function normalizeProtectedDirectoryName(directoryName: string): string | null {
  * @param importPath - Import or re-export path to validate.
  */
 function reportIfProtectedParentImport(
-  context: NoParentInternalAccessContext,
-  options: IResolvedNoParentInternalAccessOptions,
-  node: TSESTree.Node,
+  context: Readonly<NoParentInternalAccessContext>,
+  options: Readonly<IResolvedNoParentInternalAccessOptions>,
+  node: Readonly<TSESTree.Node>,
   importPath: string,
 ): void {
   const directory = getProtectedDirectoryFromParentPath(importPath, options);
@@ -276,7 +276,7 @@ function reportIfProtectedParentImport(
  * @param options - Raw rule options.
  * @returns Resolved protected-directory option set.
  */
-function resolveOptions(options: RuleOptions): IResolvedNoParentInternalAccessOptions {
+function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoParentInternalAccessOptions {
   const [raw = {}] = options;
   return {
     protectedDirectories: getProtectedDirectories(raw.protectedDirectories),
