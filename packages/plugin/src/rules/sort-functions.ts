@@ -543,6 +543,22 @@ function hasOnlyWhitespaceBeforeComment(
 }
 
 /**
+ * Returns true when a source range contains only whitespace.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param start - Start offset.
+ * @param end - End offset.
+ * @returns True when the range contains only whitespace.
+ */
+function hasOnlyWhitespaceBetweenOffsets(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  start: number,
+  end: number,
+): boolean {
+  return sourceCode.text.slice(start, end).trim().length === 0;
+}
+
+/**
  * Checks whether the current leading comment scan points at an owned comment.
  *
  * @param sourceCode - ESLint source code helper.
@@ -602,6 +618,27 @@ function hasUnsafeOwnedComments(
 }
 
 /**
+ * Returns true when a leading comment is adjacent to the next owned span.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate comment.
+ * @param nextStart - Start offset of the following owned span.
+ * @param nextStartLine - Start line of the following owned span.
+ * @returns True when the comment has no blank-line or text gap before the owned span.
+ */
+function isAdjacentToNextOwnedSpan(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+  nextStart: number,
+  nextStartLine: number,
+): boolean {
+  return (
+    nextStartLine - comment.loc.end.line <= 1 &&
+    hasOnlyWhitespaceBetweenOffsets(sourceCode, comment.range[1], nextStart)
+  );
+}
+
+/**
  * Returns true when a trailing comment is adjacent to the previous owned comment.
  *
  * @param sourceCode - ESLint source code helper.
@@ -618,7 +655,7 @@ function isAdjacentTrailingComment(
 ): boolean {
   return (
     currentComment.loc.start.line === nodeEndLine &&
-    !/[^\s]/u.test(sourceCode.text.slice(previousComment.range[1], currentComment.range[0]))
+    hasOnlyWhitespaceBetweenOffsets(sourceCode, previousComment.range[1], currentComment.range[0])
   );
 }
 
@@ -638,10 +675,8 @@ function isAttachedLeadingComment(
   nextStartLine: number,
 ): boolean {
   return (
-    isOwnLineBlockComment(sourceCode, comment) &&
-    !hasAdjacentPreviousNonLeadingContent(sourceCode, comment) &&
-    nextStartLine - comment.loc.end.line <= 1 &&
-    sourceCode.text.slice(comment.range[1], nextStart).trim().length === 0
+    isMovableLeadingBlockComment(sourceCode, comment) &&
+    isAdjacentToNextOwnedSpan(sourceCode, comment, nextStart, nextStartLine)
   );
 }
 
@@ -725,6 +760,23 @@ function isFunctionInitializer(init: TSESTree.Expression): boolean {
 }
 
 /**
+ * Returns true when a block comment can move with the following declaration.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param comment - Candidate comment.
+ * @returns True when previous adjacent content does not make ownership unsafe.
+ */
+function isMovableLeadingBlockComment(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  comment: TSESTree.Comment,
+): boolean {
+  return (
+    isOwnLineBlockComment(sourceCode, comment) &&
+    !hasAdjacentPreviousNonLeadingContent(sourceCode, comment)
+  );
+}
+
+/**
  * Returns true when a comment is a same-line trailing comment owned by the node.
  *
  * @param sourceCode - ESLint source code helper.
@@ -740,7 +792,7 @@ function isOwnedTrailingComment(
   return (
     comment !== undefined &&
     comment.loc.start.line === node.loc.end.line &&
-    sourceCode.text.slice(node.range[1], comment.range[0]).trim().length === 0
+    hasOnlyWhitespaceBetweenOffsets(sourceCode, node.range[1], comment.range[0])
   );
 }
 
