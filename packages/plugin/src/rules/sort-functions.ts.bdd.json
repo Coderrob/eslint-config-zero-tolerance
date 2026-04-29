@@ -35,6 +35,12 @@
           "then": "a sortFunctions violation is reported on the out-of-order function"
         },
         {
+          "name": "should autofix a full sortable function run in one pass",
+          "given": "a module with several top-level functions in reverse alphabetical order",
+          "when": "the rule evaluates the Program",
+          "then": "one sortFunctions violation is reported and the autofix replaces the sortable function span with all functions in alphabetical order"
+        },
+        {
           "name": "should move owned comments with a sorted declaration block",
           "given": "two out-of-order sortable functions where each declaration has one or more directly attached leading comments and optional same-line trailing comments",
           "when": "the rule evaluates the Program",

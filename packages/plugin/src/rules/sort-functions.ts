@@ -35,6 +35,14 @@ type SortableBlock = Readonly<{
   start: number;
   text: string;
 }>;
+type SortableFunctionBlock = SortableFunction & {
+  block: SortableBlock;
+};
+type ReportUnsortedFunctionInputs = Readonly<{
+  currentFunction: SortableFunction;
+  functions: ReadonlyArray<SortableFunction>;
+  previousFunction: SortableFunction;
+}>;
 type LeadingCommentScanState = Readonly<{
   nextStart: number;
   nextStartLine: number;
@@ -79,7 +87,12 @@ function checkFunctionOrdering(
     const previousFunction = functions[index - 1];
     const currentFunction = functions[index];
     if (currentFunction.name.toLowerCase() < previousFunction.name.toLowerCase()) {
-      reportUnsortedFunction(context, sourceCode, previousFunction, currentFunction);
+      reportUnsortedFunction(context, sourceCode, {
+        currentFunction,
+        functions,
+        previousFunction,
+      });
+      return;
     }
   }
 }
@@ -154,6 +167,46 @@ function collectOwnedLeadingComments(
 }
 
 /**
+ * Compares sortable functions by case-insensitive name.
+ *
+ * @param left - Left sortable function.
+ * @param right - Right sortable function.
+ * @returns Negative when left sorts before right, positive when right sorts before left, and zero for ties.
+ */
+function compareSortableFunctionsByName(
+  left: SortableFunction,
+  right: SortableFunction,
+): number {
+  const leftName = left.name.toLowerCase();
+  const rightName = right.name.toLowerCase();
+  if (leftName < rightName) {
+    return -1;
+  }
+  if (leftName > rightName) {
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * Returns fixer callback that sorts all sortable functions while preserving spacing.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functions - Sortable functions in source order.
+ * @returns Fix callback, or null when sorting is not safe.
+ */
+function createSortFix(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functions: ReadonlyArray<SortableFunction>,
+): TSESLint.ReportFixFunction | null {
+  const functionBlocks = getSortableFunctionBlocks(sourceCode, functions);
+  if (functionBlocks === null || hasUnsafeInterBlockComments(sourceCode, functionBlocks)) {
+    return null;
+  }
+  return sortSortableFunctionBlocks.bind(undefined, sourceCode, functionBlocks);
+}
+
+/**
  * Creates listeners for sort-functions rule execution.
  *
  * @param context - ESLint rule execution context.
@@ -167,30 +220,6 @@ function createSortFunctionsListeners(context: SortFunctionsContext): TSESLint.R
     VariableDeclaration: processVariableDeclaration.bind(undefined, functions),
     'Program:exit': checkFunctionOrdering.bind(undefined, context, functions, sourceCode),
   };
-}
-
-/**
- * Returns fixer callback that swaps two function declarations while preserving spacing.
- *
- * @param sourceCode - ESLint source code helper.
- * @param previousFunction - Previous sortable function.
- * @param currentFunction - Current sortable function.
- * @returns Fix callback, or null when swap is not safe.
- */
-function createSwapFix(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  previousFunction: SortableFunction,
-  currentFunction: SortableFunction,
-): TSESLint.ReportFixFunction | null {
-  const sortableBlocks = getSortableBlocks(sourceCode, previousFunction, currentFunction);
-  if (sortableBlocks === null) {
-    return null;
-  }
-  const [previousBlock, currentBlock] = sortableBlocks;
-  if (hasCommentBetweenBlocks(sourceCode, previousBlock, currentBlock)) {
-    return null;
-  }
-  return swapSortableFunctionBlocks.bind(undefined, sourceCode, previousBlock, currentBlock);
 }
 
 /**
@@ -314,21 +343,23 @@ function getSortableBlockEnd(
 }
 
 /**
- * Returns swappable comment-aware blocks for two sortable functions.
+ * Returns original text between each sortable block.
  *
  * @param sourceCode - ESLint source code helper.
- * @param previousFunction - Previous sortable function.
- * @param currentFunction - Current sortable function.
- * @returns Pair of sortable blocks, or null when swap ownership is unsafe.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @returns Separator text between adjacent sortable blocks.
  */
-function getSortableBlocks(
+function getSortableBlockSeparators(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  previousFunction: SortableFunction,
-  currentFunction: SortableFunction,
-): readonly [SortableBlock, SortableBlock] | null {
-  const previousBlock = getSwappableBlock(sourceCode, previousFunction);
-  const currentBlock = getSwappableBlock(sourceCode, currentFunction);
-  return previousBlock === null || currentBlock === null ? null : [previousBlock, currentBlock];
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+): ReadonlyArray<string> {
+  const separators: string[] = [];
+  for (let index = 1; index < functionBlocks.length; index += 1) {
+    const previousBlock = functionBlocks[index - 1].block;
+    const currentBlock = functionBlocks[index].block;
+    separators.push(sourceCode.text.slice(previousBlock.end, currentBlock.start));
+  }
+  return separators;
 }
 
 /**
@@ -343,6 +374,48 @@ function getSortableBlockStart(
   leadingComments: ReadonlyArray<TSESTree.Comment>,
 ): number {
   return leadingComments.at(0)?.range[0] ?? node.range[0];
+}
+
+/**
+ * Returns sortable declaration blocks for all functions.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functions - Sortable functions in source order.
+ * @returns Sortable function blocks, or null when block ownership is unsafe.
+ */
+function getSortableFunctionBlocks(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functions: ReadonlyArray<SortableFunction>,
+): ReadonlyArray<SortableFunctionBlock> | null {
+  const functionBlocks: SortableFunctionBlock[] = [];
+  for (const sortableFunction of functions) {
+    const block = getSwappableBlock(sourceCode, sortableFunction);
+    if (block === null) {
+      return null;
+    }
+    functionBlocks.push({ ...sortableFunction, block });
+  }
+  return functionBlocks;
+}
+
+/**
+ * Returns the sorted replacement text for a sortable function block run.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @returns Sorted block text with original separators preserved.
+ */
+function getSortedFunctionBlockText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+): string {
+  const separators = getSortableBlockSeparators(sourceCode, functionBlocks);
+  const sortedBlocks = [...functionBlocks].sort(compareSortableFunctionsByName);
+  let replacementText = sortedBlocks[0].block.text;
+  for (let index = 1; index < sortedBlocks.length; index += 1) {
+    replacementText += `${separators[index - 1]}${sortedBlocks[index].block.text}`;
+  }
+  return replacementText;
 }
 
 /**
@@ -491,6 +564,27 @@ function hasOwnedLeadingComment(
       scanState.nextStartLine,
     )
   );
+}
+
+/**
+ * Returns true when any text between sortable blocks contains comments.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @returns True when inter-block text contains comments.
+ */
+function hasUnsafeInterBlockComments(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+): boolean {
+  for (let index = 1; index < functionBlocks.length; index += 1) {
+    const previousBlock = functionBlocks[index - 1].block;
+    const currentBlock = functionBlocks[index].block;
+    if (hasCommentBetweenBlocks(sourceCode, previousBlock, currentBlock)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -743,43 +837,41 @@ function processVariableDeclaration(
  *
  * @param context - ESLint rule execution context.
  * @param sourceCode - ESLint source code helper.
- * @param previousFunction - Previous sortable function.
- * @param currentFunction - Current sortable function.
+ * @param inputs - Function ordering details for the report.
  */
 function reportUnsortedFunction(
   context: SortFunctionsContext,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  previousFunction: SortableFunction,
-  currentFunction: SortableFunction,
+  inputs: ReportUnsortedFunctionInputs,
 ): void {
   context.report({
-    node: currentFunction.node,
+    node: inputs.currentFunction.node,
     messageId: 'unsortedFunction',
-    data: { current: currentFunction.name, previous: previousFunction.name },
-    fix: createSwapFix(sourceCode, previousFunction, currentFunction),
+    data: {
+      current: inputs.currentFunction.name,
+      previous: inputs.previousFunction.name,
+    },
+    fix: createSortFix(sourceCode, inputs.functions),
   });
 }
 
 /**
- * Swaps two sortable function nodes while preserving text between them.
+ * Sorts all sortable function blocks while preserving original separators.
  *
  * @param sourceCode - ESLint source code helper.
- * @param previousNode - Previous node in source order.
- * @param currentNode - Current node in source order.
+ * @param functionBlocks - Sortable function blocks in source order.
  * @param fixer - ESLint fixer.
  * @returns Text-range replacement fix.
  */
-function swapSortableFunctionBlocks(
+function sortSortableFunctionBlocks(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  previousBlock: SortableBlock,
-  currentBlock: SortableBlock,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
   fixer: TSESLint.RuleFixer,
 ): TSESLint.RuleFix {
-  const betweenText = sourceCode.text.slice(previousBlock.end, currentBlock.start);
-  return fixer.replaceTextRange(
-    [previousBlock.start, currentBlock.end],
-    `${currentBlock.text}${betweenText}${previousBlock.text}`,
-  );
+  const firstBlock = functionBlocks[0].block;
+  const lastBlock = functionBlocks[functionBlocks.length - 1].block;
+  const sortedText = getSortedFunctionBlockText(sourceCode, functionBlocks);
+  return fixer.replaceTextRange([firstBlock.start, lastBlock.end], sortedText);
 }
 
 /**

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **`prefer-readonly-parameters` rule**: Added configurable `ignoredTypeNamePatterns` exemptions, with callable defaults such as `Dispatch`, so React state setters and similar function aliases are not rewritten to non-callable `Readonly<...>` types.
+- **`sort-functions` rule**: Updated autofix to sort the full sortable function span in one pass instead of swapping one adjacent out-of-order function pair per lint fix run.
+
 ## [1.2.4] - 2026-04-28
 
 ### Added

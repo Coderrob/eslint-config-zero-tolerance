@@ -16,6 +16,14 @@ ruleTester.run('prefer-readonly-parameters', preferReadonlyParameters, {
       code: 'function total(values: ReadonlyArray<number>) { return values.length; }',
     },
     {
+      name: 'should allow React Dispatch parameter type because it is callable',
+      code: 'function update(setName: Dispatch<SetStateAction<string>>) { setName("ready"); }',
+    },
+    {
+      name: 'should allow qualified React Dispatch parameter type because it is callable',
+      code: 'function update(setName: React.Dispatch<React.SetStateAction<string>>) { setName("ready"); }',
+    },
+    {
       name: 'should allow readonly array syntax',
       code: 'function total(values: readonly number[]) { return values.length; }',
     },
@@ -54,6 +62,11 @@ ruleTester.run('prefer-readonly-parameters', preferReadonlyParameters, {
     {
       name: 'should allow readonly constructor parameter property with Readonly type and default value',
       code: 'class Service { constructor(private readonly user: Readonly<User> = {}) {} }',
+    },
+    {
+      name: 'should allow configured ignored type reference parameter',
+      code: 'function subscribe(listener: Listener) { listener(); }',
+      options: [{ ignoredTypeNamePatterns: ['^Listener$'] }],
     },
   ],
   invalid: [
