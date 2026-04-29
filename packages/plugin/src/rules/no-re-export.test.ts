@@ -118,6 +118,19 @@ ruleTester.run('no-re-export', noReExport, {
       errors: [{ messageId: 'noReExport' }],
     },
     {
+      code: "import { parentFoo } from '../sibling';\nexport const foo = 1;\nexport { parentFoo as foo };",
+      name: 'should remove redundant pass-through export when direct export already exists',
+      output: "import { parentFoo } from '../sibling';\nexport const foo = 1;\n",
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import { parentFoo, parentBar } from '../sibling';\nexport const foo = 1;\nexport { parentFoo as foo, parentBar as bar };",
+      name: 'should remove only redundant pass-through export specifiers',
+      output:
+        "import { parentFoo, parentBar } from '../sibling';\nexport const foo = 1;\nexport { parentBar as bar };",
+      errors: [{ messageId: 'noReExport' }, { messageId: 'noReExport' }],
+    },
+    {
       code: "import type { Foo } from '../sibling';\nexport type { Foo };",
       name: 'should disallow pass-through type export of a parent import',
       errors: [{ messageId: 'noReExport' }],

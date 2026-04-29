@@ -20,7 +20,6 @@ import { createRule } from './support/rule-factory';
 
 type NoExportAliasContext = Readonly<TSESLint.RuleContext<'noExportAlias', []>>;
 type ExportAliasInfo = { local: string; alias: string };
-const EXPORT_KIND_TYPE = 'type';
 
 /**
  * Checks named export declarations for alias specifiers.
@@ -51,38 +50,6 @@ function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.R
   return {
     ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context, sourceCode),
   };
-}
-
-/**
- * Builds replacement text that removes aliasing while preserving `type` exports.
- *
- * @param sourceCode - Source code utility from ESLint context.
- * @param specifier - Export specifier to rewrite.
- * @returns Replacement export specifier text.
- */
-function createSpecifierReplacement(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
-): string {
-  const localText = sourceCode.getText(specifier.local);
-  const typePrefix = specifier.exportKind === EXPORT_KIND_TYPE ? `${EXPORT_KIND_TYPE} ` : '';
-  return `${typePrefix}${localText}`;
-}
-
-/**
- * Builds a fix that rewrites aliased export specifiers.
- *
- * @param sourceCode - Source code utility from ESLint context.
- * @param specifier - Export specifier node.
- * @param fixer - ESLint fixer utility.
- * @returns Rule fix operation.
- */
-function fixAliasSpecifier(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
-  fixer: TSESLint.RuleFixer,
-): TSESLint.RuleFix {
-  return fixer.replaceText(specifier, createSpecifierReplacement(sourceCode, specifier));
 }
 
 /**
@@ -133,7 +100,6 @@ function reportAliasSpecifier(
     node: specifier,
     messageId: 'noExportAlias',
     data: aliasInfo,
-    fix: fixAliasSpecifier.bind(undefined, sourceCode, specifier),
   });
 }
 
@@ -144,7 +110,6 @@ export const noExportAlias = createRule({
   name: 'no-export-alias',
   meta: {
     type: 'suggestion',
-    fixable: 'code',
     docs: {
       description: 'Prevent use of alias in export statements',
     },

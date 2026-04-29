@@ -15,9 +15,11 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from './support/rule-factory';
 
-type NoNonNullAssertionContext = Readonly<TSESLint.RuleContext<'noNonNullAssertion', []>>;
+enum NoNonNullAssertionMessageId { NoNonNullAssertion = "noNonNullAssertion", UseOptionalChaining = "useOptionalChaining" }
+type NoNonNullAssertionContext = Readonly<TSESLint.RuleContext<NoNonNullAssertionMessageId, []>>;
 
 /**
  * Creates listeners for TS non-null assertion nodes.
@@ -34,6 +36,82 @@ function createNoNonNullAssertionListeners(
 }
 
 /**
+ * Creates an optional-chaining suggestion when the non-null assertion is in a safe syntactic form.
+ *
+ * @param node - TS non-null expression node.
+ * @returns Optional-chaining suggestion entries.
+ */
+function createOptionalChainingSuggestions(
+  node: TSESTree.TSNonNullExpression,
+): TSESLint.ReportSuggestionArray<NoNonNullAssertionMessageId> {
+  if (!isSafeOptionalChainingTarget(node)) {
+    return [];
+  }
+  return [
+    {
+      messageId: 'useOptionalChaining',
+      fix: replaceNonNullAssertionWithOptionalChain.bind(undefined, node),
+    },
+  ];
+}
+
+/**
+ * Returns the optional-chain replacement token for one member expression.
+ *
+ * @param node - Member expression using the non-null assertion as object.
+ * @returns Optional-chain token text.
+ */
+function getMemberOptionalChainText(node: TSESTree.MemberExpression): string {
+  return node.computed ? '?.' : '?';
+}
+
+/**
+ * Returns true when optional chaining can replace the non-null assertion without rewriting structure.
+ *
+ * @param node - TS non-null expression node.
+ * @returns True when the parent expression supports optional chaining.
+ */
+function isSafeOptionalChainingTarget(node: TSESTree.TSNonNullExpression): boolean {
+  const parent = node.parent;
+  if (parent.type === AST_NODE_TYPES.MemberExpression && parent.object === node) {
+    return !isUnsafeMemberUsage(parent);
+  }
+  return parent.type === AST_NODE_TYPES.CallExpression && parent.callee === node;
+}
+
+/**
+ * Returns true when optional member access would create an unsafe assignment/update target.
+ *
+ * @param node - Member expression using the non-null assertion as object.
+ * @returns True when the member usage is unsafe to suggest.
+ */
+function isUnsafeMemberUsage(node: TSESTree.MemberExpression): boolean {
+  const parent = node.parent;
+  return (
+    (parent.type === AST_NODE_TYPES.AssignmentExpression && parent.left === node) ||
+    (parent.type === AST_NODE_TYPES.UpdateExpression && parent.argument === node)
+  );
+}
+
+/**
+ * Replaces the non-null assertion token with optional-chain syntax.
+ *
+ * @param node - TS non-null expression node.
+ * @param fixer - ESLint fixer.
+ * @returns Generated replacement fix.
+ */
+function replaceNonNullAssertionWithOptionalChain(
+  node: TSESTree.TSNonNullExpression,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  const replacementText =
+    node.parent.type === AST_NODE_TYPES.MemberExpression && node.parent.object === node
+      ? getMemberOptionalChainText(node.parent)
+      : '?.';
+  return fixer.replaceTextRange([node.expression.range[1], node.range[1]], replacementText);
+}
+
+/**
  * Reports a TS non-null assertion expression.
  *
  * @param context - ESLint rule execution context.
@@ -43,7 +121,12 @@ function reportNonNullAssertion(
   context: NoNonNullAssertionContext,
   node: TSESTree.TSNonNullExpression,
 ): void {
-  context.report({ node, messageId: 'noNonNullAssertion' });
+  const suggestions = createOptionalChainingSuggestions(node);
+  context.report({
+    node,
+    messageId: 'noNonNullAssertion',
+    ...(suggestions.length > 0 ? { suggest: suggestions } : {}),
+  });
 }
 
 /**
@@ -53,12 +136,14 @@ export const noNonNullAssertion = createRule({
   name: 'no-non-null-assertion',
   meta: {
     type: 'problem',
+    hasSuggestions: true,
     docs: {
       description: 'Disallow non-null assertions using the "!" postfix operator',
     },
     messages: {
       noNonNullAssertion:
         'Non-null assertion "!" bypasses TypeScript\'s type safety; use optional chaining or a proper null check instead',
+      useOptionalChaining: 'Use optional chaining instead of a non-null assertion.',
     },
     schema: [],
   },

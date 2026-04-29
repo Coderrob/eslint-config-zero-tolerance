@@ -50,6 +50,20 @@ ruleTester.run('no-inline-type-import', noInlineTypeImport, {
         }
       `,
       name: 'should report inline type imports in interface members',
+      output: `
+        import type { PipelineContext } from "../types/pipeline";
+import type { CompilerOptions, Program, SourceFile, TypeChecker } from "typescript";
+export interface SourceLoadResult {
+          readonly context: PipelineContext;
+          readonly checker: TypeChecker;
+          readonly configPath?: string;
+          readonly errors: readonly string[];
+          readonly options: CompilerOptions;
+          readonly program: Program;
+          readonly sourceFiles: readonly SourceFile[];
+          readonly sourceFileMap: ReadonlyMap<string, SourceFile>;
+        }
+      `,
       errors: [
         { messageId: 'noInlineTypeImport' },
         { messageId: 'noInlineTypeImport' },
@@ -62,6 +76,19 @@ ruleTester.run('no-inline-type-import', noInlineTypeImport, {
     {
       code: 'export type ProgramLike = import("typescript").Program;',
       name: 'should report inline type imports in type aliases',
+      output: 'import type { Program } from "typescript";\nexport type ProgramLike = Program;',
+      errors: [{ messageId: 'noInlineTypeImport' }],
+    },
+    {
+      code: 'import type { Program } from "typescript";\nexport type ProgramLike = import("typescript").Program;',
+      name: 'should reuse existing top-level type import',
+      output: 'import type { Program } from "typescript";\nexport type ProgramLike = Program;',
+      errors: [{ messageId: 'noInlineTypeImport' }],
+    },
+    {
+      code: 'type Program = string;\nexport type ProgramLike = import("typescript").Program;',
+      name: 'should not fix inline type imports when the type name collides',
+      output: null,
       errors: [{ messageId: 'noInlineTypeImport' }],
     },
   ],

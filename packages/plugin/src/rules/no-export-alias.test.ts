@@ -48,7 +48,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { foo as bar };',
       name: 'should report named export with alias',
-      output: 'export { foo };',
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -59,7 +59,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: "export { foo as bar } from './module';",
       name: 'should report re-export with alias',
-      output: "export { foo } from './module';",
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -70,7 +70,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { MyClass as default };',
       name: 'should report export aliased as default',
-      output: 'export { MyClass };',
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -81,7 +81,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { foo as bar, baz as qux };',
       name: 'should report multiple aliased exports',
-      output: 'export { foo, baz };',
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -96,7 +96,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: "export { alpha as beta, gamma } from './module';",
       name: 'should report mixed aliased and direct re-exports',
-      output: "export { alpha, gamma } from './module';",
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -107,7 +107,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { foo as "bar" };',
       name: 'should report string literal export alias',
-      output: 'export { foo };',
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -118,7 +118,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: 'export { type Foo as Bar };',
       name: 'should report type-only export with alias and preserve type modifier in autofix',
-      output: 'export { type Foo };',
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',
@@ -129,7 +129,7 @@ ruleTester.run('no-export-alias', noExportAlias, {
     {
       code: "export { type Foo as Bar } from './module';",
       name: 'should report type-only re-export with alias and preserve type modifier in autofix',
-      output: "export { type Foo } from './module';",
+      output: null,
       errors: [
         {
           messageId: 'noExportAlias',

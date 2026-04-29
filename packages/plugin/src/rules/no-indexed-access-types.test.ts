@@ -27,6 +27,28 @@ ruleTester.run('no-indexed-access-types', noIndexedAccessTypes, {
       errors: [{ messageId: 'noIndexedAccessTypes' }],
     },
     {
+      code: 'type Value = MyObject["key"];',
+      name: 'should suggest extracting indexed access with configured alias name pattern',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [
+        {
+          messageId: 'noIndexedAccessTypes',
+          suggestions: [
+            {
+              messageId: 'extractIndexedAccessType',
+              output: 'type MyObjectKey = MyObject["key"];\ntype Value = MyObjectKey;',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      code: 'type MyObjectKey = string;\ntype Value = MyObject["key"];',
+      name: 'should not suggest extracting indexed access when generated alias collides',
+      options: [{ aliasNamePattern: '{object}{property}' }],
+      errors: [{ messageId: 'noIndexedAccessTypes', suggestions: [] }],
+    },
+    {
       code: 'type Prop = Props["onChange"];',
       name: 'should report indexed access for prop type',
       errors: [{ messageId: 'noIndexedAccessTypes' }],

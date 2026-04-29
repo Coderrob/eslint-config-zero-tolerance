@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { isBarrelFile } from '../helpers/import-path-helpers';
 import { createRule } from './support/rule-factory';
@@ -45,6 +47,27 @@ function checkBarrelReExport(
 }
 
 /**
+ * Creates a fix for bare same-directory barrel re-export paths.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Re-export declaration to fix.
+ * @returns Fix callback, or null when the target cannot be verified.
+ */
+function createRelativeBarrelExportFix(
+  context: RequireBarrelRelativeExportsContext,
+  node: BarrelReExportNode,
+): TSESLint.ReportFixFunction | null {
+  const exportPath = getBareSameDirectoryExportPath(node);
+  if (exportPath === null) {
+    return null;
+  }
+  if (!hasVerifiedSameDirectoryTarget(context.filename, exportPath)) {
+    return null;
+  }
+  return replaceExportPath.bind(undefined, node, `${CURRENT_DIRECTORY_PREFIX}${exportPath}`);
+}
+
+/**
  * Creates listeners for require-barrel-relative-exports rule execution.
  *
  * @param context - ESLint rule execution context.
@@ -63,6 +86,63 @@ function createRequireBarrelRelativeExportsListeners(
 }
 
 /**
+ * Returns a bare same-directory export path when the source is safely fixable.
+ *
+ * @param node - Re-export declaration to inspect.
+ * @returns Bare export path, or null.
+ */
+function getBareSameDirectoryExportPath(node: BarrelReExportNode): string | null {
+  const exportPath = node.source?.value;
+  if (typeof exportPath !== 'string') {
+    return null;
+  }
+  return isBareSameDirectoryExportPath(exportPath) ? exportPath : null;
+}
+
+/**
+ * Returns candidate sibling target paths for a bare export path.
+ *
+ * @param targetBasePath - Target path without extension.
+ * @returns Candidate file and directory paths.
+ */
+function getSameDirectoryTargetCandidates(targetBasePath: string): readonly string[] {
+  return [
+    targetBasePath,
+    `${targetBasePath}.ts`,
+    `${targetBasePath}.tsx`,
+    `${targetBasePath}.js`,
+    `${targetBasePath}.jsx`,
+    path.join(targetBasePath, 'index.ts'),
+    path.join(targetBasePath, 'index.js'),
+  ];
+}
+
+/**
+ * Returns true when a same-directory export target exists.
+ *
+ * @param filename - Barrel file name.
+ * @param exportPath - Bare export path.
+ * @returns True when a sibling file or directory exists.
+ */
+function hasVerifiedSameDirectoryTarget(filename: string, exportPath: string): boolean {
+  if (!path.isAbsolute(filename)) {
+    return false;
+  }
+  const targetBasePath = path.join(path.dirname(filename), exportPath);
+  return getSameDirectoryTargetCandidates(targetBasePath).some(fs.existsSync);
+}
+
+/**
+ * Returns true when an export path is a bare same-directory candidate.
+ *
+ * @param exportPath - Export path to inspect.
+ * @returns True when the path is a bare relative candidate.
+ */
+function isBareSameDirectoryExportPath(exportPath: string): boolean {
+  return !exportPath.startsWith('.') && !exportPath.startsWith('/') && !exportPath.includes('/');
+}
+
+/**
  * Returns true when a barrel re-export path stays within the current directory tree.
  *
  * @param exportPath - Re-export path to evaluate.
@@ -78,6 +158,26 @@ function isRelativeBarrelExportPath(exportPath: string): boolean {
 }
 
 /**
+ * Replaces an export source path.
+ *
+ * @param node - Re-export declaration to fix.
+ * @param replacementPath - Replacement export path.
+ * @param fixer - ESLint fixer.
+ * @returns Generated replacement fix.
+ * @throws {Error} When the re-export source is unexpectedly unavailable during fix application.
+ */
+function replaceExportPath(
+  node: BarrelReExportNode,
+  replacementPath: string,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  if (node.source === null) {
+    throw new Error('Expected barrel re-export source to exist.');
+  }
+  return fixer.replaceText(node.source, `'${replacementPath}'`);
+}
+
+/**
  * Reports a barrel re-export that does not target a current-directory descendant path.
  *
  * @param context - ESLint rule execution context.
@@ -90,6 +190,7 @@ function reportInvalidBarrelExportPath(
   context.report({
     node,
     messageId: 'relativeBarrelExport',
+    fix: createRelativeBarrelExportFix(context, node),
   });
 }
 
@@ -100,6 +201,7 @@ export const requireBarrelRelativeExports = createRule({
   name: 'require-barrel-relative-exports',
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description:
         "Require barrel re-export declarations to use current-directory descendant paths that start with './'",

@@ -20,9 +20,15 @@ import { isBoolean } from '../helpers/type-guards';
 import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
+const OPERATOR_LOGICAL_NOT = '!';
+
 type FixInputs = Readonly<{
   literalValue: boolean;
   nonLiteralSide: TSESTree.Expression;
+}>;
+type ConditionalBooleanFixInputs = Readonly<{
+  shouldNegate: boolean;
+  test: TSESTree.Expression;
 }>;
 
 type StrictComparisonExpression = TSESTree.BinaryExpression & {
@@ -64,6 +70,52 @@ function checkBinaryExpression(
 }
 
 /**
+ * Checks a conditional expression and reports redundant boolean branches.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Conditional expression to inspect.
+ */
+function checkConditionalExpression(
+  context: NoRedundantBooleanContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.ConditionalExpression,
+): void {
+  const fixInputs = getConditionalBooleanFixInputs(node);
+  if (fixInputs === null) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'redundantBoolean',
+    fix: replaceRedundantBooleanConditional.bind(undefined, sourceCode, node, fixInputs),
+  });
+}
+
+/**
+ * Checks a unary expression and reports redundant double negation of boolean expressions.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Unary expression to inspect.
+ */
+function checkUnaryExpression(
+  context: NoRedundantBooleanContext,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.UnaryExpression,
+): void {
+  const innerExpression = getDoubleNegatedBooleanExpression(node);
+  if (innerExpression === null) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'redundantBoolean',
+    fix: replaceDoubleNegation.bind(undefined, sourceCode, node, innerExpression),
+  });
+}
+
+/**
  * Creates a deterministic replacement fixer for redundant comparisons.
  *
  * @param sourceCode - Source code helper.
@@ -91,6 +143,8 @@ function createNoRedundantBooleanListeners(
   const sourceCode = context.sourceCode;
   return {
     BinaryExpression: checkBinaryExpression.bind(undefined, context, sourceCode),
+    ConditionalExpression: checkConditionalExpression.bind(undefined, context, sourceCode),
+    UnaryExpression: checkUnaryExpression.bind(undefined, context, sourceCode),
   };
 }
 
@@ -112,6 +166,40 @@ function createReplacementText(
     return expressionText;
   }
   return `!(${expressionText})`;
+}
+
+/**
+ * Returns fix inputs for a boolean conditional expression.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns Fix inputs when the branches are redundant boolean literals.
+ */
+function getConditionalBooleanFixInputs(
+  node: TSESTree.ConditionalExpression,
+): ConditionalBooleanFixInputs | null {
+  if (isDirectBooleanConditional(node)) {
+    return { shouldNegate: false, test: node.test };
+  }
+  if (isNegatedBooleanConditional(node)) {
+    return { shouldNegate: true, test: node.test };
+  }
+  return null;
+}
+
+/**
+ * Returns the boolean expression inside a redundant double negation.
+ *
+ * @param node - Unary expression to inspect.
+ * @returns Inner boolean expression when double negation is redundant.
+ */
+function getDoubleNegatedBooleanExpression(node: TSESTree.UnaryExpression): TSESTree.Expression | null {
+  if (!isNestedLogicalNot(node)) {
+    return null;
+  }
+  if (!isBooleanExpression(node.argument.argument)) {
+    return null;
+  }
+  return node.argument.argument;
 }
 
 /**
@@ -161,6 +249,16 @@ function hasBooleanLiteralOperand(
 }
 
 /**
+ * Returns true when the expression is syntactically known to produce a boolean.
+ *
+ * @param node - Expression to inspect.
+ * @returns True when the expression is boolean-valued.
+ */
+function isBooleanExpression(node: TSESTree.Expression): boolean {
+  return isBooleanLiteral(node) || (node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator));
+}
+
+/**
  * Returns true when the node is a boolean literal (true or false).
  *
  * @param node - The node to check.
@@ -168,6 +266,69 @@ function hasBooleanLiteralOperand(
  */
 function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { value: boolean } {
   return node.type === AST_NODE_TYPES.Literal && isBoolean(node.value);
+}
+
+/**
+ * Returns true when the node is a boolean literal with a specific value.
+ *
+ * @param node - Node to inspect.
+ * @param value - Expected boolean value.
+ * @returns True when the node is the expected boolean literal.
+ */
+function isBooleanLiteralWithValue(node: TSESTree.Node, value: boolean): boolean {
+  return isBooleanLiteral(node) && node.value === value;
+}
+
+/**
+ * Returns true when an operator produces a boolean comparison result.
+ *
+ * @param operator - Operator to inspect.
+ * @returns True when the operator is a comparison operator.
+ */
+function isComparisonOperator(operator: string): boolean {
+  return ['===', '!==', '==', '!=', '>', '>=', '<', '<='].includes(operator);
+}
+
+/**
+ * Returns true when a conditional expression has `true : false` branches.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns True when branches directly mirror the test.
+ */
+function isDirectBooleanConditional(node: TSESTree.ConditionalExpression): boolean {
+  return (
+    isBooleanLiteralWithValue(node.consequent, true) &&
+    isBooleanLiteralWithValue(node.alternate, false)
+  );
+}
+
+/**
+ * Returns true when a conditional expression has `false : true` branches.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns True when branches negate the test.
+ */
+function isNegatedBooleanConditional(node: TSESTree.ConditionalExpression): boolean {
+  return (
+    isBooleanLiteralWithValue(node.consequent, false) &&
+    isBooleanLiteralWithValue(node.alternate, true)
+  );
+}
+
+/**
+ * Returns true when a unary expression is a double logical-not expression.
+ *
+ * @param node - Unary expression to inspect.
+ * @returns True when the expression starts with `!!`.
+ */
+function isNestedLogicalNot(
+  node: TSESTree.UnaryExpression,
+): node is TSESTree.UnaryExpression & { argument: TSESTree.UnaryExpression } {
+  return (
+    node.operator === OPERATOR_LOGICAL_NOT &&
+    node.argument.type === AST_NODE_TYPES.UnaryExpression &&
+    node.argument.operator === OPERATOR_LOGICAL_NOT
+  );
 }
 
 /**
@@ -208,6 +369,24 @@ function isStrictComparisonOperator(operator: string): boolean {
 }
 
 /**
+ * Applies a replacement fix for redundant double negation.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Unary expression being replaced.
+ * @param innerExpression - Inner boolean expression.
+ * @param fixer - ESLint fixer.
+ * @returns Generated text replacement fix.
+ */
+function replaceDoubleNegation(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.UnaryExpression,
+  innerExpression: TSESTree.Expression,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  return fixer.replaceText(node, sourceCode.getText(innerExpression));
+}
+
+/**
  * Applies a replacement fix for a redundant boolean comparison.
  *
  * @param sourceCode - Source code helper.
@@ -223,6 +402,26 @@ function replaceRedundantBooleanComparison(
   fixer: TSESLint.RuleFixer,
 ): TSESLint.RuleFix {
   return fixer.replaceText(node, createReplacementText(sourceCode, node, fixInputs));
+}
+
+/**
+ * Applies a replacement fix for a redundant boolean conditional.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Conditional expression being replaced.
+ * @param fixInputs - Precomputed fix inputs.
+ * @param fixer - ESLint fixer.
+ * @returns Generated text replacement fix.
+ */
+function replaceRedundantBooleanConditional(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: TSESTree.ConditionalExpression,
+  fixInputs: ConditionalBooleanFixInputs,
+  fixer: TSESLint.RuleFixer,
+): TSESLint.RuleFix {
+  const testText = sourceCode.getText(fixInputs.test);
+  const replacementText = fixInputs.shouldNegate ? `!(${testText})` : testText;
+  return fixer.replaceText(node, replacementText);
 }
 
 /**
