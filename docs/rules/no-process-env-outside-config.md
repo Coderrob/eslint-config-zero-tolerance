@@ -4,12 +4,12 @@ Disallow `process.env` reads outside configuration modules.
 
 ## Rule Details
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `problem`    |
-| **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 

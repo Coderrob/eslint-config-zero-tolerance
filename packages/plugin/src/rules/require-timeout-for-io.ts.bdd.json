@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-timeout-for-io.ts",
+  "module": {
+    "name": "require-timeout-for-io",
+    "description": "Require timeout or cancellation options for external IO calls.",
+    "exports": ["requireTimeoutForIo"]
+  },
+  "specifications": [
+    {
+      "feature": "IO timeout enforcement",
+      "scenarios": [
+        {
+          "name": "should allow IO calls with signal, timeout, or approved wrappers",
+          "given": "code that calls fetch, HTTP clients, subprocesses, or custom IO through cancellation-aware options",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report fetch, HTTP client, and subprocess calls without cancellation",
+          "given": "production code that calls external IO without timeout or signal options",
+          "when": "the rule evaluates the call",
+          "then": "a missingTimeout violation is reported"
+        },
+        {
+          "name": "should skip tests by default and check them when configured",
+          "given": "IO calls appear in test files",
+          "when": "checkTests is false or true",
+          "then": "test files are exempt by default and reported when configured"
+        }
+      ]
+    }
+  ]
+}

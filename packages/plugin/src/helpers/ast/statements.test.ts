@@ -12,7 +12,7 @@ describe('ast statement helpers', () => {
       const statement = {
         type: AST_NODE_TYPES.ReturnStatement,
         argument: { type: AST_NODE_TYPES.Literal, value: true },
-      } as any;
+      } as unknown;
 
       expect(getBooleanLiteralReturnValue(statement)).toBe(true);
     });
@@ -21,7 +21,7 @@ describe('ast statement helpers', () => {
       const statement = {
         type: AST_NODE_TYPES.ReturnStatement,
         argument: { type: AST_NODE_TYPES.Identifier, name: 'result' },
-      } as any;
+      } as unknown;
 
       expect(getBooleanLiteralReturnValue(statement)).toBeNull();
     });
@@ -29,13 +29,13 @@ describe('ast statement helpers', () => {
 
   describe('getBooleanLiteralValue', () => {
     it('should return the boolean value from a boolean literal expression', () => {
-      const value = { type: AST_NODE_TYPES.Literal, value: false } as any;
+      const value = { type: AST_NODE_TYPES.Literal, value: false } as unknown;
 
       expect(getBooleanLiteralValue(value)).toBe(false);
     });
 
     it('should return null for non-boolean literal expressions', () => {
-      const value = { type: AST_NODE_TYPES.Literal, value: 'text' } as any;
+      const value = { type: AST_NODE_TYPES.Literal, value: 'text' } as unknown;
 
       expect(getBooleanLiteralValue(value)).toBeNull();
     });
@@ -43,7 +43,7 @@ describe('ast statement helpers', () => {
 
   describe('getReturnStatement', () => {
     it('should return a direct return statement unchanged', () => {
-      const statement = { type: AST_NODE_TYPES.ReturnStatement, argument: null } as any;
+      const statement = { type: AST_NODE_TYPES.ReturnStatement, argument: null } as unknown;
 
       expect(getReturnStatement(statement)).toBe(statement);
     });
@@ -53,13 +53,13 @@ describe('ast statement helpers', () => {
       const statement = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [returnStatement],
-      } as any;
+      } as unknown;
 
       expect(getReturnStatement(statement)).toBe(returnStatement);
     });
 
     it('should return null when the statement cannot be reduced to a single return', () => {
-      const statement = { type: AST_NODE_TYPES.ExpressionStatement } as any;
+      const statement = { type: AST_NODE_TYPES.ExpressionStatement } as unknown;
 
       expect(getReturnStatement(statement)).toBeNull();
     });
@@ -75,7 +75,7 @@ describe('ast statement helpers', () => {
       const blockStatement = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [returnStatement],
-      } as any;
+      } as unknown;
 
       expect(getSingleReturnStatement(blockStatement)).toBe(returnStatement);
     });
@@ -84,7 +84,7 @@ describe('ast statement helpers', () => {
       const blockStatement = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [{ type: AST_NODE_TYPES.ReturnStatement }, { type: AST_NODE_TYPES.ReturnStatement }],
-      } as any;
+      } as unknown;
 
       expect(getSingleReturnStatement(blockStatement)).toBeNull();
     });
@@ -93,7 +93,7 @@ describe('ast statement helpers', () => {
       const blockStatement = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [{ type: AST_NODE_TYPES.ExpressionStatement }],
-      } as any;
+      } as unknown;
 
       expect(getSingleReturnStatement(blockStatement)).toBeNull();
     });

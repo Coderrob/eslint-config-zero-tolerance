@@ -66,9 +66,9 @@ function asRuleOption(value: unknown): RuleOption | null {
  * @param node - Call expression node to inspect.
  */
 function checkCallExpression(
-  context: RequireTestDescriptionStyleContext,
-  options: ResolvedRuleOptions,
-  node: TSESTree.CallExpression,
+  context: Readonly<RequireTestDescriptionStyleContext>,
+  options: Readonly<ResolvedRuleOptions>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   const invalidDescription = getInvalidDescriptionForEnforcedTest(node, options);
   if (invalidDescription === null) {
@@ -90,9 +90,9 @@ function checkCallExpression(
  * @returns Rule fix for replacing the description text.
  */
 function createRequireTestDescriptionStyleFix(
-  node: TSESTree.Literal,
+  node: Readonly<TSESTree.Literal>,
   prefix: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const description = String(node.value);
   const replacement = JSON.stringify(getPrefixedDescription(description, prefix));
@@ -106,7 +106,7 @@ function createRequireTestDescriptionStyleFix(
  * @returns Rule listeners.
  */
 function createRequireTestDescriptionStyleListeners(
-  context: RequireTestDescriptionStyleContext,
+  context: Readonly<RequireTestDescriptionStyleContext>,
 ): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
@@ -120,21 +120,8 @@ function createRequireTestDescriptionStyleListeners(
  * @param node - The call expression node to analyze.
  * @returns The string literal argument if present and valid, null otherwise.
  */
-function getDescriptionArgument(node: TSESTree.CallExpression): TSESTree.Literal | null {
+function getDescriptionArgument(node: Readonly<TSESTree.CallExpression>): TSESTree.Literal | null {
   return getStringLiteralCallArgument(node, 0);
-}
-
-/**
- * Returns normalized `ignoreSkip` option value.
- *
- * @param option - Parsed rule option.
- * @returns Configured ignore-skip value or default.
- */
-function getIgnoreSkipOption(option: RuleOption | null): boolean {
-  if (option?.ignoreSkip === undefined) {
-    return true;
-  }
-  return option.ignoreSkip;
 }
 
 /**
@@ -145,7 +132,7 @@ function getIgnoreSkipOption(option: RuleOption | null): boolean {
  * @returns The invalid description literal if found, null otherwise.
  */
 function getInvalidDescription(
-  node: TSESTree.CallExpression,
+  node: Readonly<TSESTree.CallExpression>,
   prefix: string,
 ): TSESTree.Literal | null {
   const description = getDescriptionArgument(node);
@@ -163,8 +150,8 @@ function getInvalidDescription(
  * @returns The invalid description literal if found, null otherwise.
  */
 function getInvalidDescriptionForEnforcedTest(
-  node: TSESTree.CallExpression,
-  options: ResolvedRuleOptions,
+  node: Readonly<TSESTree.CallExpression>,
+  options: Readonly<ResolvedRuleOptions>,
 ): TSESTree.Literal | null {
   if (!isEnforcedTestCall(node)) {
     return null;
@@ -210,7 +197,7 @@ function getPrefixOption(option: RuleOption | null): string {
  * @param prefix - Required description prefix.
  * @returns True if the description has the required prefix, false otherwise.
  */
-function hasRequiredDescriptionPrefix(node: TSESTree.Literal, prefix: string): boolean {
+function hasRequiredDescriptionPrefix(node: Readonly<TSESTree.Literal>, prefix: string): boolean {
   return String(node.value).trim().startsWith(prefix);
 }
 
@@ -220,7 +207,7 @@ function hasRequiredDescriptionPrefix(node: TSESTree.Literal, prefix: string): b
  * @param node - The call expression node to check.
  * @returns True if the call is a direct test call, false otherwise.
  */
-function isDirectTestCall(node: TSESTree.CallExpression): boolean {
+function isDirectTestCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return (
     hasCallCalleeNamePath(node, [TEST_FUNCTION_IT]) ||
     hasCallCalleeNamePath(node, [TEST_FUNCTION_TEST])
@@ -233,7 +220,7 @@ function isDirectTestCall(node: TSESTree.CallExpression): boolean {
  * @param node - The call expression node to check.
  * @returns True if the call should be enforced, false otherwise.
  */
-function isEnforcedTestCall(node: TSESTree.CallExpression): boolean {
+function isEnforcedTestCall(node: Readonly<TSESTree.CallExpression>): boolean {
   if (isDirectTestCall(node)) {
     return true;
   }
@@ -246,7 +233,7 @@ function isEnforcedTestCall(node: TSESTree.CallExpression): boolean {
  * @param node - The call expression node to check.
  * @returns True if the call is a member test call, false otherwise.
  */
-function isMemberTestCall(node: TSESTree.CallExpression): boolean {
+function isMemberTestCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const calleeNamePath = getCalleeNamePath(node.callee);
   if (calleeNamePath === null || calleeNamePath.length !== MEMBER_TEST_CALL_SEGMENT_COUNT) {
     return false;
@@ -299,7 +286,7 @@ function isRuleOptionRecord(value: unknown): value is RuleOption {
  * @param node - The call expression node to check.
  * @returns True if the call is a skipped test call, false otherwise.
  */
-function isSkippedTestCall(node: TSESTree.CallExpression): boolean {
+function isSkippedTestCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return (
     hasCallCalleeNamePath(node, [TEST_FUNCTION_IT, TEST_METHOD_SKIP]) ||
     hasCallCalleeNamePath(node, [TEST_FUNCTION_TEST, TEST_METHOD_SKIP])
@@ -325,9 +312,22 @@ function isTestIdentifierName(name: string): boolean {
 function resolveOptions(options: ReadonlyArray<unknown>): ResolvedRuleOptions {
   const option = asRuleOption(options[0]);
   return {
-    ignoreSkip: getIgnoreSkipOption(option),
+    ignoreSkip: shouldIgnoreSkip(option),
     prefix: getPrefixOption(option),
   };
+}
+
+/**
+ * Returns normalized `ignoreSkip` option value.
+ *
+ * @param option - Parsed rule option.
+ * @returns Configured ignore-skip value or default.
+ */
+function shouldIgnoreSkip(option: RuleOption | null): boolean {
+  if (option?.ignoreSkip === undefined) {
+    return true;
+  }
+  return option.ignoreSkip;
 }
 
 /**

@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-unsafe-json-parse.ts",
+  "module": {
+    "name": "no-unsafe-json-parse",
+    "description": "Disallow treating JSON.parse results as typed data without validation.",
+    "exports": ["noUnsafeJsonParse"]
+  },
+  "specifications": [
+    {
+      "feature": "Typed JSON.parse detection",
+      "scenarios": [
+        {
+          "name": "should allow unknown-first parsing and validator wrappers",
+          "given": "code assigning JSON.parse to unknown or immediately passing it to an approved validator",
+          "when": "the rule evaluates the parse call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report asserted JSON.parse results",
+          "given": "code using as or angle-bracket assertions around JSON.parse",
+          "when": "the rule evaluates the assertion",
+          "then": "an unsafeJsonParse violation is reported"
+        },
+        {
+          "name": "should suggest unknown-first parsing for simple variables",
+          "given": "a variable initializer directly asserts or annotates a JSON.parse result",
+          "when": "the rule reports the unsafe parse",
+          "then": "a parseAsUnknown suggestion is provided"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-unsafe-code-generation.ts",
+  "module": {
+    "name": "no-unsafe-code-generation",
+    "description": "Disallow eval, Function constructors, string timers, and vm code execution APIs.",
+    "exports": ["noUnsafeCodeGeneration"]
+  },
+  "specifications": [
+    {
+      "feature": "Dynamic code execution detection",
+      "scenarios": [
+        {
+          "name": "should allow function timer callbacks and shadowed global names",
+          "given": "code using function callbacks for timers or local bindings named Function",
+          "when": "the rule evaluates the call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report eval, Function, and string timer callbacks",
+          "given": "code that executes source strings through globals or timer callbacks",
+          "when": "the rule evaluates the call or constructor",
+          "then": "an unsafeCodeGeneration violation is reported"
+        },
+        {
+          "name": "should report Node vm execution APIs",
+          "given": "code importing vm namespaces or vm execution helpers",
+          "when": "the rule evaluates the vm call or constructor",
+          "then": "an unsafeCodeGeneration violation is reported"
+        }
+      ]
+    }
+  ]
+}

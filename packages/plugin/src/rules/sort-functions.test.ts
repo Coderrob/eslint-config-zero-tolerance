@@ -86,11 +86,26 @@ ruleTester.run('sort-functions', sortFunctions, {
     {
       name: 'should flag multiple functions out of order',
       code: 'function gamma() {}\nfunction alpha() {}\nfunction beta() {}',
-      output: [
-        'function alpha() {}\nfunction gamma() {}\nfunction beta() {}',
-        'function alpha() {}\nfunction beta() {}\nfunction gamma() {}',
-      ],
+      output: 'function alpha() {}\nfunction beta() {}\nfunction gamma() {}',
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'gamma' } }],
+    },
+    {
+      name: 'should sort a large reversed function run in one fix',
+      code: [
+        'function zeta() {}',
+        'function epsilon() {}',
+        'function delta() {}',
+        'function beta() {}',
+        'function alpha() {}',
+      ].join('\n'),
+      output: [
+        'function alpha() {}',
+        'function beta() {}',
+        'function delta() {}',
+        'function epsilon() {}',
+        'function zeta() {}',
+      ].join('\n'),
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'epsilon', previous: 'zeta' } }],
     },
     {
       name: 'should compare names case-insensitively',

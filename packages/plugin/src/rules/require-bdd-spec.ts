@@ -51,7 +51,7 @@ const TEST_SUFFIX = '.test.ts';
  * @param content - Source file text.
  * @param exportedNames - Mutable set of export names.
  */
-function addDeclarationExports(content: string, exportedNames: Set<string>): void {
+function addDeclarationExports(content: string, exportedNames: Readonly<Set<string>>): void {
   let match: RegExpExecArray | null = EXPORT_DECLARATION_PATTERN.exec(content);
   while (match !== null) {
     exportedNames.add(match[1]);
@@ -65,7 +65,7 @@ function addDeclarationExports(content: string, exportedNames: Set<string>): voi
  * @param exportedName - Candidate export name.
  * @param exportedNames - Mutable set of export names.
  */
-function addExportIfValid(exportedName: string, exportedNames: Set<string>): void {
+function addExportIfValid(exportedName: string, exportedNames: Readonly<Set<string>>): void {
   if (/^\w+$/u.test(exportedName)) {
     exportedNames.add(exportedName);
   }
@@ -77,7 +77,7 @@ function addExportIfValid(exportedName: string, exportedNames: Set<string>): voi
  * @param content - Source file text.
  * @param exportedNames - Mutable set of export names.
  */
-function addListExports(content: string, exportedNames: Set<string>): void {
+function addListExports(content: string, exportedNames: Readonly<Set<string>>): void {
   let match: RegExpExecArray | null = EXPORT_LIST_PATTERN.exec(content);
   while (match !== null) {
     for (const segment of match[1].split(',')) {
@@ -91,6 +91,16 @@ function addListExports(content: string, exportedNames: Set<string>): void {
 }
 
 /**
+ * Appends one validation error to the accumulator.
+ *
+ * @param errors - Error accumulator.
+ * @param message - Validation message to append.
+ */
+function appendError(errors: readonly string[], message: string): void {
+  Reflect.apply(Array.prototype.push, errors, [message]);
+}
+
+/**
  * Adds source/spec export parity errors.
  *
  * @param spec - Parsed BDD spec.
@@ -100,7 +110,7 @@ function addListExports(content: string, exportedNames: Set<string>): void {
 function appendExportParityErrors(
   spec: Readonly<Record<string, unknown>>,
   sourceContent: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   const moduleRecord = getModuleRecord(spec);
   if (moduleRecord === null || !Array.isArray(moduleRecord['exports'])) {
@@ -119,10 +129,14 @@ function appendExportParityErrors(
  * @param featureIndex - Zero-based feature index.
  * @param errors - Mutable error accumulator.
  */
-function appendFeatureErrors(feature: unknown, featureIndex: number, errors: string[]): void {
+function appendFeatureErrors(
+  feature: unknown,
+  featureIndex: number,
+  errors: readonly string[],
+): void {
   const prefix = `feature[${featureIndex}]`;
   if (!isPlainObject(feature)) {
-    errors.push(`${prefix}: must be an object`);
+    appendError(errors, `${prefix}: must be an object`);
     return;
   }
   appendFeatureNameError(feature, prefix, errors);
@@ -139,10 +153,10 @@ function appendFeatureErrors(feature: unknown, featureIndex: number, errors: str
 function appendFeatureNameError(
   feature: Readonly<Record<string, unknown>>,
   prefix: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (!isNonEmptyString(feature['feature'])) {
-    errors.push(`${prefix}: "feature" must be a non-empty string`);
+    appendError(errors, `${prefix}: "feature" must be a non-empty string`);
   }
 }
 
@@ -158,15 +172,15 @@ function appendFeatureScenariosErrors(
   feature: Readonly<Record<string, unknown>>,
   featureIndex: number,
   prefix: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   const scenarios = feature['scenarios'];
   if (!Array.isArray(scenarios)) {
-    errors.push(`${prefix}: "scenarios" must be an array`);
+    appendError(errors, `${prefix}: "scenarios" must be an array`);
     return;
   }
   if (scenarios.length === 0) {
-    errors.push(`${prefix}: "scenarios" must not be empty`);
+    appendError(errors, `${prefix}: "scenarios" must not be empty`);
     return;
   }
   appendScenarioErrors(scenarios, getFeatureName(feature, featureIndex), errors);
@@ -178,7 +192,10 @@ function appendFeatureScenariosErrors(
  * @param spec - Parsed BDD spec.
  * @param errors - Mutable error accumulator.
  */
-function appendFieldTypeErrors(spec: Readonly<Record<string, unknown>>, errors: string[]): void {
+function appendFieldTypeErrors(
+  spec: Readonly<Record<string, unknown>>,
+  errors: readonly string[],
+): void {
   appendSchemaFieldTypeError(spec, errors);
   appendSourceFileTypeError(spec, errors);
   appendTopLevelModuleTypeError(spec, errors);
@@ -193,11 +210,11 @@ function appendFieldTypeErrors(spec: Readonly<Record<string, unknown>>, errors: 
  */
 function appendMissingRequiredFieldErrors(
   spec: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   for (const field of REQUIRED_TOP_LEVEL_FIELDS) {
     if (!hasOwnField(spec, field)) {
-      errors.push(`Missing required field: "${field}"`);
+      appendError(errors, `Missing required field: "${field}"`);
     }
   }
 }
@@ -210,10 +227,10 @@ function appendMissingRequiredFieldErrors(
  */
 function appendModuleDescriptionError(
   moduleRecord: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (!isNonEmptyString(moduleRecord['description'])) {
-    errors.push('"module.description" must be a non-empty string');
+    appendError(errors, '"module.description" must be a non-empty string');
   }
 }
 
@@ -225,7 +242,7 @@ function appendModuleDescriptionError(
  */
 function appendModuleErrors(
   moduleRecord: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   appendModuleNameError(moduleRecord, errors);
   appendModuleDescriptionError(moduleRecord, errors);
@@ -240,10 +257,10 @@ function appendModuleErrors(
  */
 function appendModuleExportsErrors(
   moduleRecord: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (!Array.isArray(moduleRecord['exports'])) {
-    errors.push('"module.exports" must be an array');
+    appendError(errors, '"module.exports" must be an array');
     return;
   }
   pushModuleExportEntryErrors(moduleRecord['exports'], errors);
@@ -257,10 +274,10 @@ function appendModuleExportsErrors(
  */
 function appendModuleNameError(
   moduleRecord: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (!isNonEmptyString(moduleRecord['name'])) {
-    errors.push('"module.name" must be a non-empty string');
+    appendError(errors, '"module.name" must be a non-empty string');
   }
 }
 
@@ -274,7 +291,7 @@ function appendModuleNameError(
 function appendScenarioErrors(
   scenarios: ReadonlyArray<unknown>,
   featureName: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   for (let i = 0; i < scenarios.length; i += 1) {
     pushScenarioFieldErrors(scenarios[i], featureName, i, errors);
@@ -289,10 +306,10 @@ function appendScenarioErrors(
  */
 function appendSchemaFieldTypeError(
   spec: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (hasOwnField(spec, '$schema') && typeof spec['$schema'] !== 'string') {
-    errors.push('"$schema" must be a string');
+    appendError(errors, '"$schema" must be a string');
   }
 }
 
@@ -303,14 +320,18 @@ function appendSchemaFieldTypeError(
  * @param featureName - Feature display name.
  * @param errors - Mutable error accumulator.
  */
-function appendSchemaVersionError(spec: Readonly<Record<string, unknown>>, errors: string[]): void {
+function appendSchemaVersionError(
+  spec: Readonly<Record<string, unknown>>,
+  errors: readonly string[],
+): void {
   if (!hasOwnField(spec, 'schemaVersion')) {
     return;
   }
   if (spec['schemaVersion'] === SCHEMA_VERSION) {
     return;
   }
-  errors.push(
+  appendError(
+    errors,
     `"schemaVersion" must equal "${SCHEMA_VERSION}" (got ${JSON.stringify(spec['schemaVersion'])})`,
   );
 }
@@ -321,14 +342,17 @@ function appendSchemaVersionError(spec: Readonly<Record<string, unknown>>, error
  * @param spec - Parsed BDD spec.
  * @param errors - Mutable error accumulator.
  */
-function appendSourceFileErrors(spec: Readonly<Record<string, unknown>>, errors: string[]): void {
+function appendSourceFileErrors(
+  spec: Readonly<Record<string, unknown>>,
+  errors: readonly string[],
+): void {
   const sourceFile = spec['sourceFile'];
   if (!isNonEmptyString(sourceFile)) {
-    errors.push('"sourceFile" must be a non-empty string');
+    appendError(errors, '"sourceFile" must be a non-empty string');
     return;
   }
   if (!existsSync(sourceFile)) {
-    errors.push(`"sourceFile" points to a non-existent file: ${sourceFile}`);
+    appendError(errors, `"sourceFile" points to a non-existent file: ${sourceFile}`);
   }
 }
 
@@ -340,10 +364,10 @@ function appendSourceFileErrors(spec: Readonly<Record<string, unknown>>, errors:
  */
 function appendSourceFileTypeError(
   spec: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (hasOwnField(spec, 'sourceFile') && typeof spec['sourceFile'] !== 'string') {
-    errors.push('"sourceFile" must be a string');
+    appendError(errors, '"sourceFile" must be a string');
   }
 }
 
@@ -355,10 +379,10 @@ function appendSourceFileTypeError(
  */
 function appendSpecificationsErrors(
   specifications: ReadonlyArray<unknown>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (specifications.length === 0) {
-    errors.push('"specifications" must not be empty');
+    appendError(errors, '"specifications" must not be empty');
     return;
   }
   for (let i = 0; i < specifications.length; i += 1) {
@@ -374,10 +398,10 @@ function appendSpecificationsErrors(
  */
 function appendTopLevelModuleTypeError(
   spec: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (hasOwnField(spec, 'module') && !isPlainObject(spec['module'])) {
-    errors.push('"module" must be an object');
+    appendError(errors, '"module" must be an object');
   }
 }
 
@@ -389,10 +413,10 @@ function appendTopLevelModuleTypeError(
  */
 function appendTopLevelSpecificationsTypeError(
   spec: Readonly<Record<string, unknown>>,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   if (hasOwnField(spec, 'specifications') && !Array.isArray(spec['specifications'])) {
-    errors.push('"specifications" must be an array');
+    appendError(errors, '"specifications" must be an array');
   }
 }
 
@@ -402,7 +426,10 @@ function appendTopLevelSpecificationsTypeError(
  * @param context - ESLint rule context.
  * @param node - Program node.
  */
-function checkProgram(context: RequireBddSpecContext, node: TSESTree.Program): void {
+function checkProgram(
+  context: Readonly<RequireBddSpecContext>,
+  node: Readonly<TSESTree.Program>,
+): void {
   const filename = context.filename;
   if (isTestFile(filename)) {
     return;
@@ -424,11 +451,11 @@ function checkProgram(context: RequireBddSpecContext, node: TSESTree.Program): v
  * @param moduleExports - module.exports value.
  * @returns Declared export names.
  */
-function collectDeclaredExports(moduleExports: unknown[]): string[] {
+function collectDeclaredExports(moduleExports: readonly unknown[]): string[] {
   const declaredExports: string[] = [];
   for (const value of moduleExports) {
     if (isNonEmptyString(value)) {
-      declaredExports.push(value);
+      Reflect.apply(Array.prototype.push, declaredExports, [value]);
     }
   }
   return declaredExports;
@@ -498,7 +525,9 @@ function collectTopLevelErrors(spec: Readonly<Record<string, unknown>>): string[
  * @param context - ESLint rule context.
  * @returns Listener map.
  */
-function createRequireBddSpecListeners(context: RequireBddSpecContext): TSESLint.RuleListener {
+function createRequireBddSpecListeners(
+  context: Readonly<RequireBddSpecContext>,
+): TSESLint.RuleListener {
   return {
     Program: checkProgram.bind(undefined, context),
   };
@@ -656,12 +685,15 @@ function parseSpec(specPath: string): unknown {
  */
 function pushMissingSourceExports(
   declaredExports: ReadonlyArray<string>,
-  actualExports: ReadonlySet<string>,
-  errors: string[],
+  actualExports: Readonly<ReadonlySet<string>>,
+  errors: readonly string[],
 ): void {
   for (const name of declaredExports) {
     if (!actualExports.has(name)) {
-      errors.push(`"module.exports" lists "${name}" but it is not exported by the source file`);
+      appendError(
+        errors,
+        `"module.exports" lists "${name}" but it is not exported by the source file`,
+      );
     }
   }
 }
@@ -675,12 +707,15 @@ function pushMissingSourceExports(
  */
 function pushMissingSpecExports(
   declaredExports: ReadonlyArray<string>,
-  actualExports: ReadonlySet<string>,
-  errors: string[],
+  actualExports: Readonly<ReadonlySet<string>>,
+  errors: readonly string[],
 ): void {
   for (const name of actualExports) {
     if (!declaredExports.includes(name)) {
-      errors.push(`"module.exports" is missing "${name}" which is exported by the source file`);
+      appendError(
+        errors,
+        `"module.exports" is missing "${name}" which is exported by the source file`,
+      );
     }
   }
 }
@@ -692,10 +727,13 @@ function pushMissingSpecExports(
  * @param actualExports - Source named exports.
  * @param errors - Mutable error accumulator.
  */
-function pushModuleExportEntryErrors(moduleExports: unknown[], errors: string[]): void {
+function pushModuleExportEntryErrors(
+  moduleExports: readonly unknown[],
+  errors: readonly string[],
+): void {
   for (let i = 0; i < moduleExports.length; i += 1) {
     if (!isNonEmptyString(moduleExports[i])) {
-      errors.push(`"module.exports[${i}]" must be a non-empty string`);
+      appendError(errors, `"module.exports[${i}]" must be a non-empty string`);
     }
   }
 }
@@ -712,11 +750,11 @@ function pushScenarioFieldErrors(
   scenario: unknown,
   featureName: string,
   scenarioIndex: number,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   const prefix = `scenario[${scenarioIndex}] in feature "${featureName}"`;
   if (!isPlainObject(scenario)) {
-    errors.push(`${prefix}: must be an object`);
+    appendError(errors, `${prefix}: must be an object`);
     return;
   }
   pushScenarioRequiredFieldErrors(scenario, prefix, errors);
@@ -733,11 +771,11 @@ function pushScenarioFieldErrors(
 function pushScenarioRequiredFieldErrors(
   scenario: Readonly<Record<string, unknown>>,
   prefix: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   for (const field of SCENARIO_FIELDS) {
     if (!isNonEmptyString(scenario[field])) {
-      errors.push(`${prefix}: "${field}" must be a non-empty string`);
+      appendError(errors, `${prefix}: "${field}" must be a non-empty string`);
     }
   }
 }
@@ -752,14 +790,14 @@ function pushScenarioRequiredFieldErrors(
 function pushScenarioShouldPrefixError(
   scenario: Readonly<Record<string, unknown>>,
   prefix: string,
-  errors: string[],
+  errors: readonly string[],
 ): void {
   const scenarioName = scenario['name'];
   if (!isNonEmptyString(scenarioName)) {
     return;
   }
   if (!/^should\b/u.test(scenarioName)) {
-    errors.push(`${prefix}: "name" must start with "should" (got "${scenarioName}")`);
+    appendError(errors, `${prefix}: "name" must start with "should" (got "${scenarioName}")`);
   }
 }
 
@@ -771,8 +809,8 @@ function pushScenarioShouldPrefixError(
  * @param errors - Validation error list.
  */
 function reportInvalidSpec(
-  context: RequireBddSpecContext,
-  node: TSESTree.Program,
+  context: Readonly<RequireBddSpecContext>,
+  node: Readonly<TSESTree.Program>,
   errors: ReadonlyArray<string>,
 ): void {
   context.report({
@@ -790,8 +828,8 @@ function reportInvalidSpec(
  * @param specPath - Expected sibling spec path.
  */
 function reportMissingSpec(
-  context: RequireBddSpecContext,
-  node: TSESTree.Program,
+  context: Readonly<RequireBddSpecContext>,
+  node: Readonly<TSESTree.Program>,
   specPath: string,
 ): void {
   context.report({

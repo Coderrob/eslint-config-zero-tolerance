@@ -40,6 +40,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface User { name: string; }',
       name: 'should report interface without I prefix',
+      output: 'interface IUser { name: string; }',
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -50,6 +51,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface user { name: string; }',
       name: 'should report lowercase interface name',
+      output: null,
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -70,6 +72,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface Generic<T> { value: T; }',
       name: 'should report generic interface without I prefix',
+      output: 'interface IGeneric<T> { value: T; }',
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -80,6 +83,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface Extended extends Base { extra: string; }',
       name: 'should report extended interface without I prefix',
+      output: 'interface IExtended extends Base { extra: string; }',
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -90,6 +94,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface Props { onClick(): void; }',
       name: 'should report interface with methods but no I prefix',
+      output: 'interface IProps { onClick(): void; }',
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -100,6 +105,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface I_Thing { name: string; }',
       name: 'should report I prefix followed by underscore',
+      output: null,
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -110,6 +116,7 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface I1Thing { name: string; }',
       name: 'should report I prefix followed by digit',
+      output: null,
       errors: [
         {
           messageId: 'interfacePrefix',
@@ -120,12 +127,31 @@ ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     {
       code: 'interface I {}',
       name: 'should report interface name with prefix only',
+      output: null,
       errors: [
         {
           messageId: 'interfacePrefix',
           data: { name: 'I' },
         },
       ],
+    },
+    {
+      code: 'interface User { name: string; }\ntype Account = User;\ninterface Profile extends User {}',
+      name: 'should fix same-file type references when prefixing interface',
+      output: [
+        'interface IUser { name: string; }\ntype Account = IUser;\ninterface Profile extends IUser {}',
+        'interface IUser { name: string; }\ntype Account = IUser;\ninterface IProfile extends IUser {}',
+      ],
+      errors: [
+        { messageId: 'interfacePrefix', data: { name: 'User' } },
+        { messageId: 'interfacePrefix', data: { name: 'Profile' } },
+      ],
+    },
+    {
+      code: 'interface IUser { id: string; }\ninterface User { name: string; }',
+      name: 'should not fix interface prefix when replacement collides',
+      output: null,
+      errors: [{ messageId: 'interfacePrefix', data: { name: 'User' } }],
     },
   ],
 });

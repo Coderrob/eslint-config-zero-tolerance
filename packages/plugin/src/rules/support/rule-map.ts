@@ -36,6 +36,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-destructured-parameter-type-literal',
   'no-dynamic-import',
   'no-explicit-any',
+  'no-hardcoded-secrets',
   'no-literal-unions',
   'no-export-alias',
   'no-re-export',
@@ -50,6 +51,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-type-assertion',
   'no-literal-property-unions',
   'no-eslint-disable',
+  'no-ts-nocheck',
   'sort-imports',
   'sort-functions',
   'no-magic-numbers',
@@ -71,8 +73,13 @@ const DEFAULT_RULE_NAMES: string[] = [
   'no-labels',
   'no-barrel-parent-imports',
   'no-indexed-access-types',
+  'no-placeholder-implementation',
   'no-process-env-outside-config',
+  'no-raw-sql-interpolation',
   'no-return-type',
+  'no-shell-command-construction',
+  'no-unsafe-code-generation',
+  'no-unsafe-json-parse',
   'no-with',
   'prefer-guard-clauses',
   'prefer-nullish-coalescing',
@@ -85,6 +92,7 @@ const DEFAULT_RULE_NAMES: string[] = [
   'require-exhaustive-switch',
   'no-test-interface-declaration',
   'require-node-protocol',
+  'require-timeout-for-io',
   'require-union-type-alias',
 ];
 
@@ -115,13 +123,10 @@ function buildPrefixedRuleName(ruleName: string): string {
  * @param preset - Requested preset.
  * @returns Rules record for ESLint config consumption.
  */
-export function buildRules(preset: Preset): Linter.RulesRecord {
-  const rules: Linter.RulesRecord = {};
-  for (const [name, config] of Object.entries(ruleMap)) {
-    const [prefixedName, ruleEntry] = mapRuleForPreset(name, config, preset);
-    rules[prefixedName] = ruleEntry;
-  }
-  return rules;
+export function buildRules(preset: Readonly<Preset>): Linter.RulesRecord {
+  return Object.fromEntries(
+    Object.entries(ruleMap).map(mapRuleEntryForPreset.bind(undefined, preset)),
+  );
 }
 
 /**
@@ -144,8 +149,8 @@ function createDefaultRuleEntry(ruleName: string): RuleEntryTuple {
  */
 function createRuleEntry(
   ruleName: string,
-  recommended: Linter.RuleEntry = WARN_LEVEL,
-  strict: Linter.RuleEntry = ERROR_LEVEL,
+  recommended: Readonly<Linter.RuleEntry> = WARN_LEVEL,
+  strict: Readonly<Linter.RuleEntry> = ERROR_LEVEL,
 ): RuleEntryTuple {
   return [ruleName, { recommended, strict }];
 }
@@ -157,8 +162,25 @@ function createRuleEntry(
  * @param preset - Requested preset.
  * @returns The matching rule entry.
  */
-function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEntry {
+function getPresetRuleConfig(
+  config: Readonly<IRuleConfig>,
+  preset: Readonly<Preset>,
+): Linter.RuleEntry {
   return preset === Preset.Strict ? config.strict : config.recommended;
+}
+
+/**
+ * Maps one rule map entry to its configured preset value.
+ *
+ * @param preset - Requested preset.
+ * @param entry - Rule map entry.
+ * @returns Prefixed rule name and ESLint rule setting.
+ */
+function mapRuleEntryForPreset(
+  preset: Readonly<Preset>,
+  [name, config]: Readonly<RuleEntryTuple>,
+): readonly [string, Linter.RuleEntry] {
+  return mapRuleForPreset(name, config, preset);
 }
 
 /**
@@ -171,8 +193,8 @@ function getPresetRuleConfig(config: IRuleConfig, preset: Preset): Linter.RuleEn
  */
 function mapRuleForPreset(
   ruleName: string,
-  config: IRuleConfig,
-  preset: Preset,
+  config: Readonly<IRuleConfig>,
+  preset: Readonly<Preset>,
 ): readonly [string, Linter.RuleEntry] {
   return [buildPrefixedRuleName(ruleName), getPresetRuleConfig(config, preset)];
 }

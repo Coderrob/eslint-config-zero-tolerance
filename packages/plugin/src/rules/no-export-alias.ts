@@ -20,7 +20,6 @@ import { createRule } from './support/rule-factory';
 
 type NoExportAliasContext = Readonly<TSESLint.RuleContext<'noExportAlias', []>>;
 type ExportAliasInfo = { local: string; alias: string };
-const EXPORT_KIND_TYPE = 'type';
 
 /**
  * Checks named export declarations for alias specifiers.
@@ -30,9 +29,9 @@ const EXPORT_KIND_TYPE = 'type';
  * @param node - Named export declaration to inspect.
  */
 function checkExportNamedDeclaration(
-  context: NoExportAliasContext,
+  context: Readonly<NoExportAliasContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ExportNamedDeclaration,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   for (const specifier of node.specifiers) {
     reportAliasSpecifier(context, sourceCode, specifier);
@@ -45,7 +44,9 @@ function checkExportNamedDeclaration(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.RuleListener {
+function createNoExportAliasListeners(
+  context: Readonly<NoExportAliasContext>,
+): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
 
   return {
@@ -54,43 +55,11 @@ function createNoExportAliasListeners(context: NoExportAliasContext): TSESLint.R
 }
 
 /**
- * Builds replacement text that removes aliasing while preserving `type` exports.
- *
- * @param sourceCode - Source code utility from ESLint context.
- * @param specifier - Export specifier to rewrite.
- * @returns Replacement export specifier text.
- */
-function createSpecifierReplacement(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
-): string {
-  const localText = sourceCode.getText(specifier.local);
-  const typePrefix = specifier.exportKind === EXPORT_KIND_TYPE ? `${EXPORT_KIND_TYPE} ` : '';
-  return `${typePrefix}${localText}`;
-}
-
-/**
- * Builds a fix that rewrites aliased export specifiers.
- *
- * @param sourceCode - Source code utility from ESLint context.
- * @param specifier - Export specifier node.
- * @param fixer - ESLint fixer utility.
- * @returns Rule fix operation.
- */
-function fixAliasSpecifier(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
-  fixer: TSESLint.RuleFixer,
-): TSESLint.RuleFix {
-  return fixer.replaceText(specifier, createSpecifierReplacement(sourceCode, specifier));
-}
-
-/**
  * Returns alias/local names when export specifier is an alias.
  * @param specifier - The export specifier to analyze.
  * @returns Object with local and alias names if it's an alias, null otherwise.
  */
-function getAliasInfo(specifier: TSESTree.ExportSpecifier): ExportAliasInfo | null {
+function getAliasInfo(specifier: Readonly<TSESTree.ExportSpecifier>): ExportAliasInfo | null {
   const localName = getSpecifierName(specifier.local);
   const exportedName = getSpecifierName(specifier.exported);
 
@@ -120,9 +89,9 @@ function getSpecifierName(node: TSESTree.Identifier | TSESTree.StringLiteral): s
  * @param specifier - Export specifier to inspect.
  */
 function reportAliasSpecifier(
-  context: NoExportAliasContext,
+  context: Readonly<NoExportAliasContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  specifier: TSESTree.ExportSpecifier,
+  specifier: Readonly<TSESTree.ExportSpecifier>,
 ): void {
   const aliasInfo = getAliasInfo(specifier);
   if (aliasInfo === null) {
@@ -133,7 +102,6 @@ function reportAliasSpecifier(
     node: specifier,
     messageId: 'noExportAlias',
     data: aliasInfo,
-    fix: fixAliasSpecifier.bind(undefined, sourceCode, specifier),
   });
 }
 
@@ -144,7 +112,6 @@ export const noExportAlias = createRule({
   name: 'no-export-alias',
   meta: {
     type: 'suggestion',
-    fixable: 'code',
     docs: {
       description: 'Prevent use of alias in export statements',
     },

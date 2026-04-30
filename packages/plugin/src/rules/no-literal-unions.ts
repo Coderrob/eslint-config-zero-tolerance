@@ -78,8 +78,8 @@ const TYPESCRIPT_UTILITY_TYPE_NAMES = new Set([
  * @param declaration - Variable declaration to inspect.
  */
 function addConstLiteralDeclarations(
-  declarations: Map<string, IResolvedConstLiteral>,
-  declaration: TSESTree.VariableDeclaration,
+  declarations: Readonly<Map<string, IResolvedConstLiteral>>,
+  declaration: Readonly<TSESTree.VariableDeclaration>,
 ): void {
   if (declaration.kind !== VARIABLE_KIND_CONST) {
     return;
@@ -87,7 +87,7 @@ function addConstLiteralDeclarations(
   for (const declarator of declaration.declarations) {
     const resolvedLiteral = getResolvedConstDeclaratorLiteral(declarator);
     if (resolvedLiteral !== null) {
-      declarations.set(resolvedLiteral.memberName, resolvedLiteral);
+      Reflect.apply(Map.prototype.set, declarations, [resolvedLiteral.memberName, resolvedLiteral]);
     }
   }
 }
@@ -100,9 +100,9 @@ function addConstLiteralDeclarations(
  * @param node - Union type node to inspect.
  */
 function checkUnionType(
-  context: NoLiteralUnionsContext,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
-  node: TSESTree.TSUnionType,
+  context: Readonly<NoLiteralUnionsContext>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
+  node: Readonly<TSESTree.TSUnionType>,
 ): void {
   if (isAllowedLiteralUnion(node, constLiteralMap)) {
     return;
@@ -127,10 +127,10 @@ function checkUnionType(
  * @returns Enum declaration source text.
  */
 function createEnumDeclarationText(
-  alias: TSESTree.TSTypeAliasDeclaration,
-  unionNode: TSESTree.TSUnionType,
-  replacementNode: TSESTree.Node,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  alias: Readonly<TSESTree.TSTypeAliasDeclaration>,
+  unionNode: Readonly<TSESTree.TSUnionType>,
+  replacementNode: Readonly<TSESTree.Node>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): string {
   const prefix = getEnumDeclarationPrefix(alias, replacementNode);
   const members = createEnumMembersFromUnion(unionNode, constLiteralMap).join(', ');
@@ -146,8 +146,8 @@ function createEnumDeclarationText(
  * @returns Enum member declaration text.
  */
 function createEnumMemberDeclaration(
-  names: Set<string>,
-  unionMember: IResolvedStringUnionMember,
+  names: Readonly<Set<string>>,
+  unionMember: Readonly<IResolvedStringUnionMember>,
   index: number,
 ): string {
   const memberName = createUniqueStringEnumMemberName(
@@ -171,7 +171,7 @@ function createEnumMemberNameBase(value: string, index: number): string {
   if (pascalValue === '') {
     return `${ENUM_MEMBER_FALLBACK_PREFIX}${index}`;
   }
-  return startsWithDigit(pascalValue)
+  return hasLeadingDigit(pascalValue)
     ? `${ENUM_MEMBER_FALLBACK_PREFIX}${pascalValue}`
     : pascalValue;
 }
@@ -184,14 +184,16 @@ function createEnumMemberNameBase(value: string, index: number): string {
  * @returns Enum member declarations.
  */
 function createEnumMembersFromUnion(
-  unionNode: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  unionNode: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): string[] {
   const members: string[] = [];
   const names = new Set<string>();
   let index = 1;
   for (const unionMember of getResolvedStringUnionMembers(unionNode, constLiteralMap)) {
-    members.push(createEnumMemberDeclaration(names, unionMember, index));
+    Reflect.apply(Array.prototype.push, members, [
+      createEnumMemberDeclaration(names, unionMember, index),
+    ]);
     index += 1;
   }
   return members;
@@ -205,8 +207,8 @@ function createEnumMembersFromUnion(
  * @returns Fix function, or null when no safe fix is available.
  */
 function createLiteralUnionFix(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): TSESLint.ReportFixFunction | null {
   const alias = getDirectTypeAliasDeclaration(node);
   if (alias === null || alias.typeParameters !== undefined) {
@@ -226,7 +228,9 @@ function createLiteralUnionFix(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoLiteralUnionsListeners(context: NoLiteralUnionsContext): TSESLint.RuleListener {
+function createNoLiteralUnionsListeners(
+  context: Readonly<NoLiteralUnionsContext>,
+): TSESLint.RuleListener {
   const constLiteralMap = getConstLiteralDeclarations(context.sourceCode.ast.body);
   return {
     TSUnionType: checkUnionType.bind(undefined, context, constLiteralMap),
@@ -240,14 +244,14 @@ function createNoLiteralUnionsListeners(context: NoLiteralUnionsContext): TSESLi
  * @param names - Set of already-used enum member names.
  * @returns Unique enum member name.
  */
-function createUniqueMemberName(baseName: string, names: Set<string>): string {
+function createUniqueMemberName(baseName: string, names: Readonly<Set<string>>): string {
   let candidateName = baseName;
   let suffix = DUPLICATE_SUFFIX_START;
   while (names.has(candidateName)) {
     candidateName = `${baseName}${suffix}`;
     suffix += 1;
   }
-  names.add(candidateName);
+  Reflect.apply(Set.prototype.add, names, [candidateName]);
   return candidateName;
 }
 
@@ -263,7 +267,7 @@ function createUniqueMemberName(baseName: string, names: Set<string>): string {
 function createUniqueStringEnumMemberName(
   preferredMemberName: string | null,
   value: string,
-  names: Set<string>,
+  names: Readonly<Set<string>>,
   index: number,
 ): string {
   const baseName = preferredMemberName ?? createEnumMemberNameBase(value, index);
@@ -296,7 +300,7 @@ function getConstLiteralDeclarations(
  * @returns Variable declaration to inspect, or null.
  */
 function getConstLiteralDeclarationsFromStatement(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): TSESTree.VariableDeclaration | null {
   if (statement.type === AST_NODE_TYPES.VariableDeclaration) {
     return statement;
@@ -314,7 +318,7 @@ function getConstLiteralDeclarationsFromStatement(
  * @returns Direct type alias declaration, or null.
  */
 function getDirectTypeAliasDeclaration(
-  node: TSESTree.TSUnionType,
+  node: Readonly<TSESTree.TSUnionType>,
 ): TSESTree.TSTypeAliasDeclaration | null {
   const parentNode = node.parent;
   if (parentNode.type !== AST_NODE_TYPES.TSTypeAliasDeclaration) {
@@ -331,8 +335,8 @@ function getDirectTypeAliasDeclaration(
  * @returns Enum declaration prefix.
  */
 function getEnumDeclarationPrefix(
-  alias: TSESTree.TSTypeAliasDeclaration,
-  replacementNode: TSESTree.Node,
+  alias: Readonly<TSESTree.TSTypeAliasDeclaration>,
+  replacementNode: Readonly<TSESTree.Node>,
 ): string {
   const exportPrefix = hasExportPrefix(replacementNode) ? EXPORT_PREFIX : '';
   const declarePrefix = alias.declare ? DECLARE_PREFIX : '';
@@ -345,15 +349,28 @@ function getEnumDeclarationPrefix(
  * @param node - Type node to inspect.
  * @returns Nearest type reference ancestor, or null when absent.
  */
-function getNearestTypeReference(node: TSESTree.TypeNode): TSESTree.TSTypeReference | null {
-  let currentNode = node.parent;
-  while (currentNode.type !== AST_NODE_TYPES.Program) {
-    if (currentNode.type === AST_NODE_TYPES.TSTypeReference) {
-      return currentNode;
-    }
-    currentNode = currentNode.parent;
+function getNearestTypeReference(
+  node: Readonly<TSESTree.TypeNode>,
+): TSESTree.TSTypeReference | null {
+  return getNearestTypeReferenceFromNode(node.parent);
+}
+
+/**
+ * Recursively finds the nearest containing type reference.
+ *
+ * @param node - Node to inspect.
+ * @returns Nearest type reference ancestor, or null when absent.
+ */
+function getNearestTypeReferenceFromNode(
+  node: Readonly<TSESTree.Node>,
+): TSESTree.TSTypeReference | null {
+  if (node.type === AST_NODE_TYPES.Program) {
+    return null;
   }
-  return null;
+  if (node.type === AST_NODE_TYPES.TSTypeReference) {
+    return node;
+  }
+  return getNearestTypeReferenceFromNode(node.parent);
 }
 
 /**
@@ -363,7 +380,7 @@ function getNearestTypeReference(node: TSESTree.TypeNode): TSESTree.TSTypeRefere
  * @returns Resolved literal metadata, or null.
  */
 function getResolvedConstDeclaratorLiteral(
-  declarator: TSESTree.VariableDeclarator,
+  declarator: Readonly<TSESTree.VariableDeclarator>,
 ): IResolvedConstLiteral | null {
   if (declarator.id.type !== AST_NODE_TYPES.Identifier || declarator.init === null) {
     return null;
@@ -386,8 +403,8 @@ function getResolvedConstDeclaratorLiteral(
  * @returns Resolved const-literal metadata, or null.
  */
 function getResolvedConstLiteral(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): IResolvedConstLiteral | null {
   if (
     type.type !== AST_NODE_TYPES.TSTypeQuery ||
@@ -406,8 +423,8 @@ function getResolvedConstLiteral(
  * @returns Fixable string-union member, or null.
  */
 function getResolvedStringUnionMember(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): IResolvedStringUnionMember | null {
   const directStringLiteral = getResolvedStringUnionMemberFromLiteral(type);
   if (directStringLiteral !== null) {
@@ -423,7 +440,7 @@ function getResolvedStringUnionMember(
  * @returns Resolved string-union member, or null.
  */
 function getResolvedStringUnionMemberFromLiteral(
-  type: TSESTree.TypeNode,
+  type: Readonly<TSESTree.TypeNode>,
 ): IResolvedStringUnionMember | null {
   if (!isStringLiteralTypeNode(type)) {
     return null;
@@ -442,8 +459,8 @@ function getResolvedStringUnionMemberFromLiteral(
  * @returns Resolved string-union member, or null.
  */
 function getResolvedStringUnionMemberFromReference(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): IResolvedStringUnionMember | null {
   const resolvedLiteral = getResolvedConstLiteral(type, constLiteralMap);
   if (!isResolvedStringConstLiteral(resolvedLiteral)) {
@@ -463,8 +480,8 @@ function getResolvedStringUnionMemberFromReference(
  * @returns Fixable string-union members.
  */
 function getResolvedStringUnionMembers(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): IResolvedStringUnionMember[] {
   const members: IResolvedStringUnionMember[] = [];
   for (const unionMember of node.types) {
@@ -472,7 +489,7 @@ function getResolvedStringUnionMembers(
     if (resolvedMember === null) {
       return [];
     }
-    members.push(resolvedMember);
+    Reflect.apply(Array.prototype.push, members, [resolvedMember]);
   }
   return members;
 }
@@ -483,7 +500,9 @@ function getResolvedStringUnionMembers(
  * @param expression - Template literal to inspect.
  * @returns Cooked string value, or null when unavailable.
  */
-function getTemplateLiteralCookedValue(expression: TSESTree.TemplateLiteral): string | null {
+function getTemplateLiteralCookedValue(
+  expression: Readonly<TSESTree.TemplateLiteral>,
+): string | null {
   return expression.quasis[0].value.cooked;
 }
 
@@ -493,7 +512,9 @@ function getTemplateLiteralCookedValue(expression: TSESTree.TemplateLiteral): st
  * @param alias - Type alias declaration.
  * @returns Export wrapper node when present, otherwise alias node.
  */
-function getTypeAliasReplacementNode(alias: TSESTree.TSTypeAliasDeclaration): TSESTree.Node {
+function getTypeAliasReplacementNode(
+  alias: Readonly<TSESTree.TSTypeAliasDeclaration>,
+): TSESTree.Node {
   const parentNode = alias.parent;
   if (
     parentNode.type === AST_NODE_TYPES.ExportNamedDeclaration &&
@@ -512,8 +533,8 @@ function getTypeAliasReplacementNode(alias: TSESTree.TSTypeAliasDeclaration): TS
  * @returns True when the union should be reported.
  */
 function hasBannedLiteralUnionMember(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   return (
     hasDirectLiteralUnionMember(node) || hasLiteralConstReferenceUnionMember(node, constLiteralMap)
@@ -529,9 +550,9 @@ function hasBannedLiteralUnionMember(
  * @returns True when the type query resolves to a matching literal kind.
  */
 function hasConstLiteralReferenceKind(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
-  expectedKind: ResolvedLiteralKind,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
+  expectedKind: Readonly<ResolvedLiteralKind>,
 ): boolean {
   const resolvedLiteral = getResolvedConstLiteral(type, constLiteralMap);
   return isResolvedConstLiteralKind(resolvedLiteral, expectedKind);
@@ -543,7 +564,7 @@ function hasConstLiteralReferenceKind(
  * @param node - Union type node to inspect.
  * @returns True when a direct literal member should be reported.
  */
-function hasDirectLiteralUnionMember(node: TSESTree.TSUnionType): boolean {
+function hasDirectLiteralUnionMember(node: Readonly<TSESTree.TSUnionType>): boolean {
   for (const unionMember of node.types) {
     if (isLiteralTypeNode(unionMember) && BANNED_LITERAL_NODE_TYPES.has(unionMember.literal.type)) {
       return true;
@@ -558,8 +579,18 @@ function hasDirectLiteralUnionMember(node: TSESTree.TSUnionType): boolean {
  * @param replacementNode - Node replaced by the fixer.
  * @returns True when the enum should be exported.
  */
-function hasExportPrefix(replacementNode: TSESTree.Node): boolean {
+function hasExportPrefix(replacementNode: Readonly<TSESTree.Node>): boolean {
   return replacementNode.type === AST_NODE_TYPES.ExportNamedDeclaration;
+}
+
+/**
+ * Returns true when a string starts with a digit.
+ *
+ * @param value - String value to inspect.
+ * @returns True when the first character is numeric.
+ */
+function hasLeadingDigit(value: string): boolean {
+  return /^\d/u.test(value);
 }
 
 /**
@@ -570,8 +601,8 @@ function hasExportPrefix(replacementNode: TSESTree.Node): boolean {
  * @returns True when the type alias includes a literal const reference.
  */
 function hasLiteralConstReferenceUnionMember(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   if (!isTypeAliasUnion(node)) {
     return false;
@@ -592,8 +623,8 @@ function hasLiteralConstReferenceUnionMember(
  * @returns True when another rule owns the union or it matches an explicit exemption.
  */
 function isAllowedLiteralUnion(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   return (
     isDirectPropertyTypeAnnotationUnion(node) ||
@@ -610,8 +641,8 @@ function isAllowedLiteralUnion(
  * @returns True when the union is autofixable to a string enum.
  */
 function isAutofixableStringLiteralUnion(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   return getResolvedStringUnionMembers(node, constLiteralMap).length === node.types.length;
 }
@@ -624,8 +655,8 @@ function isAutofixableStringLiteralUnion(
  * @returns True when the type is a `true`/`false` literal or boolean-literal const reference.
  */
 function isBooleanLiteralType(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   return (
     isDirectBooleanLiteralType(type) ||
@@ -641,8 +672,8 @@ function isBooleanLiteralType(
  * @returns True for `true | false` style unions.
  */
 function isBooleanLiteralUnion(
-  node: TSESTree.TSUnionType,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  node: Readonly<TSESTree.TSUnionType>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   for (const unionMember of node.types) {
     if (!isBooleanLiteralType(unionMember, constLiteralMap)) {
@@ -658,7 +689,7 @@ function isBooleanLiteralUnion(
  * @param type - Type node to inspect.
  * @returns True when the type is a direct `true` or `false` literal.
  */
-function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
+function isDirectBooleanLiteralType(type: Readonly<TSESTree.TypeNode>): boolean {
   return (
     isLiteralTypeNode(type) &&
     type.literal.type === AST_NODE_TYPES.Literal &&
@@ -672,7 +703,7 @@ function isDirectBooleanLiteralType(type: TSESTree.TypeNode): boolean {
  * @param node - Union type node to inspect.
  * @returns True when the new property-specific rule owns the report.
  */
-function isDirectPropertyTypeAnnotationUnion(node: TSESTree.TSUnionType): boolean {
+function isDirectPropertyTypeAnnotationUnion(node: Readonly<TSESTree.TSUnionType>): boolean {
   const parentNode = node.parent;
   if (parentNode.type !== AST_NODE_TYPES.TSTypeAnnotation) {
     return false;
@@ -692,7 +723,7 @@ function isDirectPropertyTypeAnnotationUnion(node: TSESTree.TSUnionType): boolea
  * @returns True when the statement exports a variable declaration.
  */
 function isExportedVariableDeclarationStatement(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): statement is TSESTree.ExportNamedDeclaration & {
   declaration: TSESTree.VariableDeclaration;
 } {
@@ -708,7 +739,7 @@ function isExportedVariableDeclarationStatement(
  * @param node - Union type node to inspect.
  * @returns True when the nearest enclosing type reference is a TypeScript utility type.
  */
-function isInsideTypeScriptUtilityType(node: TSESTree.TSUnionType): boolean {
+function isInsideTypeScriptUtilityType(node: Readonly<TSESTree.TSUnionType>): boolean {
   const typeReference = getNearestTypeReference(node);
   return typeReference !== null && isTypeScriptUtilityTypeReference(typeReference);
 }
@@ -721,8 +752,8 @@ function isInsideTypeScriptUtilityType(node: TSESTree.TSUnionType): boolean {
  * @returns True when the type query resolves to a literal-valued const.
  */
 function isLiteralConstReferenceType(
-  type: TSESTree.TypeNode,
-  constLiteralMap: ReadonlyMap<string, IResolvedConstLiteral>,
+  type: Readonly<TSESTree.TypeNode>,
+  constLiteralMap: Readonly<ReadonlyMap<string, IResolvedConstLiteral>>,
 ): boolean {
   return getResolvedConstLiteral(type, constLiteralMap) !== null;
 }
@@ -733,7 +764,7 @@ function isLiteralConstReferenceType(
  * @param type - Type node to inspect.
  * @returns True when the node is a `TSLiteralType`.
  */
-function isLiteralTypeNode(type: TSESTree.TypeNode): type is TSESTree.TSLiteralType {
+function isLiteralTypeNode(type: Readonly<TSESTree.TypeNode>): type is TSESTree.TSLiteralType {
   return type.type === AST_NODE_TYPES.TSLiteralType;
 }
 
@@ -744,7 +775,7 @@ function isLiteralTypeNode(type: TSESTree.TypeNode): type is TSESTree.TSLiteralT
  * @returns True when the expression is `-<number>`.
  */
 function isNegativeNumberUnaryExpression(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): expression is TSESTree.UnaryExpression & {
   argument: TSESTree.NumberLiteral;
   operator: typeof NEGATIVE_NUMBER_OPERATOR;
@@ -774,7 +805,7 @@ function isNonEmptyString(value: string): boolean {
  * @returns True when the expression has no interpolations.
  */
 function isNoSubstitutionTemplateLiteral(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): expression is TSESTree.TemplateLiteral & {
   expressions: [];
 } {
@@ -790,7 +821,7 @@ function isNoSubstitutionTemplateLiteral(
  */
 function isResolvedConstLiteralKind(
   resolvedLiteral: IResolvedConstLiteral | null,
-  expectedKind: ResolvedLiteralKind,
+  expectedKind: Readonly<ResolvedLiteralKind>,
 ): resolvedLiteral is IResolvedConstLiteral {
   return resolvedLiteral !== null && resolvedLiteral.kind === expectedKind;
 }
@@ -820,7 +851,7 @@ function isResolvedStringConstLiteral(
  * @returns True when type is a string literal type.
  */
 function isStringLiteralTypeNode(
-  type: TSESTree.TypeNode,
+  type: Readonly<TSESTree.TypeNode>,
 ): type is TSESTree.TSLiteralType & { literal: TSESTree.StringLiteral } {
   return (
     isLiteralTypeNode(type) &&
@@ -835,7 +866,7 @@ function isStringLiteralTypeNode(
  * @param node - Union type node to inspect.
  * @returns True when the containing type alias is a direct type alias declaration.
  */
-function isTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
+function isTypeAliasUnion(node: Readonly<TSESTree.TSUnionType>): boolean {
   return getDirectTypeAliasDeclaration(node) !== null;
 }
 
@@ -845,7 +876,7 @@ function isTypeAliasUnion(node: TSESTree.TSUnionType): boolean {
  * @param node - Type reference to inspect.
  * @returns True when the type reference is a known TypeScript utility type.
  */
-function isTypeScriptUtilityTypeReference(node: TSESTree.TSTypeReference): boolean {
+function isTypeScriptUtilityTypeReference(node: Readonly<TSESTree.TSTypeReference>): boolean {
   const typeReferenceName = getTypeReferenceName(node);
   return typeReferenceName !== null && TYPESCRIPT_UTILITY_TYPE_NAMES.has(typeReferenceName);
 }
@@ -859,9 +890,9 @@ function isTypeScriptUtilityTypeReference(node: TSESTree.TSTypeReference): boole
  * @returns Text replacement fix.
  */
 function replaceWithEnumDeclaration(
-  replacementNode: TSESTree.Node,
+  replacementNode: Readonly<TSESTree.Node>,
   replacementText: string,
-  fixer: TSESLint.RuleFixer,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceText(replacementNode, replacementText);
 }
@@ -873,7 +904,7 @@ function replaceWithEnumDeclaration(
  * @returns Resolved literal metadata, or null when unsupported.
  */
 function resolveLiteralExpressionValue(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): Omit<IResolvedConstLiteral, 'memberName'> | null {
   const unwrappedExpression = unwrapTsExpression(expression);
   return (
@@ -890,7 +921,7 @@ function resolveLiteralExpressionValue(
  * @returns Resolved numeric literal metadata, or null.
  */
 function resolveNegativeNumberLiteral(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): Omit<IResolvedConstLiteral, 'memberName'> | null {
   if (!isNegativeNumberUnaryExpression(expression)) {
     return null;
@@ -905,7 +936,7 @@ function resolveNegativeNumberLiteral(
  * @returns Resolved primitive literal metadata, or null.
  */
 function resolvePrimitiveLiteral(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): Omit<IResolvedConstLiteral, 'memberName'> | null {
   if (expression.type !== AST_NODE_TYPES.Literal) {
     return null;
@@ -938,7 +969,7 @@ function resolvePrimitiveLiteralValue(
  * @returns Resolved string literal metadata, or null.
  */
 function resolveTemplateLiteral(
-  expression: TSESTree.Expression,
+  expression: Readonly<TSESTree.Expression>,
 ): Omit<IResolvedConstLiteral, 'memberName'> | null {
   if (!isNoSubstitutionTemplateLiteral(expression)) {
     return null;
@@ -952,16 +983,6 @@ function resolveTemplateLiteral(
     kind: ResolvedLiteralKind.String,
     value: cookedValue,
   };
-}
-
-/**
- * Returns true when a string starts with a digit.
- *
- * @param value - String value to inspect.
- * @returns True when the first character is numeric.
- */
-function startsWithDigit(value: string): boolean {
-  return /^\d/u.test(value);
 }
 
 /**

@@ -27,10 +27,22 @@ const DESTRUCTURED_PARAMETER_NAME = 'destructured parameter';
 const READONLY_OPERATOR = 'readonly';
 const READONLY_TYPE_NAME = 'Readonly';
 const READONLY_ARRAY_TYPE_NAME = 'ReadonlyArray';
+const DEFAULT_IGNORED_TYPE_NAME_PATTERNS = [
+  '^Dispatch$',
+  '^Function$',
+  '^RefCallback$',
+  '^VoidFunction$',
+  '(Callback|Handler)$',
+];
 
 type PreferReadonlyParametersContext = Readonly<
-  TSESLint.RuleContext<'preferReadonlyParameter', []>
+  TSESLint.RuleContext<'preferReadonlyParameter', RuleOptions>
 >;
+type RuleOptions = [IPreferReadonlyParametersOptions?];
+
+interface IPreferReadonlyParametersOptions {
+  readonly ignoredTypeNamePatterns?: readonly string[];
+}
 
 /**
  * Checks function parameters for mutable object/array-like annotations.
@@ -38,10 +50,24 @@ type PreferReadonlyParametersContext = Readonly<
  * @param context - ESLint rule execution context.
  * @param node - Function-like node.
  */
-function checkFunctionNode(context: PreferReadonlyParametersContext, node: FunctionNode): void {
+function checkFunctionNode(
+  context: Readonly<PreferReadonlyParametersContext>,
+  node: Readonly<FunctionNode>,
+): void {
+  const ignoredTypeNamePatterns = resolveIgnoredTypeNamePatterns(context.options);
   for (const param of node.params) {
-    reportIfMutableParameter(context, param);
+    reportIfMutableParameter(context, ignoredTypeNamePatterns, param);
   }
+}
+
+/**
+ * Compiles one ignored type-name pattern.
+ *
+ * @param pattern - Regular expression source from rule options.
+ * @returns Compiled regular expression.
+ */
+function createIgnoredTypeNamePattern(pattern: string): RegExp {
+  return new RegExp(pattern);
 }
 
 /**
@@ -51,7 +77,7 @@ function checkFunctionNode(context: PreferReadonlyParametersContext, node: Funct
  * @returns Rule listener map.
  */
 function createPreferReadonlyParametersListeners(
-  context: PreferReadonlyParametersContext,
+  context: Readonly<PreferReadonlyParametersContext>,
 ): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
@@ -66,8 +92,8 @@ function createPreferReadonlyParametersListeners(
  */
 function createReadonlyParameterFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  typeNode: TSESTree.TypeNode,
-  fixer: TSESLint.RuleFixer,
+  typeNode: Readonly<TSESTree.TypeNode>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix | null {
   const replacementType = getReadonlyReplacementTypeText(sourceCode, typeNode);
   if (replacementType === null) {
@@ -82,7 +108,7 @@ function createReadonlyParameterFix(
  * @param param - Function parameter node.
  * @returns Parameter display name.
  */
-function getParameterName(param: TSESTree.Parameter): string {
+function getParameterName(param: Readonly<TSESTree.Parameter>): string {
   if (param.type === AST_NODE_TYPES.TSParameterProperty) {
     return getNamedParameterName(param.parameter) ?? DESTRUCTURED_PARAMETER_NAME;
   }
@@ -116,7 +142,7 @@ function getReadonlyArrayLikeTypeText(
  */
 function getReadonlyReplacementTypeText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.TypeNode,
+  node: Readonly<TSESTree.TypeNode>,
 ): string | null {
   if (node.type === AST_NODE_TYPES.TSArrayType || node.type === AST_NODE_TYPES.TSTupleType) {
     return getReadonlyArrayLikeTypeText(sourceCode, node);
@@ -128,43 +154,91 @@ function getReadonlyReplacementTypeText(
 }
 
 /**
+ * Returns the rightmost identifier name from simple or qualified type references.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Type-reference node.
+ * @returns Terminal identifier name.
+ */
+function getTerminalTypeReferenceName(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.TSTypeReference>,
+): string {
+  const typeName = sourceCode.getText(node.typeName);
+  const qualifierIndex = typeName.lastIndexOf('.');
+  if (qualifierIndex === -1) {
+    return typeName;
+  }
+  return typeName.slice(qualifierIndex + 1);
+}
+
+/**
  * Returns true when any type-literal member is mutable.
  *
  * @param node - Type-literal node.
  * @returns True when mutable.
  */
-function hasMutableTypeLiteralMembers(node: TSESTree.TSTypeLiteral): boolean {
+function hasMutableTypeLiteralMembers(node: Readonly<TSESTree.TSTypeLiteral>): boolean {
   return !hasAllReadonlyPropertyMembers(node);
 }
 
 /**
- * Returns true when a type node is mutable for parameter usage.
+ * Returns true when a type reference matches configured ignored type-name patterns.
  *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Type-reference node.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
+ * @returns True when the type reference should not be reported.
+ */
+function isIgnoredTypeReference(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.TSTypeReference>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
+): boolean {
+  const typeName = getTerminalTypeReferenceName(sourceCode, node);
+  return ignoredTypeNamePatterns.some(isPatternMatchingTypeName.bind(undefined, typeName));
+}
+
+/**
+ * Returns true when a parameter type is mutable after applying configured exclusions.
+ *
+ * @param sourceCode - ESLint source code helper.
  * @param node - Type node.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
  * @returns True when mutable.
  */
-function isMutableParameterType(node: TSESTree.TypeNode): boolean {
+function isMutableParameterTypeWithOptions(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.TypeNode>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
+): boolean {
   if (node.type === AST_NODE_TYPES.TSArrayType || node.type === AST_NODE_TYPES.TSTupleType) {
     return true;
   }
   if (isReadonlyTypeOperator(node)) {
     return false;
   }
-  return isMutableStructuredType(node);
+  return isMutableStructuredType(sourceCode, node, ignoredTypeNamePatterns);
 }
 
 /**
  * Returns true when non-array structured type is mutable.
  *
+ * @param sourceCode - ESLint source code helper.
  * @param node - Type node.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
  * @returns True when mutable.
  */
-function isMutableStructuredType(node: TSESTree.TypeNode): boolean {
+function isMutableStructuredType(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.TypeNode>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
+): boolean {
   if (node.type === AST_NODE_TYPES.TSTypeLiteral) {
     return hasMutableTypeLiteralMembers(node);
   }
   if (node.type === AST_NODE_TYPES.TSTypeReference) {
-    return isMutableTypeReference(node);
+    return isMutableTypeReference(sourceCode, node, ignoredTypeNamePatterns);
   }
   return false;
 }
@@ -172,15 +246,32 @@ function isMutableStructuredType(node: TSESTree.TypeNode): boolean {
 /**
  * Returns true when a type reference represents mutable parameter typing.
  *
+ * @param sourceCode - ESLint source code helper.
  * @param node - Type-reference node.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
  * @returns True when mutable.
  */
-function isMutableTypeReference(node: TSESTree.TSTypeReference): boolean {
+function isMutableTypeReference(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.TSTypeReference>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
+): boolean {
   const typeReferenceName = getTypeReferenceName(node);
   if (typeReferenceName === READONLY_ARRAY_TYPE_NAME || typeReferenceName === READONLY_TYPE_NAME) {
     return false;
   }
-  return true;
+  return !isIgnoredTypeReference(sourceCode, node, ignoredTypeNamePatterns);
+}
+
+/**
+ * Returns true when the pattern matches a type-reference name.
+ *
+ * @param typeName - Terminal type-reference name.
+ * @param pattern - Compiled ignored type-name pattern.
+ * @returns True when the name is ignored.
+ */
+function isPatternMatchingTypeName(typeName: string, pattern: Readonly<RegExp>): boolean {
+  return pattern.test(typeName);
 }
 
 /**
@@ -189,7 +280,7 @@ function isMutableTypeReference(node: TSESTree.TSTypeReference): boolean {
  * @param node - Type node.
  * @returns True for readonly type operator.
  */
-function isReadonlyTypeOperator(node: TSESTree.TypeNode): boolean {
+function isReadonlyTypeOperator(node: Readonly<TSESTree.TypeNode>): boolean {
   return node.type === AST_NODE_TYPES.TSTypeOperator && node.operator === READONLY_OPERATOR;
 }
 
@@ -197,14 +288,19 @@ function isReadonlyTypeOperator(node: TSESTree.TypeNode): boolean {
  * Reports mutable object/array-like parameter annotations.
  *
  * @param context - ESLint rule execution context.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
  * @param param - Function parameter node.
  */
 function reportIfMutableParameter(
-  context: PreferReadonlyParametersContext,
-  param: TSESTree.Parameter,
+  context: Readonly<PreferReadonlyParametersContext>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
+  param: Readonly<TSESTree.Parameter>,
 ): void {
   const typeNode = getParameterTypeNode(param);
-  if (typeNode === null || !isMutableParameterType(typeNode)) {
+  if (
+    typeNode === null ||
+    !isMutableParameterTypeWithOptions(context.sourceCode, typeNode, ignoredTypeNamePatterns)
+  ) {
     return;
   }
   context.report({
@@ -213,6 +309,18 @@ function reportIfMutableParameter(
     data: { name: getParameterName(param) },
     fix: createReadonlyParameterFix.bind(undefined, context.sourceCode, typeNode),
   });
+}
+
+/**
+ * Compiles configured ignored type-name patterns.
+ *
+ * @param options - Rule options.
+ * @returns Configured ignore patterns.
+ */
+function resolveIgnoredTypeNamePatterns(options: Readonly<RuleOptions>): ReadonlyArray<RegExp> {
+  const option = options[0];
+  const patterns = option?.ignoredTypeNamePatterns ?? DEFAULT_IGNORED_TYPE_NAME_PATTERNS;
+  return patterns.map(createIgnoredTypeNamePattern);
 }
 
 /** Requires readonly object/array-like function parameter typing. */
@@ -229,9 +337,20 @@ export const preferReadonlyParameters = createRule({
       preferReadonlyParameter:
         'Parameter "{{name}}" should use readonly typing (for example Readonly<T> or readonly arrays).',
     },
-    schema: [],
+    schema: [
+      {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          ignoredTypeNamePatterns: {
+            type: 'array',
+            items: { type: 'string' },
+          },
+        },
+      },
+    ],
   },
-  defaultOptions: [],
+  defaultOptions: [{}],
   create: createPreferReadonlyParametersListeners,
 });
 

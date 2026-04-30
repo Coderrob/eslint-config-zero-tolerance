@@ -34,7 +34,10 @@ type NoBooleanReturnTrapContext = Readonly<TSESLint.RuleContext<'noBooleanReturn
  * @param context - ESLint rule execution context.
  * @param node - Function node.
  */
-function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNode): void {
+function checkFunctionNode(
+  context: Readonly<NoBooleanReturnTrapContext>,
+  node: Readonly<FunctionNode>,
+): void {
   const functionName = resolveFunctionName(node);
   const returnTypeAnnotation = node.returnType;
   if (
@@ -57,7 +60,7 @@ function checkFunctionNode(context: NoBooleanReturnTrapContext, node: FunctionNo
  * @returns Rule listener map.
  */
 function createNoBooleanReturnTrapListeners(
-  context: NoBooleanReturnTrapContext,
+  context: Readonly<NoBooleanReturnTrapContext>,
 ): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
@@ -68,7 +71,7 @@ function createNoBooleanReturnTrapListeners(
  * @param node - Type node.
  * @returns True when node is boolean or Promise<boolean>.
  */
-function isBooleanLikeReturnType(node: TSESTree.TypeNode): boolean {
+function isBooleanLikeReturnType(node: Readonly<TSESTree.TypeNode>): boolean {
   if (node.type === AST_NODE_TYPES.TSBooleanKeyword) {
     return true;
   }
@@ -94,7 +97,7 @@ function isPredicateName(functionName: string): boolean {
  * @param node - Type-reference node.
  * @returns True when promise contains boolean type argument.
  */
-function isPromiseBooleanType(node: TSESTree.TSTypeReference): boolean {
+function isPromiseBooleanType(node: Readonly<TSESTree.TSTypeReference>): boolean {
   if (!hasNamedTypeReferenceWithTypeArguments(node, PROMISE_IDENTIFIER)) {
     return false;
   }

@@ -11,10 +11,10 @@ import {
 describe('ast navigation helpers', () => {
   describe('findAncestor', () => {
     it('should return the nearest matching ancestor', () => {
-      const program = { type: AST_NODE_TYPES.Program } as any;
-      const block = { type: AST_NODE_TYPES.BlockStatement, parent: program } as any;
-      const statement = { type: AST_NODE_TYPES.ExpressionStatement, parent: block } as any;
-      const node = { type: AST_NODE_TYPES.Identifier, parent: statement } as any;
+      const program = { type: AST_NODE_TYPES.Program } as unknown;
+      const block = { type: AST_NODE_TYPES.BlockStatement, parent: program } as unknown;
+      const statement = { type: AST_NODE_TYPES.ExpressionStatement, parent: block } as unknown;
+      const node = { type: AST_NODE_TYPES.Identifier, parent: statement } as unknown;
 
       const result = findAncestor(
         node,
@@ -26,7 +26,7 @@ describe('ast navigation helpers', () => {
     });
 
     it('should return null when no ancestor matches', () => {
-      const node = { type: AST_NODE_TYPES.Identifier } as any;
+      const node = { type: AST_NODE_TYPES.Identifier } as unknown;
 
       const result = findAncestor(
         node,
@@ -42,9 +42,9 @@ describe('ast navigation helpers', () => {
     it('should return the nearest enclosing function-like ancestor', () => {
       const functionNode = {
         type: AST_NODE_TYPES.FunctionExpression,
-      } as any;
-      const block = { type: AST_NODE_TYPES.BlockStatement, parent: functionNode } as any;
-      const node = { type: AST_NODE_TYPES.Identifier, parent: block } as any;
+      } as unknown;
+      const block = { type: AST_NODE_TYPES.BlockStatement, parent: functionNode } as unknown;
+      const node = { type: AST_NODE_TYPES.Identifier, parent: block } as unknown;
 
       expect(findEnclosingFunction(node)).toBe(functionNode);
     });
@@ -53,7 +53,7 @@ describe('ast navigation helpers', () => {
       const node = {
         type: AST_NODE_TYPES.Identifier,
         parent: { type: AST_NODE_TYPES.Program },
-      } as any;
+      } as unknown;
 
       expect(findEnclosingFunction(node)).toBeNull();
     });
@@ -61,22 +61,22 @@ describe('ast navigation helpers', () => {
 
   describe('getNextStatementInBlock', () => {
     it('should return the following statement in the same block', () => {
-      const first = { type: AST_NODE_TYPES.ExpressionStatement } as any;
-      const second = { type: AST_NODE_TYPES.ReturnStatement } as any;
+      const first = { type: AST_NODE_TYPES.ExpressionStatement } as unknown;
+      const second = { type: AST_NODE_TYPES.ReturnStatement } as unknown;
       const block = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [first, second],
-      } as any;
+      } as unknown;
 
       expect(getNextStatementInBlock(block, first)).toBe(second);
     });
 
     it('should return null when no following statement exists', () => {
-      const only = { type: AST_NODE_TYPES.ExpressionStatement } as any;
+      const only = { type: AST_NODE_TYPES.ExpressionStatement } as unknown;
       const block = {
         type: AST_NODE_TYPES.BlockStatement,
         body: [only],
-      } as any;
+      } as unknown;
 
       expect(getNextStatementInBlock(block, only)).toBeNull();
     });
@@ -84,11 +84,11 @@ describe('ast navigation helpers', () => {
 
   describe('getParentBlockStatement', () => {
     it('should return the parent block statement for a statement node', () => {
-      const block = { type: AST_NODE_TYPES.BlockStatement } as any;
+      const block = { type: AST_NODE_TYPES.BlockStatement } as unknown;
       const statement = {
         type: AST_NODE_TYPES.ReturnStatement,
         parent: block,
-      } as any;
+      } as unknown;
 
       expect(getParentBlockStatement(statement)).toBe(block);
     });
@@ -97,7 +97,7 @@ describe('ast navigation helpers', () => {
       const statement = {
         type: AST_NODE_TYPES.ReturnStatement,
         parent: { type: AST_NODE_TYPES.IfStatement },
-      } as any;
+      } as unknown;
 
       expect(getParentBlockStatement(statement)).toBeNull();
     });
@@ -109,7 +109,7 @@ describe('ast navigation helpers', () => {
         { type: AST_NODE_TYPES.Program },
         { type: AST_NODE_TYPES.ForStatement },
         { type: AST_NODE_TYPES.BlockStatement },
-      ] as TSESTree.Node[];
+      ] as unknown;
 
       expect(
         isInsideBoundary(
@@ -126,7 +126,7 @@ describe('ast navigation helpers', () => {
         { type: AST_NODE_TYPES.ForStatement },
         { type: AST_NODE_TYPES.FunctionExpression },
         { type: AST_NODE_TYPES.BlockStatement },
-      ] as TSESTree.Node[];
+      ] as unknown;
 
       expect(
         isInsideBoundary(

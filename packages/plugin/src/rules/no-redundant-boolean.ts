@@ -20,9 +20,21 @@ import { isBoolean } from '../helpers/type-guards';
 import { OPERATOR_STRICT_EQ, OPERATOR_STRICT_NEQ } from './support/rule-constants';
 import { createRule } from './support/rule-factory';
 
+const OPERATOR_LOGICAL_NOT = '!';
+
 type FixInputs = Readonly<{
   literalValue: boolean;
   nonLiteralSide: TSESTree.Expression;
+}>;
+type ConditionalBooleanFixInputs = Readonly<{
+  shouldNegate: boolean;
+  test: TSESTree.Expression;
+}>;
+type BooleanLiteralValueInputs = Readonly<{
+  value: boolean;
+}>;
+type ComparisonNegationInputs = Readonly<{
+  literalValue: boolean;
 }>;
 
 type StrictComparisonExpression = TSESTree.BinaryExpression & {
@@ -48,9 +60,9 @@ type NoRedundantBooleanContext = Readonly<TSESLint.RuleContext<'redundantBoolean
  * @param node - Binary expression to inspect.
  */
 function checkBinaryExpression(
-  context: NoRedundantBooleanContext,
+  context: Readonly<NoRedundantBooleanContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.BinaryExpression,
+  node: Readonly<TSESTree.BinaryExpression>,
 ): void {
   const fixInputs = getFixInputs(node);
   if (fixInputs === null) {
@@ -64,6 +76,52 @@ function checkBinaryExpression(
 }
 
 /**
+ * Checks a conditional expression and reports redundant boolean branches.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Conditional expression to inspect.
+ */
+function checkConditionalExpression(
+  context: Readonly<NoRedundantBooleanContext>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.ConditionalExpression>,
+): void {
+  const fixInputs = getConditionalBooleanFixInputs(node);
+  if (fixInputs === null) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'redundantBoolean',
+    fix: replaceRedundantBooleanConditional.bind(undefined, sourceCode, node, fixInputs),
+  });
+}
+
+/**
+ * Checks a unary expression and reports redundant double negation of boolean expressions.
+ *
+ * @param context - ESLint rule execution context.
+ * @param sourceCode - Source code helper.
+ * @param node - Unary expression to inspect.
+ */
+function checkUnaryExpression(
+  context: Readonly<NoRedundantBooleanContext>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.UnaryExpression>,
+): void {
+  const innerExpression = getDoubleNegatedBooleanExpression(node);
+  if (innerExpression === null) {
+    return;
+  }
+  context.report({
+    node,
+    messageId: 'redundantBoolean',
+    fix: replaceDoubleNegation.bind(undefined, sourceCode, node, innerExpression),
+  });
+}
+
+/**
  * Creates a deterministic replacement fixer for redundant comparisons.
  *
  * @param sourceCode - Source code helper.
@@ -73,8 +131,8 @@ function checkBinaryExpression(
  */
 function createFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.BinaryExpression,
-  fixInputs: FixInputs,
+  node: Readonly<TSESTree.BinaryExpression>,
+  fixInputs: Readonly<FixInputs>,
 ): TSESLint.ReportFixFunction {
   return replaceRedundantBooleanComparison.bind(undefined, sourceCode, node, fixInputs);
 }
@@ -86,11 +144,13 @@ function createFix(
  * @returns Rule listeners.
  */
 function createNoRedundantBooleanListeners(
-  context: NoRedundantBooleanContext,
+  context: Readonly<NoRedundantBooleanContext>,
 ): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
   return {
     BinaryExpression: checkBinaryExpression.bind(undefined, context, sourceCode),
+    ConditionalExpression: checkConditionalExpression.bind(undefined, context, sourceCode),
+    UnaryExpression: checkUnaryExpression.bind(undefined, context, sourceCode),
   };
 }
 
@@ -104,14 +164,50 @@ function createNoRedundantBooleanListeners(
  */
 function createReplacementText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.BinaryExpression,
-  fixInputs: FixInputs,
+  node: Readonly<TSESTree.BinaryExpression>,
+  fixInputs: Readonly<FixInputs>,
 ): string {
   const expressionText = sourceCode.getText(fixInputs.nonLiteralSide);
-  if (!shouldNegateComparison(node.operator, fixInputs.literalValue)) {
+  if (!shouldNegateComparison(node.operator, { literalValue: fixInputs.literalValue })) {
     return expressionText;
   }
   return `!(${expressionText})`;
+}
+
+/**
+ * Returns fix inputs for a boolean conditional expression.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns Fix inputs when the branches are redundant boolean literals.
+ */
+function getConditionalBooleanFixInputs(
+  node: Readonly<TSESTree.ConditionalExpression>,
+): ConditionalBooleanFixInputs | null {
+  if (isDirectBooleanConditional(node)) {
+    return { shouldNegate: false, test: node.test };
+  }
+  if (isNegatedBooleanConditional(node)) {
+    return { shouldNegate: true, test: node.test };
+  }
+  return null;
+}
+
+/**
+ * Returns the boolean expression inside a redundant double negation.
+ *
+ * @param node - Unary expression to inspect.
+ * @returns Inner boolean expression when double negation is redundant.
+ */
+function getDoubleNegatedBooleanExpression(
+  node: Readonly<TSESTree.UnaryExpression>,
+): TSESTree.Expression | null {
+  if (!isNestedLogicalNot(node)) {
+    return null;
+  }
+  if (!isBooleanExpression(node.argument.argument)) {
+    return null;
+  }
+  return node.argument.argument;
 }
 
 /**
@@ -120,7 +216,7 @@ function createReplacementText(
  * @param node - Binary expression to inspect.
  * @returns Fix inputs when expression is redundant, otherwise null.
  */
-function getFixInputs(node: TSESTree.BinaryExpression): FixInputs | null {
+function getFixInputs(node: Readonly<TSESTree.BinaryExpression>): FixInputs | null {
   if (!isRedundantBooleanComparison(node)) {
     return null;
   }
@@ -140,7 +236,7 @@ function getFixInputs(node: TSESTree.BinaryExpression): FixInputs | null {
  * @returns True when left operand is a boolean literal.
  */
 function hasBooleanLiteralLeftOperand(
-  node: RedundantBooleanComparisonExpression,
+  node: Readonly<RedundantBooleanComparisonExpression>,
 ): node is StrictComparisonExpression & { left: TSESTree.Literal & { value: boolean } } {
   return isBooleanLiteral(node.left);
 }
@@ -152,7 +248,7 @@ function hasBooleanLiteralLeftOperand(
  * @returns True if either operand is a boolean literal, false otherwise.
  */
 function hasBooleanLiteralOperand(
-  node: StrictComparisonExpression,
+  node: Readonly<StrictComparisonExpression>,
 ): node is RedundantBooleanComparisonExpression {
   if (isBooleanLiteral(node.left)) {
     return true;
@@ -161,13 +257,94 @@ function hasBooleanLiteralOperand(
 }
 
 /**
+ * Returns true when the expression is syntactically known to produce a boolean.
+ *
+ * @param node - Expression to inspect.
+ * @returns True when the expression is boolean-valued.
+ */
+function isBooleanExpression(node: Readonly<TSESTree.Expression>): boolean {
+  return (
+    isBooleanLiteral(node) ||
+    (node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator))
+  );
+}
+
+/**
  * Returns true when the node is a boolean literal (true or false).
  *
  * @param node - The node to check.
  * @returns True if the node is a boolean literal, false otherwise.
  */
-function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { value: boolean } {
+function isBooleanLiteral(
+  node: Readonly<TSESTree.Node>,
+): node is TSESTree.Literal & { value: boolean } {
   return node.type === AST_NODE_TYPES.Literal && isBoolean(node.value);
+}
+
+/**
+ * Returns true when the node is a boolean literal with a specific value.
+ *
+ * @param node - Node to inspect.
+ * @param value - Expected boolean value.
+ * @returns True when the node is the expected boolean literal.
+ */
+function isBooleanLiteralWithValue(
+  node: Readonly<TSESTree.Node>,
+  inputs: Readonly<BooleanLiteralValueInputs>,
+): boolean {
+  return isBooleanLiteral(node) && node.value === inputs.value;
+}
+
+/**
+ * Returns true when an operator produces a boolean comparison result.
+ *
+ * @param operator - Operator to inspect.
+ * @returns True when the operator is a comparison operator.
+ */
+function isComparisonOperator(operator: string): boolean {
+  return ['===', '!==', '==', '!=', '>', '>=', '<', '<='].includes(operator);
+}
+
+/**
+ * Returns true when a conditional expression has `true : false` branches.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns True when branches directly mirror the test.
+ */
+function isDirectBooleanConditional(node: Readonly<TSESTree.ConditionalExpression>): boolean {
+  return (
+    isBooleanLiteralWithValue(node.consequent, { value: true }) &&
+    isBooleanLiteralWithValue(node.alternate, { value: false })
+  );
+}
+
+/**
+ * Returns true when a conditional expression has `false : true` branches.
+ *
+ * @param node - Conditional expression to inspect.
+ * @returns True when branches negate the test.
+ */
+function isNegatedBooleanConditional(node: Readonly<TSESTree.ConditionalExpression>): boolean {
+  return (
+    isBooleanLiteralWithValue(node.consequent, { value: false }) &&
+    isBooleanLiteralWithValue(node.alternate, { value: true })
+  );
+}
+
+/**
+ * Returns true when a unary expression is a double logical-not expression.
+ *
+ * @param node - Unary expression to inspect.
+ * @returns True when the expression starts with `!!`.
+ */
+function isNestedLogicalNot(
+  node: Readonly<TSESTree.UnaryExpression>,
+): node is TSESTree.UnaryExpression & { argument: TSESTree.UnaryExpression } {
+  return (
+    node.operator === OPERATOR_LOGICAL_NOT &&
+    node.argument.type === AST_NODE_TYPES.UnaryExpression &&
+    node.argument.operator === OPERATOR_LOGICAL_NOT
+  );
 }
 
 /**
@@ -177,7 +354,7 @@ function isBooleanLiteral(node: TSESTree.Node): node is TSESTree.Literal & { val
  * @returns True when expression compares against a boolean literal.
  */
 function isRedundantBooleanComparison(
-  node: TSESTree.BinaryExpression,
+  node: Readonly<TSESTree.BinaryExpression>,
 ): node is RedundantBooleanComparisonExpression {
   if (!isStrictComparisonExpression(node)) {
     return false;
@@ -192,7 +369,7 @@ function isRedundantBooleanComparison(
  * @returns True when operator is strict equality/inequality.
  */
 function isStrictComparisonExpression(
-  node: TSESTree.BinaryExpression,
+  node: Readonly<TSESTree.BinaryExpression>,
 ): node is StrictComparisonExpression {
   return isStrictComparisonOperator(node.operator);
 }
@@ -208,6 +385,24 @@ function isStrictComparisonOperator(operator: string): boolean {
 }
 
 /**
+ * Applies a replacement fix for redundant double negation.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Unary expression being replaced.
+ * @param innerExpression - Inner boolean expression.
+ * @param fixer - ESLint fixer.
+ * @returns Generated text replacement fix.
+ */
+function replaceDoubleNegation(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.UnaryExpression>,
+  innerExpression: Readonly<TSESTree.Expression>,
+  fixer: Readonly<TSESLint.RuleFixer>,
+): TSESLint.RuleFix {
+  return fixer.replaceText(node, sourceCode.getText(innerExpression));
+}
+
+/**
  * Applies a replacement fix for a redundant boolean comparison.
  *
  * @param sourceCode - Source code helper.
@@ -218,11 +413,31 @@ function isStrictComparisonOperator(operator: string): boolean {
  */
 function replaceRedundantBooleanComparison(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.BinaryExpression,
-  fixInputs: FixInputs,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.BinaryExpression>,
+  fixInputs: Readonly<FixInputs>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   return fixer.replaceText(node, createReplacementText(sourceCode, node, fixInputs));
+}
+
+/**
+ * Applies a replacement fix for a redundant boolean conditional.
+ *
+ * @param sourceCode - Source code helper.
+ * @param node - Conditional expression being replaced.
+ * @param fixInputs - Precomputed fix inputs.
+ * @param fixer - ESLint fixer.
+ * @returns Generated text replacement fix.
+ */
+function replaceRedundantBooleanConditional(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.ConditionalExpression>,
+  fixInputs: Readonly<ConditionalBooleanFixInputs>,
+  fixer: Readonly<TSESLint.RuleFixer>,
+): TSESLint.RuleFix {
+  const testText = sourceCode.getText(fixInputs.test);
+  const replacementText = fixInputs.shouldNegate ? `!(${testText})` : testText;
+  return fixer.replaceText(node, replacementText);
 }
 
 /**
@@ -232,11 +447,14 @@ function replaceRedundantBooleanComparison(
  * @param literalValue - The boolean literal value.
  * @returns True if the expression should be negated, false otherwise.
  */
-function shouldNegateComparison(operator: string, literalValue: boolean): boolean {
+function shouldNegateComparison(
+  operator: string,
+  inputs: Readonly<ComparisonNegationInputs>,
+): boolean {
   if (operator === OPERATOR_STRICT_EQ) {
-    return !literalValue;
+    return !inputs.literalValue;
   }
-  return literalValue;
+  return inputs.literalValue;
 }
 
 /**

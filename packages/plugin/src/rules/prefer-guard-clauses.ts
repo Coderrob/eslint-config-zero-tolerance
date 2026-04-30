@@ -33,7 +33,10 @@ type PreferGuardClausesContext = Readonly<TSESLint.RuleContext<'preferGuardClaus
  * @param context - ESLint rule context.
  * @param node - If statement node.
  */
-function checkIfStatement(context: PreferGuardClausesContext, node: TSESTree.IfStatement): void {
+function checkIfStatement(
+  context: Readonly<PreferGuardClausesContext>,
+  node: Readonly<TSESTree.IfStatement>,
+): void {
   if (!shouldReportElseBlock(node) || node.alternate === null) {
     return;
   }
@@ -44,27 +47,13 @@ function checkIfStatement(context: PreferGuardClausesContext, node: TSESTree.IfS
 }
 
 /**
- * Returns true when the consequent branch ends with a terminator.
- *
- * @param consequent - If consequent statement.
- * @returns True when guard-clause style is applicable.
- */
-function consequentEndsWithTerminator(consequent: TSESTree.Statement): boolean {
-  if (consequent.type === AST_NODE_TYPES.BlockStatement) {
-    const last = consequent.body.at(-1);
-    return last !== undefined && isTerminator(last);
-  }
-  return isTerminator(consequent);
-}
-
-/**
  * Creates the IfStatement checker visitor.
  *
  * @param context - ESLint rule context.
  * @returns IfStatement visitor callback.
  */
 function createIfStatementChecker(
-  context: PreferGuardClausesContext,
+  context: Readonly<PreferGuardClausesContext>,
 ): (node: TSESTree.IfStatement) => void {
   return checkIfStatement.bind(null, context);
 }
@@ -76,11 +65,25 @@ function createIfStatementChecker(
  * @returns Listener map for the rule.
  */
 function createPreferGuardClausesListeners(
-  context: PreferGuardClausesContext,
+  context: Readonly<PreferGuardClausesContext>,
 ): TSESLint.RuleListener {
   return {
     IfStatement: createIfStatementChecker(context),
   };
+}
+
+/**
+ * Returns true when the consequent branch ends with a terminator.
+ *
+ * @param consequent - If consequent statement.
+ * @returns True when guard-clause style is applicable.
+ */
+function hasTerminatingConsequent(consequent: Readonly<TSESTree.Statement>): boolean {
+  if (consequent.type === AST_NODE_TYPES.BlockStatement) {
+    const last = consequent.body.at(-1);
+    return last !== undefined && isTerminator(last);
+  }
+  return isTerminator(consequent);
 }
 
 /**
@@ -89,7 +92,7 @@ function createPreferGuardClausesListeners(
  * @param node - Statement node to check.
  * @returns True when the statement terminates current branch flow.
  */
-function isTerminator(node: TSESTree.Statement): boolean {
+function isTerminator(node: Readonly<TSESTree.Statement>): boolean {
   return TERMINATOR_NODE_TYPES.has(node.type);
 }
 
@@ -99,11 +102,11 @@ function isTerminator(node: TSESTree.Statement): boolean {
  * @param node - If statement node.
  * @returns True when guard-clause style should be used.
  */
-function shouldReportElseBlock(node: TSESTree.IfStatement): boolean {
+function shouldReportElseBlock(node: Readonly<TSESTree.IfStatement>): boolean {
   if (node.alternate === null || node.alternate.type === AST_NODE_TYPES.IfStatement) {
     return false;
   }
-  return consequentEndsWithTerminator(node.consequent);
+  return hasTerminatingConsequent(node.consequent);
 }
 
 /** Prefers guard clauses over `else` blocks after terminating branches. */

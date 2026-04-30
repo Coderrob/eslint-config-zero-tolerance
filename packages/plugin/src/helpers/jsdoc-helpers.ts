@@ -40,7 +40,7 @@ const PARENT_OWNED_TARGET_TYPES = new Set([
  */
 export function getJsdocComment(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
 ): TSESTree.Comment | null {
   const comments = sourceCode.getCommentsBefore(node);
   const jsdocComments = comments.filter(isJsdocBlockComment);
@@ -56,7 +56,7 @@ export function getJsdocComment(
  */
 export function getLineIndentation(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
 ): string {
   const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
   return lineText.slice(0, lineText.length - lineText.trimStart().length);
@@ -68,7 +68,7 @@ export function getLineIndentation(
  * @param node - Function node.
  * @returns Parent node if it owns JSDoc, otherwise null.
  */
-export function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
+export function getParentOwnedTargetNode(node: Readonly<FunctionNode>): TSESTree.Node | null {
   if (!isParentOwnedTargetType(node.parent.type)) {
     return null;
   }
@@ -81,7 +81,7 @@ export function getParentOwnedTargetNode(node: FunctionNode): TSESTree.Node | nu
  * @param node - Function node to inspect.
  * @returns Target node for JSDoc placement.
  */
-export function getTargetNode(node: FunctionNode): TSESTree.Node {
+export function getTargetNode(node: Readonly<FunctionNode>): TSESTree.Node {
   return getParentOwnedTargetNode(node) ?? getVariableOwnedTargetNode(node) ?? node;
 }
 
@@ -91,7 +91,7 @@ export function getTargetNode(node: FunctionNode): TSESTree.Node {
  * @param node - Function node.
  * @returns JSDoc owner target node, or null.
  */
-export function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | null {
+export function getVariableOwnedTargetNode(node: Readonly<FunctionNode>): TSESTree.Node | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
@@ -110,7 +110,7 @@ export function getVariableOwnedTargetNode(node: FunctionNode): TSESTree.Node | 
  * @param comment - Comment token to inspect.
  * @returns True when the token is a JSDoc block comment.
  */
-export function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
+export function isJsdocBlockComment(comment: Readonly<TSESTree.Comment>): boolean {
   return comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith(JSDOC_BLOCK_MARKER);
 }
 
@@ -120,7 +120,7 @@ export function isJsdocBlockComment(comment: TSESTree.Comment): boolean {
  * @param type - Node type to inspect.
  * @returns True when the node type owns JSDoc placement.
  */
-export function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
+export function isParentOwnedTargetType(type: Readonly<AST_NODE_TYPES>): boolean {
   return PARENT_OWNED_TARGET_TYPES.has(type);
 }
 
@@ -133,7 +133,7 @@ export function isParentOwnedTargetType(type: AST_NODE_TYPES): boolean {
  */
 export function isStandaloneLineTarget(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Node,
+  node: Readonly<TSESTree.Node>,
 ): boolean {
   const lineText = sourceCode.lines[node.loc.start.line - 1] ?? '';
   const prefix = lineText.slice(0, node.loc.start.column);

@@ -18,7 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../helpers/ast-guards';
 import { getObjectDestructuredParameterTypeNode } from '../helpers/ast/parameters';
-import { someDescendant } from '../helpers/ast/search';
+import { hasDescendant } from '../helpers/ast/search';
 import { createFunctionNodeListeners } from './support/function-listeners';
 import { createRule } from './support/rule-factory';
 
@@ -33,8 +33,8 @@ type NoDestructuredParameterTypeLiteralContext = Readonly<
  * @param node - Function-like node.
  */
 function checkFunctionNode(
-  context: NoDestructuredParameterTypeLiteralContext,
-  node: FunctionNode,
+  context: Readonly<NoDestructuredParameterTypeLiteralContext>,
+  node: Readonly<FunctionNode>,
 ): void {
   for (const param of node.params) {
     reportIfInlineDestructuredParameterType(context, param);
@@ -48,7 +48,7 @@ function checkFunctionNode(
  * @returns Rule listener map.
  */
 function createNoDestructuredParameterTypeLiteralListeners(
-  context: NoDestructuredParameterTypeLiteralContext,
+  context: Readonly<NoDestructuredParameterTypeLiteralContext>,
 ): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
@@ -61,10 +61,10 @@ function createNoDestructuredParameterTypeLiteralListeners(
  * @returns True when a TSTypeLiteral exists in the type tree.
  */
 function hasInlineObjectTypeLiteral(
-  node: TSESTree.TypeNode,
+  node: Readonly<TSESTree.TypeNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
-  return someDescendant(node, sourceCode, isTypeLiteralNode);
+  return hasDescendant(node, sourceCode, isTypeLiteralNode);
 }
 
 /**
@@ -73,7 +73,7 @@ function hasInlineObjectTypeLiteral(
  * @param node - Node to inspect.
  * @returns True when the node is a TSTypeLiteral.
  */
-function isTypeLiteralNode(node: TSESTree.Node): node is TSESTree.TSTypeLiteral {
+function isTypeLiteralNode(node: Readonly<TSESTree.Node>): node is TSESTree.TSTypeLiteral {
   return node.type === AST_NODE_TYPES.TSTypeLiteral;
 }
 
@@ -84,8 +84,8 @@ function isTypeLiteralNode(node: TSESTree.Node): node is TSESTree.TSTypeLiteral 
  * @param param - Function parameter node.
  */
 function reportIfInlineDestructuredParameterType(
-  context: NoDestructuredParameterTypeLiteralContext,
-  param: TSESTree.Parameter,
+  context: Readonly<NoDestructuredParameterTypeLiteralContext>,
+  param: Readonly<TSESTree.Parameter>,
 ): void {
   const typeNode = getObjectDestructuredParameterTypeNode(param);
   if (typeNode === null || !hasInlineObjectTypeLiteral(typeNode, context.sourceCode)) {

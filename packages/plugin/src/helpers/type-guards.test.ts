@@ -7,6 +7,9 @@ import {
   isString,
 } from './type-guards';
 
+const NUMBER_VALUE = 42;
+const FIXED_DATE_TIMESTAMP = 0;
+
 describe('type-guards', () => {
   // ── isDefined ────────────────────────────────────────────────────────────
 
@@ -72,7 +75,7 @@ describe('type-guards', () => {
     });
 
     it('should return false for a number', () => {
-      expect(isString(42)).toBe(false);
+      expect(isString(NUMBER_VALUE)).toBe(false);
     });
   });
 
@@ -92,7 +95,7 @@ describe('type-guards', () => {
 
   describe('isNumber', () => {
     it('should return true for a number', () => {
-      expect(isNumber(42)).toBe(true);
+      expect(isNumber(NUMBER_VALUE)).toBe(true);
     });
 
     it('should return false for a string', () => {
@@ -118,7 +121,7 @@ describe('type-guards', () => {
     });
 
     it('should return false for Date instances', () => {
-      expect(isPlainObject(new Date())).toBe(false);
+      expect(isPlainObject(new Date(FIXED_DATE_TIMESTAMP))).toBe(false);
     });
 
     it('should return false for Map instances', () => {

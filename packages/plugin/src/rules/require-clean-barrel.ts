@@ -28,8 +28,11 @@ type RequireCleanBarrelContext = Readonly<TSESLint.RuleContext<'cleanBarrelOnlyR
  * @param context - ESLint rule execution context.
  * @param program - Program node.
  */
-function checkProgram(context: RequireCleanBarrelContext, program: TSESTree.Program): void {
-  if (!containsModuleReExport(program.body)) {
+function checkProgram(
+  context: Readonly<RequireCleanBarrelContext>,
+  program: Readonly<TSESTree.Program>,
+): void {
+  if (!hasModuleReExport(program.body)) {
     return;
   }
   for (const statement of program.body) {
@@ -40,23 +43,13 @@ function checkProgram(context: RequireCleanBarrelContext, program: TSESTree.Prog
 }
 
 /**
- * Returns true when a program includes at least one module re-export declaration.
- *
- * @param statements - Program statements.
- * @returns True when any statement is a module re-export declaration.
- */
-function containsModuleReExport(statements: ReadonlyArray<TSESTree.ProgramStatement>): boolean {
-  return statements.some(isAllowedBarrelStatement);
-}
-
-/**
  * Creates listeners for require-clean-barrel rule execution.
  *
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
 function createRequireCleanBarrelListeners(
-  context: RequireCleanBarrelContext,
+  context: Readonly<RequireCleanBarrelContext>,
 ): TSESLint.RuleListener {
   if (!isBarrelFile(context.filename)) {
     return {};
@@ -67,12 +60,22 @@ function createRequireCleanBarrelListeners(
 }
 
 /**
+ * Returns true when a program includes at least one module re-export declaration.
+ *
+ * @param statements - Program statements.
+ * @returns True when any statement is a module re-export declaration.
+ */
+function hasModuleReExport(statements: ReadonlyArray<TSESTree.ProgramStatement>): boolean {
+  return statements.some(isAllowedBarrelStatement);
+}
+
+/**
  * Returns true when a top-level statement is a module re-export declaration.
  *
  * @param statement - Program statement node.
  * @returns True when the statement is a permitted re-export declaration.
  */
-function isAllowedBarrelStatement(statement: TSESTree.ProgramStatement): boolean {
+function isAllowedBarrelStatement(statement: Readonly<TSESTree.ProgramStatement>): boolean {
   if (statement.type === AST_NODE_TYPES.ExportAllDeclaration) {
     return true;
   }
@@ -89,8 +92,8 @@ function isAllowedBarrelStatement(statement: TSESTree.ProgramStatement): boolean
  * @param statement - Statement to report.
  */
 function reportDisallowedBarrelStatement(
-  context: RequireCleanBarrelContext,
-  statement: TSESTree.ProgramStatement,
+  context: Readonly<RequireCleanBarrelContext>,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): void {
   context.report({
     node: statement,

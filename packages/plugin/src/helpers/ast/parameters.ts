@@ -23,6 +23,12 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 const THIS_PARAMETER_NAME = 'this';
 
+type AnnotatableParameter =
+  | TSESTree.ArrayPattern
+  | TSESTree.Identifier
+  | TSESTree.ObjectPattern
+  | TSESTree.RestElement;
+
 /**
  * Returns the type annotation from a directly annotatable parameter shape.
  *
@@ -30,11 +36,7 @@ const THIS_PARAMETER_NAME = 'this';
  * @returns Type annotation when present.
  */
 function getAnnotatableParameterTypeAnnotation(
-  param:
-    | TSESTree.ArrayPattern
-    | TSESTree.Identifier
-    | TSESTree.ObjectPattern
-    | TSESTree.RestElement,
+  param: Readonly<AnnotatableParameter>,
 ): TSESTree.TSTypeAnnotation | null {
   return 'typeAnnotation' in param ? (param.typeAnnotation ?? null) : null;
 }
@@ -46,7 +48,7 @@ function getAnnotatableParameterTypeAnnotation(
  * @returns Type annotation when present.
  */
 function getAssignmentPatternTypeAnnotation(
-  param: TSESTree.AssignmentPattern,
+  param: Readonly<TSESTree.AssignmentPattern>,
 ): TSESTree.TSTypeAnnotation | null {
   return getAnnotatableParameterTypeAnnotation(param.left);
 }
@@ -57,7 +59,9 @@ function getAssignmentPatternTypeAnnotation(
  * @param param - Function parameter node.
  * @returns Type node when the parameter is an annotated object pattern.
  */
-function getDirectObjectDestructuredTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
+function getDirectObjectDestructuredTypeNode(
+  param: Readonly<TSESTree.Parameter>,
+): TSESTree.TypeNode | null {
   return param.type === AST_NODE_TYPES.ObjectPattern
     ? (param.typeAnnotation?.typeAnnotation ?? null)
     : null;
@@ -87,7 +91,7 @@ export function getFirstNonThisParameter(
  * @returns Type node when the assignment pattern destructures an annotated object.
  */
 function getObjectDestructuredAssignmentTypeNode(
-  param: TSESTree.AssignmentPattern,
+  param: Readonly<TSESTree.AssignmentPattern>,
 ): TSESTree.TypeNode | null {
   const left = param.left;
   return left.type === AST_NODE_TYPES.ObjectPattern
@@ -105,7 +109,7 @@ function getObjectDestructuredAssignmentTypeNode(
  * @returns Type node when the parameter destructures an object and is annotated.
  */
 export function getObjectDestructuredParameterTypeNode(
-  param: TSESTree.Parameter,
+  param: Readonly<TSESTree.Parameter>,
 ): TSESTree.TypeNode | null {
   const directTypeNode = getDirectObjectDestructuredTypeNode(param);
   if (directTypeNode !== null) {
@@ -123,7 +127,7 @@ export function getObjectDestructuredParameterTypeNode(
  * @returns Type annotation when present.
  */
 export function getParameterTypeAnnotation(
-  param: TSESTree.Parameter,
+  param: Readonly<TSESTree.Parameter>,
 ): TSESTree.TSTypeAnnotation | null {
   if (param.type === AST_NODE_TYPES.TSParameterProperty) {
     return getTsParameterPropertyTypeAnnotation(param);
@@ -140,7 +144,9 @@ export function getParameterTypeAnnotation(
  * @param param - Function parameter node.
  * @returns Type node when present.
  */
-export function getParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNode | null {
+export function getParameterTypeNode(
+  param: Readonly<TSESTree.Parameter>,
+): TSESTree.TypeNode | null {
   return getParameterTypeAnnotation(param)?.typeAnnotation ?? null;
 }
 
@@ -151,7 +157,7 @@ export function getParameterTypeNode(param: TSESTree.Parameter): TSESTree.TypeNo
  * @returns Type annotation when present.
  */
 function getTsParameterPropertyTypeAnnotation(
-  param: TSESTree.TSParameterProperty,
+  param: Readonly<TSESTree.TSParameterProperty>,
 ): TSESTree.TSTypeAnnotation | null {
   const inner = param.parameter;
   return inner.type === AST_NODE_TYPES.AssignmentPattern
@@ -165,6 +171,6 @@ function getTsParameterPropertyTypeAnnotation(
  * @param param - Function parameter node.
  * @returns True when the parameter is `this`.
  */
-export function isThisParameter(param: TSESTree.Parameter): boolean {
+export function isThisParameter(param: Readonly<TSESTree.Parameter>): boolean {
   return param.type === AST_NODE_TYPES.Identifier && param.name === THIS_PARAMETER_NAME;
 }

@@ -25,7 +25,7 @@ type NoEslintDisableContext = Readonly<TSESLint.RuleContext<'noEslintDisable', [
  *
  * @param context - ESLint rule execution context.
  */
-function checkProgram(context: NoEslintDisableContext): void {
+function checkProgram(context: Readonly<NoEslintDisableContext>): void {
   const comments = context.sourceCode.getAllComments();
 
   for (const comment of comments) {
@@ -46,7 +46,9 @@ function checkProgram(context: NoEslintDisableContext): void {
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoEslintDisableListeners(context: NoEslintDisableContext): TSESLint.RuleListener {
+function createNoEslintDisableListeners(
+  context: Readonly<NoEslintDisableContext>,
+): TSESLint.RuleListener {
   return {
     Program: checkProgram.bind(undefined, context),
   };

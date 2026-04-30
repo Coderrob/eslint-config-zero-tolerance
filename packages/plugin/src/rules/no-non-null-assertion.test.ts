@@ -29,12 +29,32 @@ ruleTester.run('no-non-null-assertion', noNonNullAssertion, {
     {
       name: 'should report chained non-null assertion',
       code: 'const x = obj.prop!.method();',
-      errors: [{ messageId: 'noNonNullAssertion' }],
+      errors: [
+        {
+          messageId: 'noNonNullAssertion',
+          suggestions: [
+            {
+              messageId: 'useOptionalChaining',
+              output: 'const x = obj.prop?.method();',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report parameter non-null assertion',
       code: 'function f(x: string | null) { return x!.length; }',
-      errors: [{ messageId: 'noNonNullAssertion' }],
+      errors: [
+        {
+          messageId: 'noNonNullAssertion',
+          suggestions: [
+            {
+              messageId: 'useOptionalChaining',
+              output: 'function f(x: string | null) { return x?.length; }',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report DOM query non-null assertion',
@@ -42,9 +62,54 @@ ruleTester.run('no-non-null-assertion', noNonNullAssertion, {
       errors: [{ messageId: 'noNonNullAssertion' }],
     },
     {
+      name: 'should suggest optional call for non-null asserted function',
+      code: 'const value = callback!();',
+      errors: [
+        {
+          messageId: 'noNonNullAssertion',
+          suggestions: [
+            {
+              messageId: 'useOptionalChaining',
+              output: 'const value = callback?.();',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'should suggest optional computed access for non-null asserted object',
+      code: 'const value = data![key];',
+      errors: [
+        {
+          messageId: 'noNonNullAssertion',
+          suggestions: [
+            {
+              messageId: 'useOptionalChaining',
+              output: 'const value = data?.[key];',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'should not suggest optional chaining for assignment targets',
+      code: 'value!.prop = next;',
+      errors: [{ messageId: 'noNonNullAssertion', suggestions: [] }],
+    },
+    {
       name: 'should report chained non-null assertion on find result',
       code: 'arr.find(x => x.id === 1)!.name',
-      errors: [{ messageId: 'noNonNullAssertion' }],
+      errors: [
+        {
+          messageId: 'noNonNullAssertion',
+          suggestions: [
+            {
+              messageId: 'useOptionalChaining',
+              output: 'arr.find(x => x.id === 1)?.name',
+            },
+          ],
+        },
+      ],
     },
   ],
 });

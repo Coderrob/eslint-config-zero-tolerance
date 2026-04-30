@@ -22,7 +22,7 @@ import { createFunctionNodeEnterExitListeners } from './support/function-listene
 import { createRule } from './support/rule-factory';
 
 type NoParameterReassignContext = Readonly<TSESLint.RuleContext<'noParameterReassign', []>>;
-type ParameterScopeStack = Array<Set<string>>;
+type ParameterScopeStack = Array<ReadonlySet<string>>;
 
 /**
  * Checks assignment expressions for direct parameter reassignment.
@@ -32,9 +32,9 @@ type ParameterScopeStack = Array<Set<string>>;
  * @param node - Assignment expression node.
  */
 function checkAssignmentExpression(
-  context: NoParameterReassignContext,
-  parameterStack: ParameterScopeStack,
-  node: TSESTree.AssignmentExpression,
+  context: Readonly<NoParameterReassignContext>,
+  parameterStack: Readonly<ParameterScopeStack>,
+  node: Readonly<TSESTree.AssignmentExpression>,
 ): void {
   if (node.left.type !== AST_NODE_TYPES.Identifier) {
     return;
@@ -50,9 +50,9 @@ function checkAssignmentExpression(
  * @param node - Update expression node.
  */
 function checkUpdateExpression(
-  context: NoParameterReassignContext,
-  parameterStack: ParameterScopeStack,
-  node: TSESTree.UpdateExpression,
+  context: Readonly<NoParameterReassignContext>,
+  parameterStack: Readonly<ParameterScopeStack>,
+  node: Readonly<TSESTree.UpdateExpression>,
 ): void {
   if (node.argument.type !== AST_NODE_TYPES.Identifier) {
     return;
@@ -67,7 +67,7 @@ function checkUpdateExpression(
  * @returns Listener map for the rule.
  */
 function createNoParameterReassignListeners(
-  context: NoParameterReassignContext,
+  context: Readonly<NoParameterReassignContext>,
 ): TSESLint.RuleListener {
   const parameterStack: ParameterScopeStack = [];
   return {
@@ -86,8 +86,11 @@ function createNoParameterReassignListeners(
  * @param parameterStack - Nested function parameter stack.
  * @param node - Function node being entered.
  */
-function enterFunctionScope(parameterStack: ParameterScopeStack, node: FunctionNode): void {
-  parameterStack.push(getFunctionParameterNames(node));
+function enterFunctionScope(
+  parameterStack: Readonly<ParameterScopeStack>,
+  node: Readonly<FunctionNode>,
+): void {
+  Reflect.apply(Array.prototype.push, parameterStack, [getFunctionParameterNames(node)]);
 }
 
 /**
@@ -96,8 +99,11 @@ function enterFunctionScope(parameterStack: ParameterScopeStack, node: FunctionN
  * @param parameterStack - Nested function parameter stack.
  * @param _node - Function node being exited.
  */
-function exitFunctionScope(parameterStack: ParameterScopeStack, _node: FunctionNode): void {
-  parameterStack.pop();
+function exitFunctionScope(
+  parameterStack: Readonly<ParameterScopeStack>,
+  _node: Readonly<FunctionNode>,
+): void {
+  Reflect.apply(Array.prototype.pop, parameterStack, []);
 }
 
 /**
@@ -106,15 +112,18 @@ function exitFunctionScope(parameterStack: ParameterScopeStack, _node: FunctionN
  * @param node - Function node to inspect.
  * @returns Set of parameter identifiers in that function signature.
  */
-function getFunctionParameterNames(node: FunctionNode): Set<string> {
-  const names = new Set<string>();
-  for (const param of node.params) {
-    const name = getNamedParameterName(param);
-    if (name !== null) {
-      names.add(name);
-    }
-  }
-  return names;
+function getFunctionParameterNames(node: Readonly<FunctionNode>): ReadonlySet<string> {
+  return new Set(node.params.map(getNamedParameterName).filter(isParameterName));
+}
+
+/**
+ * Returns true when a parameter name was resolved.
+ *
+ * @param name - Candidate parameter name.
+ * @returns True when the name is non-null.
+ */
+function isParameterName(name: string | null): name is string {
+  return name !== null;
 }
 
 /**
@@ -125,9 +134,9 @@ function getFunctionParameterNames(node: FunctionNode): Set<string> {
  * @param node - Identifier node assigned or updated.
  */
 function reportIfParameterReassigned(
-  context: NoParameterReassignContext,
-  parameterStack: ParameterScopeStack,
-  node: TSESTree.Identifier,
+  context: Readonly<NoParameterReassignContext>,
+  parameterStack: Readonly<ParameterScopeStack>,
+  node: Readonly<TSESTree.Identifier>,
 ): void {
   const currentScope = parameterStack.at(-1);
   if (currentScope === undefined || !currentScope.has(node.name)) {

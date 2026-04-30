@@ -36,7 +36,7 @@ ruleTester.run('no-eslint-disable', noEslintDisable, {
   ],
   invalid: [
     {
-      name: 'should report eslint-disable block comment',
+      name: 'should report eslint-disable block comment for specific rules',
       code: '/* eslint-disable no-undef */\nconst x = 1;',
       errors: [{ messageId: 'noEslintDisable' }],
     },

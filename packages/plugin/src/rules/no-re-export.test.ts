@@ -24,6 +24,10 @@ ruleTester.run('no-re-export', noReExport, {
       name: 'should allow class export',
     },
     {
+      code: 'export enum Status { Ready }',
+      name: 'should allow enum exports',
+    },
+    {
       code: "export { foo } from './child';",
       name: 'should allow re-export from child module',
     },
@@ -116,6 +120,26 @@ ruleTester.run('no-re-export', noReExport, {
       code: "import { foo } from '../sibling';\nexport { foo };",
       name: 'should disallow pass-through named export of a parent import',
       errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import { parentFoo } from '../sibling';\nexport const foo = 1;\nexport { parentFoo as foo };",
+      name: 'should remove redundant pass-through export when direct export already exists',
+      output: "import { parentFoo } from '../sibling';\nexport const foo = 1;\n",
+      errors: [{ messageId: 'noReExport' }],
+    },
+    {
+      code: "import { parentFoo, parentBar } from '../sibling';\nexport const foo = 1;\nexport { parentFoo as foo, parentBar as bar };",
+      name: 'should remove only redundant pass-through export specifiers',
+      output:
+        "import { parentFoo, parentBar } from '../sibling';\nexport const foo = 1;\nexport { parentBar as bar };",
+      errors: [{ messageId: 'noReExport' }, { messageId: 'noReExport' }],
+    },
+    {
+      code: "import { parentFoo, parentBar } from '../sibling';\nexport const bar = 1;\nexport { parentFoo as foo, parentBar as bar };",
+      name: 'should remove redundant trailing pass-through export specifiers',
+      output:
+        "import { parentFoo, parentBar } from '../sibling';\nexport const bar = 1;\nexport { parentFoo as foo };",
+      errors: [{ messageId: 'noReExport' }, { messageId: 'noReExport' }],
     },
     {
       code: "import type { Foo } from '../sibling';\nexport type { Foo };",

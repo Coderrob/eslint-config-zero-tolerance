@@ -24,9 +24,7 @@ const MEMBER_CALLEE_PATH_LENGTH = 2;
 const SET_TIMEOUT_NAME = 'setTimeout';
 const SINGLE_CALLEE_PATH_LENGTH = 1;
 
-type NoSetTimeoutInTestsContext = Readonly<
-  TSESLint.RuleContext<'noSetTimeoutInTests', []>
->;
+type NoSetTimeoutInTestsContext = Readonly<TSESLint.RuleContext<'noSetTimeoutInTests', []>>;
 
 /**
  * Checks call expressions for global setTimeout usage.
@@ -35,8 +33,8 @@ type NoSetTimeoutInTestsContext = Readonly<
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoSetTimeoutInTestsContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoSetTimeoutInTestsContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!isRestrictedSetTimeoutCall(node)) {
     return;
@@ -55,7 +53,7 @@ function checkCallExpression(
  * @returns Listener map for the rule.
  */
 function createNoSetTimeoutInTestsListeners(
-  context: NoSetTimeoutInTestsContext,
+  context: Readonly<NoSetTimeoutInTestsContext>,
 ): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
@@ -96,7 +94,7 @@ function isGlobalSetTimeoutCall(calleePath: ReadonlyArray<string>): boolean {
  * @param node - Call expression node.
  * @returns True when the callee resolves to setTimeout or a known global timer object.
  */
-function isRestrictedSetTimeoutCall(node: TSESTree.CallExpression): boolean {
+function isRestrictedSetTimeoutCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const calleePath = getCalleeNamePath(node.callee);
   if (calleePath === null) {
     return false;

@@ -47,6 +47,12 @@
           "then": "a noReExport violation is reported"
         },
         {
+          "name": "should fix redundant pass-through export specifiers already directly exported",
+          "given": "export const bar = 1; import { bar as parentBar } from '../bar'; export { parentBar as bar }",
+          "when": "the rule evaluates the pass-through export specifier",
+          "then": "a noReExport violation is reported with a fix that removes only the redundant specifier"
+        },
+        {
           "name": "should report a pass-through named export of a parent import regardless of statement ordering",
           "given": "export { bar } followed later by import { bar } from '../bar' in a non-index source file",
           "when": "the rule precomputes parent-imported bindings from the full program and evaluates the export declaration",

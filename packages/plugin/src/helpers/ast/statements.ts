@@ -77,7 +77,7 @@ export function getReturnStatement(
  * @returns Contained return statement, or null when the block does not match.
  */
 export function getSingleReturnStatement(
-  blockStatement: TSESTree.BlockStatement,
+  blockStatement: Readonly<TSESTree.BlockStatement>,
 ): TSESTree.ReturnStatement | null {
   if (blockStatement.body.length !== SINGLE_ITEM_COUNT) {
     return null;

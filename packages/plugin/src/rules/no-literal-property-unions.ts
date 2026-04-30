@@ -34,7 +34,10 @@ const NEGATIVE_NUMBER_OPERATOR = '-';
  * @param context - ESLint rule execution context.
  * @param node - Property-like node to inspect.
  */
-function checkPropertyNode(context: NoLiteralPropertyUnionsContext, node: PropertyNode): void {
+function checkPropertyNode(
+  context: Readonly<NoLiteralPropertyUnionsContext>,
+  node: Readonly<PropertyNode>,
+): void {
   const typeNode = getPropertyTypeNode(node);
   if (typeNode === null || !isLiteralPropertyUnion(typeNode)) {
     return;
@@ -55,7 +58,7 @@ function checkPropertyNode(context: NoLiteralPropertyUnionsContext, node: Proper
  * @returns Listener map for the rule.
  */
 function createNoLiteralPropertyUnionsListeners(
-  context: NoLiteralPropertyUnionsContext,
+  context: Readonly<NoLiteralPropertyUnionsContext>,
 ): TSESLint.RuleListener {
   return {
     PropertyDefinition: checkPropertyNode.bind(undefined, context),
@@ -71,8 +74,11 @@ function createNoLiteralPropertyUnionsListeners(
  * @param node - Property-like node to inspect.
  * @returns Property name text.
  */
-function getPropertyName(sourceCode: Readonly<TSESLint.SourceCode>, node: PropertyNode): string {
-  const propertyName = getUncomputedPropertyName(node.key, node.computed);
+function getPropertyName(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<PropertyNode>,
+): string {
+  const propertyName = getUncomputedPropertyName({ key: node.key, computed: node.computed });
   return propertyName ?? sourceCode.getText(node.key);
 }
 
@@ -82,7 +88,7 @@ function getPropertyName(sourceCode: Readonly<TSESLint.SourceCode>, node: Proper
  * @param node - Property-like node to inspect.
  * @returns Declared property type node, or null.
  */
-function getPropertyTypeNode(node: PropertyNode): TSESTree.TypeNode | null {
+function getPropertyTypeNode(node: Readonly<PropertyNode>): TSESTree.TypeNode | null {
   return node.typeAnnotation?.typeAnnotation ?? null;
 }
 
@@ -93,11 +99,14 @@ function getPropertyTypeNode(node: PropertyNode): TSESTree.TypeNode | null {
  * @param computed - Whether the key is computed.
  * @returns Property name for simple keys, or null.
  */
-function getUncomputedPropertyName(key: TSESTree.PropertyName, computed: boolean): string | null {
-  if (computed) {
+function getUncomputedPropertyName(property: Readonly<{
+  computed: boolean;
+  key: TSESTree.PropertyName;
+}>): string | null {
+  if (property.computed) {
     return null;
   }
-  return getUncomputedPropertyNameFromKey(key);
+  return getUncomputedPropertyNameFromKey(property.key);
 }
 
 /**
@@ -106,7 +115,7 @@ function getUncomputedPropertyName(key: TSESTree.PropertyName, computed: boolean
  * @param key - Uncomputed property key to inspect.
  * @returns Property name for identifiers and literals, or null.
  */
-function getUncomputedPropertyNameFromKey(key: TSESTree.PropertyName): string | null {
+function getUncomputedPropertyNameFromKey(key: Readonly<TSESTree.PropertyName>): string | null {
   if (key.type === AST_NODE_TYPES.Identifier) {
     return key.name;
   }
@@ -122,7 +131,7 @@ function getUncomputedPropertyNameFromKey(key: TSESTree.PropertyName): string | 
  * @param members - Union members to inspect.
  * @returns True when the union includes a banned literal member.
  */
-function hasBannedLiteralUnionMember(members: TSESTree.TypeNode[]): boolean {
+function hasBannedLiteralUnionMember(members: readonly TSESTree.TypeNode[]): boolean {
   for (const member of members) {
     if (isBannedLiteralTypeNode(member)) {
       return true;
@@ -137,7 +146,7 @@ function hasBannedLiteralUnionMember(members: TSESTree.TypeNode[]): boolean {
  * @param node - Literal node to inspect.
  * @returns True when the literal should be reported.
  */
-function isBannedLiteralNode(node: TSESTree.Node): boolean {
+function isBannedLiteralNode(node: Readonly<TSESTree.Node>): boolean {
   return (
     isBannedPrimitiveLiteralNode(node) ||
     node.type === AST_NODE_TYPES.TemplateLiteral ||
@@ -151,7 +160,7 @@ function isBannedLiteralNode(node: TSESTree.Node): boolean {
  * @param node - Type node to inspect.
  * @returns True when the type member is a literal property value.
  */
-function isBannedLiteralTypeNode(node: TSESTree.TypeNode): boolean {
+function isBannedLiteralTypeNode(node: Readonly<TSESTree.TypeNode>): boolean {
   if (node.type === AST_NODE_TYPES.TSTemplateLiteralType) {
     return true;
   }
@@ -177,7 +186,7 @@ function isBannedLiteralValue(value: boolean | bigint | number | RegExp | string
  * @param node - Node to inspect.
  * @returns True for string, number, and boolean literals.
  */
-function isBannedPrimitiveLiteralNode(node: TSESTree.Node): boolean {
+function isBannedPrimitiveLiteralNode(node: Readonly<TSESTree.Node>): boolean {
   return node.type === AST_NODE_TYPES.Literal && isBannedLiteralValue(node.value);
 }
 
@@ -187,7 +196,7 @@ function isBannedPrimitiveLiteralNode(node: TSESTree.Node): boolean {
  * @param node - Type node to inspect.
  * @returns True when the type member is true or false.
  */
-function isBooleanLiteralTypeNode(node: TSESTree.TypeNode): boolean {
+function isBooleanLiteralTypeNode(node: Readonly<TSESTree.TypeNode>): boolean {
   return (
     node.type === AST_NODE_TYPES.TSLiteralType &&
     node.literal.type === AST_NODE_TYPES.Literal &&
@@ -201,7 +210,7 @@ function isBooleanLiteralTypeNode(node: TSESTree.TypeNode): boolean {
  * @param members - Union members to inspect.
  * @returns True when the union represents the full boolean domain.
  */
-function isBooleanLiteralUnion(members: TSESTree.TypeNode[]): boolean {
+function isBooleanLiteralUnion(members: readonly TSESTree.TypeNode[]): boolean {
   for (const member of members) {
     if (!isBooleanLiteralTypeNode(member)) {
       return false;
@@ -216,7 +225,7 @@ function isBooleanLiteralUnion(members: TSESTree.TypeNode[]): boolean {
  * @param node - Type node to inspect.
  * @returns True when the property union should be reported.
  */
-function isLiteralPropertyUnion(node: TSESTree.TypeNode): boolean {
+function isLiteralPropertyUnion(node: Readonly<TSESTree.TypeNode>): boolean {
   if (node.type !== AST_NODE_TYPES.TSUnionType) {
     return false;
   }
@@ -229,7 +238,9 @@ function isLiteralPropertyUnion(node: TSESTree.TypeNode): boolean {
  * @param node - Node to inspect.
  * @returns True when the node is `-<number>`.
  */
-function isNegativeNumberLiteralNode(node: TSESTree.Node): node is TSESTree.UnaryExpression & {
+function isNegativeNumberLiteralNode(
+  node: Readonly<TSESTree.Node>,
+): node is TSESTree.UnaryExpression & {
   argument: TSESTree.NumberLiteral;
   operator: typeof NEGATIVE_NUMBER_OPERATOR;
 } {

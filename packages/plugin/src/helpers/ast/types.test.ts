@@ -15,7 +15,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
-      } as any;
+      } as unknown;
 
       expect(getTypeReferenceName(node)).toBe('Readonly');
     });
@@ -24,7 +24,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.TSQualifiedName },
-      } as any;
+      } as unknown;
 
       expect(getTypeReferenceName(node)).toBeNull();
     });
@@ -36,7 +36,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeArguments: { params: [firstTypeArgument] },
-      } as any;
+      } as unknown;
 
       expect(getFirstTypeArgument(node)).toBe(firstTypeArgument);
     });
@@ -44,7 +44,7 @@ describe('ast type helpers', () => {
     it('should return null when a type reference has no type arguments', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
-      } as any;
+      } as unknown;
 
       expect(getFirstTypeArgument(node)).toBeNull();
     });
@@ -55,7 +55,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeLiteral,
         members: [{ type: AST_NODE_TYPES.TSPropertySignature, readonly: true }],
-      } as any;
+      } as unknown;
 
       expect(hasAllReadonlyPropertyMembers(node)).toBe(true);
     });
@@ -64,7 +64,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeLiteral,
         members: [{ type: AST_NODE_TYPES.TSMethodSignature, readonly: true }],
-      } as any;
+      } as unknown;
 
       expect(hasAllReadonlyPropertyMembers(node)).toBe(false);
     });
@@ -75,7 +75,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeArguments: { params: [{}] },
-      } as any;
+      } as unknown;
 
       expect(hasTypeArguments(node)).toBe(true);
     });
@@ -83,7 +83,7 @@ describe('ast type helpers', () => {
     it('should return false when a type reference has no type arguments', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
-      } as any;
+      } as unknown;
 
       expect(hasTypeArguments(node)).toBe(false);
     });
@@ -94,7 +94,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
-      } as any;
+      } as unknown;
 
       expect(isNamedTypeReference(node, 'Readonly')).toBe(true);
     });
@@ -103,7 +103,7 @@ describe('ast type helpers', () => {
       const node = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Props' },
-      } as any;
+      } as unknown;
 
       expect(isNamedTypeReference(node, 'Readonly')).toBe(false);
     });
@@ -115,7 +115,7 @@ describe('ast type helpers', () => {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
         typeArguments: { params: [{ type: AST_NODE_TYPES.TSTypeLiteral, members: [] }] },
-      } as any;
+      } as unknown;
 
       expect(hasNamedTypeReferenceWithTypeArguments(node, 'Readonly')).toBe(true);
     });
@@ -125,11 +125,11 @@ describe('ast type helpers', () => {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Props' },
         typeArguments: { params: [{ type: AST_NODE_TYPES.TSTypeLiteral, members: [] }] },
-      } as any;
+      } as unknown;
       const missingArgsNode = {
         type: AST_NODE_TYPES.TSTypeReference,
         typeName: { type: AST_NODE_TYPES.Identifier, name: 'Readonly' },
-      } as any;
+      } as unknown;
 
       expect(hasNamedTypeReferenceWithTypeArguments(mismatchedNode, 'Readonly')).toBe(false);
       expect(hasNamedTypeReferenceWithTypeArguments(missingArgsNode, 'Readonly')).toBe(false);
@@ -148,13 +148,13 @@ describe('ast type helpers', () => {
             expression: inner,
           },
         },
-      } as any;
+      } as unknown;
 
       expect(unwrapTsExpression(node)).toBe(inner);
     });
 
     it('should return the original expression when no wrapper is present', () => {
-      const node = { type: AST_NODE_TYPES.Identifier, name: 'value' } as any;
+      const node = { type: AST_NODE_TYPES.Identifier, name: 'value' } as unknown;
 
       expect(unwrapTsExpression(node)).toBe(node);
     });

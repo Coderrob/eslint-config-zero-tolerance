@@ -82,8 +82,8 @@ type RequireJsdocAnonymousFunctionsContext = Readonly<
  */
 function buildMissingJsdocBlock(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  targetNode: TSESTree.Node,
-  node: FunctionNode,
+  targetNode: Readonly<TSESTree.Node>,
+  node: Readonly<FunctionNode>,
 ): string {
   const indent = getLineIndentation(sourceCode, targetNode);
   const lines = [
@@ -105,9 +105,9 @@ function buildMissingJsdocBlock(
  */
 function createMissingJsdocFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  targetNode: TSESTree.Node,
-  node: FunctionNode,
-  fixer: TSESLint.RuleFixer,
+  targetNode: Readonly<TSESTree.Node>,
+  node: Readonly<FunctionNode>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix | null {
   if (targetNode.type === AST_NODE_TYPES.VariableDeclarator) {
     return null;
@@ -130,7 +130,7 @@ function createMissingJsdocFix(
  * @returns Rule listeners.
  */
 function createRequireJsdocAnonymousFunctionsListeners(
-  context: RequireJsdocAnonymousFunctionsContext,
+  context: Readonly<RequireJsdocAnonymousFunctionsContext>,
 ): TSESLint.RuleListener {
   if (isTestFile(context.filename)) {
     return {};
@@ -179,7 +179,7 @@ function hasKnownTestCallbackPathShape(
  * @param callee - Callee node to inspect.
  * @returns True when the callee is a known test callback API.
  */
-function isKnownTestCallbackCallee(callee: TSESTree.Node): boolean {
+function isKnownTestCallbackCallee(callee: Readonly<TSESTree.Node>): boolean {
   const calleeNamePath = getCalleeNamePath(callee);
   if (calleeNamePath === null) {
     return false;
@@ -197,7 +197,7 @@ function isKnownTestCallbackCallee(callee: TSESTree.Node): boolean {
  * @param node - Function node to inspect.
  * @returns True when the function is used as a test callback or hook.
  */
-function isKnownTestCallbackFunction(node: FunctionNode): boolean {
+function isKnownTestCallbackFunction(node: Readonly<FunctionNode>): boolean {
   if (node.type === AST_NODE_TYPES.FunctionDeclaration || !isCallExpressionNode(node.parent)) {
     return false;
   }
@@ -235,9 +235,9 @@ function isKnownTestCallbackPrefixName(name: string): boolean {
  * @param node - Function-like AST node.
  */
 function reportMissingAnonymousJsdoc(
-  context: RequireJsdocAnonymousFunctionsContext,
+  context: Readonly<RequireJsdocAnonymousFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
 ): void {
   const targetNode = getTargetNode(node);
   if (!shouldReportAnonymousJsdoc(node, sourceCode, targetNode)) {
@@ -255,10 +255,10 @@ function reportMissingAnonymousJsdoc(
  * @param targetNode - JSDoc owner node for the function.
  */
 function reportMissingAnonymousJsdocForTarget(
-  context: RequireJsdocAnonymousFunctionsContext,
+  context: Readonly<RequireJsdocAnonymousFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  targetNode: TSESTree.Node,
+  node: Readonly<FunctionNode>,
+  targetNode: Readonly<TSESTree.Node>,
 ): void {
   context.report({
     node,
@@ -277,9 +277,9 @@ function reportMissingAnonymousJsdocForTarget(
  * @returns True when the function is anonymous and missing JSDoc.
  */
 function shouldReportAnonymousJsdoc(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  targetNode: TSESTree.Node,
+  targetNode: Readonly<TSESTree.Node>,
 ): boolean {
   if (resolveFunctionName(node) !== ANONYMOUS_FUNCTION_NAME) {
     return false;

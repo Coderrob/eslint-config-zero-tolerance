@@ -21,25 +21,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { getVisitorChildNodes } from '../ast-helpers';
 
-/**
- * Appends traversable children for the current search node.
- *
- * @param pendingNodes - Remaining nodes to search.
- * @param currentNode - Current node being inspected.
- * @param sourceCode - ESLint source code helper.
- * @param stopPredicate - Optional traversal-stop predicate.
- */
-function appendSearchChildren(
-  pendingNodes: TSESTree.Node[],
-  currentNode: TSESTree.Node,
-  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
-  stopPredicate: ((candidate: TSESTree.Node) => boolean) | undefined,
-): void {
-  if (stopPredicate?.(currentNode) ?? false) {
-    return;
-  }
-  pendingNodes.push(...getVisitorChildNodes(currentNode, sourceCode));
-}
+const LAST_ITEM_OFFSET = 1;
 
 /**
  * Returns the first descendant node that satisfies the predicate, or null.
@@ -54,43 +36,52 @@ function appendSearchChildren(
  * @returns First matching descendant node, or null when no match exists.
  */
 export function findDescendant<T extends TSESTree.Node>(
-  node: TSESTree.Node,
-  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
+  node: Readonly<TSESTree.Node>,
+  sourceCode: Readonly<Pick<TSESLint.SourceCode, 'visitorKeys'>>,
   predicate: (candidate: TSESTree.Node) => candidate is T,
   stopPredicate?: (candidate: TSESTree.Node) => boolean,
 ): T | null {
-  const pendingNodes: TSESTree.Node[] = [node];
+  let pendingNodes: ReadonlyArray<TSESTree.Node> = [node];
   while (hasPendingNodes(pendingNodes)) {
-    const currentNode = popPendingNode(pendingNodes);
+    const currentNode = getLastPendingNode(pendingNodes);
+    const remainingNodes = pendingNodes.slice(0, -LAST_ITEM_OFFSET);
     if (predicate(currentNode)) {
       return currentNode;
     }
-    appendSearchChildren(pendingNodes, currentNode, sourceCode, stopPredicate);
+    pendingNodes = getNextPendingNodes(remainingNodes, currentNode, sourceCode, stopPredicate);
   }
   return null;
 }
 
 /**
- * Returns true when the search stack still contains nodes to visit.
- *
- * @param pendingNodes - Remaining nodes to search.
- * @returns True when at least one node remains.
- */
-function hasPendingNodes(pendingNodes: ReadonlyArray<TSESTree.Node>): boolean {
-  return pendingNodes.length > 0;
-}
-
-/**
- * Removes and returns the next node to inspect from the search stack.
+ * Returns the next node to inspect from the search stack.
  *
  * @param pendingNodes - Remaining nodes to search.
  * @returns Next node to inspect.
  */
-function popPendingNode(pendingNodes: TSESTree.Node[]): TSESTree.Node {
-  const lastIndex = pendingNodes.length - 1;
-  const currentNode = pendingNodes[lastIndex];
-  pendingNodes.length = lastIndex;
-  return currentNode;
+function getLastPendingNode(pendingNodes: ReadonlyArray<TSESTree.Node>): TSESTree.Node {
+  return pendingNodes[pendingNodes.length - LAST_ITEM_OFFSET];
+}
+
+/**
+ * Returns the next search stack after visiting the current node.
+ *
+ * @param remainingNodes - Remaining nodes to search.
+ * @param currentNode - Current node being inspected.
+ * @param sourceCode - ESLint source code helper.
+ * @param stopPredicate - Optional traversal-stop predicate.
+ * @returns Updated search stack.
+ */
+function getNextPendingNodes(
+  remainingNodes: ReadonlyArray<TSESTree.Node>,
+  currentNode: Readonly<TSESTree.Node>,
+  sourceCode: Readonly<Pick<TSESLint.SourceCode, 'visitorKeys'>>,
+  stopPredicate: ((candidate: TSESTree.Node) => boolean) | undefined,
+): ReadonlyArray<TSESTree.Node> {
+  if (stopPredicate?.(currentNode) ?? false) {
+    return remainingNodes;
+  }
+  return [...remainingNodes, ...getVisitorChildNodes(currentNode, sourceCode)];
 }
 
 /**
@@ -102,11 +93,21 @@ function popPendingNode(pendingNodes: TSESTree.Node[]): TSESTree.Node {
  * @param stopPredicate - Optional traversal-stop predicate.
  * @returns True when a matching descendant exists.
  */
-export function someDescendant<T extends TSESTree.Node>(
-  node: TSESTree.Node,
-  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
+export function hasDescendant<T extends TSESTree.Node>(
+  node: Readonly<TSESTree.Node>,
+  sourceCode: Readonly<Pick<TSESLint.SourceCode, 'visitorKeys'>>,
   predicate: (candidate: TSESTree.Node) => candidate is T,
   stopPredicate?: (candidate: TSESTree.Node) => boolean,
 ): boolean {
   return findDescendant(node, sourceCode, predicate, stopPredicate) !== null;
+}
+
+/**
+ * Returns true when the search stack still contains nodes to visit.
+ *
+ * @param pendingNodes - Remaining nodes to search.
+ * @returns True when at least one node remains.
+ */
+function hasPendingNodes(pendingNodes: ReadonlyArray<TSESTree.Node>): boolean {
+  return pendingNodes.length > 0;
 }

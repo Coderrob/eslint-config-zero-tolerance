@@ -42,6 +42,9 @@ const MAX_DEPTH = 3;
 /** Root directory for type-aware parser resolution */
 const ROOT_DIR = path.dirname(fileURLToPath(import.meta.url));
 
+/** Strict zero-tolerance rules used to dogfood the plugin across this repository. */
+const ZERO_TOLERANCE_STRICT_RULES = zeroTolerancePlugin.configs.strict.rules;
+
 /** Jest global variables for test files */
 const JEST_GLOBALS = {
   afterAll: 'readonly',
@@ -58,6 +61,7 @@ const JEST_GLOBALS = {
 /** Files and directories to ignore */
 const IGNORE_PATTERNS = [
   '**/*.d.ts',
+  '**/coverage/**',
   '**/dist/**',
   '**/jest.config.js',
   '**/node_modules/**',
@@ -129,46 +133,9 @@ const baseConfig = {
     'no-warning-comments': ['error', { terms: ['TODO', 'FIXME', 'XXX'], location: 'start' }],
 
     // Zero-tolerance plugin rules (dogfooding)
-    // Code quality and style
-    'zero-tolerance/require-interface-prefix': 'error',
-    'zero-tolerance/sort-imports': 'error',
-    'zero-tolerance/sort-functions': 'error',
+    ...ZERO_TOLERANCE_STRICT_RULES,
 
-    // Documentation and naming
-    'zero-tolerance/require-jsdoc-anonymous-functions': 'error',
-    'zero-tolerance/require-jsdoc-functions': 'error',
-    'zero-tolerance/require-test-description-style': 'error',
-
-    // Type safety and assertions
-    'zero-tolerance/no-indexed-access-types': 'error',
-    'zero-tolerance/no-literal-unions': 'error',
-    'zero-tolerance/no-type-assertion': 'error',
-    'zero-tolerance/no-non-null-assertion': 'error',
-    'zero-tolerance/no-return-type': 'error',
-
-    // Import/export patterns
-    'zero-tolerance/require-barrel-relative-exports': 'error',
-    'zero-tolerance/require-clean-barrel': 'error',
-    'zero-tolerance/no-re-export': 'error',
-    'zero-tolerance/no-dynamic-import': 'error',
-    'zero-tolerance/no-export-alias': 'error',
-
-    // Error handling
-    'zero-tolerance/no-empty-catch': 'error',
-    'zero-tolerance/no-throw-literal': 'error',
-
-    // Control flow and async
-    'zero-tolerance/no-await-in-loop': 'error',
-    'zero-tolerance/no-floating-promises': 'error',
-
-    // Code analysis
-    'zero-tolerance/no-identical-expressions': 'error',
-    'zero-tolerance/no-redundant-boolean': 'error',
-    'zero-tolerance/no-eslint-disable': 'error',
-
-    // Code metrics
-    'zero-tolerance/no-magic-numbers': 'error',
-    'zero-tolerance/no-magic-strings': 'error',
+    // Repository-specific stricter metrics
     'zero-tolerance/max-function-lines': ['error', { max: MAX_FUNCTION_LINES }],
     'zero-tolerance/max-params': ['error', { max: MAX_PARAMS }],
   },
@@ -199,9 +166,6 @@ const testConfig = {
     'max-depth': 'off',
     'no-warning-comments': 'off',
     'zero-tolerance/max-function-lines': 'off',
-    'zero-tolerance/no-dynamic-import': 'off',
-    'zero-tolerance/no-magic-numbers': 'off',
-    'zero-tolerance/no-type-assertion': 'off',
   },
 };
 
@@ -212,8 +176,24 @@ const ignoreConfig = {
   ignores: IGNORE_PATTERNS,
 };
 
+/**
+ * Configuration for ESLint's own inline directive handling.
+ */
+const linterOptionsConfig = {
+  linterOptions: {
+    noInlineConfig: true,
+    reportUnusedDisableDirectives: 'error',
+  },
+};
+
 // ============================================================================
 // Export
 // ============================================================================
 
-export default [eslint.configs.recommended, baseConfig, testConfig, ignoreConfig];
+export default [
+  eslint.configs.recommended,
+  linterOptionsConfig,
+  baseConfig,
+  testConfig,
+  ignoreConfig,
+];

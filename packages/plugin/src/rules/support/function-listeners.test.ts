@@ -3,23 +3,28 @@ import {
   createFunctionNodeListeners,
 } from './function-listeners';
 
+const ARROW_FUNCTION_CALL_INDEX = 1;
+const DECLARATION_FUNCTION_CALL_INDEX = 2;
+const EXPRESSION_FUNCTION_CALL_INDEX = 3;
+const STANDARD_FUNCTION_NODE_COUNT = 3;
+
 describe('function-listeners', () => {
   describe('createFunctionNodeListeners', () => {
     it('should create listeners for all standard function-like nodes', () => {
       const listener = jest.fn();
       const ruleListener = createFunctionNodeListeners(listener);
-      const arrowNode = { type: 'ArrowFunctionExpression' } as any;
-      const declarationNode = { type: 'FunctionDeclaration' } as any;
-      const expressionNode = { type: 'FunctionExpression' } as any;
+      const arrowNode = { type: 'ArrowFunctionExpression' } as unknown;
+      const declarationNode = { type: 'FunctionDeclaration' } as unknown;
+      const expressionNode = { type: 'FunctionExpression' } as unknown;
 
       ruleListener.ArrowFunctionExpression?.(arrowNode);
       ruleListener.FunctionDeclaration?.(declarationNode);
       ruleListener.FunctionExpression?.(expressionNode);
 
-      expect(listener).toHaveBeenCalledTimes(3);
-      expect(listener).toHaveBeenNthCalledWith(1, arrowNode);
-      expect(listener).toHaveBeenNthCalledWith(2, declarationNode);
-      expect(listener).toHaveBeenNthCalledWith(3, expressionNode);
+      expect(listener).toHaveBeenCalledTimes(STANDARD_FUNCTION_NODE_COUNT);
+      expect(listener).toHaveBeenNthCalledWith(ARROW_FUNCTION_CALL_INDEX, arrowNode);
+      expect(listener).toHaveBeenNthCalledWith(DECLARATION_FUNCTION_CALL_INDEX, declarationNode);
+      expect(listener).toHaveBeenNthCalledWith(EXPRESSION_FUNCTION_CALL_INDEX, expressionNode);
     });
   });
 
@@ -28,9 +33,9 @@ describe('function-listeners', () => {
       const enterListener = jest.fn();
       const exitListener = jest.fn();
       const ruleListener = createFunctionNodeEnterExitListeners(enterListener, exitListener);
-      const arrowNode = { type: 'ArrowFunctionExpression' } as any;
-      const declarationNode = { type: 'FunctionDeclaration' } as any;
-      const expressionNode = { type: 'FunctionExpression' } as any;
+      const arrowNode = { type: 'ArrowFunctionExpression' } as unknown;
+      const declarationNode = { type: 'FunctionDeclaration' } as unknown;
+      const expressionNode = { type: 'FunctionExpression' } as unknown;
 
       ruleListener.ArrowFunctionExpression?.(arrowNode);
       ruleListener.FunctionDeclaration?.(declarationNode);
@@ -39,14 +44,20 @@ describe('function-listeners', () => {
       ruleListener['FunctionDeclaration:exit']?.(declarationNode);
       ruleListener['FunctionExpression:exit']?.(expressionNode);
 
-      expect(enterListener).toHaveBeenCalledTimes(3);
-      expect(enterListener).toHaveBeenNthCalledWith(1, arrowNode);
-      expect(enterListener).toHaveBeenNthCalledWith(2, declarationNode);
-      expect(enterListener).toHaveBeenNthCalledWith(3, expressionNode);
-      expect(exitListener).toHaveBeenCalledTimes(3);
-      expect(exitListener).toHaveBeenNthCalledWith(1, arrowNode);
-      expect(exitListener).toHaveBeenNthCalledWith(2, declarationNode);
-      expect(exitListener).toHaveBeenNthCalledWith(3, expressionNode);
+      expect(enterListener).toHaveBeenCalledTimes(STANDARD_FUNCTION_NODE_COUNT);
+      expect(enterListener).toHaveBeenNthCalledWith(ARROW_FUNCTION_CALL_INDEX, arrowNode);
+      expect(enterListener).toHaveBeenNthCalledWith(
+        DECLARATION_FUNCTION_CALL_INDEX,
+        declarationNode,
+      );
+      expect(enterListener).toHaveBeenNthCalledWith(EXPRESSION_FUNCTION_CALL_INDEX, expressionNode);
+      expect(exitListener).toHaveBeenCalledTimes(STANDARD_FUNCTION_NODE_COUNT);
+      expect(exitListener).toHaveBeenNthCalledWith(ARROW_FUNCTION_CALL_INDEX, arrowNode);
+      expect(exitListener).toHaveBeenNthCalledWith(
+        DECLARATION_FUNCTION_CALL_INDEX,
+        declarationNode,
+      );
+      expect(exitListener).toHaveBeenNthCalledWith(EXPRESSION_FUNCTION_CALL_INDEX, expressionNode);
     });
   });
 });

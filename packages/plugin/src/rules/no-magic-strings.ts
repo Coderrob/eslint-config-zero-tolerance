@@ -46,9 +46,9 @@ type RuleOptions = [INoMagicStringsOptions];
  * @param node - Literal node to inspect.
  */
 function checkLiteral(
-  context: NoMagicStringsContext,
-  options: IResolvedNoMagicStringsOptions,
-  node: TSESTree.Literal,
+  context: Readonly<NoMagicStringsContext>,
+  options: Readonly<IResolvedNoMagicStringsOptions>,
+  node: Readonly<TSESTree.Literal>,
 ): void {
   const value = getStringValue(node);
   if (value === null || options.ignoreValues.has(value)) {
@@ -69,7 +69,9 @@ function checkLiteral(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoMagicStringsListeners(context: NoMagicStringsContext): TSESLint.RuleListener {
+function createNoMagicStringsListeners(
+  context: Readonly<NoMagicStringsContext>,
+): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
     Literal: checkLiteral.bind(undefined, context, options),
@@ -82,7 +84,7 @@ function createNoMagicStringsListeners(context: NoMagicStringsContext): TSESLint
  * @param node - The literal node to extract the string value from.
  * @returns The string value if valid, otherwise null.
  */
-function getStringValue(node: TSESTree.Literal): string | null {
+function getStringValue(node: Readonly<TSESTree.Literal>): string | null {
   const value = getLiteralStringValue(node);
   if (value === null || value === '') {
     return null;
@@ -112,8 +114,8 @@ function isComparableBinaryExpression(
  * @returns True if the literal is in a comparison expression, false otherwise.
  */
 function isComparisonContextEnabled(
-  node: TSESTree.Literal,
-  options: IResolvedNoMagicStringsOptions,
+  node: Readonly<TSESTree.Literal>,
+  options: Readonly<IResolvedNoMagicStringsOptions>,
 ): boolean {
   return options.checkComparisons && isInComparisonExpression(node);
 }
@@ -124,7 +126,7 @@ function isComparisonContextEnabled(
  * @param node - The literal node to check.
  * @returns True if the literal is in a switch case, false otherwise.
  */
-function isInComparisonExpression(node: TSESTree.Literal): boolean {
+function isInComparisonExpression(node: Readonly<TSESTree.Literal>): boolean {
   if (!isBinaryExpressionNode(node.parent)) {
     return false;
   }
@@ -137,7 +139,7 @@ function isInComparisonExpression(node: TSESTree.Literal): boolean {
  * @param node - The literal node to check.
  * @returns True if the literal is in a typeof comparison, false otherwise.
  */
-function isInSwitchCase(node: TSESTree.Literal): boolean {
+function isInSwitchCase(node: Readonly<TSESTree.Literal>): boolean {
   return isSwitchCaseNode(node.parent) && node.parent.test === node;
 }
 
@@ -147,7 +149,7 @@ function isInSwitchCase(node: TSESTree.Literal): boolean {
  * @param node - Candidate parent node.
  * @returns True when node is a supported binary comparison.
  */
-function isInTypeofComparison(node: TSESTree.Literal): boolean {
+function isInTypeofComparison(node: Readonly<TSESTree.Literal>): boolean {
   const parentExpression = node.parent;
   if (!isComparableBinaryExpression(parentExpression)) {
     return false;
@@ -165,8 +167,8 @@ function isInTypeofComparison(node: TSESTree.Literal): boolean {
  * @returns True if the literal is in a forbidden context, false otherwise.
  */
 function isMagicStringContext(
-  node: TSESTree.Literal,
-  options: IResolvedNoMagicStringsOptions,
+  node: Readonly<TSESTree.Literal>,
+  options: Readonly<IResolvedNoMagicStringsOptions>,
 ): boolean {
   if (isInTypeofComparison(node)) {
     return false;
@@ -185,8 +187,8 @@ function isMagicStringContext(
  * @returns True when switch-case context should report.
  */
 function isSwitchCaseContextEnabled(
-  node: TSESTree.Literal,
-  options: IResolvedNoMagicStringsOptions,
+  node: Readonly<TSESTree.Literal>,
+  options: Readonly<IResolvedNoMagicStringsOptions>,
 ): boolean {
   return options.checkSwitchCases && isInSwitchCase(node);
 }
@@ -197,37 +199,11 @@ function isSwitchCaseContextEnabled(
  * @param expression - Expression node.
  * @returns True when expression is `typeof ...`.
  */
-function isTypeofUnaryExpression(expression: TSESTree.Node): boolean {
+function isTypeofUnaryExpression(expression: Readonly<TSESTree.Node>): boolean {
   if (expression.type !== AST_NODE_TYPES.UnaryExpression) {
     return false;
   }
   return expression.operator === TYPEOF_OPERATOR;
-}
-
-/**
- * Resolves check-comparisons option with default.
- *
- * @param raw - Raw rule options object.
- * @returns Resolved boolean option.
- */
-function resolveCheckComparisonsOption(raw: INoMagicStringsOptions | undefined): boolean {
-  if (raw?.checkComparisons === undefined) {
-    return true;
-  }
-  return raw.checkComparisons;
-}
-
-/**
- * Resolves check-switch-cases option with default.
- *
- * @param raw - Raw rule options object.
- * @returns Resolved boolean option.
- */
-function resolveCheckSwitchCasesOption(raw: INoMagicStringsOptions | undefined): boolean {
-  if (raw?.checkSwitchCases === undefined) {
-    return true;
-  }
-  return raw.checkSwitchCases;
 }
 
 /**
@@ -246,13 +222,39 @@ function resolveIgnoreValuesOption(raw: INoMagicStringsOptions | undefined): Set
  * @param options - Raw rule options.
  * @returns Resolved rule options.
  */
-function resolveOptions(options: RuleOptions): IResolvedNoMagicStringsOptions {
+function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoMagicStringsOptions {
   const raw = options[0];
   return {
-    checkComparisons: resolveCheckComparisonsOption(raw),
-    checkSwitchCases: resolveCheckSwitchCasesOption(raw),
+    checkComparisons: shouldCheckComparisons(raw),
+    checkSwitchCases: shouldCheckSwitchCases(raw),
     ignoreValues: resolveIgnoreValuesOption(raw),
   };
+}
+
+/**
+ * Resolves check-comparisons option with default.
+ *
+ * @param raw - Raw rule options object.
+ * @returns Resolved boolean option.
+ */
+function shouldCheckComparisons(raw: INoMagicStringsOptions | undefined): boolean {
+  if (raw?.checkComparisons === undefined) {
+    return true;
+  }
+  return raw.checkComparisons;
+}
+
+/**
+ * Resolves check-switch-cases option with default.
+ *
+ * @param raw - Raw rule options object.
+ * @returns Resolved boolean option.
+ */
+function shouldCheckSwitchCases(raw: INoMagicStringsOptions | undefined): boolean {
+  if (raw?.checkSwitchCases === undefined) {
+    return true;
+  }
+  return raw.checkSwitchCases;
 }
 
 /**
