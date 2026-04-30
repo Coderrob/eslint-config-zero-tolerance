@@ -125,7 +125,7 @@ function buildPrefixedRuleName(ruleName: string): string {
  */
 export function buildRules(preset: Readonly<Preset>): Linter.RulesRecord {
   return Object.fromEntries(
-    Object.entries(ruleMap).map(([name, config]) => mapRuleForPreset(name, config, preset)),
+    Object.entries(ruleMap).map(mapRuleEntryForPreset.bind(undefined, preset)),
   );
 }
 
@@ -162,8 +162,25 @@ function createRuleEntry(
  * @param preset - Requested preset.
  * @returns The matching rule entry.
  */
-function getPresetRuleConfig(config: Readonly<IRuleConfig>, preset: Readonly<Preset>): Linter.RuleEntry {
+function getPresetRuleConfig(
+  config: Readonly<IRuleConfig>,
+  preset: Readonly<Preset>,
+): Linter.RuleEntry {
   return preset === Preset.Strict ? config.strict : config.recommended;
+}
+
+/**
+ * Maps one rule map entry to its configured preset value.
+ *
+ * @param preset - Requested preset.
+ * @param entry - Rule map entry.
+ * @returns Prefixed rule name and ESLint rule setting.
+ */
+function mapRuleEntryForPreset(
+  preset: Readonly<Preset>,
+  [name, config]: Readonly<RuleEntryTuple>,
+): readonly [string, Linter.RuleEntry] {
+  return mapRuleForPreset(name, config, preset);
 }
 
 /**

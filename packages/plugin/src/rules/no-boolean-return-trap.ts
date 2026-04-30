@@ -34,7 +34,10 @@ type NoBooleanReturnTrapContext = Readonly<TSESLint.RuleContext<'noBooleanReturn
  * @param context - ESLint rule execution context.
  * @param node - Function node.
  */
-function checkFunctionNode(context: Readonly<NoBooleanReturnTrapContext>, node: Readonly<FunctionNode>): void {
+function checkFunctionNode(
+  context: Readonly<NoBooleanReturnTrapContext>,
+  node: Readonly<FunctionNode>,
+): void {
   const functionName = resolveFunctionName(node);
   const returnTypeAnnotation = node.returnType;
   if (

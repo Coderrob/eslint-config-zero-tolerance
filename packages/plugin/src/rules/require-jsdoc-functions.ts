@@ -53,6 +53,21 @@ const RETURNS_DESCRIPTION_PLACEHOLDER = 'TODO: describe return value';
 const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
 const THROWS_DESCRIPTION_PLACEHOLDER = 'TODO: describe error condition';
 
+type NamedKeyParentNode =
+  | TSESTree.MethodDefinition
+  | TSESTree.PropertyDefinition
+  | TSESTree.Property;
+
+/**
+ * Appends one line to a line accumulator.
+ *
+ * @param lines - Line accumulator.
+ * @param line - Line to append.
+ */
+function appendLine(lines: readonly string[], line: string): void {
+  Reflect.apply(Array.prototype.push, lines, [line]);
+}
+
 export enum RequireJsdocFunctionsMessageId {
   MissingJsdoc = 'missingJsdoc',
   MissingJsdocParam = 'missingJsdocParam',
@@ -117,12 +132,12 @@ function appendToSingleLineComment(commentText: string, tagLines: ReadonlyArray<
   const inlineDescription = commentText.slice(COMMENT_PREFIX_LENGTH, -COMMENT_SUFFIX_LENGTH).trim();
   const lines = ['/**'];
   if (inlineDescription.length > 0) {
-    lines.push(` * ${inlineDescription}`);
+    appendLine(lines, ` * ${inlineDescription}`);
   }
   for (const tagLine of tagLines) {
-    lines.push(` * ${tagLine}`);
+    appendLine(lines, ` * ${tagLine}`);
   }
-  lines.push(' */');
+  appendLine(lines, ' */');
   return lines.join('\n');
 }
 
@@ -143,9 +158,9 @@ function buildMissingJsdocBlock(
   const lines = [`${indent}/**`, `${indent} * ${getSummaryDescriptionLine(node)}`];
   const missingTagLines = getMissingTagLines(node, sourceCode, null);
   for (const tagLine of missingTagLines) {
-    lines.push(`${indent} * ${tagLine}`);
+    appendLine(lines, `${indent} * ${tagLine}`);
   }
-  lines.push(`${indent} */`);
+  appendLine(lines, `${indent} */`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -261,11 +276,7 @@ function getMissingParamTagNames(
   if (existingParamTags >= node.params.length) {
     return [];
   }
-  const names: string[] = [];
-  for (let index = existingParamTags; index < node.params.length; index += 1) {
-    names.push(getParamTagName(node.params[index], index + 1));
-  }
-  return names;
+  return node.params.slice(existingParamTags).map(getParamTagNameAfterOffset.bind(undefined, existingParamTags));
 }
 
 /**
@@ -284,13 +295,13 @@ function getMissingTagLines(
   const missingTags: string[] = [];
   const missingParams = getMissingParamTagNames(node, jsdocComment);
   for (const name of missingParams) {
-    missingTags.push(`@${JsdocTagName.Param} ${name} ${PARAM_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Param} ${name} ${PARAM_DESCRIPTION_PLACEHOLDER}`);
   }
   if (isMissingReturnsTag(node, sourceCode, jsdocComment)) {
-    missingTags.push(`@${JsdocTagName.Returns} ${RETURNS_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Returns} ${RETURNS_DESCRIPTION_PLACEHOLDER}`);
   }
   if (isMissingThrowsTag(node, sourceCode, jsdocComment)) {
-    missingTags.push(`@${JsdocTagName.Throws} {Error} ${THROWS_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Throws} {Error} ${THROWS_DESCRIPTION_PLACEHOLDER}`);
   }
   return missingTags;
 }
@@ -320,6 +331,22 @@ function getParamTagName(param: Readonly<TSESTree.Parameter>, position: number):
 }
 
 /**
+ * Returns a generated JSDoc parameter name after an existing tag offset.
+ *
+ * @param offset - Existing param tag count.
+ * @param param - Parameter node.
+ * @param index - Zero-based missing parameter index.
+ * @returns Parameter name for generated JSDoc.
+ */
+function getParamTagNameAfterOffset(
+  offset: number,
+  param: Readonly<TSESTree.Parameter>,
+  index: number,
+): string {
+  return getParamTagName(param, offset + index + 1);
+}
+
+/**
  * Returns a one-line summary sentence for generated JSDoc blocks.
  *
  * @param node - Function node to describe.
@@ -337,7 +364,7 @@ function getSummaryDescriptionLine(node: Readonly<FunctionNode>): string {
  */
 function hasIdentifierKey(
   parent: TSESTree.Node | null | undefined,
-): parent is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+): parent is NamedKeyParentNode {
   return isNamedKeyParentNode(parent) && isIdentifierNode(parent.key);
 }
 
@@ -348,7 +375,10 @@ function hasIdentifierKey(
  * @param tagName - Tag name without `@`.
  * @returns True when the tag exists.
  */
-function hasJsdocTag(comment: Readonly<TSESTree.Comment>, tagName: Readonly<JsdocTagName>): boolean {
+function hasJsdocTag(
+  comment: Readonly<TSESTree.Comment>,
+  tagName: Readonly<JsdocTagName>,
+): boolean {
   return new RegExp(String.raw`@${tagName}\b`, 'u').test(comment.value);
 }
 
@@ -388,7 +418,10 @@ function hasReturnWithValue(
  * @param sourceCode - ESLint source code helper.
  * @returns True when function throws.
  */
-function hasThrowStatement(node: Readonly<FunctionNode>, sourceCode: Readonly<TSESLint.SourceCode>): boolean {
+function hasThrowStatement(
+  node: Readonly<FunctionNode>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): boolean {
   if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
     return false;
   }
@@ -459,7 +492,7 @@ function isMissingThrowsTag(
  */
 function isNamedKeyParentNode(
   node: TSESTree.Node | null | undefined,
-): node is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+): node is NamedKeyParentNode {
   return node !== null && node !== undefined && NAMED_KEY_PARENT_TYPES.has(node.type);
 }
 

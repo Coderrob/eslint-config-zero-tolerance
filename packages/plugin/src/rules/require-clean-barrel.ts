@@ -28,8 +28,11 @@ type RequireCleanBarrelContext = Readonly<TSESLint.RuleContext<'cleanBarrelOnlyR
  * @param context - ESLint rule execution context.
  * @param program - Program node.
  */
-function checkProgram(context: Readonly<RequireCleanBarrelContext>, program: Readonly<TSESTree.Program>): void {
-  if (!containsModuleReExport(program.body)) {
+function checkProgram(
+  context: Readonly<RequireCleanBarrelContext>,
+  program: Readonly<TSESTree.Program>,
+): void {
+  if (!hasModuleReExport(program.body)) {
     return;
   }
   for (const statement of program.body) {
@@ -37,16 +40,6 @@ function checkProgram(context: Readonly<RequireCleanBarrelContext>, program: Rea
       reportDisallowedBarrelStatement(context, statement);
     }
   }
-}
-
-/**
- * Returns true when a program includes at least one module re-export declaration.
- *
- * @param statements - Program statements.
- * @returns True when any statement is a module re-export declaration.
- */
-function containsModuleReExport(statements: ReadonlyArray<TSESTree.ProgramStatement>): boolean {
-  return statements.some(isAllowedBarrelStatement);
 }
 
 /**
@@ -64,6 +57,16 @@ function createRequireCleanBarrelListeners(
   return {
     Program: checkProgram.bind(undefined, context),
   };
+}
+
+/**
+ * Returns true when a program includes at least one module re-export declaration.
+ *
+ * @param statements - Program statements.
+ * @returns True when any statement is a module re-export declaration.
+ */
+function hasModuleReExport(statements: ReadonlyArray<TSESTree.ProgramStatement>): boolean {
+  return statements.some(isAllowedBarrelStatement);
 }
 
 /**

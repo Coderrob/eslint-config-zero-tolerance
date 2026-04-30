@@ -37,7 +37,10 @@ function createNoWithListeners(context: Readonly<NoWithContext>): TSESLint.RuleL
  * @param context - ESLint rule execution context.
  * @param node - With statement node.
  */
-function reportWithUsage(context: Readonly<NoWithContext>, node: Readonly<TSESTree.WithStatement>): void {
+function reportWithUsage(
+  context: Readonly<NoWithContext>,
+  node: Readonly<TSESTree.WithStatement>,
+): void {
   context.report({
     node,
     messageId: 'noWith',

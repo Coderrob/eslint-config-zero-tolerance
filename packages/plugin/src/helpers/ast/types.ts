@@ -21,13 +21,20 @@
 import type { TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 
+type TsWrapperExpression =
+  | TSESTree.TSAsExpression
+  | TSESTree.TSNonNullExpression
+  | TSESTree.TSSatisfiesExpression;
+
 /**
  * Returns the first type argument for a type reference, or null.
  *
  * @param node - Type-reference node.
  * @returns First type argument when present, otherwise null.
  */
-export function getFirstTypeArgument(node: Readonly<TSESTree.TSTypeReference>): TSESTree.TypeNode | null {
+export function getFirstTypeArgument(
+  node: Readonly<TSESTree.TSTypeReference>,
+): TSESTree.TypeNode | null {
   return node.typeArguments?.params[0] ?? null;
 }
 
@@ -106,10 +113,7 @@ export function isNamedTypeReference(
  */
 function isTsWrapperExpression(
   expression: Readonly<TSESTree.Expression>,
-): expression is
-  | TSESTree.TSAsExpression
-  | TSESTree.TSNonNullExpression
-  | TSESTree.TSSatisfiesExpression {
+): expression is TsWrapperExpression {
   return (
     expression.type === AST_NODE_TYPES.TSAsExpression ||
     expression.type === AST_NODE_TYPES.TSNonNullExpression ||

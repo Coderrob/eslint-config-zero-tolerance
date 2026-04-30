@@ -30,6 +30,11 @@ interface IResolvedNoThrowLiteralOptions {
   allowThrowingMemberExpressions: boolean;
 }
 
+interface IBooleanOptionResolution {
+  fallback: boolean;
+  value: boolean | undefined;
+}
+
 type NoThrowLiteralContext = Readonly<TSESLint.RuleContext<'noThrowLiteral', RuleOptions>>;
 type RuleOptions = [INoThrowLiteralOptions?];
 
@@ -74,7 +79,9 @@ function checkThrowStatement(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoThrowLiteralListeners(context: Readonly<NoThrowLiteralContext>): TSESLint.RuleListener {
+function createNoThrowLiteralListeners(
+  context: Readonly<NoThrowLiteralContext>,
+): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
     ThrowStatement: checkThrowStatement.bind(undefined, context, options),
@@ -115,7 +122,10 @@ function getCatchParameterName(node: Readonly<TSESTree.Node>): string | null {
  * @param identifierName - Identifier being thrown.
  * @returns Boolean decision, or null when walk should continue.
  */
-function getCatchScopeDecision(node: Readonly<TSESTree.Node>, identifierName: string): boolean | null {
+function getCatchScopeDecision(
+  node: Readonly<TSESTree.Node>,
+  identifierName: string,
+): boolean | null {
   if (isFunctionBoundaryNode(node)) {
     return false;
   }
@@ -129,7 +139,9 @@ function getCatchScopeDecision(node: Readonly<TSESTree.Node>, identifierName: st
  * @param options - Resolved rule options.
  * @returns Lookup of node type to option-enabled allowance.
  */
-function getThrowNodeOptionLookup(options: Readonly<IResolvedNoThrowLiteralOptions>): Map<string, boolean> {
+function getThrowNodeOptionLookup(
+  options: Readonly<IResolvedNoThrowLiteralOptions>,
+): Map<string, boolean> {
   return new Map([
     [AST_NODE_TYPES.AwaitExpression, options.allowThrowingAwaitExpressions],
     [AST_NODE_TYPES.CallExpression, options.allowThrowingCallExpressions],
@@ -158,21 +170,45 @@ function isAllowedThrowArgument(
 }
 
 /**
+ * Resolves a boolean option value with fallback.
+ *
+ * @param value - Raw option value.
+ * @param fallback - Default boolean value.
+ * @returns Boolean option value.
+ */
+function isBooleanOptionEnabled(resolution: Readonly<IBooleanOptionResolution>): boolean {
+  return resolution.value === undefined ? resolution.fallback : resolution.value;
+}
+
+/**
  * Returns true when an identifier matches the nearest catch parameter in scope.
  *
  * @param node - Identifier node being thrown.
  * @returns True when identifier directly re-throws a catch parameter.
  */
 function isCatchParameterIdentifier(node: Readonly<TSESTree.Identifier>): boolean {
-  let currentNode: TSESTree.Node | null = node.parent;
-  while (currentNode !== null) {
-    const decision = getCatchScopeDecision(currentNode, node.name);
-    if (decision !== null) {
-      return decision;
-    }
-    currentNode = currentNode.parent ?? null;
+  return isCatchParameterIdentifierInScope(node.parent, node.name);
+}
+
+/**
+ * Recursively checks ancestor scope for a matching catch parameter.
+ *
+ * @param currentNode - Current ancestor node.
+ * @param identifierName - Identifier being thrown.
+ * @returns True when the nearest relevant scope is a matching catch parameter.
+ */
+function isCatchParameterIdentifierInScope(
+  currentNode: Readonly<TSESTree.Node> | null,
+  identifierName: string,
+): boolean {
+  if (currentNode === null) {
+    return false;
   }
-  return false;
+  const decision = getCatchScopeDecision(currentNode, identifierName);
+  if (decision !== null) {
+    return decision;
+  }
+  return isCatchParameterIdentifierInScope(currentNode.parent, identifierName);
 }
 
 /**
@@ -202,47 +238,6 @@ function isOptionAllowedThrowNode(
 }
 
 /**
- * Resolves allowThrowingAwaitExpressions option.
- *
- * @param options - Raw options.
- * @returns Resolved boolean option value.
- */
-function resolveAllowThrowingAwaitExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
-  return resolveBooleanOption(options.allowThrowingAwaitExpressions, false);
-}
-
-/**
- * Resolves allowThrowingCallExpressions option.
- *
- * @param options - Raw options.
- * @returns Resolved boolean option value.
- */
-function resolveAllowThrowingCallExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
-  return resolveBooleanOption(options.allowThrowingCallExpressions, false);
-}
-
-/**
- * Resolves allowThrowingMemberExpressions option.
- *
- * @param options - Raw options.
- * @returns Resolved boolean option value.
- */
-function resolveAllowThrowingMemberExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
-  return resolveBooleanOption(options.allowThrowingMemberExpressions, false);
-}
-
-/**
- * Resolves a boolean option value with fallback.
- *
- * @param value - Raw option value.
- * @param fallback - Default boolean value.
- * @returns Boolean option value.
- */
-function resolveBooleanOption(value: boolean | undefined, fallback: boolean): boolean {
-  return value === undefined ? fallback : value;
-}
-
-/**
  * Resolves rule options with defaults applied.
  *
  * @param options - Raw rule options.
@@ -251,10 +246,40 @@ function resolveBooleanOption(value: boolean | undefined, fallback: boolean): bo
 function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoThrowLiteralOptions {
   const rawOptions = options[0] ?? DEFAULT_OPTIONS;
   return {
-    allowThrowingAwaitExpressions: resolveAllowThrowingAwaitExpressions(rawOptions),
-    allowThrowingCallExpressions: resolveAllowThrowingCallExpressions(rawOptions),
-    allowThrowingMemberExpressions: resolveAllowThrowingMemberExpressions(rawOptions),
+    allowThrowingAwaitExpressions: shouldAllowThrowingAwaitExpressions(rawOptions),
+    allowThrowingCallExpressions: shouldAllowThrowingCallExpressions(rawOptions),
+    allowThrowingMemberExpressions: shouldAllowThrowingMemberExpressions(rawOptions),
   };
+}
+
+/**
+ * Resolves allowThrowingAwaitExpressions option.
+ *
+ * @param options - Raw options.
+ * @returns Resolved boolean option value.
+ */
+function shouldAllowThrowingAwaitExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
+  return isBooleanOptionEnabled({ value: options.allowThrowingAwaitExpressions, fallback: false });
+}
+
+/**
+ * Resolves allowThrowingCallExpressions option.
+ *
+ * @param options - Raw options.
+ * @returns Resolved boolean option value.
+ */
+function shouldAllowThrowingCallExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
+  return isBooleanOptionEnabled({ value: options.allowThrowingCallExpressions, fallback: false });
+}
+
+/**
+ * Resolves allowThrowingMemberExpressions option.
+ *
+ * @param options - Raw options.
+ * @returns Resolved boolean option value.
+ */
+function shouldAllowThrowingMemberExpressions(options: Readonly<INoThrowLiteralOptions>): boolean {
+  return isBooleanOptionEnabled({ value: options.allowThrowingMemberExpressions, fallback: false });
 }
 
 /**

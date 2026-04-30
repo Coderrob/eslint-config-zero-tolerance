@@ -281,9 +281,11 @@ export function isNullLiteral(node: TSESTree.Expression | null): boolean {
  * @returns True when the expression is relevant to string construction.
  */
 function isStringBoundary(node: Readonly<TSESTree.Expression>): boolean {
-  return node.type === AST_NODE_TYPES.TemplateLiteral ||
+  return (
+    node.type === AST_NODE_TYPES.TemplateLiteral ||
     isStringLiteral(node) ||
-    node.type === AST_NODE_TYPES.BinaryExpression;
+    node.type === AST_NODE_TYPES.BinaryExpression
+  );
 }
 
 /**
@@ -316,7 +318,10 @@ export function isStringLiteral(node: TSESTree.Expression | null): node is TSEST
  * @param name - Property name to match.
  * @returns True when the property matches and is true.
  */
-function isTrueProperty(property: TSESTree.Property | TSESTree.SpreadElement, name: string): boolean {
+function isTrueProperty(
+  property: TSESTree.Property | TSESTree.SpreadElement,
+  name: string,
+): boolean {
   if (property.type !== AST_NODE_TYPES.Property || getPropertyName(property.key) !== name) {
     return false;
   }

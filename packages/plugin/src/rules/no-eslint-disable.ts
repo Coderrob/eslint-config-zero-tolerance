@@ -46,7 +46,9 @@ function checkProgram(context: Readonly<NoEslintDisableContext>): void {
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoEslintDisableListeners(context: Readonly<NoEslintDisableContext>): TSESLint.RuleListener {
+function createNoEslintDisableListeners(
+  context: Readonly<NoEslintDisableContext>,
+): TSESLint.RuleListener {
   return {
     Program: checkProgram.bind(undefined, context),
   };

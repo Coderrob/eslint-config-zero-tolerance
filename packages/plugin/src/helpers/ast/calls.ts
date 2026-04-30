@@ -27,6 +27,10 @@ import {
 } from '../ast-helpers';
 
 type StringLiteralArgument = TSESTree.Literal & { value: string };
+type NamePathSegmentComparison = Readonly<{
+  expectedPath: ReadonlyArray<string>;
+  segment: string;
+}>;
 
 /**
  * Returns a call-expression argument by index.
@@ -75,7 +79,9 @@ export function getCalleeNamePath(callee: Readonly<TSESTree.Node>): string[] | n
  * @param callee - Call expression callee to inspect.
  * @returns Ordered callee name path, or null when unresolved.
  */
-function getCalleeNamePathFromCallExpression(callee: Readonly<TSESTree.CallExpression>): string[] | null {
+function getCalleeNamePathFromCallExpression(
+  callee: Readonly<TSESTree.CallExpression>,
+): string[] | null {
   return getCalleeNamePath(callee.callee);
 }
 
@@ -85,7 +91,9 @@ function getCalleeNamePathFromCallExpression(callee: Readonly<TSESTree.CallExpre
  * @param callee - Member expression callee to inspect.
  * @returns Ordered callee name path, or null when unresolved.
  */
-function getCalleeNamePathFromMemberExpression(callee: Readonly<TSESTree.MemberExpression>): string[] | null {
+function getCalleeNamePathFromMemberExpression(
+  callee: Readonly<TSESTree.MemberExpression>,
+): string[] | null {
   const propertyName = getMemberPropertyName(callee);
   const objectPath = getCalleeNamePath(callee.object);
   if (propertyName === null || objectPath === null) {
@@ -159,12 +167,43 @@ function hasMatchingNamePath(
   if (actualPath.length !== expectedPath.length) {
     return false;
   }
-  for (let index = 0; index < actualPath.length; index += 1) {
-    if (actualPath[index] !== expectedPath[index]) {
-      return false;
-    }
+  return hasMatchingNamePathAtIndex(actualPath, expectedPath, 0);
+}
+
+/**
+ * Recursively compares name-path segments without mutating loop state.
+ *
+ * @param actualPath - Resolved callee name path.
+ * @param expectedPath - Expected callee name path.
+ * @param index - Segment index to compare.
+ * @returns True when all segments match.
+ */
+function hasMatchingNamePathAtIndex(
+  actualPath: ReadonlyArray<string>,
+  expectedPath: ReadonlyArray<string>,
+  index: number,
+): boolean {
+  if (index >= actualPath.length) {
+    return true;
   }
-  return true;
+  if (!isMatchingNamePathSegment({ expectedPath, segment: actualPath[index] }, index)) {
+    return false;
+  }
+  return hasMatchingNamePathAtIndex(actualPath, expectedPath, index + 1);
+}
+
+/**
+ * Returns true when one path segment matches the expected path at the same index.
+ *
+ * @param comparison - Segment comparison data.
+ * @param index - Segment index.
+ * @returns True when the segment matches the expected path.
+ */
+function isMatchingNamePathSegment(
+  comparison: Readonly<NamePathSegmentComparison>,
+  index: number,
+): boolean {
+  return comparison.segment === comparison.expectedPath[index];
 }
 
 /**

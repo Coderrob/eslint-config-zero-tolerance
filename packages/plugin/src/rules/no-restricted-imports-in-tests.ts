@@ -324,7 +324,9 @@ function reportIfRestrictedImport(
  * @param options - Raw rule options.
  * @returns Resolved restricted module option set.
  */
-function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoRestrictedImportsInTestsOptions {
+function resolveOptions(
+  options: Readonly<RuleOptions>,
+): IResolvedNoRestrictedImportsInTestsOptions {
   const modules = new Set<string>();
   for (const moduleName of readConfiguredModules(options)) {
     addRestrictedModule(modules, moduleName);

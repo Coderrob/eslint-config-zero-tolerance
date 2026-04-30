@@ -9,7 +9,7 @@ describe('ast search helpers', () => {
       Program: ['body'],
       TSTypeLiteral: [],
     },
-  } as const;
+  };
 
   describe('findDescendant', () => {
     it('should return the first descendant that matches the predicate', () => {
@@ -17,7 +17,7 @@ describe('ast search helpers', () => {
       const root = {
         type: AST_NODE_TYPES.Program,
         body: [{ type: AST_NODE_TYPES.ExpressionStatement, expression: identifier }],
-      } as any;
+      } as unknown;
 
       const result = findDescendant(
         root,
@@ -33,7 +33,7 @@ describe('ast search helpers', () => {
       const root = {
         type: AST_NODE_TYPES.Program,
         body: [{ type: AST_NODE_TYPES.TSTypeLiteral, members: [identifier] }],
-      } as any;
+      } as unknown;
 
       const result = findDescendant(
         root,
@@ -52,7 +52,7 @@ describe('ast search helpers', () => {
       const root = {
         type: AST_NODE_TYPES.Program,
         body: [{ type: AST_NODE_TYPES.ExpressionStatement, expression: identifier }],
-      } as any;
+      } as unknown;
 
       expect(
         hasDescendant(
@@ -68,13 +68,14 @@ describe('ast search helpers', () => {
       const root = {
         type: AST_NODE_TYPES.Program,
         body: [],
-      } as any;
+      } as unknown;
 
       expect(
         hasDescendant(
           root,
           sourceCode,
-          (candidate): candidate is any => candidate.type === AST_NODE_TYPES.Identifier,
+          (candidate): candidate is { type: AST_NODE_TYPES.Identifier } =>
+            candidate.type === AST_NODE_TYPES.Identifier,
         ),
       ).toBe(false);
     });

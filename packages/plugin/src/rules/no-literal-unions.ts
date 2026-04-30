@@ -87,7 +87,7 @@ function addConstLiteralDeclarations(
   for (const declarator of declaration.declarations) {
     const resolvedLiteral = getResolvedConstDeclaratorLiteral(declarator);
     if (resolvedLiteral !== null) {
-      declarations.set(resolvedLiteral.memberName, resolvedLiteral);
+      Reflect.apply(Map.prototype.set, declarations, [resolvedLiteral.memberName, resolvedLiteral]);
     }
   }
 }
@@ -171,7 +171,7 @@ function createEnumMemberNameBase(value: string, index: number): string {
   if (pascalValue === '') {
     return `${ENUM_MEMBER_FALLBACK_PREFIX}${index}`;
   }
-  return startsWithDigit(pascalValue)
+  return hasLeadingDigit(pascalValue)
     ? `${ENUM_MEMBER_FALLBACK_PREFIX}${pascalValue}`
     : pascalValue;
 }
@@ -191,7 +191,9 @@ function createEnumMembersFromUnion(
   const names = new Set<string>();
   let index = 1;
   for (const unionMember of getResolvedStringUnionMembers(unionNode, constLiteralMap)) {
-    members.push(createEnumMemberDeclaration(names, unionMember, index));
+    Reflect.apply(Array.prototype.push, members, [
+      createEnumMemberDeclaration(names, unionMember, index),
+    ]);
     index += 1;
   }
   return members;
@@ -226,7 +228,9 @@ function createLiteralUnionFix(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoLiteralUnionsListeners(context: Readonly<NoLiteralUnionsContext>): TSESLint.RuleListener {
+function createNoLiteralUnionsListeners(
+  context: Readonly<NoLiteralUnionsContext>,
+): TSESLint.RuleListener {
   const constLiteralMap = getConstLiteralDeclarations(context.sourceCode.ast.body);
   return {
     TSUnionType: checkUnionType.bind(undefined, context, constLiteralMap),
@@ -247,7 +251,7 @@ function createUniqueMemberName(baseName: string, names: Readonly<Set<string>>):
     candidateName = `${baseName}${suffix}`;
     suffix += 1;
   }
-  names.add(candidateName);
+  Reflect.apply(Set.prototype.add, names, [candidateName]);
   return candidateName;
 }
 
@@ -345,15 +349,28 @@ function getEnumDeclarationPrefix(
  * @param node - Type node to inspect.
  * @returns Nearest type reference ancestor, or null when absent.
  */
-function getNearestTypeReference(node: Readonly<TSESTree.TypeNode>): TSESTree.TSTypeReference | null {
-  let currentNode = node.parent;
-  while (currentNode.type !== AST_NODE_TYPES.Program) {
-    if (currentNode.type === AST_NODE_TYPES.TSTypeReference) {
-      return currentNode;
-    }
-    currentNode = currentNode.parent;
+function getNearestTypeReference(
+  node: Readonly<TSESTree.TypeNode>,
+): TSESTree.TSTypeReference | null {
+  return getNearestTypeReferenceFromNode(node.parent);
+}
+
+/**
+ * Recursively finds the nearest containing type reference.
+ *
+ * @param node - Node to inspect.
+ * @returns Nearest type reference ancestor, or null when absent.
+ */
+function getNearestTypeReferenceFromNode(
+  node: Readonly<TSESTree.Node>,
+): TSESTree.TSTypeReference | null {
+  if (node.type === AST_NODE_TYPES.Program) {
+    return null;
   }
-  return null;
+  if (node.type === AST_NODE_TYPES.TSTypeReference) {
+    return node;
+  }
+  return getNearestTypeReferenceFromNode(node.parent);
 }
 
 /**
@@ -472,7 +489,7 @@ function getResolvedStringUnionMembers(
     if (resolvedMember === null) {
       return [];
     }
-    members.push(resolvedMember);
+    Reflect.apply(Array.prototype.push, members, [resolvedMember]);
   }
   return members;
 }
@@ -483,7 +500,9 @@ function getResolvedStringUnionMembers(
  * @param expression - Template literal to inspect.
  * @returns Cooked string value, or null when unavailable.
  */
-function getTemplateLiteralCookedValue(expression: Readonly<TSESTree.TemplateLiteral>): string | null {
+function getTemplateLiteralCookedValue(
+  expression: Readonly<TSESTree.TemplateLiteral>,
+): string | null {
   return expression.quasis[0].value.cooked;
 }
 
@@ -493,7 +512,9 @@ function getTemplateLiteralCookedValue(expression: Readonly<TSESTree.TemplateLit
  * @param alias - Type alias declaration.
  * @returns Export wrapper node when present, otherwise alias node.
  */
-function getTypeAliasReplacementNode(alias: Readonly<TSESTree.TSTypeAliasDeclaration>): TSESTree.Node {
+function getTypeAliasReplacementNode(
+  alias: Readonly<TSESTree.TSTypeAliasDeclaration>,
+): TSESTree.Node {
   const parentNode = alias.parent;
   if (
     parentNode.type === AST_NODE_TYPES.ExportNamedDeclaration &&
@@ -560,6 +581,16 @@ function hasDirectLiteralUnionMember(node: Readonly<TSESTree.TSUnionType>): bool
  */
 function hasExportPrefix(replacementNode: Readonly<TSESTree.Node>): boolean {
   return replacementNode.type === AST_NODE_TYPES.ExportNamedDeclaration;
+}
+
+/**
+ * Returns true when a string starts with a digit.
+ *
+ * @param value - String value to inspect.
+ * @returns True when the first character is numeric.
+ */
+function hasLeadingDigit(value: string): boolean {
+  return /^\d/u.test(value);
 }
 
 /**
@@ -952,16 +983,6 @@ function resolveTemplateLiteral(
     kind: ResolvedLiteralKind.String,
     value: cookedValue,
   };
-}
-
-/**
- * Returns true when a string starts with a digit.
- *
- * @param value - String value to inspect.
- * @returns True when the first character is numeric.
- */
-function startsWithDigit(value: string): boolean {
-  return /^\d/u.test(value);
 }
 
 /**

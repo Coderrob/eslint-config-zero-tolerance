@@ -204,14 +204,7 @@ function getFirstNonParentSegment(importPath: string): string | null {
  */
 function getProtectedDirectories(protectedDirectories: readonly string[] | undefined): Set<string> {
   const configuredDirectories = protectedDirectories ?? DEFAULT_PROTECTED_DIRECTORIES;
-  const normalizedDirectoryNames = new Set<string>();
-  for (const directoryName of configuredDirectories) {
-    const normalizedDirectoryName = normalizeProtectedDirectoryName(directoryName);
-    if (normalizedDirectoryName !== null) {
-      normalizedDirectoryNames.add(normalizedDirectoryName);
-    }
-  }
-  return normalizedDirectoryNames;
+  return new Set(configuredDirectories.map(normalizeProtectedDirectoryName).filter(isDirectoryName));
 }
 
 /**
@@ -233,6 +226,16 @@ function getProtectedDirectoryFromParentPath(
     return null;
   }
   return options.protectedDirectories.has(firstNonParentSegment) ? firstNonParentSegment : null;
+}
+
+/**
+ * Returns true when a normalized directory name is usable.
+ *
+ * @param directoryName - Candidate directory name.
+ * @returns True when the directory name is non-null.
+ */
+function isDirectoryName(directoryName: string | null): directoryName is string {
+  return directoryName !== null;
 }
 
 /**

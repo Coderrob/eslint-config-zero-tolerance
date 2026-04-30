@@ -41,6 +41,9 @@ export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';
 /** npm package name of the plugin, as declared in package.json. */
 export const PLUGIN_PACKAGE_NAME = '@coderrob/eslint-plugin-zero-tolerance';
 
+/** Current npm package version of the plugin. */
+export const PLUGIN_PACKAGE_VERSION = '1.2.4';
+
 /** Config map key for the legacy recommended preset. */
 export const CONFIG_KEY_LEGACY_RECOMMENDED = 'legacy-recommended';
 

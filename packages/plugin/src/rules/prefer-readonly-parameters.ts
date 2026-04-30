@@ -50,7 +50,10 @@ interface IPreferReadonlyParametersOptions {
  * @param context - ESLint rule execution context.
  * @param node - Function-like node.
  */
-function checkFunctionNode(context: Readonly<PreferReadonlyParametersContext>, node: Readonly<FunctionNode>): void {
+function checkFunctionNode(
+  context: Readonly<PreferReadonlyParametersContext>,
+  node: Readonly<FunctionNode>,
+): void {
   const ignoredTypeNamePatterns = resolveIgnoredTypeNamePatterns(context.options);
   for (const param of node.params) {
     reportIfMutableParameter(context, ignoredTypeNamePatterns, param);
@@ -97,17 +100,6 @@ function createReadonlyParameterFix(
     return null;
   }
   return fixer.replaceText(typeNode, replacementType);
-}
-
-/**
- * Returns true when the pattern matches a type-reference name.
- *
- * @param typeName - Terminal type-reference name.
- * @param pattern - Compiled ignored type-name pattern.
- * @returns True when the name is ignored.
- */
-function doesPatternMatchTypeName(typeName: string, pattern: Readonly<RegExp>): boolean {
-  return pattern.test(typeName);
 }
 
 /**
@@ -204,7 +196,7 @@ function isIgnoredTypeReference(
   ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
 ): boolean {
   const typeName = getTerminalTypeReferenceName(sourceCode, node);
-  return ignoredTypeNamePatterns.some(doesPatternMatchTypeName.bind(undefined, typeName));
+  return ignoredTypeNamePatterns.some(isPatternMatchingTypeName.bind(undefined, typeName));
 }
 
 /**
@@ -269,6 +261,17 @@ function isMutableTypeReference(
     return false;
   }
   return !isIgnoredTypeReference(sourceCode, node, ignoredTypeNamePatterns);
+}
+
+/**
+ * Returns true when the pattern matches a type-reference name.
+ *
+ * @param typeName - Terminal type-reference name.
+ * @param pattern - Compiled ignored type-name pattern.
+ * @returns True when the name is ignored.
+ */
+function isPatternMatchingTypeName(typeName: string, pattern: Readonly<RegExp>): boolean {
+  return pattern.test(typeName);
 }
 
 /**

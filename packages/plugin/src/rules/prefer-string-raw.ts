@@ -51,27 +51,20 @@ function buildStringRawReplacement(node: Readonly<TSESTree.StringLiteral>): stri
  * @param context - ESLint rule execution context.
  * @param node - Literal node to inspect.
  */
-function checkStringLiteral(context: Readonly<PreferStringRawContext>, node: Readonly<TSESTree.Literal>): void {
+function checkStringLiteral(
+  context: Readonly<PreferStringRawContext>,
+  node: Readonly<TSESTree.Literal>,
+): void {
   if (!isStringLiteral(node)) {
     return;
   }
-  if (!containsBackslash(node.value)) {
+  if (!hasBackslash(node.value)) {
     return;
   }
   if (isInsideStringRaw(node)) {
     return;
   }
   reportPreferStringRaw(context, node);
-}
-
-/**
- * Returns true when a value contains one or more backslash characters.
- *
- * @param value - String literal value.
- * @returns True when value contains backslashes.
- */
-function containsBackslash(value: string): boolean {
-  return value.includes(BACKSLASH);
 }
 
 /**
@@ -98,10 +91,22 @@ function createPreferStringRawFix(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createPreferStringRawListeners(context: Readonly<PreferStringRawContext>): TSESLint.RuleListener {
+function createPreferStringRawListeners(
+  context: Readonly<PreferStringRawContext>,
+): TSESLint.RuleListener {
   return {
     Literal: checkStringLiteral.bind(undefined, context),
   };
+}
+
+/**
+ * Returns true when a value contains one or more backslash characters.
+ *
+ * @param value - String literal value.
+ * @returns True when value contains backslashes.
+ */
+function hasBackslash(value: string): boolean {
+  return value.includes(BACKSLASH);
 }
 
 /**

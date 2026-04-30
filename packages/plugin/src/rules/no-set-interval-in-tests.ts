@@ -24,9 +24,7 @@ const MEMBER_CALLEE_PATH_LENGTH = 2;
 const SET_INTERVAL_NAME = 'setInterval';
 const SINGLE_CALLEE_PATH_LENGTH = 1;
 
-type NoSetIntervalInTestsContext = Readonly<
-  TSESLint.RuleContext<'noSetIntervalInTests', []>
->;
+type NoSetIntervalInTestsContext = Readonly<TSESLint.RuleContext<'noSetIntervalInTests', []>>;
 
 /**
  * Checks call expressions for global setInterval usage.

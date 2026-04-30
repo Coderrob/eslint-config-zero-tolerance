@@ -55,7 +55,11 @@ function checkTSInterfaceDeclaration(
  * @param key - Property key.
  * @param value - Property value.
  */
-function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string, value: unknown): void {
+function collectChildNodeValue(
+  childNodes: readonly TSESTree.Node[],
+  key: string,
+  value: unknown,
+): void {
   if (key === PARENT_PROPERTY_KEY) {
     return;
   }
@@ -64,7 +68,7 @@ function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string
     return;
   }
   if (isNodeLike(value)) {
-    childNodes.push(value);
+    Reflect.apply(Array.prototype.push, childNodes, [value]);
   }
 }
 
@@ -74,10 +78,13 @@ function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string
  * @param childNodes - Mutable child node collection.
  * @param values - Property array values.
  */
-function collectChildNodeValues(childNodes: readonly TSESTree.Node[], values: readonly unknown[]): void {
+function collectChildNodeValues(
+  childNodes: readonly TSESTree.Node[],
+  values: readonly unknown[],
+): void {
   for (const value of values) {
     if (isNodeLike(value)) {
-      childNodes.push(value);
+      Reflect.apply(Array.prototype.push, childNodes, [value]);
     }
   }
 }
@@ -95,7 +102,7 @@ function collectInterfaceNameReferenceNodes(
   references: readonly TSESTree.Identifier[],
 ): void {
   if (isInterfaceNameReferenceNode(node, currentName)) {
-    references.push(node);
+    Reflect.apply(Array.prototype.push, references, [node]);
   }
   for (const child of getChildNodes(node)) {
     collectInterfaceNameReferenceNodes(child, currentName, references);
@@ -114,10 +121,18 @@ function createInterfacePrefixFix(
   node: Readonly<TSESTree.TSInterfaceDeclaration>,
 ): TSESLint.ReportFixFunction | null {
   const replacementName = `${INTERFACE_REQUIRED_PREFIX}${node.id.name}`;
-  if (!isPotentialInterfacePrefixFix(node.id.name) || hasTopLevelName(sourceCode.ast, replacementName)) {
+  if (
+    !isPotentialInterfacePrefixFix(node.id.name) ||
+    hasTopLevelName(sourceCode.ast, replacementName)
+  ) {
     return null;
   }
-  return replaceInterfaceNameReferences.bind(undefined, sourceCode.ast, node.id.name, replacementName);
+  return replaceInterfaceNameReferences.bind(
+    undefined,
+    sourceCode.ast,
+    node.id.name,
+    replacementName,
+  );
 }
 
 /**
@@ -217,7 +232,10 @@ function isInterfaceDeclarationIdentifier(
  * @param node - Identifier node.
  * @returns True when the identifier is an interface heritage expression.
  */
-function isInterfaceHeritageReference(parent: Readonly<TSESTree.Node>, node: Readonly<TSESTree.Identifier>): boolean {
+function isInterfaceHeritageReference(
+  parent: Readonly<TSESTree.Node>,
+  node: Readonly<TSESTree.Identifier>,
+): boolean {
   return (
     parent.type === TS_INTERFACE_HERITAGE_NODE_TYPE &&
     'expression' in parent &&
@@ -250,7 +268,10 @@ function isInterfaceNameReferenceNode(
  * @param node - Identifier node.
  * @returns True when the identifier references the interface in a type position.
  */
-function isInterfaceTypeReference(parent: Readonly<TSESTree.Node>, node: Readonly<TSESTree.Identifier>): boolean {
+function isInterfaceTypeReference(
+  parent: Readonly<TSESTree.Node>,
+  node: Readonly<TSESTree.Identifier>,
+): boolean {
   return (
     (parent.type === AST_NODE_TYPES.TSTypeReference && parent.typeName === node) ||
     isInterfaceHeritageReference(parent, node)
@@ -279,7 +300,10 @@ function isNodeLike(value: unknown): value is TSESTree.Node {
  * @returns True when the name starts with a capital letter and is not already I-prefixed.
  */
 function isPotentialInterfacePrefixFix(interfaceName: string): boolean {
-  return /^[A-Z][A-Za-z0-9]*$/u.test(interfaceName) && !interfaceName.startsWith(INTERFACE_REQUIRED_PREFIX);
+  return (
+    /^[A-Z][A-Za-z0-9]*$/u.test(interfaceName) &&
+    !interfaceName.startsWith(INTERFACE_REQUIRED_PREFIX)
+  );
 }
 
 /**
@@ -315,7 +339,7 @@ function replaceInterfaceNameReferences(
 ): TSESLint.RuleFix[] {
   const fixes: TSESLint.RuleFix[] = [];
   for (const identifier of getInterfaceNameReferenceNodes(program, currentName)) {
-    fixes.push(fixer.replaceText(identifier, replacementName));
+    Reflect.apply(Array.prototype.push, fixes, [fixer.replaceText(identifier, replacementName)]);
   }
   return fixes;
 }

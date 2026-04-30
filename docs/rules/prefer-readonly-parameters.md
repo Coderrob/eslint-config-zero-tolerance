@@ -25,7 +25,7 @@ function format(user: Readonly<User>): string {
 }
 
 function update(setName: Dispatch<SetStateAction<string>>): void {
-  setName("ready");
+  setName('ready');
 }
 
 class Service {
@@ -60,8 +60,8 @@ class Service {
 ]
 ```
 
-| Option                    | Type       | Default                                                               | Description                                      |
-| ------------------------- | ---------- | --------------------------------------------------------------------- | ------------------------------------------------ |
+| Option                    | Type       | Default                                                                                   | Description                                          |
+| ------------------------- | ---------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | `ignoredTypeNamePatterns` | `string[]` | `['^Dispatch$', '^Function$', '^RefCallback$', '^VoidFunction$', '(Callback\|Handler)$']` | Type-reference names excluded from readonly wrapping |
 
 ## Autofix Notes

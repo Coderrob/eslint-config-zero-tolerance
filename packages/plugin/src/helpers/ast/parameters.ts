@@ -23,6 +23,12 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 const THIS_PARAMETER_NAME = 'this';
 
+type AnnotatableParameter =
+  | TSESTree.ArrayPattern
+  | TSESTree.Identifier
+  | TSESTree.ObjectPattern
+  | TSESTree.RestElement;
+
 /**
  * Returns the type annotation from a directly annotatable parameter shape.
  *
@@ -30,11 +36,7 @@ const THIS_PARAMETER_NAME = 'this';
  * @returns Type annotation when present.
  */
 function getAnnotatableParameterTypeAnnotation(
-  param:
-    | TSESTree.ArrayPattern
-    | TSESTree.Identifier
-    | TSESTree.ObjectPattern
-    | TSESTree.RestElement,
+  param: Readonly<AnnotatableParameter>,
 ): TSESTree.TSTypeAnnotation | null {
   return 'typeAnnotation' in param ? (param.typeAnnotation ?? null) : null;
 }
@@ -57,7 +59,9 @@ function getAssignmentPatternTypeAnnotation(
  * @param param - Function parameter node.
  * @returns Type node when the parameter is an annotated object pattern.
  */
-function getDirectObjectDestructuredTypeNode(param: Readonly<TSESTree.Parameter>): TSESTree.TypeNode | null {
+function getDirectObjectDestructuredTypeNode(
+  param: Readonly<TSESTree.Parameter>,
+): TSESTree.TypeNode | null {
   return param.type === AST_NODE_TYPES.ObjectPattern
     ? (param.typeAnnotation?.typeAnnotation ?? null)
     : null;
@@ -140,7 +144,9 @@ export function getParameterTypeAnnotation(
  * @param param - Function parameter node.
  * @returns Type node when present.
  */
-export function getParameterTypeNode(param: Readonly<TSESTree.Parameter>): TSESTree.TypeNode | null {
+export function getParameterTypeNode(
+  param: Readonly<TSESTree.Parameter>,
+): TSESTree.TypeNode | null {
   return getParameterTypeAnnotation(param)?.typeAnnotation ?? null;
 }
 

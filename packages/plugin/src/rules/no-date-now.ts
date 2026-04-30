@@ -34,7 +34,10 @@ type NoDateNowContext = Readonly<TSESLint.RuleContext<NoDateNowMessageId, []>>;
  * @param context - ESLint rule execution context.
  * @param node - Call expression node.
  */
-function checkCallExpression(context: Readonly<NoDateNowContext>, node: Readonly<TSESTree.CallExpression>): void {
+function checkCallExpression(
+  context: Readonly<NoDateNowContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   if (!isDateNowCall(node)) {
     return;
   }
@@ -50,7 +53,10 @@ function checkCallExpression(context: Readonly<NoDateNowContext>, node: Readonly
  * @param context - ESLint rule execution context.
  * @param node - New expression node.
  */
-function checkNewExpression(context: Readonly<NoDateNowContext>, node: Readonly<TSESTree.NewExpression>): void {
+function checkNewExpression(
+  context: Readonly<NoDateNowContext>,
+  node: Readonly<TSESTree.NewExpression>,
+): void {
   if (!isNoArgDateConstructor(node)) {
     return;
   }

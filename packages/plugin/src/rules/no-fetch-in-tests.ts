@@ -52,7 +52,9 @@ function checkCallExpression(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoFetchInTestsListeners(context: Readonly<NoFetchInTestsContext>): TSESLint.RuleListener {
+function createNoFetchInTestsListeners(
+  context: Readonly<NoFetchInTestsContext>,
+): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
   }

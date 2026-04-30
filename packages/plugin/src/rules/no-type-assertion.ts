@@ -55,7 +55,9 @@ function checkTypeAssertion(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoTypeAssertionListeners(context: Readonly<NoTypeAssertionContext>): TSESLint.RuleListener {
+function createNoTypeAssertionListeners(
+  context: Readonly<NoTypeAssertionContext>,
+): TSESLint.RuleListener {
   return {
     TSAsExpression: checkTypeAssertion.bind(undefined, context),
     TSTypeAssertion: checkTypeAssertion.bind(undefined, context),
@@ -110,7 +112,11 @@ function getAssertionSyntax(
 function isSatisfiesSuggestionTarget(
   node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
 ): node is TSESTree.TSAsExpression {
-  return node.type === AST_NODE_TYPES.TSAsExpression && node.parent.type === AST_NODE_TYPES.VariableDeclarator && node.parent.init === node;
+  return (
+    node.type === AST_NODE_TYPES.TSAsExpression &&
+    node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
+    node.parent.init === node
+  );
 }
 
 /**

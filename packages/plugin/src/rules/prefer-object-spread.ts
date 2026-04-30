@@ -81,9 +81,9 @@ function createObjectSpreadFix(
   const spreadParts = collectSpreadParts(sourceCode, node.arguments.filter(isExpressionArgument));
   const inner = spreadParts.length > 0 ? ` ${spreadParts.join(', ')} ` : '';
   const objectLiteralText = `{${inner}}`;
-  const replacementText = requiresParenthesizedObjectSpread(node) ?
-    `(${objectLiteralText})` :
-    objectLiteralText;
+  const replacementText = shouldParenthesizeObjectSpread(node)
+    ? `(${objectLiteralText})`
+    : objectLiteralText;
   return fixer.replaceText(node, replacementText);
 }
 
@@ -211,7 +211,7 @@ function reportObjectAssign(
  * @param node - Call expression being replaced.
  * @returns Whether the replacement must be parenthesized to remain valid syntax.
  */
-function requiresParenthesizedObjectSpread(node: Readonly<TSESTree.CallExpression>): boolean {
+function shouldParenthesizeObjectSpread(node: Readonly<TSESTree.CallExpression>): boolean {
   const { parent } = node;
   if (parent.type === AST_NODE_TYPES.ExpressionStatement) {
     return true;

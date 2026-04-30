@@ -52,6 +52,16 @@ type SortFunctionsContext = Readonly<TSESLint.RuleContext<'unsortedFunction', []
 type SortableFunctions = SortableFunction[];
 
 /**
+ * Appends one item to an accumulator.
+ *
+ * @param values - Accumulator array.
+ * @param value - Value to append.
+ */
+function appendValue<T>(values: readonly T[], value: Readonly<T>): void {
+  Reflect.apply(Array.prototype.push, values, [value]);
+}
+
+/**
  * Builds a sortable block from a declaration and its owned comments.
  *
  * @param sourceCode - ESLint source code helper.
@@ -119,7 +129,7 @@ function collectAdjacentTrailingComments(
     if (!isAdjacentTrailingComment(sourceCode, previous, current, nodeEndLine)) {
       break;
     }
-    owned.push(current);
+    appendValue(owned, current);
   }
   return owned;
 }
@@ -137,7 +147,7 @@ function collectFunctionDeclarators(
   for (const declaration of declarations) {
     const functionName = getFunctionDeclaratorName(declaration);
     if (functionName !== null) {
-      functions.push({ name: functionName, node: declaration });
+      appendValue(functions, { name: functionName, node: declaration });
     }
   }
 }
@@ -159,11 +169,10 @@ function collectOwnedLeadingComments(
   let currentScanState = scanState;
   while (hasOwnedLeadingComment(sourceCode, leadingComments, currentScanState)) {
     const previousComment = leadingComments[currentScanState.startIndex];
-    ownedComments.push(previousComment);
+    appendValue(ownedComments, previousComment);
     currentScanState = updateLeadingCommentScanState(currentScanState, previousComment);
   }
-  ownedComments.reverse();
-  return ownedComments;
+  return ownedComments.reduceRight<ReadonlyArray<TSESTree.Comment>>(prependLeadingComment, []);
 }
 
 /**
@@ -212,7 +221,9 @@ function createSortFix(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createSortFunctionsListeners(context: Readonly<SortFunctionsContext>): TSESLint.RuleListener {
+function createSortFunctionsListeners(
+  context: Readonly<SortFunctionsContext>,
+): TSESLint.RuleListener {
   const functions: SortableFunctions = [];
   const sourceCode = context.sourceCode;
   return {
@@ -238,7 +249,9 @@ function getFunctionDeclarationName(declaration: Readonly<TSESTree.FunctionDecla
  * @param declaration - The variable declarator to inspect.
  * @returns The identifier name if declaration is function-valued, otherwise null.
  */
-function getFunctionDeclaratorName(declaration: Readonly<TSESTree.VariableDeclarator>): string | null {
+function getFunctionDeclaratorName(
+  declaration: Readonly<TSESTree.VariableDeclarator>,
+): string | null {
   if (!isFunctionDeclarator(declaration)) {
     return null;
   }
@@ -301,12 +314,31 @@ function getOwnedTrailingCommentStartIndex(
   node: Readonly<TSESTree.Node>,
   trailingComments: ReadonlyArray<TSESTree.Comment>,
 ): number | null {
-  for (let index = 0; index < trailingComments.length; index += 1) {
-    if (isOwnedTrailingComment(sourceCode, node, trailingComments[index])) {
-      return index;
-    }
+  return getOwnedTrailingCommentStartIndexAt(sourceCode, node, trailingComments, 0);
+}
+
+/**
+ * Returns the first same-line trailing comment index from a starting index.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param node - Node that may own trailing comments.
+ * @param trailingComments - Comments that follow the declaration.
+ * @param index - Current trailing comment index.
+ * @returns First owned trailing comment index, or null when none exist.
+ */
+function getOwnedTrailingCommentStartIndexAt(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<TSESTree.Node>,
+  trailingComments: ReadonlyArray<TSESTree.Comment>,
+  index: number,
+): number | null {
+  if (index >= trailingComments.length) {
+    return null;
   }
-  return null;
+  if (isOwnedTrailingComment(sourceCode, node, trailingComments[index])) {
+    return index;
+  }
+  return getOwnedTrailingCommentStartIndexAt(sourceCode, node, trailingComments, index + 1);
 }
 
 /**
@@ -343,6 +375,25 @@ function getSortableBlockEnd(
 }
 
 /**
+ * Returns original text between one sortable block and its previous block.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @param functionBlock - Current sortable function block.
+ * @param index - Index in the collection after dropping the first block.
+ * @returns Separator text before the current sortable block.
+ */
+function getSortableBlockSeparator(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+  functionBlock: Readonly<SortableFunctionBlock>,
+  index: number,
+): string {
+  const previousBlock = functionBlocks[index].block;
+  return sourceCode.text.slice(previousBlock.end, functionBlock.block.start);
+}
+
+/**
  * Returns original text between each sortable block.
  *
  * @param sourceCode - ESLint source code helper.
@@ -353,13 +404,9 @@ function getSortableBlockSeparators(
   sourceCode: Readonly<TSESLint.SourceCode>,
   functionBlocks: ReadonlyArray<SortableFunctionBlock>,
 ): ReadonlyArray<string> {
-  const separators: string[] = [];
-  for (let index = 1; index < functionBlocks.length; index += 1) {
-    const previousBlock = functionBlocks[index - 1].block;
-    const currentBlock = functionBlocks[index].block;
-    separators.push(sourceCode.text.slice(previousBlock.end, currentBlock.start));
-  }
-  return separators;
+  return functionBlocks
+    .slice(1)
+    .map(getSortableBlockSeparator.bind(undefined, sourceCode, functionBlocks));
 }
 
 /**
@@ -393,9 +440,53 @@ function getSortableFunctionBlocks(
     if (block === null) {
       return null;
     }
-    functionBlocks.push({ ...sortableFunction, block });
+    appendValue(functionBlocks, { ...sortableFunction, block });
   }
   return functionBlocks;
+}
+
+/**
+ * Returns sortable function blocks in case-insensitive name order.
+ *
+ * @param functionBlocks - Function blocks in source order.
+ * @returns Sorted function blocks.
+ */
+function getSortedFunctionBlocks(
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+): ReadonlyArray<SortableFunctionBlock> {
+  return functionBlocks.reduce<ReadonlyArray<SortableFunctionBlock>>(insertSortedFunctionBlock, []);
+}
+
+/**
+ * Returns one sorted block segment with the separator that precedes it.
+ *
+ * @param block - Sorted function block.
+ * @param separators - Original separators in source order.
+ * @param index - Sorted block index.
+ * @returns Text segment for the sorted output.
+ */
+function getSortedFunctionBlockSegment(
+  block: Readonly<SortableFunctionBlock>,
+  separators: ReadonlyArray<string>,
+  index: number,
+): string {
+  return index === 0 ? block.block.text : `${separators[index - 1]}${block.block.text}`;
+}
+
+/**
+ * Returns one sorted block segment using bound separator text.
+ *
+ * @param separators - Original separators in source order.
+ * @param block - Sorted function block.
+ * @param index - Sorted block index.
+ * @returns Text segment for the sorted output.
+ */
+function getSortedFunctionBlockSegmentWithSeparators(
+  separators: ReadonlyArray<string>,
+  block: Readonly<SortableFunctionBlock>,
+  index: number,
+): string {
+  return getSortedFunctionBlockSegment(block, separators, index);
 }
 
 /**
@@ -410,12 +501,10 @@ function getSortedFunctionBlockText(
   functionBlocks: ReadonlyArray<SortableFunctionBlock>,
 ): string {
   const separators = getSortableBlockSeparators(sourceCode, functionBlocks);
-  const sortedBlocks = [...functionBlocks].sort(compareSortableFunctionsByName);
-  let replacementText = sortedBlocks[0].block.text;
-  for (let index = 1; index < sortedBlocks.length; index += 1) {
-    replacementText += `${separators[index - 1]}${sortedBlocks[index].block.text}`;
-  }
-  return replacementText;
+  const sortedBlocks = getSortedFunctionBlocks(functionBlocks);
+  return sortedBlocks
+    .map(getSortedFunctionBlockSegmentWithSeparators.bind(undefined, separators))
+    .join('');
 }
 
 /**
@@ -583,6 +672,25 @@ function hasOwnedLeadingComment(
 }
 
 /**
+ * Returns true when text between one sortable block and its previous block contains comments.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @param functionBlock - Current sortable function block.
+ * @param index - Index in the collection after dropping the first block.
+ * @returns True when the preceding separator contains comments.
+ */
+function hasUnsafeInterBlockCommentAfterPrevious(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+  functionBlock: Readonly<SortableFunctionBlock>,
+  index: number,
+): boolean {
+  const previousBlock = functionBlocks[index].block;
+  return hasCommentBetweenBlocks(sourceCode, previousBlock, functionBlock.block);
+}
+
+/**
  * Returns true when any text between sortable blocks contains comments.
  *
  * @param sourceCode - ESLint source code helper.
@@ -593,14 +701,9 @@ function hasUnsafeInterBlockComments(
   sourceCode: Readonly<TSESLint.SourceCode>,
   functionBlocks: ReadonlyArray<SortableFunctionBlock>,
 ): boolean {
-  for (let index = 1; index < functionBlocks.length; index += 1) {
-    const previousBlock = functionBlocks[index - 1].block;
-    const currentBlock = functionBlocks[index].block;
-    if (hasCommentBetweenBlocks(sourceCode, previousBlock, currentBlock)) {
-      return true;
-    }
-  }
-  return false;
+  return functionBlocks
+    .slice(1)
+    .some(hasUnsafeInterBlockCommentAfterPrevious.bind(undefined, sourceCode, functionBlocks));
 }
 
 /**
@@ -615,6 +718,28 @@ function hasUnsafeOwnedComments(
   trailingComments: ReadonlyArray<TSESTree.Comment>,
 ): boolean {
   return hasDirectiveComment(leadingComments) || hasDirectiveComment(trailingComments);
+}
+
+/**
+ * Inserts one function block into an immutable sorted collection.
+ *
+ * @param sortedBlocks - Sorted blocks accumulated so far.
+ * @param functionBlock - Block to insert.
+ * @returns Updated sorted blocks.
+ */
+function insertSortedFunctionBlock(
+  sortedBlocks: ReadonlyArray<SortableFunctionBlock>,
+  functionBlock: Readonly<SortableFunctionBlock>,
+): ReadonlyArray<SortableFunctionBlock> {
+  const insertionIndex = sortedBlocks.findIndex(isSortableFunctionBlockAfter.bind(undefined, functionBlock));
+  if (insertionIndex === -1) {
+    return [...sortedBlocks, functionBlock];
+  }
+  return [
+    ...sortedBlocks.slice(0, insertionIndex),
+    functionBlock,
+    ...sortedBlocks.slice(insertionIndex),
+  ];
 }
 
 /**
@@ -825,6 +950,20 @@ function isPreviousNonLeadingContent(
 }
 
 /**
+ * Returns true when an existing sorted function block should follow the inserted block.
+ *
+ * @param functionBlock - Function block being inserted.
+ * @param sortedBlock - Existing sorted function block.
+ * @returns True when the insertion point has been found.
+ */
+function isSortableFunctionBlockAfter(
+  functionBlock: Readonly<SortableFunctionBlock>,
+  sortedBlock: Readonly<SortableFunctionBlock>,
+): boolean {
+  return compareSortableFunctionsByName(functionBlock, sortedBlock) < 0;
+}
+
+/**
  * Checks if a function declaration is at the top level (including exported declarations).
  *
  * @param node - The function declaration node to check.
@@ -853,6 +992,20 @@ function isTopLevelVariableDeclaration(node: Readonly<TSESTree.VariableDeclarati
 }
 
 /**
+ * Adds one leading comment while reversing comment order immutably.
+ *
+ * @param comments - Reversed comments accumulated so far.
+ * @param comment - Comment to prepend.
+ * @returns Updated comments.
+ */
+function prependLeadingComment(
+  comments: ReadonlyArray<TSESTree.Comment>,
+  comment: Readonly<TSESTree.Comment>,
+): ReadonlyArray<TSESTree.Comment> {
+  return [...comments, comment];
+}
+
+/**
  * Processes a function declaration node.
  *
  * @param functions - Mutable sortable collection.
@@ -865,7 +1018,7 @@ function processFunctionDeclaration(
   if (!isTopLevelFunctionDeclaration(node)) {
     return;
   }
-  functions.push({ name: getFunctionDeclarationName(node), node });
+  appendValue(functions, { name: getFunctionDeclarationName(node), node });
 }
 
 /**

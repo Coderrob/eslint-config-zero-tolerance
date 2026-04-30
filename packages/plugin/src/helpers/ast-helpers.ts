@@ -51,7 +51,9 @@ export function getCallMemberMethodName(node: Readonly<TSESTree.CallExpression>)
  * @param property - The computed property node to inspect.
  * @returns The property name if it is a string literal, otherwise null.
  */
-function getComputedPropertyName(property: Readonly<{ type: string; value?: unknown }>): string | null {
+function getComputedPropertyName(
+  property: Readonly<{ type: string; value?: unknown }>,
+): string | null {
   return isString(property.value) ? property.value : null;
 }
 
@@ -152,10 +154,12 @@ export function getMappedMemberPropertyName(
  * @param node - Member expression-like node to inspect.
  * @returns The property name if available, otherwise null.
  */
-export function getMemberPropertyName(node: Readonly<{
-  computed: boolean;
-  property: { type: string; name?: string; value?: unknown };
-}>): string | null {
+export function getMemberPropertyName(
+  node: Readonly<{
+    computed: boolean;
+    property: { type: string; name?: string; value?: unknown };
+  }>,
+): string | null {
   if (!node.computed) {
     return getNonComputedPropertyName(node.property);
   }
@@ -168,7 +172,9 @@ export function getMemberPropertyName(node: Readonly<{
  * @param property - The property node.
  * @returns The property name if it's an identifier, otherwise null.
  */
-function getNonComputedPropertyName(property: Readonly<{ type: string; name?: string }>): string | null {
+function getNonComputedPropertyName(
+  property: Readonly<{ type: string; name?: string }>,
+): string | null {
   return isString(property.name) ? property.name : null;
 }
 
@@ -213,7 +219,18 @@ export function getVisitorChildNodes(
   sourceCode: Readonly<Pick<TSESLint.SourceCode, 'visitorKeys'>>,
 ): ReadonlyArray<TSESTree.Node> {
   const visitorKeys = sourceCode.visitorKeys[node.type] ?? [];
-  return visitorKeys.flatMap((key) => getVisitorArrayNodes(Reflect.get(node, key)));
+  return visitorKeys.flatMap(getVisitorChildNodesForKey.bind(undefined, node));
+}
+
+/**
+ * Returns visitor child nodes for one visitor key.
+ *
+ * @param node - Node whose child should be read.
+ * @param key - Visitor key.
+ * @returns Child nodes for the key.
+ */
+function getVisitorChildNodesForKey(node: Readonly<TSESTree.Node>, key: string): ReadonlyArray<TSESTree.Node> {
+  return getVisitorArrayNodes(Reflect.get(node, key));
 }
 
 /**

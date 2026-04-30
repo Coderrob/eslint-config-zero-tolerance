@@ -13,7 +13,7 @@ ruleTester.run('no-shell-command-construction', noShellCommandConstruction, {
     },
     {
       name: 'should allow approved shell wrapper',
-      code: "safeExec(`git ${branch}`);",
+      code: 'safeExec(`git ${branch}`);',
       options: [{ approvedWrapperNames: ['safeExec'] }],
     },
     {

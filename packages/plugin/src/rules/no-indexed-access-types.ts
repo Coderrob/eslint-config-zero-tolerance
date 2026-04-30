@@ -133,16 +133,28 @@ function getIndexedAccessPropertyName(
 }
 
 /**
+ * Walks to the nearest ancestor whose parent is the Program node.
+ *
+ * @param node - Node to inspect.
+ * @returns Nearest top-level node.
+ */
+function getNearestTopLevelNode(node: Readonly<TSESTree.Node>): TSESTree.Node {
+  if (node.parent === undefined || node.parent.type === AST_NODE_TYPES.Program) {
+    return node;
+  }
+  return getNearestTopLevelNode(node.parent);
+}
+
+/**
  * Returns the nearest top-level statement that contains the node.
  *
  * @param node - Node to inspect.
  * @returns Top-level statement, or null when none is available.
  */
-function getNearestTopLevelStatement(node: Readonly<TSESTree.Node>): TSESTree.ProgramStatement | null {
-  let currentNode = node;
-  while (currentNode.parent !== undefined && currentNode.parent.type !== AST_NODE_TYPES.Program) {
-    currentNode = currentNode.parent;
-  }
+function getNearestTopLevelStatement(
+  node: Readonly<TSESTree.Node>,
+): TSESTree.ProgramStatement | null {
+  const currentNode = getNearestTopLevelNode(node);
   /* istanbul ignore next -- parser-produced TSIndexedAccessType nodes always have a statement ancestor. */
   if (!isProgramStatement(currentNode)) {
     return null;
@@ -175,7 +187,9 @@ function getTopLevelBindingName(statement: Readonly<TSESTree.ProgramStatement>):
  * @param statement - Variable declaration to inspect.
  * @returns Binding name, or null.
  */
-function getVariableDeclarationBindingName(statement: Readonly<TSESTree.VariableDeclaration>): string | null {
+function getVariableDeclarationBindingName(
+  statement: Readonly<TSESTree.VariableDeclaration>,
+): string | null {
   const declaration = statement.declarations[0];
   /* istanbul ignore next -- multi-declarator variable collision handling is intentionally conservative. */
   return statement.declarations.length === 1 && declaration.id.type === AST_NODE_TYPES.Identifier
@@ -190,7 +204,10 @@ function getVariableDeclarationBindingName(statement: Readonly<TSESTree.Variable
  * @param statement - Program statement to inspect.
  * @returns True when the statement declares the binding.
  */
-function hasMatchingTopLevelBinding(name: string, statement: Readonly<TSESTree.ProgramStatement>): boolean {
+function hasMatchingTopLevelBinding(
+  name: string,
+  statement: Readonly<TSESTree.ProgramStatement>,
+): boolean {
   return getTopLevelBindingName(statement) === name;
 }
 
@@ -236,10 +253,7 @@ function replaceWithExtractedTypeAlias(
     return [];
   }
   const aliasText = `type ${aliasName} = ${sourceCode.getText(node)};\n`;
-  return [
-    fixer.insertTextBefore(statement, aliasText),
-    fixer.replaceText(node, aliasName),
-  ];
+  return [fixer.insertTextBefore(statement, aliasText), fixer.replaceText(node, aliasName)];
 }
 
 /**

@@ -8,6 +8,9 @@ import { RequireBddSpecMessageId, requireBddSpec } from './require-bdd-spec';
 
 const tmpDir = mkdtempSync(join(tmpdir(), 'require-bdd-spec-test-'));
 const THEN_FIELD = 'then';
+const INDENT_SIZE = 2;
+const NON_STRING_FIELD_VALUE = 123;
+const NON_STRING_SCHEMA_VALUE = 42;
 
 afterAll(() => {
   rmSync(tmpDir, { recursive: true, force: true });
@@ -42,7 +45,7 @@ function buildValidBddSpec(sourceFilePath: string, namedExports: readonly string
 
 /** Writes a sibling BDD spec for the given source file path. */
 function makeBddSpec(sourceFilePath: string, spec: unknown): void {
-  writeFileSync(sourceFilePath + '.bdd.json', JSON.stringify(spec, null, 2));
+  writeFileSync(sourceFilePath + '.bdd.json', JSON.stringify(spec, null, INDENT_SIZE));
 }
 
 /** Builds a minimal valid BDD spec object for a source file with given named exports. */
@@ -322,7 +325,7 @@ const nonStringSourceFileFieldSourceFile = makeSourceFile(
 makeBddSpec(nonStringSourceFileFieldSourceFile, {
   $schema: '../../../../bdd-spec.schema.json',
   schemaVersion: '1.0.0',
-  sourceFile: 123,
+  sourceFile: NON_STRING_FIELD_VALUE,
   module: { name: 'q', description: 'q', exports: ['q'] },
   specifications: [
     {
@@ -376,7 +379,7 @@ const nonStringSchemaFieldSourceFile = makeSourceFile(
   'export const u = 21;\n',
 );
 makeBddSpec(nonStringSchemaFieldSourceFile, {
-  $schema: 42,
+  $schema: NON_STRING_SCHEMA_VALUE,
   schemaVersion: '1.0.0',
   sourceFile: nonStringSchemaFieldSourceFile,
   module: { name: 'u', description: 'u', exports: ['u'] },
@@ -416,7 +419,7 @@ makeBddSpec(nonObjectScenarioSourceFile, {
   schemaVersion: '1.0.0',
   sourceFile: nonObjectScenarioSourceFile,
   module: { name: 'w', description: 'w', exports: ['w'] },
-  specifications: [{ feature: 'Feature w', scenarios: [123] }],
+  specifications: [{ feature: 'Feature w', scenarios: [NON_STRING_FIELD_VALUE] }],
 });
 
 // Invalid: scenario missing name triggers should-prefix early return path.

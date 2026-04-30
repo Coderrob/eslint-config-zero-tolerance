@@ -33,7 +33,10 @@ const OBJECT_FREEZE_PATH = ['Object', 'freeze'];
  * @param context - ESLint rule execution context.
  * @param node - Program node being traversed.
  */
-function checkProgram(context: Readonly<RequireExportedObjectTypeContext>, node: Readonly<TSESTree.Program>): void {
+function checkProgram(
+  context: Readonly<RequireExportedObjectTypeContext>,
+  node: Readonly<TSESTree.Program>,
+): void {
   const exportedBindings = getIndirectlyExportedBindings(node.body);
   for (const statement of node.body) {
     reportDirectExportViolations(context, statement);
@@ -116,7 +119,7 @@ function getIndirectlyExportedBindings(
       continue;
     }
     for (const specifier of statement.specifiers) {
-      exportedBindings.add(specifier.local.name);
+      Reflect.apply(Set.prototype.add, exportedBindings, [specifier.local.name]);
     }
   }
   return exportedBindings;
@@ -197,7 +200,9 @@ function isObjectLikeInitializer(expression: Readonly<TSESTree.Expression>): boo
  * @param declarator - Variable declarator to inspect.
  * @returns True when the declarator should be reported.
  */
-function isUntypedExportedObjectDeclarator(declarator: Readonly<TSESTree.VariableDeclarator>): boolean {
+function isUntypedExportedObjectDeclarator(
+  declarator: Readonly<TSESTree.VariableDeclarator>,
+): boolean {
   return (
     declarator.id.type === AST_NODE_TYPES.Identifier &&
     declarator.id.typeAnnotation === undefined &&

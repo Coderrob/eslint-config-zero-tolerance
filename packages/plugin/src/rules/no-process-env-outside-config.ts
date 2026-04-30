@@ -96,10 +96,7 @@ function isAllowedConfigBasename(basename: string): boolean {
  * @returns True when process.env access is allowed in this file.
  */
 function isAllowedConfigFile(filename: string): boolean {
-  const normalizedFilename = filename
-    .split(WINDOWS_PATH_SEPARATOR)
-    .join('/')
-    .toLowerCase();
+  const normalizedFilename = filename.split(WINDOWS_PATH_SEPARATOR).join('/').toLowerCase();
   return (
     normalizedFilename.includes(CONFIG_DIRECTORY_SEGMENT) ||
     isAllowedConfigBasename(getBasename(normalizedFilename))

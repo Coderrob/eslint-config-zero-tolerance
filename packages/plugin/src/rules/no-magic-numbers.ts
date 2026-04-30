@@ -58,7 +58,9 @@ function checkLiteral(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoMagicNumbersListeners(context: Readonly<NoMagicNumbersContext>): TSESLint.RuleListener {
+function createNoMagicNumbersListeners(
+  context: Readonly<NoMagicNumbersContext>,
+): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
   return {
     Literal: checkLiteral.bind(undefined, context, sourceCode),
@@ -71,7 +73,9 @@ function createNoMagicNumbersListeners(context: Readonly<NoMagicNumbersContext>)
  * @param node - Candidate node whose parent may be a variable declarator.
  * @returns Owning variable declarator, or null.
  */
-function getDirectVariableDeclarator(node: Readonly<TSESTree.Node>): TSESTree.VariableDeclarator | null {
+function getDirectVariableDeclarator(
+  node: Readonly<TSESTree.Node>,
+): TSESTree.VariableDeclarator | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
@@ -101,7 +105,9 @@ function getNumericLiteralText(
  * @param node - The literal node to find the declarator for.
  * @returns The variable declarator if found, otherwise null.
  */
-function getVariableDeclarator(node: Readonly<TSESTree.Literal>): TSESTree.VariableDeclarator | null {
+function getVariableDeclarator(
+  node: Readonly<TSESTree.Literal>,
+): TSESTree.VariableDeclarator | null {
   if (isUnaryMinus(node.parent)) {
     return getDirectVariableDeclarator(node.parent);
   }

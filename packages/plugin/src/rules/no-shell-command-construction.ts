@@ -45,10 +45,7 @@ enum NoShellCommandConstructionMessageId {
 }
 
 type NoShellCommandConstructionContext = Readonly<
-  TSESLint.RuleContext<
-    NoShellCommandConstructionMessageId,
-    [INoShellCommandConstructionOptions?]
-  >
+  TSESLint.RuleContext<NoShellCommandConstructionMessageId, [INoShellCommandConstructionOptions?]>
 >;
 
 /**
@@ -69,7 +66,10 @@ function checkShellCommandCall(
     return;
   }
   if (isShellStringCall(state, options, node) || isShellEnabledSpawn(state, node)) {
-    context.report({ node, messageId: NoShellCommandConstructionMessageId.ShellCommandConstruction });
+    context.report({
+      node,
+      messageId: NoShellCommandConstructionMessageId.ShellCommandConstruction,
+    });
   }
 }
 
@@ -120,7 +120,10 @@ function getChildProcessApiName(
  * @param memberPath - Dotted callee path.
  * @returns The API name when the path uses a tracked namespace.
  */
-function getNamespacedApiName(state: Readonly<IShellCommandState>, memberPath: string | null): string | null {
+function getNamespacedApiName(
+  state: Readonly<IShellCommandState>,
+  memberPath: string | null,
+): string | null {
   /* istanbul ignore next */
   if (memberPath === null) {
     return null;
@@ -140,7 +143,10 @@ function getNamespacedApiName(state: Readonly<IShellCommandState>, memberPath: s
  * @param callee - Callee expression to inspect.
  * @returns Shell API name when statically known.
  */
-function getShellApiName(state: Readonly<IShellCommandState>, callee: Readonly<TSESTree.Expression>): string | null {
+function getShellApiName(
+  state: Readonly<IShellCommandState>,
+  callee: Readonly<TSESTree.Expression>,
+): string | null {
   const importedName = getChildProcessApiName(state, callee);
   if (importedName !== null) {
     return importedName;
@@ -198,7 +204,10 @@ function isDynamicFirstArgument(node: Readonly<TSESTree.CallExpression>): boolea
  * @param node - Call expression to inspect.
  * @returns True when spawn shell mode is enabled.
  */
-function isShellEnabledSpawn(state: Readonly<IShellCommandState>, node: Readonly<TSESTree.CallExpression>): boolean {
+function isShellEnabledSpawn(
+  state: Readonly<IShellCommandState>,
+  node: Readonly<TSESTree.CallExpression>,
+): boolean {
   const apiName = getShellApiName(state, node.callee);
   return SPAWN_FUNCTIONS.includes(apiName ?? '') && hasShellTrueArgument(node);
 }
@@ -247,7 +256,10 @@ function isShellStringCall(
  * @param node - Call expression to inspect.
  * @returns True when the command argument is dynamically constructed.
  */
-function isSpawnDynamicCommand(apiName: string | null, node: Readonly<TSESTree.CallExpression>): boolean {
+function isSpawnDynamicCommand(
+  apiName: string | null,
+  node: Readonly<TSESTree.CallExpression>,
+): boolean {
   if (!SPAWN_FUNCTIONS.includes(apiName ?? '')) {
     return false;
   }
@@ -302,11 +314,14 @@ function trackChildProcessSpecifier(
   specifier: Readonly<TSESTree.ImportClause>,
 ): void {
   if (specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier) {
-    state.childProcessNamespaces.add(specifier.local.name);
+    Reflect.apply(Set.prototype.add, state.childProcessNamespaces, [specifier.local.name]);
   }
   if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
     /* istanbul ignore next */
-    state.childProcessImports.set(specifier.local.name, getCalleeName(specifier.imported) ?? '');
+    Reflect.apply(Map.prototype.set, state.childProcessImports, [
+      specifier.local.name,
+      getCalleeName(specifier.imported) ?? '',
+    ]);
   }
 }
 

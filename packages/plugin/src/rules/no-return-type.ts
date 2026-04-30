@@ -36,7 +36,10 @@ type NoReturnTypeContext = Readonly<TSESLint.RuleContext<NoReturnTypeMessageId, 
  * @param context - ESLint rule execution context.
  * @param node - Type reference node to inspect.
  */
-function checkTypeReference(context: Readonly<NoReturnTypeContext>, node: Readonly<TSESTree.TSTypeReference>): void {
+function checkTypeReference(
+  context: Readonly<NoReturnTypeContext>,
+  node: Readonly<TSESTree.TSTypeReference>,
+): void {
   if (!isReturnTypeReference(node)) {
     return;
   }
@@ -74,7 +77,9 @@ function createExplicitReturnTypeSuggestions(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoReturnTypeListeners(context: Readonly<NoReturnTypeContext>): TSESLint.RuleListener {
+function createNoReturnTypeListeners(
+  context: Readonly<NoReturnTypeContext>,
+): TSESLint.RuleListener {
   return {
     TSTypeReference: checkTypeReference.bind(undefined, context),
   };
@@ -258,9 +263,7 @@ function isReturnTypeReference(node: Readonly<TSESTree.TSTypeReference>): boolea
  * @param node - Type node to inspect.
  * @returns True when the node is a type query.
  */
-function isTypeQueryArgument(
-  node: TSESTree.TypeNode | null,
-): node is TSESTree.TSTypeQuery {
+function isTypeQueryArgument(node: TSESTree.TypeNode | null): node is TSESTree.TSTypeQuery {
   return node?.type === AST_NODE_TYPES.TSTypeQuery;
 }
 
@@ -286,7 +289,10 @@ function replaceReturnTypeReference(
  * @param context - ESLint rule execution context.
  * @param node - Type reference node to report.
  */
-function reportReturnType(context: Readonly<NoReturnTypeContext>, node: Readonly<TSESTree.TSTypeReference>): void {
+function reportReturnType(
+  context: Readonly<NoReturnTypeContext>,
+  node: Readonly<TSESTree.TSTypeReference>,
+): void {
   const suggestions = createExplicitReturnTypeSuggestions(context.sourceCode, node);
   context.report({
     node,

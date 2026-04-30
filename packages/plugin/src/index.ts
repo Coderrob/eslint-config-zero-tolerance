@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import packageJson from '../package.json';
-import type { IPluginFlatConfig } from './configs/recommended';
 import {
   createRecommendedConfig,
   createStrictConfig,
   legacyRecommendedConfig,
   legacyStrictConfig,
 } from './configs';
+import type { IPluginFlatConfig } from './configs/recommended';
+import { PLUGIN_PACKAGE_NAME, PLUGIN_PACKAGE_VERSION } from './constants';
 import maxFunctionLines from './rules/max-function-lines';
 import maxParams from './rules/max-params';
 import noArrayMutation from './rules/no-array-mutation';
@@ -205,8 +205,8 @@ const rules: Record<string, unknown> = {
 /** Base plugin object shared by both flat and legacy config presets. */
 const basePlugin: IBasePlugin = {
   meta: {
-    name: packageJson.name,
-    version: packageJson.version,
+    name: PLUGIN_PACKAGE_NAME,
+    version: PLUGIN_PACKAGE_VERSION,
   },
   rules,
 };

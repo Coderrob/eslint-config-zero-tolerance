@@ -49,8 +49,18 @@ function addMissingImportType(
     return;
   }
   const typeNames = missingImportTypes.get(fixInputs.moduleName) ?? new Set<string>();
-  typeNames.add(fixInputs.typeName);
-  missingImportTypes.set(fixInputs.moduleName, typeNames);
+  Reflect.apply(Set.prototype.add, typeNames, [fixInputs.typeName]);
+  Reflect.apply(Map.prototype.set, missingImportTypes, [fixInputs.moduleName, typeNames]);
+}
+
+/**
+ * Appends one value to an accumulator.
+ *
+ * @param values - Accumulator array.
+ * @param value - Value to append.
+ */
+function appendValue<T>(values: readonly T[], item: Readonly<T>): void {
+  Reflect.apply(Array.prototype.push, values, [item]);
 }
 
 /**
@@ -60,7 +70,11 @@ function addMissingImportType(
  * @param key - Property key.
  * @param value - Property value.
  */
-function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string, value: unknown): void {
+function collectChildNodeValue(
+  childNodes: readonly TSESTree.Node[],
+  key: string,
+  value: unknown,
+): void {
   if (key === PARENT_PROPERTY_KEY) {
     return;
   }
@@ -69,7 +83,7 @@ function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string
     return;
   }
   if (isNodeLike(value)) {
-    childNodes.push(value);
+    appendValue(childNodes, value);
   }
 }
 
@@ -79,10 +93,13 @@ function collectChildNodeValue(childNodes: readonly TSESTree.Node[], key: string
  * @param childNodes - Mutable child node collection.
  * @param values - Property array values.
  */
-function collectChildNodeValues(childNodes: readonly TSESTree.Node[], values: readonly unknown[]): void {
+function collectChildNodeValues(
+  childNodes: readonly TSESTree.Node[],
+  values: readonly unknown[],
+): void {
   for (const value of values) {
     if (isNodeLike(value)) {
-      childNodes.push(value);
+      appendValue(childNodes, value);
     }
   }
 }
@@ -102,7 +119,7 @@ function collectInlineTypeImportFixTargets(
   if (node.type === AST_NODE_TYPES.TSImportType) {
     const fixInputs = getInlineTypeImportFixInputs(sourceCode, node);
     if (fixInputs !== null) {
-      targets.push({ node, fixInputs });
+      appendValue(targets, { node, fixInputs });
     }
   }
   for (const child of getChildNodes(node)) {
@@ -172,7 +189,7 @@ function createInlineTypeImportFixes(
   const targets = getSafeInlineTypeImportFixTargets(sourceCode);
   const fixes = [...createImportTypeInsertionFixes(sourceCode, targets, fixer)];
   for (const target of targets) {
-    fixes.push(fixer.replaceText(target.node, target.fixInputs.typeName));
+    appendValue(fixes, fixer.replaceText(target.node, target.fixInputs.typeName));
   }
   return fixes;
 }
@@ -190,7 +207,7 @@ function createMissingImportTypeText(
 ): string {
   const declarations: string[] = [];
   for (const [moduleName, typeNames] of getMissingImportTypesByModule(program, targets)) {
-    declarations.push(createImportDeclarationText(moduleName, typeNames));
+    appendValue(declarations, createImportDeclarationText(moduleName, typeNames));
   }
   return declarations.join('');
 }
@@ -249,10 +266,12 @@ function getChildNodes(node: Readonly<TSESTree.Node>): TSESTree.Node[] {
  * @param statement - Import declaration to inspect.
  * @returns Local binding names.
  */
-function getImportSpecifierLocalNames(statement: Readonly<TSESTree.ImportDeclaration>): readonly string[] {
+function getImportSpecifierLocalNames(
+  statement: Readonly<TSESTree.ImportDeclaration>,
+): readonly string[] {
   const names: string[] = [];
   for (const specifier of statement.specifiers) {
-    names.push(specifier.local.name);
+    appendValue(names, specifier.local.name);
   }
   return names;
 }
@@ -298,14 +317,30 @@ function getInlineTypeImportFixTargets(
  * @param program - Program node.
  * @returns Last import declaration, or null when none exist.
  */
-function getLastImportDeclaration(program: Readonly<TSESTree.Program>): TSESTree.ImportDeclaration | null {
-  let lastImport: TSESTree.ImportDeclaration | null = null;
-  for (const statement of program.body) {
-    if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
-      lastImport = statement;
-    }
+function getLastImportDeclaration(
+  program: Readonly<TSESTree.Program>,
+): TSESTree.ImportDeclaration | null {
+  return getLastImportDeclarationAtIndex(program.body, program.body.length - 1);
+}
+
+/**
+ * Finds the last import declaration by scanning backward immutably.
+ *
+ * @param statements - Program body statements.
+ * @param index - Current statement index.
+ * @returns Last import declaration, or null when none exist.
+ */
+function getLastImportDeclarationAtIndex(
+  statements: ReadonlyArray<TSESTree.ProgramStatement>,
+  index: number,
+): TSESTree.ImportDeclaration | null {
+  if (index < 0) {
+    return null;
   }
-  return lastImport;
+  const statement = statements[index];
+  return statement.type === AST_NODE_TYPES.ImportDeclaration
+    ? statement
+    : getLastImportDeclarationAtIndex(statements, index - 1);
 }
 
 /**
@@ -325,7 +360,10 @@ function getMissingImportTypesByModule(
   }
   const sortedMissingImportTypes = new Map<string, readonly string[]>();
   for (const [moduleName, typeNames] of missingImportTypes) {
-    sortedMissingImportTypes.set(moduleName, Array.from(typeNames).sort());
+    Reflect.apply(Map.prototype.set, sortedMissingImportTypes, [
+      moduleName,
+      getSortedStrings(typeNames),
+    ]);
   }
   return sortedMissingImportTypes;
 }
@@ -342,10 +380,20 @@ function getSafeInlineTypeImportFixTargets(
   const safeTargets: InlineTypeImportFixTarget[] = [];
   for (const target of getInlineTypeImportFixTargets(sourceCode)) {
     if (isSafeInlineTypeImportFix(sourceCode.ast, target.fixInputs)) {
-      safeTargets.push(target);
+      appendValue(safeTargets, target);
     }
   }
   return safeTargets;
+}
+
+/**
+ * Returns strings sorted in ascending order.
+ *
+ * @param values - Values to sort.
+ * @returns Sorted values.
+ */
+function getSortedStrings(values: Readonly<Iterable<string>>): readonly string[] {
+  return Array.from(values).reduce<readonly string[]>(insertSortedString, []);
 }
 
 /**
@@ -354,7 +402,9 @@ function getSafeInlineTypeImportFixTargets(
  * @param statement - Program statement to inspect.
  * @returns Binding names.
  */
-function getTopLevelBindingNames(statement: Readonly<TSESTree.ProgramStatement>): readonly string[] {
+function getTopLevelBindingNames(
+  statement: Readonly<TSESTree.ProgramStatement>,
+): readonly string[] {
   if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
     return getImportSpecifierLocalNames(statement);
   }
@@ -374,7 +424,10 @@ function getTopLevelBindingNames(statement: Readonly<TSESTree.ProgramStatement>)
  * @param typeName - Local type name to find.
  * @returns True when a matching specifier exists.
  */
-function hasImportSpecifier(statement: Readonly<TSESTree.ImportDeclaration>, typeName: string): boolean {
+function hasImportSpecifier(
+  statement: Readonly<TSESTree.ImportDeclaration>,
+  typeName: string,
+): boolean {
   for (const specifier of statement.specifiers) {
     if (specifier.local.name === typeName) {
       return true;
@@ -416,6 +469,21 @@ function hasTopLevelBinding(program: Readonly<TSESTree.Program>, typeName: strin
     }
   }
   return false;
+}
+
+/**
+ * Inserts one string into a sorted immutable list.
+ *
+ * @param sortedValues - Sorted values.
+ * @param value - Value to insert.
+ * @returns Updated sorted values.
+ */
+function insertSortedString(sortedValues: readonly string[], value: string): readonly string[] {
+  const insertionIndex = sortedValues.findIndex(isSortedStringAfterValue.bind(undefined, value));
+  if (insertionIndex === -1) {
+    return [...sortedValues, value];
+  }
+  return [...sortedValues.slice(0, insertionIndex), value, ...sortedValues.slice(insertionIndex)];
 }
 
 /**
@@ -466,6 +534,17 @@ function isSafeInlineTypeImportFix(
   return (
     hasReusableTypeImport(program, fixInputs) || !hasTopLevelBinding(program, fixInputs.typeName)
   );
+}
+
+/**
+ * Returns true when an existing sorted string should come after the inserted value.
+ *
+ * @param value - Value being inserted.
+ * @param sortedValue - Existing sorted value.
+ * @returns True when the insertion point has been found.
+ */
+function isSortedStringAfterValue(value: string, sortedValue: string): boolean {
+  return value < sortedValue;
 }
 
 /**

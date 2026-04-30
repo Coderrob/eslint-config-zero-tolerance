@@ -29,7 +29,10 @@ type NoFlagArgumentContext = Readonly<TSESLint.RuleContext<'noFlagArgument', []>
  * @param context - ESLint rule context.
  * @param node - Function node to inspect.
  */
-function checkFunctionNode(context: Readonly<NoFlagArgumentContext>, node: Readonly<FunctionNode>): void {
+function checkFunctionNode(
+  context: Readonly<NoFlagArgumentContext>,
+  node: Readonly<FunctionNode>,
+): void {
   for (const parameter of node.params) {
     const parameterIdentifier = getNamedParameterIdentifier(parameter);
     if (parameterIdentifier === null || !hasBooleanTypeAnnotation(parameterIdentifier)) {
@@ -45,7 +48,9 @@ function checkFunctionNode(context: Readonly<NoFlagArgumentContext>, node: Reado
  * @param context - ESLint rule context.
  * @returns Rule visitor map.
  */
-function createNoFlagArgumentListeners(context: Readonly<NoFlagArgumentContext>): TSESLint.RuleListener {
+function createNoFlagArgumentListeners(
+  context: Readonly<NoFlagArgumentContext>,
+): TSESLint.RuleListener {
   return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
 }
 

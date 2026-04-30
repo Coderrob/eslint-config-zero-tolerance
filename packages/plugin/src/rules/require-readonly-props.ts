@@ -207,13 +207,16 @@ function isReadonlyTypeReference(node: Readonly<TSESTree.TSTypeReference>): bool
  * @param stateStack - Active function-state stack.
  * @param node - Return statement node.
  */
-function markJsxReturn(stateStack: readonly IFunctionState[], node: Readonly<TSESTree.ReturnStatement>): void {
+function markJsxReturn(
+  stateStack: readonly IFunctionState[],
+  node: Readonly<TSESTree.ReturnStatement>,
+): void {
   const currentState = stateStack.at(-1);
   if (currentState === undefined || node.argument === null) {
     return;
   }
   if (isJsxExpression(node.argument)) {
-    currentState.hasJsxReturn = true;
+    Reflect.set(currentState, 'hasJsxReturn', true);
   }
 }
 
@@ -223,8 +226,11 @@ function markJsxReturn(stateStack: readonly IFunctionState[], node: Readonly<TSE
  * @param stateStack - Active function-state stack.
  * @param node - Arrow function node.
  */
-function onFunctionEnter(stateStack: readonly IFunctionState[], node: Readonly<FunctionNode>): void {
-  stateStack.push(buildFunctionState(node));
+function onFunctionEnter(
+  stateStack: readonly IFunctionState[],
+  node: Readonly<FunctionNode>,
+): void {
+  Reflect.apply(Array.prototype.push, stateStack, [buildFunctionState(node)]);
 }
 
 /**
@@ -248,7 +254,10 @@ function onFunctionExit(
  * @param stateStack - Active function-state stack.
  * @param node - Return statement node.
  */
-function onReturnStatement(stateStack: readonly IFunctionState[], node: Readonly<TSESTree.ReturnStatement>): void {
+function onReturnStatement(
+  stateStack: readonly IFunctionState[],
+  node: Readonly<TSESTree.ReturnStatement>,
+): void {
   markJsxReturn(stateStack, node);
 }
 
@@ -264,7 +273,7 @@ function popAndReportReadonlyViolation(
   stateStack: readonly IFunctionState[],
   node: Readonly<FunctionNode>,
 ): void {
-  const currentState = stateStack.pop();
+  const currentState = Reflect.apply(Array.prototype.pop, stateStack, []);
   if (!shouldReportReadonlyViolation(currentState, node)) {
     return;
   }

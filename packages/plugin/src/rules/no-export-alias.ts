@@ -44,7 +44,9 @@ function checkExportNamedDeclaration(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoExportAliasListeners(context: Readonly<NoExportAliasContext>): TSESLint.RuleListener {
+function createNoExportAliasListeners(
+  context: Readonly<NoExportAliasContext>,
+): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
 
   return {

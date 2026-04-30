@@ -30,7 +30,10 @@ const MIN_TYPE_REFERENCES = 2;
  * @param context - ESLint rule execution context.
  * @param node - The union type node to inspect.
  */
-function checkUnionType(context: Readonly<RequireUnionTypeAliasContext>, node: Readonly<TSESTree.TSUnionType>): void {
+function checkUnionType(
+  context: Readonly<RequireUnionTypeAliasContext>,
+  node: Readonly<TSESTree.TSUnionType>,
+): void {
   if (isDirectTypeAlias(node)) {
     return;
   }
@@ -70,17 +73,6 @@ function countTypeReferences(types: readonly TSESTree.TypeNode[]): number {
 }
 
 /**
- * Returns true when a union member is only a nullish absence marker.
- *
- * @param member - Union member to inspect.
- * @returns True when the member is null or undefined.
- */
-function isNonNullishUnionMember(member: Readonly<TSESTree.TypeNode>): boolean {
-  return member.type !== AST_NODE_TYPES.TSNullKeyword &&
-    member.type !== AST_NODE_TYPES.TSUndefinedKeyword;
-}
-
-/**
  * Creates listeners for inline union type alias checks.
  *
  * @param context - ESLint rule execution context.
@@ -102,6 +94,19 @@ function createRequireUnionTypeAliasListeners(
  */
 function isDirectTypeAlias(node: Readonly<TSESTree.TSUnionType>): boolean {
   return node.parent.type === AST_NODE_TYPES.TSTypeAliasDeclaration;
+}
+
+/**
+ * Returns true when a union member is only a nullish absence marker.
+ *
+ * @param member - Union member to inspect.
+ * @returns True when the member is null or undefined.
+ */
+function isNonNullishUnionMember(member: Readonly<TSESTree.TypeNode>): boolean {
+  return (
+    member.type !== AST_NODE_TYPES.TSNullKeyword &&
+    member.type !== AST_NODE_TYPES.TSUndefinedKeyword
+  );
 }
 
 /**

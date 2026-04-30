@@ -74,7 +74,11 @@ function checkJsonParseVariable(
     return;
   }
   if (isJsonParseCall(node.init)) {
-    reportUnsafeJsonParse(context, node.init, createTypedVariableSuggestion(context.sourceCode, node));
+    reportUnsafeJsonParse(
+      context,
+      node.init,
+      createTypedVariableSuggestion(context.sourceCode, node),
+    );
   }
 }
 
@@ -84,7 +88,9 @@ function checkJsonParseVariable(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoUnsafeJsonParseListeners(context: Readonly<NoUnsafeJsonParseContext>): TSESLint.RuleListener {
+function createNoUnsafeJsonParseListeners(
+  context: Readonly<NoUnsafeJsonParseContext>,
+): TSESLint.RuleListener {
   normalizeOptions(context.options[0]);
   return {
     TSAsExpression: checkJsonParseAssertion.bind(undefined, context),
@@ -140,7 +146,9 @@ function createUnknownSuggestion(
  * @param node - Variable declarator to inspect.
  * @returns The identifier when present.
  */
-function getTypedIdentifier(node: Readonly<TSESTree.VariableDeclarator>): TSESTree.Identifier | null {
+function getTypedIdentifier(
+  node: Readonly<TSESTree.VariableDeclarator>,
+): TSESTree.Identifier | null {
   if (node.id.type !== AST_NODE_TYPES.Identifier || node.id.typeAnnotation === undefined) {
     return null;
   }
@@ -206,10 +214,12 @@ function isUnknownAnnotation(
  * @returns True when the initializer can be suggested.
  */
 function isUntypedVariableInitializer(node: Readonly<TSESTree.TSAsExpression>): boolean {
-  return node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
+  return (
+    node.parent.type === AST_NODE_TYPES.VariableDeclarator &&
     node.parent.init === node &&
     node.parent.id.type === AST_NODE_TYPES.Identifier &&
-    node.parent.id.typeAnnotation === undefined;
+    node.parent.id.typeAnnotation === undefined
+  );
 }
 
 /**

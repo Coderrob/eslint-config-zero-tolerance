@@ -34,7 +34,10 @@ const NEGATIVE_NUMBER_OPERATOR = '-';
  * @param context - ESLint rule execution context.
  * @param node - Property-like node to inspect.
  */
-function checkPropertyNode(context: Readonly<NoLiteralPropertyUnionsContext>, node: Readonly<PropertyNode>): void {
+function checkPropertyNode(
+  context: Readonly<NoLiteralPropertyUnionsContext>,
+  node: Readonly<PropertyNode>,
+): void {
   const typeNode = getPropertyTypeNode(node);
   if (typeNode === null || !isLiteralPropertyUnion(typeNode)) {
     return;
@@ -71,8 +74,11 @@ function createNoLiteralPropertyUnionsListeners(
  * @param node - Property-like node to inspect.
  * @returns Property name text.
  */
-function getPropertyName(sourceCode: Readonly<TSESLint.SourceCode>, node: Readonly<PropertyNode>): string {
-  const propertyName = getUncomputedPropertyName(node.key, node.computed);
+function getPropertyName(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  node: Readonly<PropertyNode>,
+): string {
+  const propertyName = getUncomputedPropertyName({ key: node.key, computed: node.computed });
   return propertyName ?? sourceCode.getText(node.key);
 }
 
@@ -93,11 +99,14 @@ function getPropertyTypeNode(node: Readonly<PropertyNode>): TSESTree.TypeNode | 
  * @param computed - Whether the key is computed.
  * @returns Property name for simple keys, or null.
  */
-function getUncomputedPropertyName(key: Readonly<TSESTree.PropertyName>, computed: boolean): string | null {
-  if (computed) {
+function getUncomputedPropertyName(property: Readonly<{
+  computed: boolean;
+  key: TSESTree.PropertyName;
+}>): string | null {
+  if (property.computed) {
     return null;
   }
-  return getUncomputedPropertyNameFromKey(key);
+  return getUncomputedPropertyNameFromKey(property.key);
 }
 
 /**
@@ -229,7 +238,9 @@ function isLiteralPropertyUnion(node: Readonly<TSESTree.TypeNode>): boolean {
  * @param node - Node to inspect.
  * @returns True when the node is `-<number>`.
  */
-function isNegativeNumberLiteralNode(node: Readonly<TSESTree.Node>): node is TSESTree.UnaryExpression & {
+function isNegativeNumberLiteralNode(
+  node: Readonly<TSESTree.Node>,
+): node is TSESTree.UnaryExpression & {
   argument: TSESTree.NumberLiteral;
   operator: typeof NEGATIVE_NUMBER_OPERATOR;
 } {

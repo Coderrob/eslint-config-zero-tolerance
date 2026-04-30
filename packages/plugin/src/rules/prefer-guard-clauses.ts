@@ -33,7 +33,10 @@ type PreferGuardClausesContext = Readonly<TSESLint.RuleContext<'preferGuardClaus
  * @param context - ESLint rule context.
  * @param node - If statement node.
  */
-function checkIfStatement(context: Readonly<PreferGuardClausesContext>, node: Readonly<TSESTree.IfStatement>): void {
+function checkIfStatement(
+  context: Readonly<PreferGuardClausesContext>,
+  node: Readonly<TSESTree.IfStatement>,
+): void {
   if (!shouldReportElseBlock(node) || node.alternate === null) {
     return;
   }
@@ -41,20 +44,6 @@ function checkIfStatement(context: Readonly<PreferGuardClausesContext>, node: Re
     node: node.alternate,
     messageId: 'preferGuardClauses',
   });
-}
-
-/**
- * Returns true when the consequent branch ends with a terminator.
- *
- * @param consequent - If consequent statement.
- * @returns True when guard-clause style is applicable.
- */
-function consequentEndsWithTerminator(consequent: Readonly<TSESTree.Statement>): boolean {
-  if (consequent.type === AST_NODE_TYPES.BlockStatement) {
-    const last = consequent.body.at(-1);
-    return last !== undefined && isTerminator(last);
-  }
-  return isTerminator(consequent);
 }
 
 /**
@@ -84,6 +73,20 @@ function createPreferGuardClausesListeners(
 }
 
 /**
+ * Returns true when the consequent branch ends with a terminator.
+ *
+ * @param consequent - If consequent statement.
+ * @returns True when guard-clause style is applicable.
+ */
+function hasTerminatingConsequent(consequent: Readonly<TSESTree.Statement>): boolean {
+  if (consequent.type === AST_NODE_TYPES.BlockStatement) {
+    const last = consequent.body.at(-1);
+    return last !== undefined && isTerminator(last);
+  }
+  return isTerminator(consequent);
+}
+
+/**
  * Returns true when a node is a control-flow terminator statement.
  *
  * @param node - Statement node to check.
@@ -103,7 +106,7 @@ function shouldReportElseBlock(node: Readonly<TSESTree.IfStatement>): boolean {
   if (node.alternate === null || node.alternate.type === AST_NODE_TYPES.IfStatement) {
     return false;
   }
-  return consequentEndsWithTerminator(node.consequent);
+  return hasTerminatingConsequent(node.consequent);
 }
 
 /** Prefers guard clauses over `else` blocks after terminating branches. */

@@ -156,8 +156,10 @@ function isTrackedVmImportSpecifier(
   specifier: Readonly<TSESTree.ImportClause>,
 ): specifier is TSESTree.ImportSpecifier {
   /* istanbul ignore next */
-  return specifier.type === AST_NODE_TYPES.ImportSpecifier &&
-    VM_METHODS.includes(getCalleeName(specifier.imported) ?? '');
+  return (
+    specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+    VM_METHODS.includes(getCalleeName(specifier.imported) ?? '')
+  );
 }
 
 /**
@@ -189,9 +191,11 @@ function isUnsafeGlobalConstructor(
   context: Readonly<NoUnsafeCodeGenerationContext>,
   node: Readonly<TSESTree.NewExpression>,
 ): boolean {
-  return node.callee.type === AST_NODE_TYPES.Identifier &&
+  return (
+    node.callee.type === AST_NODE_TYPES.Identifier &&
     node.callee.name === FUNCTION_CONSTRUCTOR_NAME &&
-    !isShadowedIdentifier(context, node.callee, node.callee.name);
+    !isShadowedIdentifier(context, node.callee, node.callee.name)
+  );
 }
 
 /**
@@ -215,7 +219,10 @@ function isUnsafeTimerCall(node: Readonly<TSESTree.CallExpression>): boolean {
  * @param node - Call expression to inspect.
  * @returns True when the call uses a vm execution API.
  */
-function isUnsafeVmCall(state: Readonly<ICodeGenerationState>, node: Readonly<TSESTree.CallExpression>): boolean {
+function isUnsafeVmCall(
+  state: Readonly<ICodeGenerationState>,
+  node: Readonly<TSESTree.CallExpression>,
+): boolean {
   const memberPath = getMemberPath(node.callee);
   const calleeName = getCalleeName(node.callee);
   /* istanbul ignore next */
@@ -229,7 +236,10 @@ function isUnsafeVmCall(state: Readonly<ICodeGenerationState>, node: Readonly<TS
  * @param node - New expression to inspect.
  * @returns True when the constructor uses vm.Script.
  */
-function isUnsafeVmConstructor(state: Readonly<ICodeGenerationState>, node: Readonly<TSESTree.NewExpression>): boolean {
+function isUnsafeVmConstructor(
+  state: Readonly<ICodeGenerationState>,
+  node: Readonly<TSESTree.NewExpression>,
+): boolean {
   const memberPath = getMemberPath(node.callee);
   const calleeName = getCalleeName(node.callee);
   /* istanbul ignore next */
@@ -262,7 +272,10 @@ function isVmMemberPath(state: Readonly<ICodeGenerationState>, memberPath: strin
  * @param state - Import tracking state.
  * @param node - Import declaration to inspect.
  */
-function trackVmImports(state: Readonly<ICodeGenerationState>, node: Readonly<TSESTree.ImportDeclaration>): void {
+function trackVmImports(
+  state: Readonly<ICodeGenerationState>,
+  node: Readonly<TSESTree.ImportDeclaration>,
+): void {
   if (typeof node.source.value !== 'string' || !VM_MODULES.includes(node.source.value)) {
     return;
   }
@@ -277,12 +290,15 @@ function trackVmImports(state: Readonly<ICodeGenerationState>, node: Readonly<TS
  * @param state - Import tracking state.
  * @param specifier - Import specifier to inspect.
  */
-function trackVmSpecifier(state: Readonly<ICodeGenerationState>, specifier: Readonly<TSESTree.ImportClause>): void {
+function trackVmSpecifier(
+  state: Readonly<ICodeGenerationState>,
+  specifier: Readonly<TSESTree.ImportClause>,
+): void {
   if (specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier) {
-    state.vmNamespaces.add(specifier.local.name);
+    Reflect.apply(Set.prototype.add, state.vmNamespaces, [specifier.local.name]);
   }
   if (isTrackedVmImportSpecifier(specifier)) {
-    state.vmImports.add(specifier.local.name);
+    Reflect.apply(Set.prototype.add, state.vmImports, [specifier.local.name]);
   }
 }
 
@@ -294,7 +310,8 @@ export const noUnsafeCodeGeneration = createRule({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow eval, Function constructors, string timers, and vm code execution APIs',
+      description:
+        'Disallow eval, Function constructors, string timers, and vm code execution APIs',
     },
     messages: {
       unsafeCodeGeneration: 'Dynamic code generation is not allowed.',

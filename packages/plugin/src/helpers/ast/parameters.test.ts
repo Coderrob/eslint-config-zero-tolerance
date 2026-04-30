@@ -12,20 +12,20 @@ describe('ast parameter helpers', () => {
     it('should return the first parameter when it is already a real argument', () => {
       const param = { type: AST_NODE_TYPES.Identifier, name: 'props' };
 
-      expect(getFirstNonThisParameter([param] as any)).toBe(param);
+      expect(getFirstNonThisParameter([param] as unknown)).toBe(param);
     });
 
     it('should return the first parameter that is not the this pseudo-parameter', () => {
       const thisParam = { type: AST_NODE_TYPES.Identifier, name: 'this' };
       const actualParam = { type: AST_NODE_TYPES.Identifier, name: 'props' };
 
-      expect(getFirstNonThisParameter([thisParam, actualParam] as any)).toBe(actualParam);
+      expect(getFirstNonThisParameter([thisParam, actualParam] as unknown)).toBe(actualParam);
     });
 
     it('should return undefined when every parameter is the this pseudo-parameter', () => {
       const thisParam = { type: AST_NODE_TYPES.Identifier, name: 'this' };
 
-      expect(getFirstNonThisParameter([thisParam] as any)).toBeUndefined();
+      expect(getFirstNonThisParameter([thisParam] as unknown)).toBeUndefined();
     });
   });
 
@@ -35,7 +35,7 @@ describe('ast parameter helpers', () => {
       const param = {
         type: AST_NODE_TYPES.ObjectPattern,
         typeAnnotation: { typeAnnotation: typeNode },
-      } as any;
+      } as unknown;
 
       expect(getObjectDestructuredParameterTypeNode(param)).toBe(typeNode);
     });
@@ -48,13 +48,13 @@ describe('ast parameter helpers', () => {
           type: AST_NODE_TYPES.ObjectPattern,
           typeAnnotation: { typeAnnotation: typeNode },
         },
-      } as any;
+      } as unknown;
 
       expect(getObjectDestructuredParameterTypeNode(param)).toBe(typeNode);
     });
 
     it('should return null for non-object destructured parameters', () => {
-      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as any;
+      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as unknown;
 
       expect(getObjectDestructuredParameterTypeNode(param)).toBeNull();
     });
@@ -63,7 +63,7 @@ describe('ast parameter helpers', () => {
       const param = {
         type: AST_NODE_TYPES.AssignmentPattern,
         left: { type: AST_NODE_TYPES.Identifier, name: 'value' },
-      } as any;
+      } as unknown;
 
       expect(getObjectDestructuredParameterTypeNode(param)).toBeNull();
     });
@@ -76,7 +76,7 @@ describe('ast parameter helpers', () => {
         type: AST_NODE_TYPES.Identifier,
         name: 'value',
         typeAnnotation,
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBe(typeAnnotation);
     });
@@ -90,7 +90,7 @@ describe('ast parameter helpers', () => {
           name: 'value',
           typeAnnotation,
         },
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBe(typeAnnotation);
     });
@@ -100,7 +100,7 @@ describe('ast parameter helpers', () => {
       const param = {
         type: AST_NODE_TYPES.ObjectPattern,
         typeAnnotation,
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBe(typeAnnotation);
     });
@@ -114,7 +114,7 @@ describe('ast parameter helpers', () => {
           name: 'value',
           typeAnnotation,
         },
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBe(typeAnnotation);
     });
@@ -131,13 +131,13 @@ describe('ast parameter helpers', () => {
             typeAnnotation,
           },
         },
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBe(typeAnnotation);
     });
 
     it('should return null when a parameter has no type annotation', () => {
-      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as any;
+      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as unknown;
 
       expect(getParameterTypeAnnotation(param)).toBeNull();
     });
@@ -150,13 +150,13 @@ describe('ast parameter helpers', () => {
         type: AST_NODE_TYPES.Identifier,
         name: 'value',
         typeAnnotation: { typeAnnotation: typeNode },
-      } as any;
+      } as unknown;
 
       expect(getParameterTypeNode(param)).toBe(typeNode);
     });
 
     it('should return null when a parameter type annotation is absent', () => {
-      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as any;
+      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as unknown;
 
       expect(getParameterTypeNode(param)).toBeNull();
     });
@@ -164,19 +164,19 @@ describe('ast parameter helpers', () => {
 
   describe('isThisParameter', () => {
     it('should return true for the this pseudo-parameter', () => {
-      const param = { type: AST_NODE_TYPES.Identifier, name: 'this' } as any;
+      const param = { type: AST_NODE_TYPES.Identifier, name: 'this' } as unknown;
 
       expect(isThisParameter(param)).toBe(true);
     });
 
     it('should return false for non-this parameters', () => {
-      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as any;
+      const param = { type: AST_NODE_TYPES.Identifier, name: 'value' } as unknown;
 
       expect(isThisParameter(param)).toBe(false);
     });
 
     it('should return false for non-identifier parameter shapes', () => {
-      const param = { type: AST_NODE_TYPES.ObjectPattern } as any;
+      const param = { type: AST_NODE_TYPES.ObjectPattern } as unknown;
 
       expect(isThisParameter(param)).toBe(false);
     });

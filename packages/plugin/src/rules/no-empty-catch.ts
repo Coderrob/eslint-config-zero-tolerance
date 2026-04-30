@@ -25,7 +25,10 @@ type NoEmptyCatchContext = Readonly<TSESLint.RuleContext<'emptyCatch', []>>;
  * @param context - ESLint rule execution context.
  * @param node - Catch clause node to evaluate.
  */
-function checkCatchClause(context: Readonly<NoEmptyCatchContext>, node: Readonly<TSESTree.CatchClause>): void {
+function checkCatchClause(
+  context: Readonly<NoEmptyCatchContext>,
+  node: Readonly<TSESTree.CatchClause>,
+): void {
   if (!hasEmptyCatchBody(node)) {
     return;
   }
@@ -42,7 +45,9 @@ function checkCatchClause(context: Readonly<NoEmptyCatchContext>, node: Readonly
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoEmptyCatchListeners(context: Readonly<NoEmptyCatchContext>): TSESLint.RuleListener {
+function createNoEmptyCatchListeners(
+  context: Readonly<NoEmptyCatchContext>,
+): TSESLint.RuleListener {
   return {
     CatchClause: checkCatchClause.bind(undefined, context),
   };

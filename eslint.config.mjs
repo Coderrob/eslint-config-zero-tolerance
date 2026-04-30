@@ -190,4 +190,10 @@ const linterOptionsConfig = {
 // Export
 // ============================================================================
 
-export default [eslint.configs.recommended, linterOptionsConfig, baseConfig, testConfig, ignoreConfig];
+export default [
+  eslint.configs.recommended,
+  linterOptionsConfig,
+  baseConfig,
+  testConfig,
+  ignoreConfig,
+];

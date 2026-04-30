@@ -110,7 +110,10 @@ function isElseIfBranch(alternate: TSESTree.Statement | null): boolean {
  * @param context - ESLint rule execution context.
  * @param node - Node to report.
  */
-function reportIdenticalBranches(context: Readonly<NoIdenticalBranchesContext>, node: Readonly<TSESTree.Node>): void {
+function reportIdenticalBranches(
+  context: Readonly<NoIdenticalBranchesContext>,
+  node: Readonly<TSESTree.Node>,
+): void {
   context.report({
     node,
     messageId: 'noIdenticalBranches',

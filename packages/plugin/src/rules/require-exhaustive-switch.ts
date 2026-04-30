@@ -24,9 +24,7 @@ const FALSE_LITERAL = 'false';
 const MINIMUM_EXHAUSTIVE_CASE_COUNT = 2;
 const TRUE_LITERAL = 'true';
 
-type RequireExhaustiveSwitchContext = Readonly<
-  TSESLint.RuleContext<'requireExhaustiveSwitch', []>
->;
+type RequireExhaustiveSwitchContext = Readonly<TSESLint.RuleContext<'requireExhaustiveSwitch', []>>;
 
 interface ISwitchAnalysis {
   expectedCaseTexts: readonly string[];
@@ -94,10 +92,11 @@ function formatBigIntValue(value: Readonly<ts.PseudoBigInt>): string {
  * @param type - TypeScript type to inspect.
  * @returns Boolean case texts, or null when the type is not boolean.
  */
-function getBooleanCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
-  return checker.typeToString(type) === BOOLEAN_TYPE_TEXT
-    ? [FALSE_LITERAL, TRUE_LITERAL]
-    : null;
+function getBooleanCaseTexts(
+  checker: Readonly<ts.TypeChecker>,
+  type: Readonly<ts.Type>,
+): string[] | null {
+  return checker.typeToString(type) === BOOLEAN_TYPE_TEXT ? [FALSE_LITERAL, TRUE_LITERAL] : null;
 }
 
 /**
@@ -117,7 +116,7 @@ function getCaseTextsFromUnionMembers(
     if (caseText === null) {
       return null;
     }
-    caseTexts.push(caseText);
+    Reflect.apply(Array.prototype.push, caseTexts, [caseText]);
   }
   return [...new Set(caseTexts)];
 }
@@ -129,7 +128,10 @@ function getCaseTextsFromUnionMembers(
  * @param type - TypeScript type to inspect.
  * @returns Direct case texts, or null when another strategy is required.
  */
-function getDirectCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
+function getDirectCaseTexts(
+  checker: Readonly<ts.TypeChecker>,
+  type: Readonly<ts.Type>,
+): string[] | null {
   const booleanCaseTexts = getBooleanCaseTexts(checker, type);
   if (booleanCaseTexts !== null) {
     return booleanCaseTexts;
@@ -148,6 +150,17 @@ function getEnumCaseTexts(type: Readonly<ts.Type>): string[] | null {
 }
 
 /**
+ * Returns one enum member case text.
+ *
+ * @param enumName - Enum name.
+ * @param memberSymbol - Enum member symbol.
+ * @returns Switch case text for the enum member.
+ */
+function getEnumMemberCaseText(enumName: string, memberSymbol: Readonly<ts.Symbol>): string {
+  return `${enumName}.${memberSymbol.name}`;
+}
+
+/**
  * Returns enum member case texts for an enum symbol.
  *
  * @param symbol - Enum symbol.
@@ -157,12 +170,7 @@ function getEnumMemberCaseTexts(symbol: ts.Symbol | undefined): string[] | null 
   if (symbol?.exports === undefined || symbol.exports.size === 0) {
     return null;
   }
-  const caseTexts: string[] = [];
-  symbol.exports.forEach(
-    /** @param memberSymbol - Enum member symbol. */
-    (memberSymbol) => caseTexts.push(`${symbol.name}.${memberSymbol.name}`),
-  );
-  return caseTexts;
+  return Array.from(symbol.exports.values()).map(getEnumMemberCaseText.bind(undefined, symbol.name));
 }
 
 /**
@@ -190,7 +198,10 @@ function getExpectedCaseTexts(
  * @param type - TypeScript type to inspect.
  * @returns One finite case text, or null when not representable.
  */
-function getFiniteCaseText(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string | null {
+function getFiniteCaseText(
+  checker: Readonly<ts.TypeChecker>,
+  type: Readonly<ts.Type>,
+): string | null {
   const literalCaseText = getLiteralCaseText(type);
   if (literalCaseText !== null) {
     return literalCaseText;
@@ -217,19 +228,6 @@ function getFiniteCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts
     return [finiteCaseText];
   }
   return getUnionCaseTexts(checker, type) ?? [];
-}
-
-/**
- * Returns true when a switch statement has a default clause.
- *
- * @param node - Switch statement node.
- * @returns True when any case has a null test.
- */
-function getHasDefaultCase(node: Readonly<TSESTree.SwitchStatement>): boolean {
-  return node.cases.some(
-    /** @param switchCase - Case to inspect. */
-    (switchCase) => switchCase.test === null,
-  );
 }
 
 /**
@@ -297,7 +295,7 @@ function getSwitchAnalysis(
   context: Readonly<RequireExhaustiveSwitchContext>,
   node: Readonly<TSESTree.SwitchStatement>,
 ): Readonly<ISwitchAnalysis> | null {
-  if (getHasDefaultCase(node)) {
+  if (hasDefaultCase(node)) {
     return null;
   }
   const expectedCaseTexts = getExpectedCaseTexts(context, node.discriminant);
@@ -341,8 +339,24 @@ function getTypeContext(
  * @param type - TypeScript type to inspect.
  * @returns Union case texts, or null when any member is open-ended.
  */
-function getUnionCaseTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] | null {
+function getUnionCaseTexts(
+  checker: Readonly<ts.TypeChecker>,
+  type: Readonly<ts.Type>,
+): string[] | null {
   return isUnionType(type) ? getCaseTextsFromUnionMembers(checker, type.types) : null;
+}
+
+/**
+ * Returns true when a switch statement has a default clause.
+ *
+ * @param node - Switch statement node.
+ * @returns True when any case has a null test.
+ */
+function hasDefaultCase(node: Readonly<TSESTree.SwitchStatement>): boolean {
+  return node.cases.some(
+    /** @param switchCase - Case to inspect. */
+    (switchCase) => switchCase.test === null,
+  );
 }
 
 /**

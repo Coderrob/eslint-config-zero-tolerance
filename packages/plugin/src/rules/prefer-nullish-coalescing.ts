@@ -109,29 +109,16 @@ function createPreferNullishCoalescingListeners(
 }
 
 /**
- * Compares two expressions by their source code text.
- *
- * @param first - First expression.
- * @param second - Second expression.
- * @param sourceCode - ESLint source code helper.
- * @returns True when expressions are textually equivalent.
- */
-function expressionsMatch(
-  first: Readonly<TSESTree.Expression>,
-  second: Readonly<TSESTree.Expression>,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  return sourceCode.getText(first) === sourceCode.getText(second);
-}
-
-/**
  * Returns left-side nullish-check metadata.
  *
  * @param operator - Binary expression operator.
  * @param rightExpression - Right-side expression.
  * @returns Nullish-check metadata.
  */
-function getLeftNullishCheck(operator: string, rightExpression: Readonly<TSESTree.Expression>): NullishCheck {
+function getLeftNullishCheck(
+  operator: string,
+  rightExpression: Readonly<TSESTree.Expression>,
+): NullishCheck {
   return { expression: rightExpression, positiveCheck: operator === OPERATOR_LOOSE_NOT_EQUAL };
 }
 
@@ -154,7 +141,7 @@ function getNullishCandidate(
     return null;
   }
   const expressionBranch = getNullishExpressionBranch(node, check);
-  if (!zCheckNullishBranchMatch(check.expression, expressionBranch, sourceCode)) {
+  if (!isNullishBranchMatching(check.expression, expressionBranch, sourceCode)) {
     return null;
   }
   const fallback = zNullishFallbackBranch(node, check);
@@ -208,6 +195,22 @@ function getRightNullishCheck(
 }
 
 /**
+ * Compares two expressions by their source code text.
+ *
+ * @param first - First expression.
+ * @param second - Second expression.
+ * @param sourceCode - ESLint source code helper.
+ * @returns True when expressions are textually equivalent.
+ */
+function isExpressionMatching(
+  first: Readonly<TSESTree.Expression>,
+  second: Readonly<TSESTree.Expression>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): boolean {
+  return sourceCode.getText(first) === sourceCode.getText(second);
+}
+
+/**
  * Returns true when a binary expression uses loose nullish comparison operators.
  *
  * @param node - Binary expression node.
@@ -227,6 +230,22 @@ function isLooseNullishBinaryExpression(
  */
 function isLooseNullishOperator(operator: string): boolean {
   return operator === OPERATOR_LOOSE_NOT_EQUAL || operator === OPERATOR_LOOSE_EQUAL;
+}
+
+/**
+ * Returns true when the guarded expression matches the selected conditional branch.
+ *
+ * @param expression - Guarded expression.
+ * @param branch - Conditional branch expression.
+ * @param sourceCode - ESLint source code helper.
+ * @returns True when expressions are textually equivalent.
+ */
+function isNullishBranchMatching(
+  expression: Readonly<TSESTree.Expression>,
+  branch: Readonly<TSESTree.Expression>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): boolean {
+  return isExpressionMatching(expression, branch, sourceCode);
 }
 
 /**
@@ -274,22 +293,6 @@ function resolveNullishCheckFromLeft(
     return getRightNullishCheck(operator, leftExpression, rightOperand);
   }
   return getLeftNullishCheck(operator, rightOperand);
-}
-
-/**
- * Returns true when the guarded expression matches the selected conditional branch.
- *
- * @param expression - Guarded expression.
- * @param branch - Conditional branch expression.
- * @param sourceCode - ESLint source code helper.
- * @returns True when expressions are textually equivalent.
- */
-function zCheckNullishBranchMatch(
-  expression: Readonly<TSESTree.Expression>,
-  branch: Readonly<TSESTree.Expression>,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): boolean {
-  return expressionsMatch(expression, branch, sourceCode);
 }
 
 /**

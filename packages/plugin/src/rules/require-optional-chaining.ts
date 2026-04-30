@@ -157,7 +157,9 @@ function getOptionalChainReplacement(
  * @param expression - The expression to inspect.
  * @returns The wrapped inner expression or null when not wrapped.
  */
-function getWrappedExpression(expression: Readonly<TSESTree.Expression>): TSESTree.Expression | null {
+function getWrappedExpression(
+  expression: Readonly<TSESTree.Expression>,
+): TSESTree.Expression | null {
   if (expression.type === AST_NODE_TYPES.ChainExpression) {
     return expression.expression;
   }

@@ -11,7 +11,7 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'AssignmentPattern',
         left: { type: 'Identifier', name: 'value' },
-      } as any;
+      } as unknown;
 
       expect(getAssignmentPatternIdentifier(param)).toEqual(param.left);
     });
@@ -20,7 +20,7 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'AssignmentPattern',
         left: { type: 'ObjectPattern', properties: [] },
-      } as any;
+      } as unknown;
 
       expect(getAssignmentPatternIdentifier(param)).toBeNull();
     });
@@ -31,7 +31,7 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'RestElement',
         argument: { type: 'Identifier', name: 'items' },
-      } as any;
+      } as unknown;
 
       expect(getRestElementIdentifier(param)).toEqual(param.argument);
     });
@@ -40,7 +40,7 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'RestElement',
         argument: { type: 'ArrayPattern', elements: [] },
-      } as any;
+      } as unknown;
 
       expect(getRestElementIdentifier(param)).toBeNull();
     });
@@ -48,7 +48,7 @@ describe('parameter-helpers', () => {
 
   describe('getNamedParameterIdentifier', () => {
     it('should return the identifier for a plain parameter', () => {
-      const param = { type: 'Identifier', name: 'flag' } as any;
+      const param = { type: 'Identifier', name: 'flag' } as unknown;
 
       expect(getNamedParameterIdentifier(param)).toEqual(param);
     });
@@ -57,7 +57,7 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'AssignmentPattern',
         left: { type: 'Identifier', name: 'count' },
-      } as any;
+      } as unknown;
 
       expect(getNamedParameterIdentifier(param)).toEqual(param.left);
     });
@@ -66,13 +66,13 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'RestElement',
         argument: { type: 'Identifier', name: 'values' },
-      } as any;
+      } as unknown;
 
       expect(getNamedParameterIdentifier(param)).toEqual(param.argument);
     });
 
     it('should return null for a destructured parameter', () => {
-      const param = { type: 'ObjectPattern', properties: [] } as any;
+      const param = { type: 'ObjectPattern', properties: [] } as unknown;
 
       expect(getNamedParameterIdentifier(param)).toBeNull();
     });
@@ -83,13 +83,13 @@ describe('parameter-helpers', () => {
       const param = {
         type: 'AssignmentPattern',
         left: { type: 'Identifier', name: 'value' },
-      } as any;
+      } as unknown;
 
       expect(getNamedParameterName(param)).toBe('value');
     });
 
     it('should return null for a destructured parameter', () => {
-      const param = { type: 'ArrayPattern', elements: [] } as any;
+      const param = { type: 'ArrayPattern', elements: [] } as unknown;
 
       expect(getNamedParameterName(param)).toBeNull();
     });

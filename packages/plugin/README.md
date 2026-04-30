@@ -128,24 +128,24 @@ export default [
 
 ### Code Quality
 
-| Rule                         | Description                                                                             |
-| ---------------------------- | --------------------------------------------------------------------------------------- |
-| `max-function-lines`         | Enforce a maximum number of lines per function body                                     |
-| `max-params`                 | Enforce a maximum number of function parameters                                         |
-| `no-array-mutation`          | Disallow mutating array methods                                                         |
-| `no-date-now`                | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
-| `no-placeholder-implementation` | Disallow placeholder, stub, TODO, and not implemented production code                 |
-| `no-magic-numbers`           | Disallow magic numbers; use named constants instead                                     |
-| `no-magic-strings`           | Disallow magic strings in comparisons and switch cases                                  |
-| `no-map-set-mutation`        | Disallow direct `Map` and `Set` mutation methods                                        |
-| `no-object-mutation`         | Disallow direct object-property mutation                                                |
-| `sort-imports`               | Require import declarations to be ordered by group and alphabetically within each group |
-| `sort-functions`             | Require top-level functions and const function expressions to be sorted alphabetically  |
-| `prefer-nullish-coalescing`  | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
-| `prefer-object-spread`       | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
-| `prefer-readonly-parameters` | Prefer readonly typing for object and array-like parameters                             |
-| `prefer-string-raw`          | Prefer `String.raw` for strings containing escaped backslashes                          |
-| `prefer-structured-clone`    | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
+| Rule                            | Description                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------- |
+| `max-function-lines`            | Enforce a maximum number of lines per function body                                     |
+| `max-params`                    | Enforce a maximum number of function parameters                                         |
+| `no-array-mutation`             | Disallow mutating array methods                                                         |
+| `no-date-now`                   | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
+| `no-placeholder-implementation` | Disallow placeholder, stub, TODO, and not implemented production code                   |
+| `no-magic-numbers`              | Disallow magic numbers; use named constants instead                                     |
+| `no-magic-strings`              | Disallow magic strings in comparisons and switch cases                                  |
+| `no-map-set-mutation`           | Disallow direct `Map` and `Set` mutation methods                                        |
+| `no-object-mutation`            | Disallow direct object-property mutation                                                |
+| `sort-imports`                  | Require import declarations to be ordered by group and alphabetically within each group |
+| `sort-functions`                | Require top-level functions and const function expressions to be sorted alphabetically  |
+| `prefer-nullish-coalescing`     | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
+| `prefer-object-spread`          | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
+| `prefer-readonly-parameters`    | Prefer readonly typing for object and array-like parameters                             |
+| `prefer-string-raw`             | Prefer `String.raw` for strings containing escaped backslashes                          |
+| `prefer-structured-clone`       | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
 
 ### Error Handling
 
@@ -159,20 +159,20 @@ export default [
 
 `no-parent-internal-access` remains opt-in and only matches the first concrete directory reached after `..` traversal, such as `../src/foo`.
 
-| Rule                        | Description                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| `require-clean-barrel`      | Require barrel files (`index.*`) to contain only module re-exports                |
-| `require-barrel-relative-exports` | Require barrel re-exports to use `./` descendant paths                      |
-| `no-barrel-parent-imports`  | Disallow parent-directory traversal in barrel-file import paths                   |
-| `no-parent-internal-access` | Disallow parent-relative access into protected internal directories such as `src` |
-| `no-dynamic-import`         | Ban dynamic `import()` and `require()` outside test files                         |
-| `no-export-alias`           | Prevent use of aliases in export statements                                       |
-| `no-hardcoded-secrets`      | Disallow hardcoded secrets, credentials, tokens, and secret env defaults          |
-| `no-raw-sql-interpolation`  | Disallow interpolated raw SQL and unsafe raw query helpers                        |
-| `no-re-export`              | Disallow direct or pass-through re-exports from parent/grandparent modules        |
-| `no-shell-command-construction` | Disallow shell command construction through subprocess APIs                    |
-| `no-unsafe-code-generation` | Disallow eval, Function constructors, string timers, and vm execution APIs        |
-| `require-node-protocol`     | Require Node.js built-in module imports to use the `node:` protocol prefix        |
+| Rule                              | Description                                                                       |
+| --------------------------------- | --------------------------------------------------------------------------------- |
+| `require-clean-barrel`            | Require barrel files (`index.*`) to contain only module re-exports                |
+| `require-barrel-relative-exports` | Require barrel re-exports to use `./` descendant paths                            |
+| `no-barrel-parent-imports`        | Disallow parent-directory traversal in barrel-file import paths                   |
+| `no-parent-internal-access`       | Disallow parent-relative access into protected internal directories such as `src` |
+| `no-dynamic-import`               | Ban dynamic `import()` and `require()` outside test files                         |
+| `no-export-alias`                 | Prevent use of aliases in export statements                                       |
+| `no-hardcoded-secrets`            | Disallow hardcoded secrets, credentials, tokens, and secret env defaults          |
+| `no-raw-sql-interpolation`        | Disallow interpolated raw SQL and unsafe raw query helpers                        |
+| `no-re-export`                    | Disallow direct or pass-through re-exports from parent/grandparent modules        |
+| `no-shell-command-construction`   | Disallow shell command construction through subprocess APIs                       |
+| `no-unsafe-code-generation`       | Disallow eval, Function constructors, string timers, and vm execution APIs        |
+| `require-node-protocol`           | Require Node.js built-in module imports to use the `node:` protocol prefix        |
 
 ### Bug Prevention
 

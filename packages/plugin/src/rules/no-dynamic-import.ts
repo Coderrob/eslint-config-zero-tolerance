@@ -28,7 +28,10 @@ type NoDynamicImportContext = Readonly<TSESLint.RuleContext<string, []>>;
  * @param context - ESLint rule execution context.
  * @param node - Call expression to inspect.
  */
-function checkCallExpression(context: Readonly<NoDynamicImportContext>, node: Readonly<TSESTree.CallExpression>): void {
+function checkCallExpression(
+  context: Readonly<NoDynamicImportContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   if (!isRequireCall(node)) {
     return;
   }
@@ -42,7 +45,9 @@ function checkCallExpression(context: Readonly<NoDynamicImportContext>, node: Re
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoDynamicImportListeners(context: Readonly<NoDynamicImportContext>): TSESLint.RuleListener {
+function createNoDynamicImportListeners(
+  context: Readonly<NoDynamicImportContext>,
+): TSESLint.RuleListener {
   if (isTestFile(context.filename)) {
     return {};
   }
@@ -85,7 +90,10 @@ function reportDynamicImport(
  * @param context - ESLint rule execution context.
  * @param node - Call expression to report.
  */
-function reportRequireCall(context: Readonly<NoDynamicImportContext>, node: Readonly<TSESTree.CallExpression>): void {
+function reportRequireCall(
+  context: Readonly<NoDynamicImportContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   context.report({
     node,
     messageId: 'noRequire',

@@ -114,7 +114,10 @@ function getSensitiveAssignmentName(node: Readonly<TSESTree.Expression>): string
  * @param value - Static string value.
  * @returns True when the value is an allowed placeholder.
  */
-function isAllowedSecretPlaceholder(options: Readonly<IHardcodedSecretsOptions>, value: string): boolean {
+function isAllowedSecretPlaceholder(
+  options: Readonly<IHardcodedSecretsOptions>,
+  value: string,
+): boolean {
   const normalizedValue = value.toLowerCase();
   for (const pattern of options.allowedPatterns) {
     if (normalizedValue.includes(pattern.toLowerCase())) {
@@ -135,8 +138,10 @@ function isEnvFallback(node: Readonly<TSESTree.Expression>): boolean {
   if (parent.type !== AST_NODE_TYPES.LogicalExpression) {
     return false;
   }
-  return parent.left.type === AST_NODE_TYPES.MemberExpression &&
-    parent.left.object.type === AST_NODE_TYPES.MemberExpression;
+  return (
+    parent.left.type === AST_NODE_TYPES.MemberExpression &&
+    parent.left.object.type === AST_NODE_TYPES.MemberExpression
+  );
 }
 
 /**
@@ -160,8 +165,9 @@ function isIdentifierProperty(
 function isIdentifierVariableDeclarator(
   node: Readonly<TSESTree.Node>,
 ): node is TSESTree.VariableDeclarator & { id: TSESTree.Identifier } {
-  return node.type === AST_NODE_TYPES.VariableDeclarator &&
-    node.id.type === AST_NODE_TYPES.Identifier;
+  return (
+    node.type === AST_NODE_TYPES.VariableDeclarator && node.id.type === AST_NODE_TYPES.Identifier
+  );
 }
 
 /**
@@ -192,10 +198,12 @@ function isMessagesProperty(node: Readonly<TSESTree.Property>): boolean {
  * @returns True when the literal is a diagnostic message.
  */
 function isRuleMessageProperty(node: Readonly<TSESTree.Node>): boolean {
-  return node.type === AST_NODE_TYPES.Property &&
+  return (
+    node.type === AST_NODE_TYPES.Property &&
     node.parent.type === AST_NODE_TYPES.ObjectExpression &&
     node.parent.parent.type === AST_NODE_TYPES.Property &&
-    isMessagesProperty(node.parent.parent);
+    isMessagesProperty(node.parent.parent)
+  );
 }
 
 /**
@@ -243,8 +251,10 @@ function isSensitiveLongValue(
   node: Readonly<TSESTree.Expression>,
   value: string,
 ): boolean {
-  return value.length >= options.minimumSecretLength &&
-    (isSensitiveAssignment(node) || isEnvFallback(node));
+  return (
+    value.length >= options.minimumSecretLength &&
+    (isSensitiveAssignment(node) || isEnvFallback(node))
+  );
 }
 
 /**
@@ -268,10 +278,12 @@ function isSkippedFile(
  * @returns True when the value matches a known credential format.
  */
 function isStrongSecretPattern(value: string): boolean {
-  return PRIVATE_KEY_PATTERN.test(value) ||
+  return (
+    PRIVATE_KEY_PATTERN.test(value) ||
     JWT_PATTERN.test(value) ||
     API_KEY_PATTERN.test(value) ||
-    CREDENTIAL_URL_PATTERN.test(value);
+    CREDENTIAL_URL_PATTERN.test(value)
+  );
 }
 
 /**

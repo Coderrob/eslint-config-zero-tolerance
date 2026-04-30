@@ -37,7 +37,10 @@ function createNoLabelsListeners(context: Readonly<NoLabelsContext>): TSESLint.R
  * @param context - ESLint rule execution context.
  * @param node - Labeled statement node.
  */
-function reportLabelsUsage(context: Readonly<NoLabelsContext>, node: Readonly<TSESTree.LabeledStatement>): void {
+function reportLabelsUsage(
+  context: Readonly<NoLabelsContext>,
+  node: Readonly<TSESTree.LabeledStatement>,
+): void {
   context.report({
     node,
     messageId: 'noLabels',

@@ -199,12 +199,17 @@ function createUpdateVisitor(
  * @param functionStack - Function scope stack.
  * @param node - Function node entering scope.
  */
-function enterFunctionScope(functionStack: Readonly<QueryScopeStack>, node: Readonly<FunctionNode>): void {
+function enterFunctionScope(
+  functionStack: Readonly<QueryScopeStack>,
+  node: Readonly<FunctionNode>,
+): void {
   const name = resolveFunctionName(node);
-  functionStack.push({
-    name,
-    isQuery: isQueryName(name),
-  });
+  Reflect.apply(Array.prototype.push, functionStack, [
+    {
+      name,
+      isQuery: isQueryName(name),
+    },
+  ]);
 }
 
 /**
@@ -213,8 +218,11 @@ function enterFunctionScope(functionStack: Readonly<QueryScopeStack>, node: Read
  * @param functionStack - Function scope stack.
  * @param _node - Function node being exited.
  */
-function exitFunctionScope(functionStack: Readonly<QueryScopeStack>, _node: Readonly<FunctionNode>): void {
-  functionStack.pop();
+function exitFunctionScope(
+  functionStack: Readonly<QueryScopeStack>,
+  _node: Readonly<FunctionNode>,
+): void {
+  Reflect.apply(Array.prototype.pop, functionStack, []);
 }
 
 /**

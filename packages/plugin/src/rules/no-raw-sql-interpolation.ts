@@ -17,11 +17,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from './support/rule-factory';
-import {
-  getCalleeName,
-  getMemberPath,
-  isDynamicString,
-} from './support/security-ast';
+import { getCalleeName, getMemberPath, isDynamicString } from './support/security-ast';
 
 const DEFAULT_ALLOWED_TAGS = ['sql', 'Prisma.sql', 'db.sql'];
 const NON_SQL_TAGS = ['String.raw'];
@@ -122,7 +118,9 @@ function createNoRawSqlInterpolationListeners(
  * @param options - Normalized rule options.
  * @returns SQL sink names.
  */
-function getSqlSinkNames(options: Readonly<Required<INoRawSqlInterpolationOptions>>): ReadonlySet<string> {
+function getSqlSinkNames(
+  options: Readonly<Required<INoRawSqlInterpolationOptions>>,
+): ReadonlySet<string> {
   return new Set([...DEFAULT_SQL_SINKS, ...options.additionalSinkNames]);
 }
 
@@ -153,8 +151,9 @@ function isInterpolatedSqlSinkTag(
   node: Readonly<TSESTree.TaggedTemplateExpression>,
   tagName: string,
 ): boolean {
-  return node.quasi.expressions.length > 0 &&
-    isSqlSinkName(options, getCalleeName(node.tag) ?? tagName);
+  return (
+    node.quasi.expressions.length > 0 && isSqlSinkName(options, getCalleeName(node.tag) ?? tagName)
+  );
 }
 
 /**

@@ -31,6 +31,11 @@ type DirectNamedExportDeclaration =
   | TSESTree.FunctionDeclaration
   | TSESTree.TSInterfaceDeclaration
   | TSESTree.TSTypeAliasDeclaration;
+type IndirectParentReExportNode =
+  | TSESTree.ExportDefaultDeclaration
+  | TSESTree.ExportNamedDeclaration
+  | TSESTree.TSExportAssignment;
+type SourcedExportDeclaration = TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration;
 
 /**
  * Returns true when one export specifier exposes a binding imported from a parent path.
@@ -171,10 +176,7 @@ function collectParentImportEqualsBindings(
 function createIndirectParentReExportFix(
   context: Readonly<NoReExportContext>,
   directExportNames: Readonly<DirectExportNames>,
-  node:
-    | TSESTree.ExportDefaultDeclaration
-    | TSESTree.ExportNamedDeclaration
-    | TSESTree.TSExportAssignment,
+  node: Readonly<IndirectParentReExportNode>,
   specifier?: Readonly<TSESTree.ExportSpecifier>,
 ): TSESLint.ReportFixFunction | null {
   if (specifier === undefined || !isFixableNamedReExport(directExportNames, node, specifier)) {
@@ -252,7 +254,9 @@ function getDirectExportNames(program: Readonly<TSESTree.Program>): DirectExport
  * @param program - Program node to inspect.
  * @returns Imported local binding names sourced from parent paths.
  */
-function getImportedBindingsFromParentPaths(program: Readonly<TSESTree.Program>): ImportedBindingNames {
+function getImportedBindingsFromParentPaths(
+  program: Readonly<TSESTree.Program>,
+): ImportedBindingNames {
   const importedBindings: ImportedBindingNames = new Set<string>();
   for (const statement of program.body) {
     if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
@@ -272,7 +276,9 @@ function getImportedBindingsFromParentPaths(program: Readonly<TSESTree.Program>)
  * @param node - TS import-equals declaration node.
  * @returns Import path when the declaration targets an external module.
  */
-function getImportEqualsModulePath(node: Readonly<TSESTree.TSImportEqualsDeclaration>): string | null {
+function getImportEqualsModulePath(
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
+): string | null {
   if (node.moduleReference.type !== AST_NODE_TYPES.TSExternalModuleReference) {
     return null;
   }
@@ -339,7 +345,9 @@ function getSpecifierRemovalRange(
  * @param declaration - Variable declaration.
  * @returns Exported name, or null when unavailable.
  */
-function getVariableDeclarationExportName(declaration: Readonly<TSESTree.VariableDeclaration>): string | null {
+function getVariableDeclarationExportName(
+  declaration: Readonly<TSESTree.VariableDeclaration>,
+): string | null {
   const declarator = declaration.declarations[0];
   return declaration.declarations.length === 1 && declarator.id.type === AST_NODE_TYPES.Identifier
     ? declarator.id.name
@@ -381,10 +389,7 @@ function isCommaToken(token: TSESTree.Token | null): token is TSESTree.Token {
  */
 function isFixableNamedReExport(
   directExportNames: Readonly<DirectExportNames>,
-  node:
-    | TSESTree.ExportDefaultDeclaration
-    | TSESTree.ExportNamedDeclaration
-    | TSESTree.TSExportAssignment,
+  node: Readonly<IndirectParentReExportNode>,
   specifier: Readonly<TSESTree.ExportSpecifier>,
 ): node is TSESTree.ExportNamedDeclaration {
   return (
@@ -456,7 +461,7 @@ function removeExportSpecifier(
  */
 function reportIfParentReExport(
   context: Readonly<NoReExportContext>,
-  node: TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration,
+  node: Readonly<SourcedExportDeclaration>,
   importPath: string,
 ): void {
   if (isParentDirectoryImportPath(importPath)) {
@@ -479,10 +484,7 @@ function reportIfParentReExport(
 function reportIndirectParentReExport(
   context: Readonly<NoReExportContext>,
   directExportNames: Readonly<DirectExportNames>,
-  node:
-    | TSESTree.ExportDefaultDeclaration
-    | TSESTree.ExportNamedDeclaration
-    | TSESTree.TSExportAssignment,
+  node: Readonly<IndirectParentReExportNode>,
   specifier?: Readonly<TSESTree.ExportSpecifier>,
 ): void {
   context.report({

@@ -138,7 +138,9 @@ function getNestedJsonStringifyCall(
  * @param node - Call expression to inspect.
  * @returns The sole expression argument, or null.
  */
-function getOnlyExpressionArgument(node: Readonly<TSESTree.CallExpression>): TSESTree.Expression | null {
+function getOnlyExpressionArgument(
+  node: Readonly<TSESTree.CallExpression>,
+): TSESTree.Expression | null {
   if (node.arguments.length !== 1) {
     return null;
   }

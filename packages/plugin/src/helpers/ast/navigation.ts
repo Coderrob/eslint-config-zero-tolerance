@@ -87,7 +87,9 @@ export function getNextStatementInBlock(
  * @param node - Statement node.
  * @returns Parent block statement, or null when the parent is not a block.
  */
-export function getParentBlockStatement(node: Readonly<TSESTree.Statement>): TSESTree.BlockStatement | null {
+export function getParentBlockStatement(
+  node: Readonly<TSESTree.Statement>,
+): TSESTree.BlockStatement | null {
   const parent = node.parent;
   return parent.type === AST_NODE_TYPES.BlockStatement ? parent : null;
 }
@@ -119,14 +121,33 @@ export function isInsideBoundary(
   matchTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
   stopTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
 ): boolean {
-  for (let index = ancestors.length - 1; index >= 0; index -= 1) {
-    const ancestorType = ancestors[index].type;
-    if (stopTypes.has(ancestorType)) {
-      return false;
-    }
-    if (matchTypes.has(ancestorType)) {
-      return true;
-    }
+  return isInsideBoundaryAtIndex(ancestors, matchTypes, stopTypes, ancestors.length - 1);
+}
+
+/**
+ * Recursively checks ancestors from innermost to outermost for a matching boundary.
+ *
+ * @param ancestors - Ancestor nodes to inspect.
+ * @param matchTypes - Boundary types that count as a positive match.
+ * @param stopTypes - Boundary types that terminate the search negatively.
+ * @param index - Current ancestor index.
+ * @returns True when a match boundary is reached before a stop boundary.
+ */
+function isInsideBoundaryAtIndex(
+  ancestors: ReadonlyArray<TSESTree.Node>,
+  matchTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
+  stopTypes: Readonly<ReadonlySet<AST_NODE_TYPES>>,
+  index: number,
+): boolean {
+  if (index < 0) {
+    return false;
   }
-  return false;
+  const ancestorType = ancestors[index].type;
+  if (stopTypes.has(ancestorType)) {
+    return false;
+  }
+  if (matchTypes.has(ancestorType)) {
+    return true;
+  }
+  return isInsideBoundaryAtIndex(ancestors, matchTypes, stopTypes, index - 1);
 }

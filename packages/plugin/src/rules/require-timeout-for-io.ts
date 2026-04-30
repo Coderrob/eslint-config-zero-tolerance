@@ -55,7 +55,7 @@ function checkIoCall(
   if (shouldSkipIoCall(context, options, node)) {
     return;
   }
-  if (requiresTimeout(options, node) && !hasCancellationOption(node)) {
+  if (shouldRequireTimeout(options, node) && !hasCancellationOption(node)) {
     context.report({ node, messageId: RequireTimeoutForIoMessageId.MissingTimeout });
   }
 }
@@ -144,11 +144,16 @@ function isApprovedWrapper(
  * @param calleeName - Static callee name.
  * @returns True when the call is built-in IO.
  */
-function isBuiltInIoCall(node: Readonly<TSESTree.CallExpression>, calleeName: string | null): boolean {
+function isBuiltInIoCall(
+  node: Readonly<TSESTree.CallExpression>,
+  calleeName: string | null,
+): boolean {
   const directCalleeName = getDirectCalleeName(node.callee);
-  return isFetchCall(directCalleeName) ||
+  return (
+    isFetchCall(directCalleeName) ||
     isHttpClientCall(node, calleeName) ||
-    isSubprocessCall(directCalleeName);
+    isSubprocessCall(directCalleeName)
+  );
 }
 
 /**
@@ -159,9 +164,11 @@ function isBuiltInIoCall(node: Readonly<TSESTree.CallExpression>, calleeName: st
  */
 function isChainedTimeoutCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const parent = node.parent;
-  return parent.type === AST_NODE_TYPES.MemberExpression &&
+  return (
+    parent.type === AST_NODE_TYPES.MemberExpression &&
     getCalleeName(parent) === TIMEOUT_METHOD_NAME &&
-    parent.parent.type === AST_NODE_TYPES.CallExpression;
+    parent.parent.type === AST_NODE_TYPES.CallExpression
+  );
 }
 
 /**
@@ -181,7 +188,10 @@ function isFetchCall(calleeName: string | null): boolean {
  * @param calleeName - Static callee name.
  * @returns True when the call is an HTTP client.
  */
-function isHttpClientCall(node: Readonly<TSESTree.CallExpression>, calleeName: string | null): boolean {
+function isHttpClientCall(
+  node: Readonly<TSESTree.CallExpression>,
+  calleeName: string | null,
+): boolean {
   return HTTP_CLIENTS.includes(getRootCallName(node) ?? calleeName ?? '');
 }
 
@@ -247,7 +257,7 @@ function normalizeProvidedOptions(
  * @param node - Call expression to inspect.
  * @returns True when a timeout is required.
  */
-function requiresTimeout(
+function shouldRequireTimeout(
   options: Readonly<Required<IRequireTimeoutForIoOptions>>,
   node: Readonly<TSESTree.CallExpression>,
 ): boolean {

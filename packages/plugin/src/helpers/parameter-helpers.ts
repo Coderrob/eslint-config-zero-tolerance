@@ -42,7 +42,9 @@ export function getAssignmentPatternIdentifier(
  * @param param - Function parameter node.
  * @returns Bound identifier, or null when the parameter is destructured.
  */
-export function getNamedParameterIdentifier(param: Readonly<TSESTree.Parameter>): TSESTree.Identifier | null {
+export function getNamedParameterIdentifier(
+  param: Readonly<TSESTree.Parameter>,
+): TSESTree.Identifier | null {
   if (param.type === AST_NODE_TYPES.Identifier) {
     return param;
   }
@@ -72,6 +74,8 @@ export function getNamedParameterName(param: Readonly<TSESTree.Parameter>): stri
  * @param param - Rest parameter node.
  * @returns Identifier bound by the rest parameter, or null when unsupported.
  */
-export function getRestElementIdentifier(param: Readonly<TSESTree.RestElement>): TSESTree.Identifier | null {
+export function getRestElementIdentifier(
+  param: Readonly<TSESTree.RestElement>,
+): TSESTree.Identifier | null {
   return param.argument.type === AST_NODE_TYPES.Identifier ? param.argument : null;
 }

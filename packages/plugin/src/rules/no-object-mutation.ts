@@ -79,7 +79,9 @@ function checkUpdateExpression(
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoObjectMutationListeners(context: Readonly<NoObjectMutationContext>): TSESLint.RuleListener {
+function createNoObjectMutationListeners(
+  context: Readonly<NoObjectMutationContext>,
+): TSESLint.RuleListener {
   return {
     AssignmentExpression: checkAssignmentExpression.bind(undefined, context),
     UnaryExpression: checkUnaryExpression.bind(undefined, context),

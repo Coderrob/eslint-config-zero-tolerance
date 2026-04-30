@@ -24,9 +24,7 @@ const MEMBER_CALLEE_PATH_LENGTH = 2;
 const SET_TIMEOUT_NAME = 'setTimeout';
 const SINGLE_CALLEE_PATH_LENGTH = 1;
 
-type NoSetTimeoutInTestsContext = Readonly<
-  TSESLint.RuleContext<'noSetTimeoutInTests', []>
->;
+type NoSetTimeoutInTestsContext = Readonly<TSESLint.RuleContext<'noSetTimeoutInTests', []>>;
 
 /**
  * Checks call expressions for global setTimeout usage.

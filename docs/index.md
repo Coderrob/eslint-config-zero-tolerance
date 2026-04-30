@@ -19,16 +19,16 @@ This plugin takes the opposite approach. Every rule earns its place, every viola
 
 `@coderrob/eslint-plugin-zero-tolerance` provides rules across **eight categories**:
 
-| Category           | What it enforces                                                                                      |
-| ------------------ | ----------------------------------------------------------------------------------------------------- |
-| **Type Safety**    | Ban unsafe assertions (`as`, `!`), unsafe JSON parsing, literal unions, inline imports, and untyped exports |
-| **Code Quality**   | Limit function size and parameters, eliminate placeholders, magic values, immutability, and sort order |
-| **Testing**        | Require `should`-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse    |
+| Category           | What it enforces                                                                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Type Safety**    | Ban unsafe assertions (`as`, `!`), unsafe JSON parsing, literal unions, inline imports, and untyped exports                |
+| **Code Quality**   | Limit function size and parameters, eliminate placeholders, magic values, immutability, and sort order                     |
+| **Testing**        | Require `should`-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse                         |
 | **Bug Prevention** | Flag identical expressions, redundant booleans, missing awaits, floating promises, missing IO timeouts, and flag arguments |
-| **Error Handling** | Require `new Error()` throws, ban empty catches, encourage Result-style returns                       |
-| **Imports**        | Keep barrels clean, ban risky imports, block injection sinks, and prevent upward traversal |
-| **Documentation**  | Require JSDoc on functions, enforce BDD specs, mandate optional chaining and readonly props           |
-| **Naming**         | Enforce `I`-prefixed interfaces                                                                       |
+| **Error Handling** | Require `new Error()` throws, ban empty catches, encourage Result-style returns                                            |
+| **Imports**        | Keep barrels clean, ban risky imports, block injection sinks, and prevent upward traversal                                 |
+| **Documentation**  | Require JSDoc on functions, enforce BDD specs, mandate optional chaining and readonly props                                |
+| **Naming**         | Enforce `I`-prefixed interfaces                                                                                            |
 
 ## Packages
 

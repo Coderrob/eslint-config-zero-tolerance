@@ -1,6 +1,9 @@
 import { ruleTester } from '../testing/test-helper';
 import { noRawSqlInterpolation } from './no-raw-sql-interpolation';
 
+const BACKSLASH_CHARACTER_CODE = 92;
+const BACKSLASH = String.fromCharCode(BACKSLASH_CHARACTER_CODE);
+
 ruleTester.run('no-raw-sql-interpolation', noRawSqlInterpolation, {
   valid: [
     {
@@ -22,7 +25,7 @@ ruleTester.run('no-raw-sql-interpolation', noRawSqlInterpolation, {
     },
     {
       name: 'should allow String raw templates',
-      code: 'const path = String.raw`C:\\\\${folder}`;',
+      code: [`const path = String.raw\`C:`, '${folder}`;'].join(`${BACKSLASH}${BACKSLASH}`),
     },
     {
       name: 'should allow SQL sinks without arguments',

@@ -69,7 +69,9 @@ function checkLiteral(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoMagicStringsListeners(context: Readonly<NoMagicStringsContext>): TSESLint.RuleListener {
+function createNoMagicStringsListeners(
+  context: Readonly<NoMagicStringsContext>,
+): TSESLint.RuleListener {
   const options = resolveOptions(context.options);
   return {
     Literal: checkLiteral.bind(undefined, context, options),
@@ -205,32 +207,6 @@ function isTypeofUnaryExpression(expression: Readonly<TSESTree.Node>): boolean {
 }
 
 /**
- * Resolves check-comparisons option with default.
- *
- * @param raw - Raw rule options object.
- * @returns Resolved boolean option.
- */
-function resolveCheckComparisonsOption(raw: INoMagicStringsOptions | undefined): boolean {
-  if (raw?.checkComparisons === undefined) {
-    return true;
-  }
-  return raw.checkComparisons;
-}
-
-/**
- * Resolves check-switch-cases option with default.
- *
- * @param raw - Raw rule options object.
- * @returns Resolved boolean option.
- */
-function resolveCheckSwitchCasesOption(raw: INoMagicStringsOptions | undefined): boolean {
-  if (raw?.checkSwitchCases === undefined) {
-    return true;
-  }
-  return raw.checkSwitchCases;
-}
-
-/**
  * Resolves ignore-values option with default.
  *
  * @param raw - Raw rule options object.
@@ -249,10 +225,36 @@ function resolveIgnoreValuesOption(raw: INoMagicStringsOptions | undefined): Set
 function resolveOptions(options: Readonly<RuleOptions>): IResolvedNoMagicStringsOptions {
   const raw = options[0];
   return {
-    checkComparisons: resolveCheckComparisonsOption(raw),
-    checkSwitchCases: resolveCheckSwitchCasesOption(raw),
+    checkComparisons: shouldCheckComparisons(raw),
+    checkSwitchCases: shouldCheckSwitchCases(raw),
     ignoreValues: resolveIgnoreValuesOption(raw),
   };
+}
+
+/**
+ * Resolves check-comparisons option with default.
+ *
+ * @param raw - Raw rule options object.
+ * @returns Resolved boolean option.
+ */
+function shouldCheckComparisons(raw: INoMagicStringsOptions | undefined): boolean {
+  if (raw?.checkComparisons === undefined) {
+    return true;
+  }
+  return raw.checkComparisons;
+}
+
+/**
+ * Resolves check-switch-cases option with default.
+ *
+ * @param raw - Raw rule options object.
+ * @returns Resolved boolean option.
+ */
+function shouldCheckSwitchCases(raw: INoMagicStringsOptions | undefined): boolean {
+  if (raw?.checkSwitchCases === undefined) {
+    return true;
+  }
+  return raw.checkSwitchCases;
 }
 
 /**

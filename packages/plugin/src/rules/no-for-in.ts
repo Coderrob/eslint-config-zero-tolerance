@@ -56,7 +56,10 @@ function createNoForInListeners(context: Readonly<NoForInContext>): TSESLint.Rul
  * @param context - ESLint rule execution context.
  * @param node - For-in statement node.
  */
-function reportForInUsage(context: Readonly<NoForInContext>, node: Readonly<TSESTree.ForInStatement>): void {
+function reportForInUsage(
+  context: Readonly<NoForInContext>,
+  node: Readonly<TSESTree.ForInStatement>,
+): void {
   context.report({
     node,
     messageId: 'noForIn',

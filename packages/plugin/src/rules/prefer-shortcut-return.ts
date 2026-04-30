@@ -60,6 +60,11 @@ interface IIfThenBooleanPair {
   whenTrue: boolean;
 }
 
+interface IBooleanReturnPair {
+  readonly whenFalse: boolean;
+  readonly whenTrue: boolean;
+}
+
 /**
  * Builds a shortcut return statement for boolean-return if patterns.
  *
@@ -72,14 +77,13 @@ interface IIfThenBooleanPair {
 function buildShortcutReturnText(
   sourceCode: Readonly<TSESLint.SourceCode>,
   condition: Readonly<TSESTree.Expression>,
-  whenTrue: boolean,
-  whenFalse: boolean,
+  booleanPair: Readonly<IBooleanReturnPair>,
 ): string | null {
   const conditionText = sourceCode.getText(condition);
-  if (hasMatchingBooleanPair(whenTrue, whenFalse)) {
+  if (hasMatchingBooleanPair(booleanPair)) {
     return `return !!(${conditionText});`;
   }
-  if (hasInverseBooleanPair(whenTrue, whenFalse)) {
+  if (hasInverseBooleanPair(booleanPair)) {
     return `return !(${conditionText});`;
   }
   return null;
@@ -189,8 +193,8 @@ function getIfThenReturnReplacement(
  * @param whenFalse - Falsy branch return value.
  * @returns True when pair is false then true.
  */
-function hasInverseBooleanPair(whenTrue: boolean, whenFalse: boolean): boolean {
-  return !whenTrue && whenFalse;
+function hasInverseBooleanPair(booleanPair: Readonly<IBooleanReturnPair>): boolean {
+  return !booleanPair.whenTrue && booleanPair.whenFalse;
 }
 
 /**
@@ -200,8 +204,8 @@ function hasInverseBooleanPair(whenTrue: boolean, whenFalse: boolean): boolean {
  * @param whenFalse - Falsy branch return value.
  * @returns True when pair is true then false.
  */
-function hasMatchingBooleanPair(whenTrue: boolean, whenFalse: boolean): boolean {
-  return whenTrue && !whenFalse;
+function hasMatchingBooleanPair(booleanPair: Readonly<IBooleanReturnPair>): boolean {
+  return booleanPair.whenTrue && !booleanPair.whenFalse;
 }
 
 /**
@@ -246,13 +250,13 @@ function resolveReplacement(
  * @param node - If statement node.
  * @returns Replacement plan, or null when no pattern matches.
  */
-function resolveReplacementForBooleanPair(input: Readonly<IReplacementInput>): IReplacementPlan | null {
-  const shortcutReturnText = buildShortcutReturnText(
-    input.sourceCode,
-    input.condition,
-    input.whenTrue,
-    input.whenFalse,
-  );
+function resolveReplacementForBooleanPair(
+  input: Readonly<IReplacementInput>,
+): IReplacementPlan | null {
+  const shortcutReturnText = buildShortcutReturnText(input.sourceCode, input.condition, {
+    whenTrue: input.whenTrue,
+    whenFalse: input.whenFalse,
+  });
   return shortcutReturnText === null ? null : { endNode: input.endNode, shortcutReturnText };
 }
 
@@ -262,7 +266,9 @@ function resolveReplacementForBooleanPair(input: Readonly<IReplacementInput>): I
  * @param node - If statement node.
  * @returns Boolean pair data, or null when pattern does not match.
  */
-function resolveReplacementForIfBooleanPair(input: Readonly<IIfBooleanPairInput>): IReplacementPlan | null {
+function resolveReplacementForIfBooleanPair(
+  input: Readonly<IIfBooleanPairInput>,
+): IReplacementPlan | null {
   return resolveReplacementForBooleanPair({
     sourceCode: input.sourceCode,
     condition: input.ifNode.test,
@@ -316,7 +322,9 @@ function zIfThenBooleanPair(node: Readonly<TSESTree.IfStatement>): IIfThenBoolea
  * @param node - If statement node.
  * @returns Trailing return data, or null.
  */
-function zTrailingBooleanReturn(node: Readonly<TSESTree.IfStatement>): ITrailingBooleanReturn | null {
+function zTrailingBooleanReturn(
+  node: Readonly<TSESTree.IfStatement>,
+): ITrailingBooleanReturn | null {
   const nextReturn = getFollowingBooleanReturnStatement(node);
   if (nextReturn === null) {
     return null;

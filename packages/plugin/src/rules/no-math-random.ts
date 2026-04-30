@@ -29,7 +29,10 @@ type NoMathRandomContext = Readonly<TSESLint.RuleContext<'noMathRandom', []>>;
  * @param context - ESLint rule execution context.
  * @param node - Call expression node.
  */
-function checkCallExpression(context: Readonly<NoMathRandomContext>, node: Readonly<TSESTree.CallExpression>): void {
+function checkCallExpression(
+  context: Readonly<NoMathRandomContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   if (!isMathRandomCall(node)) {
     return;
   }
@@ -45,7 +48,9 @@ function checkCallExpression(context: Readonly<NoMathRandomContext>, node: Reado
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoMathRandomListeners(context: Readonly<NoMathRandomContext>): TSESLint.RuleListener {
+function createNoMathRandomListeners(
+  context: Readonly<NoMathRandomContext>,
+): TSESLint.RuleListener {
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
   };

@@ -38,7 +38,10 @@ type NoArrayMutationContext = Readonly<TSESLint.RuleContext<'noArrayMutation', [
  * @param context - ESLint rule execution context.
  * @param node - Call expression node.
  */
-function checkCallExpression(context: Readonly<NoArrayMutationContext>, node: Readonly<TSESTree.CallExpression>): void {
+function checkCallExpression(
+  context: Readonly<NoArrayMutationContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   const methodName = getMatchingCallMemberMethodName(node, MUTATING_ARRAY_METHODS);
   if (methodName === null) {
     return;
@@ -56,7 +59,9 @@ function checkCallExpression(context: Readonly<NoArrayMutationContext>, node: Re
  * @param context - ESLint rule execution context.
  * @returns Rule listener map.
  */
-function createNoArrayMutationListeners(context: Readonly<NoArrayMutationContext>): TSESLint.RuleListener {
+function createNoArrayMutationListeners(
+  context: Readonly<NoArrayMutationContext>,
+): TSESLint.RuleListener {
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
   };

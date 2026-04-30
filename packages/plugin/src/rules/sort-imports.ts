@@ -48,6 +48,10 @@ type ImportEntry = Readonly<{
   value: string;
   valueLower: string;
 }>;
+type ImportGroupInputs = Readonly<{
+  importPath: string;
+  isSideEffect: boolean;
+}>;
 
 type SortImportsContext = Readonly<TSESLint.RuleContext<string, []>>;
 type SortImportsState = Readonly<{
@@ -62,14 +66,20 @@ type SortImportsState = Readonly<{
  * @param imports - Mutable import entry collection.
  * @param node - Import declaration node.
  */
-function addImportEntry(imports: readonly ImportEntry[], node: Readonly<TSESTree.ImportDeclaration>): void {
+function addImportEntry(
+  imports: readonly ImportEntry[],
+  node: Readonly<TSESTree.ImportDeclaration>,
+): void {
   const importPath = getImportSourceValue(node);
-  imports.push({
-    group: getImportGroup(importPath, node.specifiers.length === 0),
+  Reflect.apply(Array.prototype.push, imports, [{
+    group: getImportGroup({
+      importPath,
+      isSideEffect: node.specifiers.length === 0,
+    }),
     node,
     value: importPath,
     valueLower: importPath.toLowerCase(),
-  });
+  }]);
 }
 
 /**
@@ -95,7 +105,10 @@ function buildSwapFix(
  * @param imports - Collected imports.
  * @returns Program exit callback.
  */
-function createProgramExitHandler(context: Readonly<SortImportsContext>, imports: readonly ImportEntry[]): () => void {
+function createProgramExitHandler(
+  context: Readonly<SortImportsContext>,
+  imports: readonly ImportEntry[],
+): () => void {
   return validateImports.bind(undefined, context, imports);
 }
 
@@ -130,14 +143,14 @@ function getGroupName(group: Readonly<ImportGroup>): string {
  * @param isSideEffect - Whether the import has no specifiers.
  * @returns Numeric group rank.
  */
-function getImportGroup(importPath: string, isSideEffect: boolean): ImportGroup {
-  if (isSideEffect) {
+function getImportGroup(inputs: Readonly<ImportGroupInputs>): ImportGroup {
+  if (inputs.isSideEffect) {
     return ImportGroup.SideEffect;
   }
-  if (importPath.startsWith(RELATIVE_PATH_PREFIX)) {
-    return getRelativeImportGroup(importPath);
+  if (inputs.importPath.startsWith(RELATIVE_PATH_PREFIX)) {
+    return getRelativeImportGroup(inputs.importPath);
   }
-  return isBuiltinImportPath(importPath) ? ImportGroup.Builtin : ImportGroup.External;
+  return isBuiltinImportPath(inputs.importPath) ? ImportGroup.Builtin : ImportGroup.External;
 }
 
 /**
@@ -204,7 +217,10 @@ function isIndexImportPath(importPath: string): boolean {
  * @param reportedNodes - Nodes already reported.
  * @param sourceCode - ESLint source code helper.
  */
-function reportAlphabeticalViolations(context: Readonly<SortImportsContext>, state: Readonly<SortImportsState>): void {
+function reportAlphabeticalViolations(
+  context: Readonly<SortImportsContext>,
+  state: Readonly<SortImportsState>,
+): void {
   for (let index = 1; index < state.imports.length; index += 1) {
     const previousEntry = state.imports[index - 1];
     const currentEntry = state.imports[index];
@@ -220,7 +236,10 @@ function reportAlphabeticalViolations(context: Readonly<SortImportsContext>, sta
  * @param reportedNodes - Nodes already reported.
  * @param sourceCode - ESLint source code helper.
  */
-function reportBackwardGroupViolations(context: Readonly<SortImportsContext>, state: Readonly<SortImportsState>): void {
+function reportBackwardGroupViolations(
+  context: Readonly<SortImportsContext>,
+  state: Readonly<SortImportsState>,
+): void {
   for (let index = state.imports.length - 1; index > 0; index -= 1) {
     const currentEntry = state.imports[index - 1];
     const nextEntry = state.imports[index];
@@ -236,7 +255,10 @@ function reportBackwardGroupViolations(context: Readonly<SortImportsContext>, st
  * @param reportedNodes - Nodes already reported.
  * @param sourceCode - ESLint source code helper.
  */
-function reportForwardGroupViolations(context: Readonly<SortImportsContext>, state: Readonly<SortImportsState>): void {
+function reportForwardGroupViolations(
+  context: Readonly<SortImportsContext>,
+  state: Readonly<SortImportsState>,
+): void {
   for (let index = 1; index < state.imports.length; index += 1) {
     const previousEntry = state.imports[index - 1];
     const currentEntry = state.imports[index];
@@ -267,7 +289,7 @@ function reportUnsortedImportIfNeeded(
     return;
   }
   reportUnsortedImportViolation(context, state, previousEntry, currentEntry);
-  state.reportedNodes.add(currentEntry.node);
+  Reflect.apply(Set.prototype.add, state.reportedNodes, [currentEntry.node]);
 }
 
 /**
@@ -311,7 +333,7 @@ function reportWrongGroupAfterIfNeeded(
     return;
   }
   reportWrongGroupAfterViolation(context, state, currentEntry, nextEntry);
-  state.reportedNodes.add(currentEntry.node);
+  Reflect.apply(Set.prototype.add, state.reportedNodes, [currentEntry.node]);
 }
 
 /**
@@ -360,7 +382,7 @@ function reportWrongGroupIfNeeded(
     return;
   }
   reportWrongGroupViolation(context, state, previousEntry, currentEntry);
-  state.reportedNodes.add(currentEntry.node);
+  Reflect.apply(Set.prototype.add, state.reportedNodes, [currentEntry.node]);
 }
 
 /**
@@ -418,9 +440,12 @@ function swapImports(
  * @param context - ESLint rule execution context.
  * @param imports - Collected imports.
  */
-function validateImports(context: Readonly<SortImportsContext>, imports: readonly ImportEntry[]): void {
+function validateImports(
+  context: Readonly<SortImportsContext>,
+  imports: readonly ImportEntry[],
+): void {
   if (!hasAtLeastTwoImports(imports)) {
-    imports.length = 0;
+    Reflect.set(imports, 'length', 0);
     return;
   }
   const state: SortImportsState = {
@@ -431,7 +456,7 @@ function validateImports(context: Readonly<SortImportsContext>, imports: readonl
   reportForwardGroupViolations(context, state);
   reportBackwardGroupViolations(context, state);
   reportAlphabeticalViolations(context, state);
-  imports.length = 0;
+  Reflect.set(imports, 'length', 0);
 }
 
 /** Enforces top-level import grouping and alphabetical ordering with adjacent-swap fixes. */

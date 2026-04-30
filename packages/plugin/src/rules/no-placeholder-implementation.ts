@@ -52,10 +52,7 @@ enum NoPlaceholderImplementationMessageId {
 }
 
 type NoPlaceholderImplementationContext = Readonly<
-  TSESLint.RuleContext<
-    NoPlaceholderImplementationMessageId,
-    [INoPlaceholderImplementationOptions?]
-  >
+  TSESLint.RuleContext<NoPlaceholderImplementationMessageId, [INoPlaceholderImplementationOptions?]>
 >;
 
 /**
@@ -93,7 +90,10 @@ function checkPlaceholderComments(
   }
   for (const comment of context.sourceCode.getAllComments()) {
     if (shouldReportComment(options, comment)) {
-      context.report({ node: comment, messageId: NoPlaceholderImplementationMessageId.PlaceholderComment });
+      context.report({
+        node: comment,
+        messageId: NoPlaceholderImplementationMessageId.PlaceholderComment,
+      });
     }
   }
 }
@@ -136,23 +136,6 @@ function checkPlaceholderThrow(
 }
 
 /**
- * Returns true when text contains a disallowed placeholder term.
- *
- * @param options - Normalized rule options.
- * @param text - Text to inspect.
- * @returns True when a term is present.
- */
-function containsPlaceholderTerm(options: Readonly<IPlaceholderOptions>, text: string): boolean {
-  const normalizedText = text.toLowerCase();
-  for (const term of DEFAULT_PLACEHOLDER_TERMS) {
-    if (isDisallowedTerm(options, term, normalizedText)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
  * Creates listeners for no-placeholder-implementation.
  *
  * @param context - ESLint rule execution context.
@@ -183,6 +166,23 @@ function hasPlaceholderArgument(
 ): boolean {
   for (const argument of node.arguments) {
     if (isPlaceholderNode(options, argument)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns true when text contains a disallowed placeholder term.
+ *
+ * @param options - Normalized rule options.
+ * @param text - Text to inspect.
+ * @returns True when a term is present.
+ */
+function hasPlaceholderTerm(options: Readonly<IPlaceholderOptions>, text: string): boolean {
+  const normalizedText = text.toLowerCase();
+  for (const term of DEFAULT_PLACEHOLDER_TERMS) {
+    if (isDisallowedTerm(options, term, normalizedText)) {
       return true;
     }
   }
@@ -285,9 +285,11 @@ function isErrorConstructor(node: Readonly<TSESTree.Expression>): boolean {
  * @returns True when the node is function-like.
  */
 function isFunctionBodyParent(node: Readonly<TSESTree.Node>): boolean {
-  return node.type === AST_NODE_TYPES.FunctionDeclaration ||
+  return (
+    node.type === AST_NODE_TYPES.FunctionDeclaration ||
     node.type === AST_NODE_TYPES.FunctionExpression ||
-    node.type === AST_NODE_TYPES.ArrowFunctionExpression;
+    node.type === AST_NODE_TYPES.ArrowFunctionExpression
+  );
 }
 
 /**
@@ -322,7 +324,7 @@ function isPlaceholderNode(
     return false;
   }
   const value = getStaticString(node);
-  return value !== null && containsPlaceholderTerm(options, value);
+  return value !== null && hasPlaceholderTerm(options, value);
 }
 
 /**
@@ -343,9 +345,11 @@ function isPlaceholderReturnValue(node: TSESTree.Expression | null): boolean {
  */
 function isSingleStatementFunctionReturn(node: Readonly<TSESTree.ReturnStatement>): boolean {
   const parent = node.parent;
-  return parent.type === AST_NODE_TYPES.BlockStatement &&
+  return (
+    parent.type === AST_NODE_TYPES.BlockStatement &&
     parent.body.length === 1 &&
-    isFunctionBodyParent(parent.parent);
+    isFunctionBodyParent(parent.parent)
+  );
 }
 
 /**
@@ -406,8 +410,14 @@ function normalizeProvidedOptions(
  * @param context - ESLint rule execution context.
  * @param node - Node to report.
  */
-function reportPlaceholder(context: Readonly<NoPlaceholderImplementationContext>, node: Readonly<TSESTree.Node>): void {
-  context.report({ node, messageId: NoPlaceholderImplementationMessageId.PlaceholderImplementation });
+function reportPlaceholder(
+  context: Readonly<NoPlaceholderImplementationContext>,
+  node: Readonly<TSESTree.Node>,
+): void {
+  context.report({
+    node,
+    messageId: NoPlaceholderImplementationMessageId.PlaceholderImplementation,
+  });
 }
 
 /**
@@ -417,11 +427,14 @@ function reportPlaceholder(context: Readonly<NoPlaceholderImplementationContext>
  * @param comment - Comment node to inspect.
  * @returns True when the comment contains a production placeholder.
  */
-function shouldReportComment(options: Readonly<IPlaceholderOptions>, comment: Readonly<TSESTree.Comment>): boolean {
+function shouldReportComment(
+  options: Readonly<IPlaceholderOptions>,
+  comment: Readonly<TSESTree.Comment>,
+): boolean {
   if (isDocumentationComment(comment)) {
     return false;
   }
-  return containsPlaceholderTerm(options, comment.value);
+  return hasPlaceholderTerm(options, comment.value);
 }
 
 /**

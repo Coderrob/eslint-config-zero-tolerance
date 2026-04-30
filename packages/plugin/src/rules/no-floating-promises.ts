@@ -68,7 +68,9 @@ function createNoFloatingPromisesListeners(
  * @param node - Call expression node.
  * @returns Parent call expression in chain, or null.
  */
-function getChainedObjectCall(node: Readonly<TSESTree.CallExpression>): TSESTree.CallExpression | null {
+function getChainedObjectCall(
+  node: Readonly<TSESTree.CallExpression>,
+): TSESTree.CallExpression | null {
   if (!isMemberExpressionNode(node.callee)) {
     return null;
   }

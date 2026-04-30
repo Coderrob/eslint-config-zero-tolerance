@@ -30,6 +30,12 @@ type ConditionalBooleanFixInputs = Readonly<{
   shouldNegate: boolean;
   test: TSESTree.Expression;
 }>;
+type BooleanLiteralValueInputs = Readonly<{
+  value: boolean;
+}>;
+type ComparisonNegationInputs = Readonly<{
+  literalValue: boolean;
+}>;
 
 type StrictComparisonExpression = TSESTree.BinaryExpression & {
   left: TSESTree.Expression;
@@ -162,7 +168,7 @@ function createReplacementText(
   fixInputs: Readonly<FixInputs>,
 ): string {
   const expressionText = sourceCode.getText(fixInputs.nonLiteralSide);
-  if (!shouldNegateComparison(node.operator, fixInputs.literalValue)) {
+  if (!shouldNegateComparison(node.operator, { literalValue: fixInputs.literalValue })) {
     return expressionText;
   }
   return `!(${expressionText})`;
@@ -192,7 +198,9 @@ function getConditionalBooleanFixInputs(
  * @param node - Unary expression to inspect.
  * @returns Inner boolean expression when double negation is redundant.
  */
-function getDoubleNegatedBooleanExpression(node: Readonly<TSESTree.UnaryExpression>): TSESTree.Expression | null {
+function getDoubleNegatedBooleanExpression(
+  node: Readonly<TSESTree.UnaryExpression>,
+): TSESTree.Expression | null {
   if (!isNestedLogicalNot(node)) {
     return null;
   }
@@ -255,7 +263,10 @@ function hasBooleanLiteralOperand(
  * @returns True when the expression is boolean-valued.
  */
 function isBooleanExpression(node: Readonly<TSESTree.Expression>): boolean {
-  return isBooleanLiteral(node) || (node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator));
+  return (
+    isBooleanLiteral(node) ||
+    (node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator))
+  );
 }
 
 /**
@@ -264,7 +275,9 @@ function isBooleanExpression(node: Readonly<TSESTree.Expression>): boolean {
  * @param node - The node to check.
  * @returns True if the node is a boolean literal, false otherwise.
  */
-function isBooleanLiteral(node: Readonly<TSESTree.Node>): node is TSESTree.Literal & { value: boolean } {
+function isBooleanLiteral(
+  node: Readonly<TSESTree.Node>,
+): node is TSESTree.Literal & { value: boolean } {
   return node.type === AST_NODE_TYPES.Literal && isBoolean(node.value);
 }
 
@@ -275,8 +288,11 @@ function isBooleanLiteral(node: Readonly<TSESTree.Node>): node is TSESTree.Liter
  * @param value - Expected boolean value.
  * @returns True when the node is the expected boolean literal.
  */
-function isBooleanLiteralWithValue(node: Readonly<TSESTree.Node>, value: boolean): boolean {
-  return isBooleanLiteral(node) && node.value === value;
+function isBooleanLiteralWithValue(
+  node: Readonly<TSESTree.Node>,
+  inputs: Readonly<BooleanLiteralValueInputs>,
+): boolean {
+  return isBooleanLiteral(node) && node.value === inputs.value;
 }
 
 /**
@@ -297,8 +313,8 @@ function isComparisonOperator(operator: string): boolean {
  */
 function isDirectBooleanConditional(node: Readonly<TSESTree.ConditionalExpression>): boolean {
   return (
-    isBooleanLiteralWithValue(node.consequent, true) &&
-    isBooleanLiteralWithValue(node.alternate, false)
+    isBooleanLiteralWithValue(node.consequent, { value: true }) &&
+    isBooleanLiteralWithValue(node.alternate, { value: false })
   );
 }
 
@@ -310,8 +326,8 @@ function isDirectBooleanConditional(node: Readonly<TSESTree.ConditionalExpressio
  */
 function isNegatedBooleanConditional(node: Readonly<TSESTree.ConditionalExpression>): boolean {
   return (
-    isBooleanLiteralWithValue(node.consequent, false) &&
-    isBooleanLiteralWithValue(node.alternate, true)
+    isBooleanLiteralWithValue(node.consequent, { value: false }) &&
+    isBooleanLiteralWithValue(node.alternate, { value: true })
   );
 }
 
@@ -431,11 +447,14 @@ function replaceRedundantBooleanConditional(
  * @param literalValue - The boolean literal value.
  * @returns True if the expression should be negated, false otherwise.
  */
-function shouldNegateComparison(operator: string, literalValue: boolean): boolean {
+function shouldNegateComparison(
+  operator: string,
+  inputs: Readonly<ComparisonNegationInputs>,
+): boolean {
   if (operator === OPERATOR_STRICT_EQ) {
-    return !literalValue;
+    return !inputs.literalValue;
   }
-  return literalValue;
+  return inputs.literalValue;
 }
 
 /**

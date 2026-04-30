@@ -125,19 +125,6 @@ function getDescriptionArgument(node: Readonly<TSESTree.CallExpression>): TSESTr
 }
 
 /**
- * Returns normalized `ignoreSkip` option value.
- *
- * @param option - Parsed rule option.
- * @returns Configured ignore-skip value or default.
- */
-function getIgnoreSkipOption(option: RuleOption | null): boolean {
-  if (option?.ignoreSkip === undefined) {
-    return true;
-  }
-  return option.ignoreSkip;
-}
-
-/**
  * Returns invalid test description literal, or null when valid/non-applicable.
  *
  * @param node - The call expression node to analyze.
@@ -325,9 +312,22 @@ function isTestIdentifierName(name: string): boolean {
 function resolveOptions(options: ReadonlyArray<unknown>): ResolvedRuleOptions {
   const option = asRuleOption(options[0]);
   return {
-    ignoreSkip: getIgnoreSkipOption(option),
+    ignoreSkip: shouldIgnoreSkip(option),
     prefix: getPrefixOption(option),
   };
+}
+
+/**
+ * Returns normalized `ignoreSkip` option value.
+ *
+ * @param option - Parsed rule option.
+ * @returns Configured ignore-skip value or default.
+ */
+function shouldIgnoreSkip(option: RuleOption | null): boolean {
+  if (option?.ignoreSkip === undefined) {
+    return true;
+  }
+  return option.ignoreSkip;
 }
 
 /**
