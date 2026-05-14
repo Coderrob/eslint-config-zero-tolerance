@@ -32,7 +32,7 @@
           "name": "should report an inline type annotation using import(\"...\")",
           "given": "a type annotation typed as import('./module').SomeType",
           "when": "the rule evaluates the code",
-          "then": "a noInlineTypeImport violation is reported"
+          "then": "a noInlineTypeImport violation is reported with a fix to add or reuse a top-level import type when the imported type name is collision-free"
         }
       ]
     }

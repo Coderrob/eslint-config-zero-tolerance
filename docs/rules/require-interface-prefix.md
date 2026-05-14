@@ -7,13 +7,17 @@ Enforce that TypeScript interface names start with `I` (capital letter) followed
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | No           |
+| **Fixable**     | Yes (`code`) |
 | **Recommended** | `warn`       |
 | **Strict**      | `error`      |
 
 ## Rationale
 
 Prefixing interface names with `I` makes it immediately clear in code that a type is an interface rather than a class or type alias. This convention improves readability, especially in large codebases where interfaces are heavily used.
+
+## Autofix
+
+The fixer prefixes capitalized interface names and same-file type references when the generated name does not collide with an existing top-level interface or type alias. Lowercase names and collision cases remain report-only.
 
 ## Examples
 

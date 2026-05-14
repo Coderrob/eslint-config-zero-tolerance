@@ -39,37 +39,92 @@ ruleTester.run('no-type-assertion', noTypeAssertion, {
       name: 'should report as string in non-test file',
       filename: 'src/utils.ts',
       code: 'const x = getValue() as string;',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: 'as string' } }],
+      errors: [
+        {
+          messageId: 'noTypeAssertion',
+          data: { assertion: 'as string' },
+          suggestions: [
+            {
+              messageId: 'useSatisfies',
+              output: 'const x = getValue() satisfies string;',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report as unknown in non-test file',
       filename: 'src/utils.ts',
       code: 'const x = getValue() as unknown;',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: 'as unknown' } }],
+      errors: [
+        {
+          messageId: 'noTypeAssertion',
+          data: { assertion: 'as unknown' },
+          suggestions: [
+            {
+              messageId: 'useSatisfies',
+              output: 'const x = getValue() satisfies unknown;',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report as string in test file',
       filename: 'src/foo.test.ts',
       code: 'const x = getValue() as string;',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: 'as string' } }],
+      errors: [
+        {
+          messageId: 'noTypeAssertion',
+          data: { assertion: 'as string' },
+          suggestions: [
+            {
+              messageId: 'useSatisfies',
+              output: 'const x = getValue() satisfies string;',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report as MyType in non-test file',
       filename: 'src/utils.ts',
       code: 'const x = getValue() as MyType;',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: 'as MyType' } }],
+      errors: [
+        {
+          messageId: 'noTypeAssertion',
+          data: { assertion: 'as MyType' },
+          suggestions: [
+            {
+              messageId: 'useSatisfies',
+              output: 'const x = getValue() satisfies MyType;',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report as number in spec file',
       filename: 'src/bar.spec.ts',
       code: 'const x = getValue() as number;',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: 'as number' } }],
+      errors: [
+        {
+          messageId: 'noTypeAssertion',
+          data: { assertion: 'as number' },
+          suggestions: [
+            {
+              messageId: 'useSatisfies',
+              output: 'const x = getValue() satisfies number;',
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'should report angle bracket assertion in non-test file',
       filename: 'src/utils.ts',
       code: 'const x = <MyType>getValue();',
-      errors: [{ messageId: 'noTypeAssertion', data: { assertion: '<MyType>' } }],
+      errors: [{ messageId: 'noTypeAssertion', data: { assertion: '<MyType>' }, suggestions: [] }],
     },
     {
       name: 'should report angle bracket unknown assertion in non-test file',

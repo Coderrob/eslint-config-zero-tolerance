@@ -33,7 +33,10 @@ const OBJECT_FREEZE_PATH = ['Object', 'freeze'];
  * @param context - ESLint rule execution context.
  * @param node - Program node being traversed.
  */
-function checkProgram(context: RequireExportedObjectTypeContext, node: TSESTree.Program): void {
+function checkProgram(
+  context: Readonly<RequireExportedObjectTypeContext>,
+  node: Readonly<TSESTree.Program>,
+): void {
   const exportedBindings = getIndirectlyExportedBindings(node.body);
   for (const statement of node.body) {
     reportDirectExportViolations(context, statement);
@@ -48,7 +51,7 @@ function checkProgram(context: RequireExportedObjectTypeContext, node: TSESTree.
  * @returns Rule listener map.
  */
 function createRequireExportedObjectTypeListeners(
-  context: RequireExportedObjectTypeContext,
+  context: Readonly<RequireExportedObjectTypeContext>,
 ): TSESLint.RuleListener {
   return {
     Program: checkProgram.bind(undefined, context),
@@ -62,7 +65,7 @@ function createRequireExportedObjectTypeListeners(
  * @returns Direct-export variable declaration, or null.
  */
 function getDirectExportDeclaration(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): TSESTree.VariableDeclaration | null {
   if (
     statement.type !== AST_NODE_TYPES.ExportNamedDeclaration ||
@@ -80,7 +83,7 @@ function getDirectExportDeclaration(
  * @returns First argument expression, or null.
  */
 function getFirstCallExpressionArgument(
-  expression: TSESTree.CallExpression,
+  expression: Readonly<TSESTree.CallExpression>,
 ): TSESTree.Expression | null {
   const firstArgument = expression.arguments.at(0) ?? null;
   return firstArgument === null ? null : unwrapCallExpressionArgument(firstArgument);
@@ -93,7 +96,7 @@ function getFirstCallExpressionArgument(
  * @returns Indirectly exported const declaration, or null.
  */
 function getIndirectExportDeclaration(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): TSESTree.VariableDeclaration | null {
   if (statement.type !== AST_NODE_TYPES.VariableDeclaration) {
     return null;
@@ -116,7 +119,7 @@ function getIndirectlyExportedBindings(
       continue;
     }
     for (const specifier of statement.specifiers) {
-      exportedBindings.add(specifier.local.name);
+      Reflect.apply(Set.prototype.add, exportedBindings, [specifier.local.name]);
     }
   }
   return exportedBindings;
@@ -128,7 +131,7 @@ function getIndirectlyExportedBindings(
  * @param expression - Expression to inspect.
  * @returns True when the call freezes an object literal.
  */
-function isFrozenObjectLiteralCall(expression: TSESTree.Expression): boolean {
+function isFrozenObjectLiteralCall(expression: Readonly<TSESTree.Expression>): boolean {
   if (
     expression.type !== AST_NODE_TYPES.CallExpression ||
     !hasCallCalleeNamePath(expression, OBJECT_FREEZE_PATH)
@@ -149,7 +152,7 @@ function isFrozenObjectLiteralCall(expression: TSESTree.Expression): boolean {
  * @returns True when the statement exports local bindings.
  */
 function isIndirectExportStatement(
-  statement: TSESTree.ProgramStatement,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): statement is TSESTree.ExportNamedDeclaration & {
   declaration: null;
   source: null;
@@ -169,8 +172,8 @@ function isIndirectExportStatement(
  * @returns True when the declarator's local binding is exported.
  */
 function isIndirectlyExportedDeclarator(
-  declarator: TSESTree.VariableDeclarator,
-  exportedBindings: ReadonlySet<string>,
+  declarator: Readonly<TSESTree.VariableDeclarator>,
+  exportedBindings: Readonly<ReadonlySet<string>>,
 ): boolean {
   return (
     declarator.id.type === AST_NODE_TYPES.Identifier && exportedBindings.has(declarator.id.name)
@@ -183,7 +186,7 @@ function isIndirectlyExportedDeclarator(
  * @param expression - Initializer expression to inspect.
  * @returns True when the initializer is object-like.
  */
-function isObjectLikeInitializer(expression: TSESTree.Expression): boolean {
+function isObjectLikeInitializer(expression: Readonly<TSESTree.Expression>): boolean {
   const unwrappedExpression = unwrapTsExpression(expression);
   return (
     unwrappedExpression.type === AST_NODE_TYPES.ObjectExpression ||
@@ -197,7 +200,9 @@ function isObjectLikeInitializer(expression: TSESTree.Expression): boolean {
  * @param declarator - Variable declarator to inspect.
  * @returns True when the declarator should be reported.
  */
-function isUntypedExportedObjectDeclarator(declarator: TSESTree.VariableDeclarator): boolean {
+function isUntypedExportedObjectDeclarator(
+  declarator: Readonly<TSESTree.VariableDeclarator>,
+): boolean {
   return (
     declarator.id.type === AST_NODE_TYPES.Identifier &&
     declarator.id.typeAnnotation === undefined &&
@@ -213,8 +218,8 @@ function isUntypedExportedObjectDeclarator(declarator: TSESTree.VariableDeclarat
  * @param statement - Program statement to inspect.
  */
 function reportDirectExportViolations(
-  context: RequireExportedObjectTypeContext,
-  statement: TSESTree.ProgramStatement,
+  context: Readonly<RequireExportedObjectTypeContext>,
+  statement: Readonly<TSESTree.ProgramStatement>,
 ): void {
   const declaration = getDirectExportDeclaration(statement);
   if (declaration === null || declaration.kind !== VARIABLE_KIND_CONST) {
@@ -232,8 +237,8 @@ function reportDirectExportViolations(
  * @param declarator - Variable declarator to inspect.
  */
 function reportExportedDeclaratorViolation(
-  context: RequireExportedObjectTypeContext,
-  declarator: TSESTree.VariableDeclarator,
+  context: Readonly<RequireExportedObjectTypeContext>,
+  declarator: Readonly<TSESTree.VariableDeclarator>,
 ): void {
   if (!isUntypedExportedObjectDeclarator(declarator)) {
     return;
@@ -252,9 +257,9 @@ function reportExportedDeclaratorViolation(
  * @param exportedBindings - Set of indirectly exported local names.
  */
 function reportIndirectExportViolations(
-  context: RequireExportedObjectTypeContext,
-  statement: TSESTree.ProgramStatement,
-  exportedBindings: ReadonlySet<string>,
+  context: Readonly<RequireExportedObjectTypeContext>,
+  statement: Readonly<TSESTree.ProgramStatement>,
+  exportedBindings: Readonly<ReadonlySet<string>>,
 ): void {
   const declaration = getIndirectExportDeclaration(statement);
   if (declaration === null) {
@@ -274,7 +279,7 @@ function reportIndirectExportViolations(
  * @returns Argument expression, or null for spread arguments.
  */
 function unwrapCallExpressionArgument(
-  argument: TSESTree.CallExpressionArgument,
+  argument: Readonly<TSESTree.CallExpressionArgument>,
 ): TSESTree.Expression | null {
   switch (argument.type) {
     case AST_NODE_TYPES.SpreadElement:

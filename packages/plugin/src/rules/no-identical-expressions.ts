@@ -42,7 +42,7 @@ type NoIdenticalExpressionsContext = Readonly<TSESLint.RuleContext<'identicalExp
  * @param node - Expression node to inspect.
  */
 function checkExpression(
-  context: NoIdenticalExpressionsContext,
+  context: Readonly<NoIdenticalExpressionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: TSESTree.BinaryExpression | TSESTree.LogicalExpression,
 ): void {
@@ -66,7 +66,7 @@ function checkExpression(
  * @returns Listener map for the rule.
  */
 function createNoIdenticalExpressionsListeners(
-  context: NoIdenticalExpressionsContext,
+  context: Readonly<NoIdenticalExpressionsContext>,
 ): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
 
@@ -86,8 +86,8 @@ function createNoIdenticalExpressionsListeners(
  */
 function hasIdenticalExpressionText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  left: TSESTree.Expression,
-  right: TSESTree.Expression,
+  left: Readonly<TSESTree.Expression>,
+  right: Readonly<TSESTree.Expression>,
 ): boolean {
   const leftText = sourceCode.getText(left);
   const rightText = sourceCode.getText(right);
@@ -110,7 +110,7 @@ function isCheckedOperator(operator: string): boolean {
  * @param node - Candidate node.
  * @returns True when node is an expression.
  */
-function isExpressionNode(node: TSESTree.Node): node is TSESTree.Expression {
+function isExpressionNode(node: Readonly<TSESTree.Node>): node is TSESTree.Expression {
   return node.type !== AST_NODE_TYPES.PrivateIdentifier;
 }
 
@@ -121,7 +121,7 @@ function isExpressionNode(node: TSESTree.Node): node is TSESTree.Expression {
  * @param node - Expression node to report.
  */
 function reportIdenticalExpression(
-  context: NoIdenticalExpressionsContext,
+  context: Readonly<NoIdenticalExpressionsContext>,
   node: TSESTree.BinaryExpression | TSESTree.LogicalExpression,
 ): void {
   context.report({

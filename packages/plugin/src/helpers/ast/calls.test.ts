@@ -10,7 +10,7 @@ import {
 describe('ast call helpers', () => {
   describe('getCalleeNamePath', () => {
     it('should return a single name for an identifier callee', () => {
-      const callee = { type: AST_NODE_TYPES.Identifier, name: 'describe' } as any;
+      const callee = { type: AST_NODE_TYPES.Identifier, name: 'describe' } as unknown;
 
       expect(getCalleeNamePath(callee)).toEqual(['describe']);
     });
@@ -26,7 +26,7 @@ describe('ast call helpers', () => {
           property: { type: AST_NODE_TYPES.Identifier, name: 'only' },
           object: { type: AST_NODE_TYPES.Identifier, name: 'describe' },
         },
-      } as any;
+      } as unknown;
 
       expect(getCalleeNamePath(callee)).toEqual(['describe', 'only', 'each']);
     });
@@ -37,7 +37,7 @@ describe('ast call helpers', () => {
         computed: true,
         property: { type: AST_NODE_TYPES.Literal, value: 'skip' },
         object: { type: AST_NODE_TYPES.Identifier, name: 'test' },
-      } as any;
+      } as unknown;
 
       expect(getCalleeNamePath(callee)).toEqual(['test', 'skip']);
     });
@@ -51,7 +51,7 @@ describe('ast call helpers', () => {
           property: { type: AST_NODE_TYPES.Identifier, name: 'each' },
           object: { type: AST_NODE_TYPES.Identifier, name: 'test' },
         },
-      } as any;
+      } as unknown;
 
       expect(getCalleeNamePath(callee)).toEqual(['test', 'each']);
     });
@@ -62,13 +62,13 @@ describe('ast call helpers', () => {
         computed: true,
         property: { type: AST_NODE_TYPES.Identifier, name: 'dynamicName' },
         object: { type: AST_NODE_TYPES.Identifier, name: 'test' },
-      } as any;
+      } as unknown;
 
       expect(getCalleeNamePath(callee)).toBeNull();
     });
 
     it('should return null for non identifier/member/call callee nodes', () => {
-      const callee = { type: AST_NODE_TYPES.ThisExpression } as any;
+      const callee = { type: AST_NODE_TYPES.ThisExpression } as unknown;
 
       expect(getCalleeNamePath(callee)).toBeNull();
     });
@@ -80,7 +80,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         arguments: [firstArgument],
-      } as any;
+      } as unknown;
 
       expect(getCallArgument(node, 0)).toBe(firstArgument);
     });
@@ -89,7 +89,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         arguments: [],
-      } as any;
+      } as unknown;
 
       expect(getCallArgument(node, 0)).toBeNull();
     });
@@ -101,7 +101,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         arguments: [argument],
-      } as any;
+      } as unknown;
 
       expect(getStringLiteralCallArgument(node, 0)).toBe(argument);
     });
@@ -110,7 +110,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         arguments: [{ type: AST_NODE_TYPES.Literal, value: 1 }],
-      } as any;
+      } as unknown;
 
       expect(getStringLiteralCallArgument(node, 0)).toBeNull();
     });
@@ -119,7 +119,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         arguments: [],
-      } as any;
+      } as unknown;
 
       expect(getStringLiteralCallArgument(node, 0)).toBeNull();
     });
@@ -135,7 +135,7 @@ describe('ast call helpers', () => {
           property: { type: AST_NODE_TYPES.Literal, value: 'skip' },
           object: { type: AST_NODE_TYPES.Identifier, name: 'test' },
         },
-      } as any;
+      } as unknown;
 
       expect(hasCallCalleeNamePath(node, ['test', 'skip'])).toBe(true);
     });
@@ -144,7 +144,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         callee: { type: AST_NODE_TYPES.Identifier, name: 'describe' },
-      } as any;
+      } as unknown;
 
       expect(hasCallCalleeNamePath(node, ['test'])).toBe(false);
     });
@@ -160,7 +160,7 @@ describe('ast call helpers', () => {
           object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
           property: { type: AST_NODE_TYPES.Identifier, name: 'push' },
         },
-      } as any;
+      } as unknown;
 
       expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBe('push');
     });
@@ -174,7 +174,7 @@ describe('ast call helpers', () => {
           object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
           property: { type: AST_NODE_TYPES.Literal, value: 'splice' },
         },
-      } as any;
+      } as unknown;
 
       expect(getMatchingCallMemberMethodName(node, new Set(['splice']))).toBe('splice');
     });
@@ -188,7 +188,7 @@ describe('ast call helpers', () => {
           object: { type: AST_NODE_TYPES.Identifier, name: 'items' },
           property: { type: AST_NODE_TYPES.Identifier, name: 'map' },
         },
-      } as any;
+      } as unknown;
 
       expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBeNull();
     });
@@ -197,7 +197,7 @@ describe('ast call helpers', () => {
       const node = {
         type: AST_NODE_TYPES.CallExpression,
         callee: { type: AST_NODE_TYPES.Identifier, name: 'push' },
-      } as any;
+      } as unknown;
 
       expect(getMatchingCallMemberMethodName(node, new Set(['push']))).toBeNull();
     });

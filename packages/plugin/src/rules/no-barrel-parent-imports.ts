@@ -33,8 +33,8 @@ type NoBarrelParentImportsContext = Readonly<TSESLint.RuleContext<'noParentImpor
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoBarrelParentImportsContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoBarrelParentImportsContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
@@ -53,8 +53,8 @@ function checkCallExpression(
  * @param node - Import declaration node.
  */
 function checkImportDeclaration(
-  context: NoBarrelParentImportsContext,
-  node: TSESTree.ImportDeclaration,
+  context: Readonly<NoBarrelParentImportsContext>,
+  node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   reportIfParentImport(context, node.source, node.source.value);
 }
@@ -66,8 +66,8 @@ function checkImportDeclaration(
  * @param node - Import expression node.
  */
 function checkImportExpression(
-  context: NoBarrelParentImportsContext,
-  node: TSESTree.ImportExpression,
+  context: Readonly<NoBarrelParentImportsContext>,
+  node: Readonly<TSESTree.ImportExpression>,
 ): void {
   const importPath = getLiteralStringNodeValue(node.source);
   if (importPath !== null) {
@@ -82,8 +82,8 @@ function checkImportExpression(
  * @param node - TS import-equals declaration node.
  */
 function checkTsImportEqualsDeclaration(
-  context: NoBarrelParentImportsContext,
-  node: TSESTree.TSImportEqualsDeclaration,
+  context: Readonly<NoBarrelParentImportsContext>,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): void {
   const moduleReference = getExternalModuleReference(node);
   const importPath = moduleReference === null ? null : getLiteralStringNodeValue(moduleReference);
@@ -99,7 +99,7 @@ function checkTsImportEqualsDeclaration(
  * @returns Listener map for the rule.
  */
 function createNoBarrelParentImportsListeners(
-  context: NoBarrelParentImportsContext,
+  context: Readonly<NoBarrelParentImportsContext>,
 ): TSESLint.RuleListener {
   if (!isBarrelFile(context.filename)) {
     return {};
@@ -119,7 +119,7 @@ function createNoBarrelParentImportsListeners(
  * @returns String-literal expression when it targets an external module.
  */
 function getExternalModuleReference(
-  node: TSESTree.TSImportEqualsDeclaration,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): TSESTree.Expression | null {
   if (node.moduleReference.type !== AST_NODE_TYPES.TSExternalModuleReference) {
     return null;
@@ -135,8 +135,8 @@ function getExternalModuleReference(
  * @param importPath - The module path to validate.
  */
 function reportIfParentImport(
-  context: NoBarrelParentImportsContext,
-  node: TSESTree.Node,
+  context: Readonly<NoBarrelParentImportsContext>,
+  node: Readonly<TSESTree.Node>,
   importPath: string,
 ): void {
   if (isParentDirectoryImportPath(importPath)) {

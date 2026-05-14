@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-placeholder-implementation.ts",
+  "module": {
+    "name": "no-placeholder-implementation",
+    "description": "Disallow placeholder, stub, TODO, and not implemented production code.",
+    "exports": ["noPlaceholderImplementation"]
+  },
+  "specifications": [
+    {
+      "feature": "Placeholder implementation detection",
+      "scenarios": [
+        {
+          "name": "should allow meaningful nullable branches and exempt test files",
+          "given": "code with real logic that may return null or placeholder text inside an exempt test file",
+          "when": "the rule evaluates the function body",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report placeholder throws, returns, and console calls",
+          "given": "production code containing TODO throws, single-statement empty returns, or console placeholder messages",
+          "when": "the rule evaluates implementation statements",
+          "then": "a placeholderImplementation violation is reported"
+        },
+        {
+          "name": "should report placeholder comments when enabled",
+          "given": "production source comments containing TODO, FIXME, stub, placeholder, temporary, hack, or not implemented",
+          "when": "comment checking is enabled",
+          "then": "a placeholderComment violation is reported"
+        }
+      ]
+    }
+  ]
+}

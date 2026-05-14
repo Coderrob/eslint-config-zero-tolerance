@@ -65,6 +65,18 @@
           "then": "a relativeBarrelExport violation is reported for each path that does not start with './'"
         },
         {
+          "name": "should fix verified bare same-directory re-export paths",
+          "given": "an index.ts file containing export { foo } from 'foo' where a sibling foo module exists",
+          "when": "the rule evaluates the barrel re-export declaration with a real filename",
+          "then": "a relativeBarrelExport violation is reported with a fix to rewrite the path to './foo'"
+        },
+        {
+          "name": "should skip fix output when a re-export source is unavailable",
+          "given": "a fix callback is evaluated for a re-export node without a source",
+          "when": "the replacement is requested",
+          "then": "no fix is emitted"
+        },
+        {
           "name": "should report the bare './' token in barrel files",
           "given": "an index.ts file containing export * from './'",
           "when": "the rule evaluates the barrel re-export declaration",

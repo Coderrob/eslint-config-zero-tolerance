@@ -44,7 +44,8 @@
         "no-return-type",
         "require-union-type-alias",
         "no-destructured-parameter-type-literal",
-        "require-exported-object-type"
+        "require-exported-object-type",
+        "no-unsafe-json-parse"
       ]
     },
     {
@@ -55,6 +56,7 @@
         "max-params",
         "no-array-mutation",
         "no-date-now",
+        "no-placeholder-implementation",
         "no-magic-numbers",
         "no-magic-strings",
         "no-map-set-mutation",
@@ -81,9 +83,13 @@
         "require-barrel-relative-exports",
         "no-dynamic-import",
         "no-export-alias",
+        "no-hardcoded-secrets",
+        "no-raw-sql-interpolation",
         "no-barrel-parent-imports",
         "no-parent-internal-access",
         "no-re-export",
+        "no-shell-command-construction",
+        "no-unsafe-code-generation",
         "require-node-protocol"
       ]
     },
@@ -102,12 +108,14 @@
         "no-floating-promises",
         "no-math-random",
         "no-eslint-disable",
+        "no-ts-nocheck",
         "no-parameter-reassign",
         "no-process-env-outside-config",
         "no-flag-argument",
         "prefer-guard-clauses",
         "prefer-shortcut-return",
         "no-query-side-effects",
+        "require-timeout-for-io",
         "require-exhaustive-switch"
       ]
     }

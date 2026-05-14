@@ -35,16 +35,22 @@
           "then": "a sortFunctions violation is reported on the out-of-order function"
         },
         {
+          "name": "should autofix a full sortable function run in one pass",
+          "given": "a module with several top-level functions in reverse alphabetical order",
+          "when": "the rule evaluates the Program",
+          "then": "one sortFunctions violation is reported and the autofix replaces the sortable function span with all functions in alphabetical order"
+        },
+        {
           "name": "should move owned comments with a sorted declaration block",
           "given": "two out-of-order sortable functions where each declaration has one or more directly attached leading comments and optional same-line trailing comments",
           "when": "the rule evaluates the Program",
           "then": "a sortFunctions violation is reported and the autofix moves the owned comments together with the reordered declaration block"
         },
         {
-          "name": "should report without autofixing when directive or ambiguous interstitial comments are present",
-          "given": "two out-of-order sortable functions separated by directive comments or standalone comments between declaration blocks",
+          "name": "should report without autofixing when directive comments or non-function content are present",
+          "given": "two out-of-order sortable functions separated by directive comments, standalone comments, or executable statements between declaration blocks",
           "when": "the rule evaluates the Program",
-          "then": "a sortFunctions violation is reported but no autofix is offered because comment ownership is unsafe"
+          "then": "a sortFunctions violation is reported but no autofix is offered because moving declarations across non-whitespace content may be unsafe"
         }
       ]
     }

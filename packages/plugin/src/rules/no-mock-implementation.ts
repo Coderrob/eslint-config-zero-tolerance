@@ -34,8 +34,8 @@ type NoMockImplementationContext = Readonly<TSESLint.RuleContext<'noMockImplemen
  * @param node - Member expression node to inspect.
  */
 function checkMemberExpression(
-  context: NoMockImplementationContext,
-  node: TSESTree.MemberExpression,
+  context: Readonly<NoMockImplementationContext>,
+  node: Readonly<TSESTree.MemberExpression>,
 ): void {
   const bannedMethod = getMappedMemberPropertyName(node, BANNED_MOCK_METHODS);
   if (bannedMethod === null) {
@@ -59,7 +59,7 @@ function checkMemberExpression(
  * @returns Rule listeners.
  */
 function createNoMockImplementationListeners(
-  context: NoMockImplementationContext,
+  context: Readonly<NoMockImplementationContext>,
 ): TSESLint.RuleListener {
   return {
     MemberExpression: checkMemberExpression.bind(undefined, context),

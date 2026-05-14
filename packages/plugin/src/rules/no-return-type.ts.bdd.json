@@ -39,6 +39,12 @@
           "given": "a type annotation using nested ReturnType utility references",
           "when": "the rule evaluates the code",
           "then": "each ReturnType usage is reported"
+        },
+        {
+          "name": "should suggest explicit return annotations from same-file functions",
+          "given": "ReturnType<typeof createValue> where createValue is a same-file function with an explicit return annotation",
+          "when": "the rule evaluates the ReturnType reference",
+          "then": "a noReturnType violation is reported with a suggestion to replace it with the explicit return annotation"
         }
       ]
     }

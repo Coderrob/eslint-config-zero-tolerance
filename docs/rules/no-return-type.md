@@ -17,6 +17,10 @@ Disallow TypeScript `ReturnType` utility usage.
 
 Prefer declaring a named result type and making that contract explicit.
 
+## Suggestions
+
+When `ReturnType<typeof fn>` references a same-file function declaration or const function with an explicit return annotation, the rule suggests replacing `ReturnType<typeof fn>` with that annotation text. Other cases remain report-only.
+
 ## Examples
 
 ### ✅ Correct

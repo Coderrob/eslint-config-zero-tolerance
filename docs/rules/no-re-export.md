@@ -7,13 +7,17 @@ Disallow direct and pass-through re-export statements from parent or ancestor mo
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | No           |
+| **Fixable**     | Yes (`code`) |
 | **Recommended** | `warn`       |
 | **Strict**      | `error`      |
 
 ## Rationale
 
 Re-export statements that reach outside the current directory (`../`) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as `export { foo } from '../foo'` and pass-through patterns such as `import { foo } from '../foo'; export { foo };`. Statement ordering does not matter: `export { foo }; import { foo } from '../foo';` is also reported. Barrel files (`index.*`) remain exempt from this rule because their re-export path policy is enforced separately by `require-barrel-relative-exports`. All other files must not re-export from peer modules (`../sibling`) or ancestors (`../../parent`, `../../../grandparent`).
+
+## Autofix
+
+The fixer only removes redundant pass-through export specifiers when the same exported name is already directly exported from the same file. Parent-path re-export statements and non-redundant pass-through exports remain report-only.
 
 ## Notes
 

@@ -28,9 +28,9 @@ type NoIdenticalBranchesContext = Readonly<TSESLint.RuleContext<'noIdenticalBran
  * @param node - Conditional expression node.
  */
 function checkConditionalExpression(
-  context: NoIdenticalBranchesContext,
+  context: Readonly<NoIdenticalBranchesContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.ConditionalExpression,
+  node: Readonly<TSESTree.ConditionalExpression>,
 ): void {
   if (!hasSameBranchBody(node.consequent, node.alternate, sourceCode)) {
     return;
@@ -47,9 +47,9 @@ function checkConditionalExpression(
  * @param node - If statement node.
  */
 function checkIfStatement(
-  context: NoIdenticalBranchesContext,
+  context: Readonly<NoIdenticalBranchesContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.IfStatement,
+  node: Readonly<TSESTree.IfStatement>,
 ): void {
   if (node.alternate === null || isElseIfBranch(node.alternate)) {
     return;
@@ -68,7 +68,7 @@ function checkIfStatement(
  * @returns Listener map for the rule.
  */
 function createNoIdenticalBranchesListeners(
-  context: NoIdenticalBranchesContext,
+  context: Readonly<NoIdenticalBranchesContext>,
 ): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
 
@@ -87,8 +87,8 @@ function createNoIdenticalBranchesListeners(
  * @returns True if branches are textually identical.
  */
 function hasSameBranchBody(
-  left: TSESTree.Node,
-  right: TSESTree.Node,
+  left: Readonly<TSESTree.Node>,
+  right: Readonly<TSESTree.Node>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
   return sourceCode.getText(left).trim() === sourceCode.getText(right).trim();
@@ -110,7 +110,10 @@ function isElseIfBranch(alternate: TSESTree.Statement | null): boolean {
  * @param context - ESLint rule execution context.
  * @param node - Node to report.
  */
-function reportIdenticalBranches(context: NoIdenticalBranchesContext, node: TSESTree.Node): void {
+function reportIdenticalBranches(
+  context: Readonly<NoIdenticalBranchesContext>,
+  node: Readonly<TSESTree.Node>,
+): void {
   context.report({
     node,
     messageId: 'noIdenticalBranches',

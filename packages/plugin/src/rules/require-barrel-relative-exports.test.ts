@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { ruleTester } from '../testing/test-helper';
 import { requireBarrelRelativeExports } from './require-barrel-relative-exports';
 
@@ -61,6 +62,14 @@ ruleTester.run('require-barrel-relative-exports', requireBarrelRelativeExports, 
       code: "export { foo } from 'package-name';",
       name: 'should report package re-exports in barrel files',
       filename: 'src/index.ts',
+      output: null,
+      errors: [{ messageId: 'relativeBarrelExport' }],
+    },
+    {
+      code: "export { noInlineTypeImport } from 'no-inline-type-import';",
+      name: 'should fix verified bare same-directory re-exports in barrel files',
+      filename: path.resolve('src', 'rules', 'index.ts'),
+      output: "export { noInlineTypeImport } from './no-inline-type-import';",
       errors: [{ messageId: 'relativeBarrelExport' }],
     },
     {

@@ -32,7 +32,7 @@ type PreferObjectSpreadContext = Readonly<TSESLint.RuleContext<'preferObjectSpre
  */
 function argumentToSpreadText(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  arg: TSESTree.Expression,
+  arg: Readonly<TSESTree.Expression>,
 ): string {
   if (arg.type === AST_NODE_TYPES.ObjectExpression) {
     return arg.properties
@@ -75,15 +75,15 @@ function collectSpreadParts(
  */
 function createObjectSpreadFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.CallExpression,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.CallExpression>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const spreadParts = collectSpreadParts(sourceCode, node.arguments.filter(isExpressionArgument));
   const inner = spreadParts.length > 0 ? ` ${spreadParts.join(', ')} ` : '';
   const objectLiteralText = `{${inner}}`;
-  const replacementText = requiresParenthesizedObjectSpread(node) ?
-    `(${objectLiteralText})` :
-    objectLiteralText;
+  const replacementText = shouldParenthesizeObjectSpread(node)
+    ? `(${objectLiteralText})`
+    : objectLiteralText;
   return fixer.replaceText(node, replacementText);
 }
 
@@ -94,11 +94,11 @@ function createObjectSpreadFix(
  * @returns Rule listeners.
  */
 function createPreferObjectSpreadListeners(
-  context: PreferObjectSpreadContext,
+  context: Readonly<PreferObjectSpreadContext>,
 ): TSESLint.RuleListener {
   return {
     /** @param node - Call expression node to evaluate. */
-    CallExpression(node: TSESTree.CallExpression): void {
+    CallExpression(node: Readonly<TSESTree.CallExpression>): void {
       if (
         isObjectAssignCall(node) &&
         isEmptyObjectLiteral(node.arguments[0]) &&
@@ -116,7 +116,7 @@ function createPreferObjectSpreadListeners(
  * @param node - Call expression to inspect.
  * @returns Whether the call has spread arguments.
  */
-function hasSpreadArgument(node: TSESTree.CallExpression): boolean {
+function hasSpreadArgument(node: Readonly<TSESTree.CallExpression>): boolean {
   return node.arguments.some(
     /** @param arg - Argument node to inspect. */
     (arg) => arg.type === AST_NODE_TYPES.SpreadElement,
@@ -139,7 +139,7 @@ function isAssignProperty(node: TSESTree.Expression | TSESTree.PrivateIdentifier
  * @param node - AST node to inspect.
  * @returns Whether the node is an empty ObjectExpression.
  */
-function isEmptyObjectLiteral(node: TSESTree.Node): boolean {
+function isEmptyObjectLiteral(node: Readonly<TSESTree.Node>): boolean {
   return node.type === AST_NODE_TYPES.ObjectExpression && node.properties.length === 0;
 }
 
@@ -150,7 +150,7 @@ function isEmptyObjectLiteral(node: TSESTree.Node): boolean {
  * @returns Whether the argument is not a spread element.
  */
 function isExpressionArgument(
-  node: TSESTree.CallExpressionArgument,
+  node: Readonly<TSESTree.CallExpressionArgument>,
 ): node is TSESTree.Expression {
   return node.type !== AST_NODE_TYPES.SpreadElement;
 }
@@ -161,7 +161,7 @@ function isExpressionArgument(
  * @param node - Call expression to inspect.
  * @returns Whether the callee is Object.assign with arguments.
  */
-function isObjectAssignCall(node: TSESTree.CallExpression): boolean {
+function isObjectAssignCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return node.arguments.length >= 1 && isObjectAssignMember(node.callee);
 }
 
@@ -171,7 +171,7 @@ function isObjectAssignCall(node: TSESTree.CallExpression): boolean {
  * @param callee - The callee expression from the call.
  * @returns Whether the callee matches Object.assign.
  */
-function isObjectAssignMember(callee: TSESTree.Expression): boolean {
+function isObjectAssignMember(callee: Readonly<TSESTree.Expression>): boolean {
   if (callee.type !== AST_NODE_TYPES.MemberExpression || callee.computed) {
     return false;
   }
@@ -184,7 +184,7 @@ function isObjectAssignMember(callee: TSESTree.Expression): boolean {
  * @param node - AST node to inspect.
  * @returns Whether the node is Object.
  */
-function isObjectIdentifier(node: TSESTree.Expression): boolean {
+function isObjectIdentifier(node: Readonly<TSESTree.Expression>): boolean {
   return node.type === AST_NODE_TYPES.Identifier && node.name === OBJECT_GLOBAL;
 }
 
@@ -195,8 +195,8 @@ function isObjectIdentifier(node: TSESTree.Expression): boolean {
  * @param node - The Object.assign call expression.
  */
 function reportObjectAssign(
-  context: PreferObjectSpreadContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<PreferObjectSpreadContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   context.report({
     node,
@@ -211,7 +211,7 @@ function reportObjectAssign(
  * @param node - Call expression being replaced.
  * @returns Whether the replacement must be parenthesized to remain valid syntax.
  */
-function requiresParenthesizedObjectSpread(node: TSESTree.CallExpression): boolean {
+function shouldParenthesizeObjectSpread(node: Readonly<TSESTree.CallExpression>): boolean {
   const { parent } = node;
   if (parent.type === AST_NODE_TYPES.ExpressionStatement) {
     return true;

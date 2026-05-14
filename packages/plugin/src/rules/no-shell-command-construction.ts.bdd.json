@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-shell-command-construction.ts",
+  "module": {
+    "name": "no-shell-command-construction",
+    "description": "Disallow shell command construction through subprocess APIs.",
+    "exports": ["noShellCommandConstruction"]
+  },
+  "specifications": [
+    {
+      "feature": "Shell command construction detection",
+      "scenarios": [
+        {
+          "name": "should allow argument-vector subprocess calls and approved wrappers",
+          "given": "code using spawn or execFile with argument arrays or configured safe wrappers",
+          "when": "the rule evaluates subprocess calls",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report shell string execution APIs",
+          "given": "code using exec, execSync, execa.command, execaCommand, or configured shell functions",
+          "when": "the rule evaluates the call",
+          "then": "a shellCommandConstruction violation is reported"
+        },
+        {
+          "name": "should report dynamic spawn commands and shell mode",
+          "given": "code passing interpolated or concatenated command strings to spawn or enabling shell true",
+          "when": "the rule evaluates the spawn call",
+          "then": "a shellCommandConstruction violation is reported"
+        }
+      ]
+    }
+  ]
+}

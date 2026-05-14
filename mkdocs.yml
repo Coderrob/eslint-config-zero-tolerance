@@ -96,11 +96,13 @@ nav:
           - require-union-type-alias: rules/require-union-type-alias.md
           - no-destructured-parameter-type-literal: rules/no-destructured-parameter-type-literal.md
           - require-exported-object-type: rules/require-exported-object-type.md
+          - no-unsafe-json-parse: rules/no-unsafe-json-parse.md
       - Code Quality:
           - max-function-lines: rules/max-function-lines.md
           - max-params: rules/max-params.md
           - no-array-mutation: rules/no-array-mutation.md
           - no-date-now: rules/no-date-now.md
+          - no-placeholder-implementation: rules/no-placeholder-implementation.md
           - no-magic-numbers: rules/no-magic-numbers.md
           - no-magic-strings: rules/no-magic-strings.md
           - no-map-set-mutation: rules/no-map-set-mutation.md
@@ -121,9 +123,13 @@ nav:
           - require-clean-barrel: rules/require-clean-barrel.md
           - no-dynamic-import: rules/no-dynamic-import.md
           - no-export-alias: rules/no-export-alias.md
+          - no-hardcoded-secrets: rules/no-hardcoded-secrets.md
+          - no-raw-sql-interpolation: rules/no-raw-sql-interpolation.md
           - no-barrel-parent-imports: rules/no-barrel-parent-imports.md
           - no-parent-internal-access: rules/no-parent-internal-access.md
           - no-re-export: rules/no-re-export.md
+          - no-shell-command-construction: rules/no-shell-command-construction.md
+          - no-unsafe-code-generation: rules/no-unsafe-code-generation.md
           - require-node-protocol: rules/require-node-protocol.md
       - Bug Prevention:
           - no-identical-expressions: rules/no-identical-expressions.md
@@ -137,10 +143,12 @@ nav:
           - no-floating-promises: rules/no-floating-promises.md
           - no-math-random: rules/no-math-random.md
           - no-eslint-disable: rules/no-eslint-disable.md
+          - no-ts-nocheck: rules/no-ts-nocheck.md
           - no-parameter-reassign: rules/no-parameter-reassign.md
           - no-process-env-outside-config: rules/no-process-env-outside-config.md
           - no-flag-argument: rules/no-flag-argument.md
           - prefer-guard-clauses: rules/prefer-guard-clauses.md
           - prefer-shortcut-return: rules/prefer-shortcut-return.md
           - no-query-side-effects: rules/no-query-side-effects.md
+          - require-timeout-for-io: rules/require-timeout-for-io.md
           - require-exhaustive-switch: rules/require-exhaustive-switch.md

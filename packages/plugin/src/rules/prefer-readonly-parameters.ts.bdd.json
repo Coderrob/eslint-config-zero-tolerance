@@ -34,6 +34,29 @@
           "given": "a class constructor parameter property typed Readonly<User>",
           "when": "the rule evaluates the constructor function expression",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow callable type references ignored by default",
+          "given": "a function parameter typed Dispatch<SetStateAction<string>>",
+          "when": "the rule evaluates the parameter type",
+          "then": "no violation is reported because Dispatch is excluded from readonly wrapping"
+        }
+      ]
+    },
+    {
+      "feature": "Configured type-reference exclusions",
+      "scenarios": [
+        {
+          "name": "should allow a configured ignored type-reference name",
+          "given": "a function parameter typed Listener and the rule option ignoredTypeNamePatterns includes ^Listener$",
+          "when": "the rule evaluates the parameter type",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report a type-reference name that does not match configured exclusions",
+          "given": "a function parameter typed User and the configured ignoredTypeNamePatterns do not match User",
+          "when": "the rule evaluates the parameter type",
+          "then": "a preferReadonlyParameters violation is reported"
         }
       ]
     },

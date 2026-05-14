@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/security-ast.ts",
+  "module": {
+    "name": "security-ast",
+    "description": "Shared AST helpers for defensive security-oriented rule implementations.",
+    "exports": [
+      "getCalleeName",
+      "getMemberPath",
+      "getPropertyName",
+      "getStaticString",
+      "hasObjectProperty",
+      "hasTrueObjectProperty",
+      "isDynamicString",
+      "isNullLiteral",
+      "isStringLiteral"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Static AST extraction",
+      "scenarios": [
+        {
+          "name": "should resolve identifiers and member expressions to stable names",
+          "given": "a rule inspects identifiers, member expressions, or object properties",
+          "when": "the helper can statically read the name",
+          "then": "the helper returns the extracted name or dotted path"
+        },
+        {
+          "name": "should detect static and dynamic string expressions",
+          "given": "a rule inspects literals, expression-free templates, interpolated templates, or concatenations",
+          "when": "the helper evaluates the expression shape",
+          "then": "static strings are returned as text and dynamic strings are identified"
+        },
+        {
+          "name": "should detect option object properties",
+          "given": "a rule inspects an object expression used as an options argument",
+          "when": "the helper evaluates property names and literal true values",
+          "then": "matching properties are reported as present"
+        }
+      ]
+    }
+  ]
+}

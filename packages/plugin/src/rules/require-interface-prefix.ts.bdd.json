@@ -32,7 +32,7 @@
           "name": "should report an interface whose name does not start with 'I'",
           "given": "interface User { name: string }",
           "when": "the rule evaluates the interface declaration",
-          "then": "a requireInterfacePrefix violation is reported"
+          "then": "a requireInterfacePrefix violation is reported with a fix to prefix the interface and same-file type references when the generated name is collision-free"
         },
         {
           "name": "should report an interface whose name starts with a lowercase letter",

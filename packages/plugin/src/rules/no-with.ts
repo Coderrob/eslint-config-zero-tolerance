@@ -25,7 +25,7 @@ type NoWithContext = Readonly<TSESLint.RuleContext<'noWith', []>>;
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createNoWithListeners(context: NoWithContext): TSESLint.RuleListener {
+function createNoWithListeners(context: Readonly<NoWithContext>): TSESLint.RuleListener {
   return {
     WithStatement: reportWithUsage.bind(undefined, context),
   };
@@ -37,7 +37,10 @@ function createNoWithListeners(context: NoWithContext): TSESLint.RuleListener {
  * @param context - ESLint rule execution context.
  * @param node - With statement node.
  */
-function reportWithUsage(context: NoWithContext, node: TSESTree.WithStatement): void {
+function reportWithUsage(
+  context: Readonly<NoWithContext>,
+  node: Readonly<TSESTree.WithStatement>,
+): void {
   context.report({
     node,
     messageId: 'noWith',

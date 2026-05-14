@@ -47,8 +47,8 @@ interface ICollectionMethodCall {
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoMapSetMutationContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoMapSetMutationContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   const collectionMethodCall = getCollectionMethodCall(node.callee);
   if (collectionMethodCall === null) {
@@ -71,7 +71,7 @@ function checkCallExpression(
  * @returns Rule listener map.
  */
 function createNoMapSetMutationListeners(
-  context: NoMapSetMutationContext,
+  context: Readonly<NoMapSetMutationContext>,
 ): TSESLint.RuleListener {
   return {
     CallExpression: checkCallExpression.bind(undefined, context),
@@ -86,8 +86,8 @@ function createNoMapSetMutationListeners(
  * @returns Map, Set, or null when the type is not recognized.
  */
 function getCollectionKind(
-  context: NoMapSetMutationContext,
-  node: TSESTree.Expression,
+  context: Readonly<NoMapSetMutationContext>,
+  node: Readonly<TSESTree.Expression>,
 ): CollectionKind | null {
   const typeContext = getTypeContext(context, node);
   if (typeContext === null) {
@@ -116,7 +116,7 @@ function getCollectionKindFromTypeText(typeTexts: readonly string[]): Collection
  * @returns Member expression with an identifier property, or null when not applicable.
  */
 function getCollectionMethodCall(
-  callee: TSESTree.Expression,
+  callee: Readonly<TSESTree.Expression>,
 ): ICollectionMethodCall | null {
   if (!isUncomputedMemberExpressionNode(callee)) {
     return null;
@@ -134,8 +134,8 @@ function getCollectionMethodCall(
  * @returns Checker and resolved type, or null when unavailable.
  */
 function getTypeContext(
-  context: NoMapSetMutationContext,
-  node: TSESTree.Expression,
+  context: Readonly<NoMapSetMutationContext>,
+  node: Readonly<TSESTree.Expression>,
 ): ITypeContext | null {
   try {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -157,7 +157,7 @@ function getTypeContext(
  * @param type - Type to inspect.
  * @returns Flat list of rendered type texts.
  */
-function getTypeTexts(checker: ts.TypeChecker, type: ts.Type): string[] {
+function getTypeTexts(checker: Readonly<ts.TypeChecker>, type: Readonly<ts.Type>): string[] {
   if (!isUnionType(type)) {
     return [checker.typeToString(type)];
   }
@@ -189,7 +189,7 @@ function isMapTypeText(typeText: string): boolean {
  * @param methodName - Called method name.
  * @returns True when the method mutates the detected collection kind.
  */
-function isMutationMethod(collectionKind: CollectionKind, methodName: string): boolean {
+function isMutationMethod(collectionKind: Readonly<CollectionKind>, methodName: string): boolean {
   return collectionKind === CollectionKind.Map
     ? MAP_MUTATION_METHODS.has(methodName)
     : SET_MUTATION_METHODS.has(methodName);
@@ -216,7 +216,7 @@ function isSetTypeText(typeText: string): boolean {
  * @param type - TypeScript type to inspect.
  * @returns True when the type is a union.
  */
-function isUnionType(type: ts.Type): type is ts.UnionType {
+function isUnionType(type: Readonly<ts.Type>): type is ts.UnionType {
   return (type.flags & ts.TypeFlags.Union) !== 0;
 }
 
@@ -229,9 +229,9 @@ function isUnionType(type: ts.Type): type is ts.UnionType {
  * @param methodName - Called mutation method.
  */
 function reportCollectionMutation(
-  context: NoMapSetMutationContext,
-  node: TSESTree.CallExpression,
-  collectionKind: CollectionKind,
+  context: Readonly<NoMapSetMutationContext>,
+  node: Readonly<TSESTree.CallExpression>,
+  collectionKind: Readonly<CollectionKind>,
   methodName: string,
 ): void {
   context.report({

@@ -11,17 +11,19 @@ import {
   resolveFunctionName,
 } from './ast-helpers';
 
+const NON_STRING_LITERAL_VALUE = 42;
+
 describe('ast-helpers', () => {
   // ── getIdentifierName ────────────────────────────────────────────────────
 
   describe('getIdentifierName', () => {
     it('should return the name when node is an Identifier', () => {
-      const node = { type: 'Identifier', name: 'foo' } as any;
+      const node = { type: 'Identifier', name: 'foo' } as unknown;
       expect(getIdentifierName(node)).toBe('foo');
     });
 
     it('should return null when node is not an Identifier', () => {
-      const node = { type: 'Literal', value: 42 } as any;
+      const node = { type: 'Literal', value: NON_STRING_LITERAL_VALUE } as unknown;
       expect(getIdentifierName(node)).toBeNull();
     });
 
@@ -44,7 +46,7 @@ describe('ast-helpers', () => {
           computed: false,
           property: { type: 'Identifier', name: 'catch' },
         },
-      } as any;
+      } as unknown;
 
       expect(getCallMemberMethodName(node)).toBe('catch');
     });
@@ -52,7 +54,7 @@ describe('ast-helpers', () => {
     it('should return null when the callee is not a member expression', () => {
       const node = {
         callee: { type: 'Identifier', name: 'fn' },
-      } as any;
+      } as unknown;
 
       expect(getCallMemberMethodName(node)).toBeNull();
     });
@@ -60,17 +62,17 @@ describe('ast-helpers', () => {
 
   describe('getLiteralStringValue', () => {
     it('should return the string value when node is a string Literal', () => {
-      const node = { type: 'Literal', value: 'foo' } as any;
+      const node = { type: 'Literal', value: 'foo' } as unknown;
       expect(getLiteralStringValue(node)).toBe('foo');
     });
 
     it('should return null when node is a non-string Literal', () => {
-      const node = { type: 'Literal', value: 42 } as any;
+      const node = { type: 'Literal', value: NON_STRING_LITERAL_VALUE } as unknown;
       expect(getLiteralStringValue(node)).toBeNull();
     });
 
     it('should return null when node is not a Literal', () => {
-      const node = { type: 'Identifier', name: 'foo' } as any;
+      const node = { type: 'Identifier', name: 'foo' } as unknown;
       expect(getLiteralStringValue(node)).toBeNull();
     });
   });
@@ -80,12 +82,12 @@ describe('ast-helpers', () => {
       const node = {
         type: 'FunctionDeclaration',
         id: { type: 'Identifier', name: 'myFunc' },
-      } as any;
+      } as unknown;
       expect(getFunctionDeclarationName(node)).toBe('myFunc');
     });
 
     it('should return null for a non-FunctionDeclaration node', () => {
-      const node = { type: 'ArrowFunctionExpression' } as any;
+      const node = { type: 'ArrowFunctionExpression' } as unknown;
       expect(getFunctionDeclarationName(node)).toBeNull();
     });
   });
@@ -100,7 +102,7 @@ describe('ast-helpers', () => {
           type: 'VariableDeclarator',
           id: { type: 'Identifier', name: 'myVar' },
         },
-      } as any;
+      } as unknown;
       expect(getFunctionVariableName(node)).toBe('myVar');
     });
 
@@ -108,7 +110,7 @@ describe('ast-helpers', () => {
       const node = {
         type: 'ArrowFunctionExpression',
         parent: { type: 'ExpressionStatement' },
-      } as any;
+      } as unknown;
       expect(getFunctionVariableName(node)).toBeNull();
     });
   });
@@ -123,7 +125,7 @@ describe('ast-helpers', () => {
           type: 'MethodDefinition',
           key: { type: 'Identifier', name: 'render' },
         },
-      } as any;
+      } as unknown;
       expect(getFunctionMethodName(node)).toBe('render');
     });
 
@@ -131,7 +133,7 @@ describe('ast-helpers', () => {
       const node = {
         type: 'FunctionExpression',
         parent: { type: 'Property' },
-      } as any;
+      } as unknown;
       expect(getFunctionMethodName(node)).toBeNull();
     });
   });
@@ -144,7 +146,7 @@ describe('ast-helpers', () => {
         type: 'FunctionDeclaration',
         id: { type: 'Identifier', name: 'hello' },
         parent: { type: 'Program' },
-      } as any;
+      } as unknown;
       expect(resolveFunctionName(node)).toBe('hello');
     });
 
@@ -152,7 +154,7 @@ describe('ast-helpers', () => {
       const node = {
         type: 'ArrowFunctionExpression',
         parent: { type: 'CallExpression' },
-      } as any;
+      } as unknown;
       expect(resolveFunctionName(node)).toBe('<anonymous>');
     });
   });
@@ -171,7 +173,7 @@ describe('ast-helpers', () => {
     it('should return null for dot notation when property has no name', () => {
       const node = {
         computed: false,
-        property: { type: 'Literal', value: 42 },
+        property: { type: 'Literal', value: NON_STRING_LITERAL_VALUE },
       };
       expect(getMemberPropertyName(node)).toBeNull();
     });
@@ -187,7 +189,7 @@ describe('ast-helpers', () => {
     it('should return null for computed non-string literal', () => {
       const node = {
         computed: true,
-        property: { type: 'Literal', value: 42 },
+        property: { type: 'Literal', value: NON_STRING_LITERAL_VALUE },
       };
       expect(getMemberPropertyName(node)).toBeNull();
     });
@@ -240,7 +242,7 @@ describe('ast-helpers', () => {
         visitorKeys: {
           BinaryExpression: ['left', 'right', 'extras'],
         },
-      } as any;
+      } as unknown;
       const left = { type: 'Identifier', name: 'left' };
       const right = { type: 'Identifier', name: 'right' };
       const extra = { type: 'Literal', value: 1 };
@@ -249,7 +251,7 @@ describe('ast-helpers', () => {
         left,
         right,
         extras: [extra, 'not-a-node'],
-      } as any;
+      } as unknown;
 
       expect(getVisitorChildNodes(node, sourceCode)).toEqual([left, right, extra]);
     });
@@ -257,11 +259,11 @@ describe('ast-helpers', () => {
     it('should return an empty array when visitor keys are missing for the node type', () => {
       const sourceCode = {
         visitorKeys: {},
-      } as any;
+      } as unknown;
       const node = {
         type: 'UnknownExpression',
         child: { type: 'Identifier', name: 'value' },
-      } as any;
+      } as unknown;
 
       expect(getVisitorChildNodes(node, sourceCode)).toEqual([]);
     });

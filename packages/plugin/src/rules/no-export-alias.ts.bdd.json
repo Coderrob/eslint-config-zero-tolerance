@@ -38,7 +38,7 @@
           "name": "should report a local aliased named export",
           "given": "const foo = 1; export { foo as myFoo }",
           "when": "the rule evaluates the export specifier",
-          "then": "a noExportAlias violation is reported"
+          "then": "a noExportAlias violation is reported without an autofix because the public alias is a naming decision"
         }
       ]
     }

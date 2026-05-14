@@ -37,7 +37,7 @@ import { isPlainObject, isString } from './type-guards';
  * @param node - Call expression node.
  * @returns Method name when callee is a member expression.
  */
-export function getCallMemberMethodName(node: TSESTree.CallExpression): string | null {
+export function getCallMemberMethodName(node: Readonly<TSESTree.CallExpression>): string | null {
   if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
     return null;
   }
@@ -51,7 +51,9 @@ export function getCallMemberMethodName(node: TSESTree.CallExpression): string |
  * @param property - The computed property node to inspect.
  * @returns The property name if it is a string literal, otherwise null.
  */
-function getComputedPropertyName(property: { type: string; value?: unknown }): string | null {
+function getComputedPropertyName(
+  property: Readonly<{ type: string; value?: unknown }>,
+): string | null {
   return isString(property.value) ? property.value : null;
 }
 
@@ -61,7 +63,7 @@ function getComputedPropertyName(property: { type: string; value?: unknown }): s
  * @param node - The function node to check.
  * @returns The declaration name if available, otherwise null.
  */
-export function getFunctionDeclarationName(node: FunctionNode): string | null {
+export function getFunctionDeclarationName(node: Readonly<FunctionNode>): string | null {
   if (!isFunctionDeclarationNode(node)) {
     return null;
   }
@@ -74,7 +76,7 @@ export function getFunctionDeclarationName(node: FunctionNode): string | null {
  * @param node - The function node to check.
  * @returns The method name if available, otherwise null.
  */
-export function getFunctionMethodName(node: FunctionNode): string | null {
+export function getFunctionMethodName(node: Readonly<FunctionNode>): string | null {
   if (!isMethodDefinitionNode(node.parent)) {
     return null;
   }
@@ -87,7 +89,7 @@ export function getFunctionMethodName(node: FunctionNode): string | null {
  * @param node - The function node to check.
  * @returns The variable name if available, otherwise null.
  */
-export function getFunctionVariableName(node: FunctionNode): string | null {
+export function getFunctionVariableName(node: Readonly<FunctionNode>): string | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
@@ -128,10 +130,10 @@ export function getLiteralStringValue(
  * @returns The matched name and replacement, or null when no match exists.
  */
 export function getMappedMemberPropertyName(
-  node: {
+  node: Readonly<{
     computed: boolean;
     property: { type: string; name?: string; value?: unknown };
-  },
+  }>,
   replacements: Readonly<Record<string, string | undefined>>,
 ): { name: string; replacement: string } | null {
   const name = getMemberPropertyName(node);
@@ -152,10 +154,12 @@ export function getMappedMemberPropertyName(
  * @param node - Member expression-like node to inspect.
  * @returns The property name if available, otherwise null.
  */
-export function getMemberPropertyName(node: {
-  computed: boolean;
-  property: { type: string; name?: string; value?: unknown };
-}): string | null {
+export function getMemberPropertyName(
+  node: Readonly<{
+    computed: boolean;
+    property: { type: string; name?: string; value?: unknown };
+  }>,
+): string | null {
   if (!node.computed) {
     return getNonComputedPropertyName(node.property);
   }
@@ -168,7 +172,9 @@ export function getMemberPropertyName(node: {
  * @param property - The property node.
  * @returns The property name if it's an identifier, otherwise null.
  */
-function getNonComputedPropertyName(property: { type: string; name?: string }): string | null {
+function getNonComputedPropertyName(
+  property: Readonly<{ type: string; name?: string }>,
+): string | null {
   return isString(property.name) ? property.name : null;
 }
 
@@ -209,15 +215,22 @@ function getVisitorArrayNodes(value: unknown): ReadonlyArray<TSESTree.Node> {
  * @returns Child nodes for traversal.
  */
 export function getVisitorChildNodes(
-  node: TSESTree.Node,
-  sourceCode: Pick<TSESLint.SourceCode, 'visitorKeys'>,
+  node: Readonly<TSESTree.Node>,
+  sourceCode: Readonly<Pick<TSESLint.SourceCode, 'visitorKeys'>>,
 ): ReadonlyArray<TSESTree.Node> {
-  const childNodes: TSESTree.Node[] = [];
   const visitorKeys = sourceCode.visitorKeys[node.type] ?? [];
-  for (const key of visitorKeys) {
-    childNodes.push(...getVisitorArrayNodes(Reflect.get(node, key)));
-  }
-  return childNodes;
+  return visitorKeys.flatMap(getVisitorChildNodesForKey.bind(undefined, node));
+}
+
+/**
+ * Returns visitor child nodes for one visitor key.
+ *
+ * @param node - Node whose child should be read.
+ * @param key - Visitor key.
+ * @returns Child nodes for the key.
+ */
+function getVisitorChildNodesForKey(node: Readonly<TSESTree.Node>, key: string): ReadonlyArray<TSESTree.Node> {
+  return getVisitorArrayNodes(Reflect.get(node, key));
 }
 
 /**
@@ -227,7 +240,7 @@ export function getVisitorChildNodes(
  * @param node - The function node to resolve the name for.
  * @returns The resolved function name.
  */
-export function resolveFunctionName(node: FunctionNode): string {
+export function resolveFunctionName(node: Readonly<FunctionNode>): string {
   const names = [
     getFunctionDeclarationName(node),
     getFunctionVariableName(node),

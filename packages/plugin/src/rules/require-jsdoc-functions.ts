@@ -23,7 +23,7 @@ import {
   getFunctionVariableName,
   getIdentifierName,
 } from '../helpers/ast-helpers';
-import { someDescendant } from '../helpers/ast/search';
+import { hasDescendant } from '../helpers/ast/search';
 import {
   getJsdocComment,
   getLineIndentation,
@@ -52,6 +52,21 @@ const PARAM_DESCRIPTION_PLACEHOLDER = 'TODO: describe parameter';
 const RETURNS_DESCRIPTION_PLACEHOLDER = 'TODO: describe return value';
 const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
 const THROWS_DESCRIPTION_PLACEHOLDER = 'TODO: describe error condition';
+
+type NamedKeyParentNode =
+  | TSESTree.MethodDefinition
+  | TSESTree.PropertyDefinition
+  | TSESTree.Property;
+
+/**
+ * Appends one line to a line accumulator.
+ *
+ * @param lines - Line accumulator.
+ * @param line - Line to append.
+ */
+function appendLine(lines: readonly string[], line: string): void {
+  Reflect.apply(Array.prototype.push, lines, [line]);
+}
 
 export enum RequireJsdocFunctionsMessageId {
   MissingJsdoc = 'missingJsdoc',
@@ -117,12 +132,12 @@ function appendToSingleLineComment(commentText: string, tagLines: ReadonlyArray<
   const inlineDescription = commentText.slice(COMMENT_PREFIX_LENGTH, -COMMENT_SUFFIX_LENGTH).trim();
   const lines = ['/**'];
   if (inlineDescription.length > 0) {
-    lines.push(` * ${inlineDescription}`);
+    appendLine(lines, ` * ${inlineDescription}`);
   }
   for (const tagLine of tagLines) {
-    lines.push(` * ${tagLine}`);
+    appendLine(lines, ` * ${tagLine}`);
   }
-  lines.push(' */');
+  appendLine(lines, ' */');
   return lines.join('\n');
 }
 
@@ -136,16 +151,16 @@ function appendToSingleLineComment(commentText: string, tagLines: ReadonlyArray<
  */
 function buildMissingJsdocBlock(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  targetNode: TSESTree.Node,
-  node: FunctionNode,
+  targetNode: Readonly<TSESTree.Node>,
+  node: Readonly<FunctionNode>,
 ): string {
   const indent = getLineIndentation(sourceCode, targetNode);
   const lines = [`${indent}/**`, `${indent} * ${getSummaryDescriptionLine(node)}`];
   const missingTagLines = getMissingTagLines(node, sourceCode, null);
   for (const tagLine of missingTagLines) {
-    lines.push(`${indent} * ${tagLine}`);
+    appendLine(lines, `${indent} * ${tagLine}`);
   }
-  lines.push(`${indent} */`);
+  appendLine(lines, `${indent} */`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -160,9 +175,9 @@ function buildMissingJsdocBlock(
  */
 function createMissingJsdocFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  targetNode: TSESTree.Node,
-  node: FunctionNode,
-  fixer: TSESLint.RuleFixer,
+  targetNode: Readonly<TSESTree.Node>,
+  node: Readonly<FunctionNode>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix | null {
   if (targetNode.type === AST_NODE_TYPES.VariableDeclarator) {
     return null;
@@ -189,9 +204,9 @@ function createMissingJsdocFix(
  */
 function createMissingJsdocTagFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  jsdocComment: TSESTree.Comment,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<FunctionNode>,
+  jsdocComment: Readonly<TSESTree.Comment>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const missingTagLines = getMissingTagLines(node, sourceCode, jsdocComment);
   const commentText = sourceCode.getText(jsdocComment);
@@ -206,7 +221,7 @@ function createMissingJsdocTagFix(
  * @returns Rule listeners.
  */
 function createRequireJsdocFunctionsListeners(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
 ): TSESLint.RuleListener {
   if (isTestFile(context.filename)) {
     return {};
@@ -221,7 +236,7 @@ function createRequireJsdocFunctionsListeners(
  * @param node - Function node to name.
  * @returns Inferred function name.
  */
-function getFunctionName(node: FunctionNode): string {
+function getFunctionName(node: Readonly<FunctionNode>): string {
   const names = [
     getFunctionDeclarationName(node),
     getFunctionVariableName(node),
@@ -241,7 +256,7 @@ function getFunctionName(node: FunctionNode): string {
  * @param comment - JSDoc block comment.
  * @returns Number of parameter tags.
  */
-function getJsdocParamTagCount(comment: TSESTree.Comment): number {
+function getJsdocParamTagCount(comment: Readonly<TSESTree.Comment>): number {
   const matches = comment.value.match(new RegExp(String.raw`@${JsdocTagName.Param}\b`, 'gu'));
   return matches === null ? 0 : matches.length;
 }
@@ -254,18 +269,14 @@ function getJsdocParamTagCount(comment: TSESTree.Comment): number {
  * @returns Missing parameter names in declaration order.
  */
 function getMissingParamTagNames(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   jsdocComment: TSESTree.Comment | null,
 ): ReadonlyArray<string> {
   const existingParamTags = jsdocComment === null ? 0 : getJsdocParamTagCount(jsdocComment);
   if (existingParamTags >= node.params.length) {
     return [];
   }
-  const names: string[] = [];
-  for (let index = existingParamTags; index < node.params.length; index += 1) {
-    names.push(getParamTagName(node.params[index], index + 1));
-  }
-  return names;
+  return node.params.slice(existingParamTags).map(getParamTagNameAfterOffset.bind(undefined, existingParamTags));
 }
 
 /**
@@ -277,20 +288,20 @@ function getMissingParamTagNames(
  * @returns Missing JSDoc tag lines without leading `*`.
  */
 function getMissingTagLines(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
   jsdocComment: TSESTree.Comment | null,
 ): ReadonlyArray<string> {
   const missingTags: string[] = [];
   const missingParams = getMissingParamTagNames(node, jsdocComment);
   for (const name of missingParams) {
-    missingTags.push(`@${JsdocTagName.Param} ${name} ${PARAM_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Param} ${name} ${PARAM_DESCRIPTION_PLACEHOLDER}`);
   }
   if (isMissingReturnsTag(node, sourceCode, jsdocComment)) {
-    missingTags.push(`@${JsdocTagName.Returns} ${RETURNS_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Returns} ${RETURNS_DESCRIPTION_PLACEHOLDER}`);
   }
   if (isMissingThrowsTag(node, sourceCode, jsdocComment)) {
-    missingTags.push(`@${JsdocTagName.Throws} {Error} ${THROWS_DESCRIPTION_PLACEHOLDER}`);
+    appendLine(missingTags, `@${JsdocTagName.Throws} {Error} ${THROWS_DESCRIPTION_PLACEHOLDER}`);
   }
   return missingTags;
 }
@@ -301,7 +312,7 @@ function getMissingTagLines(
  * @param node - Function node to inspect.
  * @returns The key name if available, otherwise null.
  */
-function getNamedKeyFunctionName(node: FunctionNode): string | null {
+function getNamedKeyFunctionName(node: Readonly<FunctionNode>): string | null {
   if (!hasIdentifierKey(node.parent)) {
     return null;
   }
@@ -315,8 +326,24 @@ function getNamedKeyFunctionName(node: FunctionNode): string | null {
  * @param position - One-based parameter position.
  * @returns Parameter name for generated JSDoc.
  */
-function getParamTagName(param: TSESTree.Parameter, position: number): string {
+function getParamTagName(param: Readonly<TSESTree.Parameter>, position: number): string {
   return getNamedParameterName(param) ?? `param${position}`;
+}
+
+/**
+ * Returns a generated JSDoc parameter name after an existing tag offset.
+ *
+ * @param offset - Existing param tag count.
+ * @param param - Parameter node.
+ * @param index - Zero-based missing parameter index.
+ * @returns Parameter name for generated JSDoc.
+ */
+function getParamTagNameAfterOffset(
+  offset: number,
+  param: Readonly<TSESTree.Parameter>,
+  index: number,
+): string {
+  return getParamTagName(param, offset + index + 1);
 }
 
 /**
@@ -325,7 +352,7 @@ function getParamTagName(param: TSESTree.Parameter, position: number): string {
  * @param node - Function node to describe.
  * @returns Summary sentence text.
  */
-function getSummaryDescriptionLine(node: FunctionNode): string {
+function getSummaryDescriptionLine(node: Readonly<FunctionNode>): string {
   return `${getFunctionName(node)} ${SUMMARY_DESCRIPTION_PLACEHOLDER}`;
 }
 
@@ -337,7 +364,7 @@ function getSummaryDescriptionLine(node: FunctionNode): string {
  */
 function hasIdentifierKey(
   parent: TSESTree.Node | null | undefined,
-): parent is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+): parent is NamedKeyParentNode {
   return isNamedKeyParentNode(parent) && isIdentifierNode(parent.key);
 }
 
@@ -348,7 +375,10 @@ function hasIdentifierKey(
  * @param tagName - Tag name without `@`.
  * @returns True when the tag exists.
  */
-function hasJsdocTag(comment: TSESTree.Comment, tagName: JsdocTagName): boolean {
+function hasJsdocTag(
+  comment: Readonly<TSESTree.Comment>,
+  tagName: Readonly<JsdocTagName>,
+): boolean {
   return new RegExp(String.raw`@${tagName}\b`, 'u').test(comment.value);
 }
 
@@ -358,7 +388,7 @@ function hasJsdocTag(comment: TSESTree.Comment, tagName: JsdocTagName): boolean 
  * @param comment - JSDoc block comment.
  * @returns True when comment includes @returns or @return.
  */
-function hasReturnJsdocTag(comment: TSESTree.Comment): boolean {
+function hasReturnJsdocTag(comment: Readonly<TSESTree.Comment>): boolean {
   return hasJsdocTag(comment, JsdocTagName.Returns) || hasJsdocTag(comment, JsdocTagName.Return);
 }
 
@@ -370,14 +400,14 @@ function hasReturnJsdocTag(comment: TSESTree.Comment): boolean {
  * @returns True when function returns a value.
  */
 function hasReturnWithValue(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): boolean {
   const body = node.body;
   return (
     isExpressionBodiedArrowFunction(node) ||
     (body.type === AST_NODE_TYPES.BlockStatement &&
-      someDescendant(body, sourceCode, isReturnWithValueNode, isNestedControlFlowBoundaryNode))
+      hasDescendant(body, sourceCode, isReturnWithValueNode, isNestedControlFlowBoundaryNode))
   );
 }
 
@@ -388,11 +418,14 @@ function hasReturnWithValue(
  * @param sourceCode - ESLint source code helper.
  * @returns True when function throws.
  */
-function hasThrowStatement(node: FunctionNode, sourceCode: Readonly<TSESLint.SourceCode>): boolean {
+function hasThrowStatement(
+  node: Readonly<FunctionNode>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): boolean {
   if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
     return false;
   }
-  return someDescendant(
+  return hasDescendant(
     node.body,
     sourceCode,
     isThrowStatementNode,
@@ -406,7 +439,7 @@ function hasThrowStatement(node: FunctionNode, sourceCode: Readonly<TSESLint.Sou
  * @param node - Function node to inspect.
  * @returns True when node is expression-bodied arrow function.
  */
-function isExpressionBodiedArrowFunction(node: FunctionNode): boolean {
+function isExpressionBodiedArrowFunction(node: Readonly<FunctionNode>): boolean {
   return (
     node.type === AST_NODE_TYPES.ArrowFunctionExpression &&
     node.body.type !== AST_NODE_TYPES.BlockStatement
@@ -422,7 +455,7 @@ function isExpressionBodiedArrowFunction(node: FunctionNode): boolean {
  * @returns True when @returns is required and currently missing.
  */
 function isMissingReturnsTag(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
   jsdocComment: TSESTree.Comment | null,
 ): boolean {
@@ -441,7 +474,7 @@ function isMissingReturnsTag(
  * @returns True when @throws is required and currently missing.
  */
 function isMissingThrowsTag(
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
   sourceCode: Readonly<TSESLint.SourceCode>,
   jsdocComment: TSESTree.Comment | null,
 ): boolean {
@@ -459,7 +492,7 @@ function isMissingThrowsTag(
  */
 function isNamedKeyParentNode(
   node: TSESTree.Node | null | undefined,
-): node is TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property {
+): node is NamedKeyParentNode {
   return node !== null && node !== undefined && NAMED_KEY_PARENT_TYPES.has(node.type);
 }
 
@@ -469,7 +502,7 @@ function isNamedKeyParentNode(
  * @param node - AST node to inspect.
  * @returns True when the node is a nested function or class boundary.
  */
-function isNestedControlFlowBoundaryNode(node: TSESTree.Node): boolean {
+function isNestedControlFlowBoundaryNode(node: Readonly<TSESTree.Node>): boolean {
   return NESTED_CONTROL_FLOW_BOUNDARY_TYPES.has(node.type);
 }
 
@@ -479,7 +512,7 @@ function isNestedControlFlowBoundaryNode(node: TSESTree.Node): boolean {
  * @param node - Node to inspect.
  * @returns True when node returns a value.
  */
-function isReturnWithValueNode(node: TSESTree.Node): node is TSESTree.ReturnStatement {
+function isReturnWithValueNode(node: Readonly<TSESTree.Node>): node is TSESTree.ReturnStatement {
   return node.type === AST_NODE_TYPES.ReturnStatement && node.argument !== null;
 }
 
@@ -489,7 +522,7 @@ function isReturnWithValueNode(node: TSESTree.Node): node is TSESTree.ReturnStat
  * @param node - Node to inspect.
  * @returns True when node is a throw statement.
  */
-function isThrowStatementNode(node: TSESTree.Node): node is TSESTree.ThrowStatement {
+function isThrowStatementNode(node: Readonly<TSESTree.Node>): node is TSESTree.ThrowStatement {
   return node.type === AST_NODE_TYPES.ThrowStatement;
 }
 
@@ -501,9 +534,9 @@ function isThrowStatementNode(node: TSESTree.Node): node is TSESTree.ThrowStatem
  * @param node - Function-like AST node.
  */
 function reportMissingJsdoc(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
 ): void {
   const functionName = getFunctionName(node);
   if (functionName === ANONYMOUS_FUNCTION_NAME) {
@@ -527,10 +560,10 @@ function reportMissingJsdoc(
  * @param targetNode - JSDoc owner target node.
  */
 function reportMissingJsdocComment(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  targetNode: TSESTree.Node,
+  node: Readonly<FunctionNode>,
+  targetNode: Readonly<TSESTree.Node>,
 ): void {
   context.report({
     node,
@@ -549,10 +582,10 @@ function reportMissingJsdocComment(
  * @param jsdocComment - Existing JSDoc block comment.
  */
 function reportMissingJsdocParam(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  jsdocComment: TSESTree.Comment,
+  node: Readonly<FunctionNode>,
+  jsdocComment: Readonly<TSESTree.Comment>,
 ): void {
   if (node.params.length === 0) {
     return;
@@ -577,10 +610,10 @@ function reportMissingJsdocParam(
  * @param jsdocComment - Existing JSDoc block comment.
  */
 function reportMissingJsdocReturns(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  jsdocComment: TSESTree.Comment,
+  node: Readonly<FunctionNode>,
+  jsdocComment: Readonly<TSESTree.Comment>,
 ): void {
   if (!hasReturnWithValue(node, sourceCode)) {
     return;
@@ -605,10 +638,10 @@ function reportMissingJsdocReturns(
  * @param jsdocComment - Existing JSDoc block comment.
  */
 function reportMissingJsdocTags(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  jsdocComment: TSESTree.Comment,
+  node: Readonly<FunctionNode>,
+  jsdocComment: Readonly<TSESTree.Comment>,
 ): void {
   reportMissingJsdocParam(context, sourceCode, node, jsdocComment);
   reportMissingJsdocReturns(context, sourceCode, node, jsdocComment);
@@ -624,10 +657,10 @@ function reportMissingJsdocTags(
  * @param jsdocComment - Existing JSDoc block comment.
  */
 function reportMissingJsdocThrows(
-  context: RequireJsdocFunctionsContext,
+  context: Readonly<RequireJsdocFunctionsContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: FunctionNode,
-  jsdocComment: TSESTree.Comment,
+  node: Readonly<FunctionNode>,
+  jsdocComment: Readonly<TSESTree.Comment>,
 ): void {
   if (!hasThrowStatement(node, sourceCode)) {
     return;

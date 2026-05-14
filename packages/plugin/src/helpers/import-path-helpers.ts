@@ -1,5 +1,7 @@
 const PARENT_DIRECTORY_IMPORT = '..';
 const PARENT_DIRECTORY_IMPORT_PREFIX = '../';
+const BACKSLASH_CODE_POINT = 92;
+const WINDOWS_PATH_SEPARATOR = String.fromCodePoint(BACKSLASH_CODE_POINT);
 
 /**
  * Returns the file name (last path segment) from a file path.
@@ -8,7 +10,10 @@ const PARENT_DIRECTORY_IMPORT_PREFIX = '../';
  * @returns The file name portion of the path.
  */
 export function getFilename(filePath: string): string {
-  const lastSeparator = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
+  const lastSeparator = Math.max(
+    filePath.lastIndexOf('/'),
+    filePath.lastIndexOf(WINDOWS_PATH_SEPARATOR),
+  );
   return filePath.slice(lastSeparator + 1);
 }
 

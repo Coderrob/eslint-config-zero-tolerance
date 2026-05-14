@@ -34,9 +34,9 @@ type NoMagicNumbersContext = Readonly<TSESLint.RuleContext<'noMagicNumbers', []>
  * @param node - Literal node to inspect.
  */
 function checkLiteral(
-  context: NoMagicNumbersContext,
+  context: Readonly<NoMagicNumbersContext>,
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: TSESTree.Literal,
+  node: Readonly<TSESTree.Literal>,
 ): void {
   if (!isNumber(node.value)) {
     return;
@@ -58,7 +58,9 @@ function checkLiteral(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoMagicNumbersListeners(context: NoMagicNumbersContext): TSESLint.RuleListener {
+function createNoMagicNumbersListeners(
+  context: Readonly<NoMagicNumbersContext>,
+): TSESLint.RuleListener {
   const sourceCode = context.sourceCode;
   return {
     Literal: checkLiteral.bind(undefined, context, sourceCode),
@@ -71,7 +73,9 @@ function createNoMagicNumbersListeners(context: NoMagicNumbersContext): TSESLint
  * @param node - Candidate node whose parent may be a variable declarator.
  * @returns Owning variable declarator, or null.
  */
-function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDeclarator | null {
+function getDirectVariableDeclarator(
+  node: Readonly<TSESTree.Node>,
+): TSESTree.VariableDeclarator | null {
   if (!isVariableDeclaratorNode(node.parent)) {
     return null;
   }
@@ -86,7 +90,7 @@ function getDirectVariableDeclarator(node: TSESTree.Node): TSESTree.VariableDecl
  * @returns Raw literal text.
  */
 function getNumericLiteralText(
-  node: TSESTree.Literal,
+  node: Readonly<TSESTree.Literal>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
   if (isUnaryMinus(node.parent)) {
@@ -101,7 +105,9 @@ function getNumericLiteralText(
  * @param node - The literal node to find the declarator for.
  * @returns The variable declarator if found, otherwise null.
  */
-function getVariableDeclarator(node: TSESTree.Literal): TSESTree.VariableDeclarator | null {
+function getVariableDeclarator(
+  node: Readonly<TSESTree.Literal>,
+): TSESTree.VariableDeclarator | null {
   if (isUnaryMinus(node.parent)) {
     return getDirectVariableDeclarator(node.parent);
   }
@@ -114,7 +120,7 @@ function getVariableDeclarator(node: TSESTree.Literal): TSESTree.VariableDeclara
  * @param node - The literal node to check.
  * @returns True if the literal is allowed, false otherwise.
  */
-function isAllowedNumericLiteral(node: TSESTree.Literal): boolean {
+function isAllowedNumericLiteral(node: Readonly<TSESTree.Literal>): boolean {
   if (isAllowedValue(node)) {
     return true;
   }
@@ -131,7 +137,7 @@ function isAllowedNumericLiteral(node: TSESTree.Literal): boolean {
  * @param node - The literal node to check.
  * @returns True if the value is allowed, false otherwise.
  */
-function isAllowedValue(node: TSESTree.Literal): boolean {
+function isAllowedValue(node: Readonly<TSESTree.Literal>): boolean {
   if (node.value === 0) {
     return true;
   }
@@ -147,7 +153,7 @@ function isAllowedValue(node: TSESTree.Literal): boolean {
  * @param node - Variable declaration node.
  * @returns True when declaration uses const.
  */
-function isConstVariableDeclaration(node: TSESTree.VariableDeclaration): boolean {
+function isConstVariableDeclaration(node: Readonly<TSESTree.VariableDeclaration>): boolean {
   return node.kind === VARIABLE_KIND_CONST;
 }
 
@@ -158,7 +164,7 @@ function isConstVariableDeclaration(node: TSESTree.VariableDeclaration): boolean
  * @param node - The literal node to check.
  * @returns True if the literal is in a const declaration, false otherwise.
  */
-function isInConstDeclaration(node: TSESTree.Literal): boolean {
+function isInConstDeclaration(node: Readonly<TSESTree.Literal>): boolean {
   const variableDeclarator = getVariableDeclarator(node);
   if (variableDeclarator === null) {
     return false;
@@ -173,7 +179,7 @@ function isInConstDeclaration(node: TSESTree.Literal): boolean {
  * @param node - The literal node to check.
  * @returns True if the literal is in an enum member, false otherwise.
  */
-function isInEnumMember(node: TSESTree.Literal): boolean {
+function isInEnumMember(node: Readonly<TSESTree.Literal>): boolean {
   return isTSEnumMemberNode(node.parent);
 }
 
@@ -183,7 +189,7 @@ function isInEnumMember(node: TSESTree.Literal): boolean {
  * @param node - The literal node to check.
  * @returns True if the literal represents -1, false otherwise.
  */
-function isNegativeOneLiteral(node: TSESTree.Literal): boolean {
+function isNegativeOneLiteral(node: Readonly<TSESTree.Literal>): boolean {
   if (node.value !== 1) {
     return false;
   }

@@ -64,7 +64,7 @@ type RuleOptions = [INoRestrictedImportsInTestsOptions];
  * @param modules - Accumulator set of restricted module roots.
  * @param moduleName - Raw configured module name.
  */
-function addRestrictedModule(modules: Set<string>, moduleName: string): void {
+function addRestrictedModule(modules: Readonly<Set<string>>, moduleName: string): void {
   const normalizedModuleName = normalizeConfiguredModuleName(moduleName);
   if (normalizedModuleName !== null) {
     modules.add(normalizedModuleName);
@@ -79,9 +79,9 @@ function addRestrictedModule(modules: Set<string>, moduleName: string): void {
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!hasCallCalleeNamePath(node, [CALLEE_REQUIRE])) {
     return;
@@ -100,9 +100,9 @@ function checkCallExpression(
  * @param node - Export-all declaration node.
  */
 function checkExportAllDeclaration(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.ExportAllDeclaration,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.ExportAllDeclaration>,
 ): void {
   reportIfRestrictedImport(context, options, node.source, node.source.value);
 }
@@ -115,9 +115,9 @@ function checkExportAllDeclaration(
  * @param node - Export named declaration node.
  */
 function checkExportNamedDeclaration(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.ExportNamedDeclaration,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   if (node.source !== null) {
     reportIfRestrictedImport(context, options, node.source, node.source.value);
@@ -132,9 +132,9 @@ function checkExportNamedDeclaration(
  * @param node - Import declaration node.
  */
 function checkImportDeclaration(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.ImportDeclaration,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   reportIfRestrictedImport(context, options, node.source, node.source.value);
 }
@@ -147,9 +147,9 @@ function checkImportDeclaration(
  * @param node - Import expression node.
  */
 function checkImportExpression(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.ImportExpression,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.ImportExpression>,
 ): void {
   const importPath = getLiteralStringValue(node.source);
   if (importPath !== null) {
@@ -165,9 +165,9 @@ function checkImportExpression(
  * @param node - TS import-equals declaration node.
  */
 function checkTsImportEqualsDeclaration(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.TSImportEqualsDeclaration,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): void {
   const moduleReference = getExternalModuleReference(node);
   const importPath = moduleReference === null ? null : getLiteralStringValue(moduleReference);
@@ -183,7 +183,7 @@ function checkTsImportEqualsDeclaration(
  * @returns Listener map for the rule.
  */
 function createNoRestrictedImportsInTestsListeners(
-  context: NoRestrictedImportsInTestsContext,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
 ): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
@@ -207,7 +207,7 @@ function createNoRestrictedImportsInTestsListeners(
  * @returns String-literal expression when it targets an external module.
  */
 function getExternalModuleReference(
-  node: TSESTree.TSImportEqualsDeclaration,
+  node: Readonly<TSESTree.TSImportEqualsDeclaration>,
 ): TSESTree.Expression | null {
   if (node.moduleReference.type !== AST_NODE_TYPES.TSExternalModuleReference) {
     return null;
@@ -237,7 +237,7 @@ function getImportRoot(moduleName: string): string {
  * @returns Matched restricted module name, or null when allowed.
  */
 function getRestrictedImportName(
-  options: IResolvedNoRestrictedImportsInTestsOptions,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
   importPath: string,
 ): string | null {
   const moduleName = normalizeImportedModulePath(importPath);
@@ -289,7 +289,7 @@ function normalizeModuleName(moduleName: string): string {
  * @param options - Raw rule options.
  * @returns Raw configured module names with defaults applied.
  */
-function readConfiguredModules(options: RuleOptions): readonly string[] {
+function readConfiguredModules(options: Readonly<RuleOptions>): readonly string[] {
   const [raw = {}] = options;
   return raw.modules ?? DEFAULT_RESTRICTED_MODULES;
 }
@@ -303,9 +303,9 @@ function readConfiguredModules(options: RuleOptions): readonly string[] {
  * @param importPath - Import path to validate.
  */
 function reportIfRestrictedImport(
-  context: NoRestrictedImportsInTestsContext,
-  options: IResolvedNoRestrictedImportsInTestsOptions,
-  node: TSESTree.Node,
+  context: Readonly<NoRestrictedImportsInTestsContext>,
+  options: Readonly<IResolvedNoRestrictedImportsInTestsOptions>,
+  node: Readonly<TSESTree.Node>,
   importPath: string,
 ): void {
   const moduleName = getRestrictedImportName(options, importPath);
@@ -324,7 +324,9 @@ function reportIfRestrictedImport(
  * @param options - Raw rule options.
  * @returns Resolved restricted module option set.
  */
-function resolveOptions(options: RuleOptions): IResolvedNoRestrictedImportsInTestsOptions {
+function resolveOptions(
+  options: Readonly<RuleOptions>,
+): IResolvedNoRestrictedImportsInTestsOptions {
   const modules = new Set<string>();
   for (const moduleName of readConfiguredModules(options)) {
     addRestrictedModule(modules, moduleName);

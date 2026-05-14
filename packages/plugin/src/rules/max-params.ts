@@ -33,7 +33,7 @@ const MAX_PARAMS_MAX = 4;
 function reportIfTooManyParams(
   context: Readonly<TSESLint.RuleContext<'tooManyParams', []>>,
   maxParamsCount: number,
-  node: FunctionNode,
+  node: Readonly<FunctionNode>,
 ): void {
   const parameterCount = node.params.length;
   if (parameterCount > maxParamsCount) {
@@ -66,7 +66,7 @@ function resolveListeners(
  * @param options - The rule options array.
  * @returns The maximum allowed number of parameters.
  */
-function resolveMax(options: unknown[]): number {
+function resolveMax(options: readonly unknown[]): number {
   const maxValue = getOptionMaxValue(options[0]);
   return isNumber(maxValue) && maxValue > 0 ? maxValue : MAX_PARAMS_MAX;
 }

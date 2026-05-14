@@ -33,8 +33,8 @@ type NoFetchInTestsContext = Readonly<TSESLint.RuleContext<'noFetchInTests', []>
  * @param node - Call expression node.
  */
 function checkCallExpression(
-  context: NoFetchInTestsContext,
-  node: TSESTree.CallExpression,
+  context: Readonly<NoFetchInTestsContext>,
+  node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (!isRestrictedFetchCall(node)) {
     return;
@@ -52,7 +52,9 @@ function checkCallExpression(
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoFetchInTestsListeners(context: NoFetchInTestsContext): TSESLint.RuleListener {
+function createNoFetchInTestsListeners(
+  context: Readonly<NoFetchInTestsContext>,
+): TSESLint.RuleListener {
   if (!isTestFile(context.filename)) {
     return {};
   }
@@ -92,7 +94,7 @@ function isGlobalFetchCall(calleePath: ReadonlyArray<string>): boolean {
  * @param node - Call expression node.
  * @returns True when the callee resolves to fetch or a known global fetch object.
  */
-function isRestrictedFetchCall(node: TSESTree.CallExpression): boolean {
+function isRestrictedFetchCall(node: Readonly<TSESTree.CallExpression>): boolean {
   const calleePath = getCalleeNamePath(node.callee);
   if (calleePath === null) {
     return false;

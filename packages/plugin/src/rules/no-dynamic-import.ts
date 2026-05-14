@@ -28,7 +28,10 @@ type NoDynamicImportContext = Readonly<TSESLint.RuleContext<string, []>>;
  * @param context - ESLint rule execution context.
  * @param node - Call expression to inspect.
  */
-function checkCallExpression(context: NoDynamicImportContext, node: TSESTree.CallExpression): void {
+function checkCallExpression(
+  context: Readonly<NoDynamicImportContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   if (!isRequireCall(node)) {
     return;
   }
@@ -42,7 +45,9 @@ function checkCallExpression(context: NoDynamicImportContext, node: TSESTree.Cal
  * @param context - ESLint rule execution context.
  * @returns Listener map for the rule.
  */
-function createNoDynamicImportListeners(context: NoDynamicImportContext): TSESLint.RuleListener {
+function createNoDynamicImportListeners(
+  context: Readonly<NoDynamicImportContext>,
+): TSESLint.RuleListener {
   if (isTestFile(context.filename)) {
     return {};
   }
@@ -59,7 +64,7 @@ function createNoDynamicImportListeners(context: NoDynamicImportContext): TSESLi
  * @param node - Call expression to inspect.
  * @returns True when the callee is the `require` identifier.
  */
-function isRequireCall(node: TSESTree.CallExpression): boolean {
+function isRequireCall(node: Readonly<TSESTree.CallExpression>): boolean {
   return hasCallCalleeNamePath(node, [CALLEE_REQUIRE]);
 }
 
@@ -70,8 +75,8 @@ function isRequireCall(node: TSESTree.CallExpression): boolean {
  * @param node - Import expression to report.
  */
 function reportDynamicImport(
-  context: NoDynamicImportContext,
-  node: TSESTree.ImportExpression,
+  context: Readonly<NoDynamicImportContext>,
+  node: Readonly<TSESTree.ImportExpression>,
 ): void {
   context.report({
     node,
@@ -85,7 +90,10 @@ function reportDynamicImport(
  * @param context - ESLint rule execution context.
  * @param node - Call expression to report.
  */
-function reportRequireCall(context: NoDynamicImportContext, node: TSESTree.CallExpression): void {
+function reportRequireCall(
+  context: Readonly<NoDynamicImportContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): void {
   context.report({
     node,
     messageId: 'noRequire',

@@ -22,7 +22,8 @@ import {
 } from '../helpers/ast-guards';
 import { createRule } from './support/rule-factory';
 
-const BACKSLASH = '\\';
+const BACKSLASH_CODE_POINT = 92;
+const BACKSLASH = String.fromCodePoint(BACKSLASH_CODE_POINT);
 const STRING_RAW_PROPERTY_NAME = 'raw';
 const STRING_CONSTRUCTOR_NAME = 'String';
 const TEMPLATE_BACKTICK = '`';
@@ -37,7 +38,7 @@ type PreferStringRawContext = Readonly<TSESLint.RuleContext<'preferStringRaw', [
  * @param node - String literal node to transform.
  * @returns Tagged-template replacement text, or null when autofix is not safe.
  */
-function buildStringRawReplacement(node: TSESTree.StringLiteral): string | null {
+function buildStringRawReplacement(node: Readonly<TSESTree.StringLiteral>): string | null {
   if (node.value.includes(TEMPLATE_BACKTICK) || node.value.includes(TEMPLATE_INTERPOLATION_START)) {
     return null;
   }
@@ -50,27 +51,20 @@ function buildStringRawReplacement(node: TSESTree.StringLiteral): string | null 
  * @param context - ESLint rule execution context.
  * @param node - Literal node to inspect.
  */
-function checkStringLiteral(context: PreferStringRawContext, node: TSESTree.Literal): void {
+function checkStringLiteral(
+  context: Readonly<PreferStringRawContext>,
+  node: Readonly<TSESTree.Literal>,
+): void {
   if (!isStringLiteral(node)) {
     return;
   }
-  if (!containsBackslash(node.value)) {
+  if (!hasBackslash(node.value)) {
     return;
   }
   if (isInsideStringRaw(node)) {
     return;
   }
   reportPreferStringRaw(context, node);
-}
-
-/**
- * Returns true when a value contains one or more backslash characters.
- *
- * @param value - String literal value.
- * @returns True when value contains backslashes.
- */
-function containsBackslash(value: string): boolean {
-  return value.includes(BACKSLASH);
 }
 
 /**
@@ -81,8 +75,8 @@ function containsBackslash(value: string): boolean {
  * @returns Rule fix to replace literal with String.raw template, or null when unsafe.
  */
 function createPreferStringRawFix(
-  node: TSESTree.StringLiteral,
-  fixer: TSESLint.RuleFixer,
+  node: Readonly<TSESTree.StringLiteral>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix | null {
   const replacement = buildStringRawReplacement(node);
   if (replacement === null) {
@@ -97,10 +91,22 @@ function createPreferStringRawFix(
  * @param context - ESLint rule execution context.
  * @returns Rule listeners.
  */
-function createPreferStringRawListeners(context: PreferStringRawContext): TSESLint.RuleListener {
+function createPreferStringRawListeners(
+  context: Readonly<PreferStringRawContext>,
+): TSESLint.RuleListener {
   return {
     Literal: checkStringLiteral.bind(undefined, context),
   };
+}
+
+/**
+ * Returns true when a value contains one or more backslash characters.
+ *
+ * @param value - String literal value.
+ * @returns True when value contains backslashes.
+ */
+function hasBackslash(value: string): boolean {
+  return value.includes(BACKSLASH);
 }
 
 /**
@@ -109,7 +115,7 @@ function createPreferStringRawListeners(context: PreferStringRawContext): TSESLi
  * @param node - Literal node to inspect.
  * @returns True when node is passed directly to String.raw.
  */
-function isInsideStringRaw(node: TSESTree.Literal): boolean {
+function isInsideStringRaw(node: Readonly<TSESTree.Literal>): boolean {
   const parentNode = node.parent;
   if (!isCallExpressionNode(parentNode)) {
     return false;
@@ -126,7 +132,7 @@ function isInsideStringRaw(node: TSESTree.Literal): boolean {
  * @param node - Member-expression object node.
  * @returns True when node is `String`.
  */
-function isStringConstructorIdentifier(node: TSESTree.Expression): boolean {
+function isStringConstructorIdentifier(node: Readonly<TSESTree.Expression>): boolean {
   return isNamedIdentifierNode(node, STRING_CONSTRUCTOR_NAME);
 }
 
@@ -136,7 +142,7 @@ function isStringConstructorIdentifier(node: TSESTree.Expression): boolean {
  * @param node - Literal node to inspect.
  * @returns True when literal value is a string.
  */
-function isStringLiteral(node: TSESTree.Literal): node is TSESTree.StringLiteral {
+function isStringLiteral(node: Readonly<TSESTree.Literal>): node is TSESTree.StringLiteral {
   return typeof node.value === 'string';
 }
 
@@ -146,7 +152,7 @@ function isStringLiteral(node: TSESTree.Literal): node is TSESTree.StringLiteral
  * @param node - Member-expression property node.
  * @returns True when property is `raw`.
  */
-function isStringRawCallee(callee: TSESTree.Expression): boolean {
+function isStringRawCallee(callee: Readonly<TSESTree.Expression>): boolean {
   if (!isUncomputedMemberExpressionNode(callee)) {
     return false;
   }
@@ -174,8 +180,8 @@ function isStringRawPropertyIdentifier(
  * @param node - String literal node to report.
  */
 function reportPreferStringRaw(
-  context: PreferStringRawContext,
-  node: TSESTree.StringLiteral,
+  context: Readonly<PreferStringRawContext>,
+  node: Readonly<TSESTree.StringLiteral>,
 ): void {
   context.report({
     node,

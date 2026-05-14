@@ -1,6 +1,8 @@
 import { ruleTester } from '../testing/test-helper';
 import { noAwaitInLoop } from './no-await-in-loop';
 
+const TOP_LEVEL_AWAIT_ECMA_VERSION = 2022;
+
 ruleTester.run('no-await-in-loop', noAwaitInLoop, {
   valid: [
     {
@@ -27,7 +29,7 @@ ruleTester.run('no-await-in-loop', noAwaitInLoop, {
       name: 'should allow top-level await outside any loop',
       code: 'await fetch(url);',
       languageOptions: {
-        ecmaVersion: 2022,
+        ecmaVersion: TOP_LEVEL_AWAIT_ECMA_VERSION,
         sourceType: 'module',
       },
     },

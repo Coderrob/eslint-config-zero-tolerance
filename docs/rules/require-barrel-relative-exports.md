@@ -7,7 +7,7 @@ Require barrel re-export declarations to use current-directory descendant paths.
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | No           |
+| **Fixable**     | Yes (`code`) |
 | **Recommended** | `warn`       |
 | **Strict**      | `error`      |
 
@@ -23,6 +23,10 @@ This rule applies only to re-export declarations inside barrel files, including:
 - `export * as ns from '...'`
 
 Allowed barrel re-export paths must start with `./` and point at a descendant module such as `./foo` or `./feature/foo`.
+
+## Autofix
+
+Bare same-directory exports such as `export { foo } from 'foo'` are fixed to `./foo` only when the sibling file or directory can be verified from the linted filename. Package, alias, absolute, parent, virtual, and unverified paths remain report-only.
 
 ## Examples
 

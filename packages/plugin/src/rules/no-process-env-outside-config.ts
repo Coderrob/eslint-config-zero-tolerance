@@ -22,7 +22,8 @@ import { createRule } from './support/rule-factory';
 const CONFIG_DIRECTORY_SEGMENT = '/config/';
 const ENV_PROPERTY = 'env';
 const PROCESS_IDENTIFIER = 'process';
-const WINDOWS_PATH_SEPARATOR = '\\';
+const BACKSLASH_CODE_POINT = 92;
+const WINDOWS_PATH_SEPARATOR = String.fromCodePoint(BACKSLASH_CODE_POINT);
 const ALLOWED_CONFIG_BASENAME_PATTERNS = [
   /^(?:.+\.)?config\.[cm]?[jt]sx?$/,
   /^(?:.+\.)?env\.[cm]?[jt]sx?$/,
@@ -39,8 +40,8 @@ type NoProcessEnvOutsideConfigContext = Readonly<
  * @param node - Member expression node.
  */
 function checkMemberExpression(
-  context: NoProcessEnvOutsideConfigContext,
-  node: TSESTree.MemberExpression,
+  context: Readonly<NoProcessEnvOutsideConfigContext>,
+  node: Readonly<TSESTree.MemberExpression>,
 ): void {
   if (isAllowedConfigFile(context.filename) || !isProcessEnvMemberExpression(node)) {
     return;
@@ -58,7 +59,7 @@ function checkMemberExpression(
  * @returns Rule listener map.
  */
 function createNoProcessEnvOutsideConfigListeners(
-  context: NoProcessEnvOutsideConfigContext,
+  context: Readonly<NoProcessEnvOutsideConfigContext>,
 ): TSESLint.RuleListener {
   return {
     MemberExpression: checkMemberExpression.bind(undefined, context),
@@ -95,10 +96,7 @@ function isAllowedConfigBasename(basename: string): boolean {
  * @returns True when process.env access is allowed in this file.
  */
 function isAllowedConfigFile(filename: string): boolean {
-  const normalizedFilename = filename
-    .split(WINDOWS_PATH_SEPARATOR)
-    .join('/')
-    .toLowerCase();
+  const normalizedFilename = filename.split(WINDOWS_PATH_SEPARATOR).join('/').toLowerCase();
   return (
     normalizedFilename.includes(CONFIG_DIRECTORY_SEGMENT) ||
     isAllowedConfigBasename(getBasename(normalizedFilename))
@@ -111,7 +109,7 @@ function isAllowedConfigFile(filename: string): boolean {
  * @param node - Member expression node to inspect.
  * @returns True when the computed property is the env literal.
  */
-function isEnvComputedProperty(node: TSESTree.MemberExpression): boolean {
+function isEnvComputedProperty(node: Readonly<TSESTree.MemberExpression>): boolean {
   return (
     node.property.type === AST_NODE_TYPES.Literal &&
     typeof node.property.value === 'string' &&
@@ -125,7 +123,7 @@ function isEnvComputedProperty(node: TSESTree.MemberExpression): boolean {
  * @param node - Member expression node to inspect.
  * @returns True when the node targets process.env.
  */
-function isProcessEnvMemberExpression(node: TSESTree.MemberExpression): boolean {
+function isProcessEnvMemberExpression(node: Readonly<TSESTree.MemberExpression>): boolean {
   if (!isNamedIdentifierNode(node.object, PROCESS_IDENTIFIER)) {
     return false;
   }

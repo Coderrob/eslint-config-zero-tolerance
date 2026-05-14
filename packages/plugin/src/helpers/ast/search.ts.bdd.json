@@ -5,7 +5,7 @@
   "module": {
     "name": "ast/search",
     "description": "Higher-level AST search helpers built on visitor-key traversal.",
-    "exports": ["findDescendant", "someDescendant"]
+    "exports": ["findDescendant", "hasDescendant"]
   },
   "specifications": [
     {
@@ -31,13 +31,13 @@
         {
           "name": "should return true when any descendant matches the predicate",
           "given": "a root AST node with at least one traversable descendant that satisfies the predicate",
-          "when": "someDescendant is called",
+          "when": "hasDescendant is called",
           "then": "returns true"
         },
         {
           "name": "should return false when no descendant matches the predicate",
           "given": "a root AST node with no traversable descendant that satisfies the predicate",
-          "when": "someDescendant is called",
+          "when": "hasDescendant is called",
           "then": "returns false"
         }
       ]

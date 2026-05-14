@@ -33,6 +33,12 @@
           "given": "value as SomeType in a regular .ts source file",
           "when": "the rule evaluates the TSAsExpression",
           "then": "a noTypeAssertion violation is reported"
+        },
+        {
+          "name": "should suggest satisfies for as assertions used as variable initializers",
+          "given": "const value = expression as SomeType in a regular .ts source file",
+          "when": "the rule evaluates the TSAsExpression directly assigned to the variable initializer",
+          "then": "a noTypeAssertion violation is reported with a suggestion to use expression satisfies SomeType"
         }
       ]
     }

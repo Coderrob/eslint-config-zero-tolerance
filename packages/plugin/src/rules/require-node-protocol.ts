@@ -85,7 +85,7 @@ const NODE_BUILTINS: ReadonlySet<string> = new Set([
  * @param source - The source node of the import/export declaration, if present.
  */
 function checkSource(
-  context: RequireNodeProtocolContext,
+  context: Readonly<RequireNodeProtocolContext>,
   source: TSESTree.StringLiteral | null,
 ): void {
   if (source === null) {
@@ -103,7 +103,7 @@ function checkSource(
  * @returns Listener map for the rule.
  */
 function createRequireNodeProtocolListeners(
-  context: RequireNodeProtocolContext,
+  context: Readonly<RequireNodeProtocolContext>,
 ): TSESLint.RuleListener {
   return {
     ImportDeclaration: handleImportDeclaration.bind(undefined, context),
@@ -120,8 +120,8 @@ function createRequireNodeProtocolListeners(
  * @returns Rule fix operation.
  */
 function fixNodeProtocol(
-  sourceNode: TSESTree.StringLiteral,
-  fixer: TSESLint.RuleFixer,
+  sourceNode: Readonly<TSESTree.StringLiteral>,
+  fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const quote = sourceNode.raw[0];
   return fixer.replaceText(
@@ -137,8 +137,8 @@ function fixNodeProtocol(
  * @param node - The export-all declaration node.
  */
 function handleExportAllDeclaration(
-  context: RequireNodeProtocolContext,
-  node: TSESTree.ExportAllDeclaration,
+  context: Readonly<RequireNodeProtocolContext>,
+  node: Readonly<TSESTree.ExportAllDeclaration>,
 ): void {
   checkSource(context, node.source);
 }
@@ -150,8 +150,8 @@ function handleExportAllDeclaration(
  * @param node - The named export declaration node.
  */
 function handleExportNamedDeclaration(
-  context: RequireNodeProtocolContext,
-  node: TSESTree.ExportNamedDeclaration,
+  context: Readonly<RequireNodeProtocolContext>,
+  node: Readonly<TSESTree.ExportNamedDeclaration>,
 ): void {
   checkSource(context, node.source);
 }
@@ -163,8 +163,8 @@ function handleExportNamedDeclaration(
  * @param node - The import declaration node.
  */
 function handleImportDeclaration(
-  context: RequireNodeProtocolContext,
-  node: TSESTree.ImportDeclaration,
+  context: Readonly<RequireNodeProtocolContext>,
+  node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   checkSource(context, node.source);
 }
@@ -186,8 +186,8 @@ function isBareNodeBuiltin(source: string): boolean {
  * @param sourceNode - The string literal AST node for the import source.
  */
 function reportBareBuiltin(
-  context: RequireNodeProtocolContext,
-  sourceNode: TSESTree.StringLiteral,
+  context: Readonly<RequireNodeProtocolContext>,
+  sourceNode: Readonly<TSESTree.StringLiteral>,
 ): void {
   context.report({
     node: sourceNode,

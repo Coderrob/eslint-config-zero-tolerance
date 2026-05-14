@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-raw-sql-interpolation.ts",
+  "module": {
+    "name": "no-raw-sql-interpolation",
+    "description": "Disallow interpolated raw SQL and unsafe raw query helpers.",
+    "exports": ["noRawSqlInterpolation"]
+  },
+  "specifications": [
+    {
+      "feature": "Raw SQL safety",
+      "scenarios": [
+        {
+          "name": "should allow parameterized SQL calls and approved SQL tags",
+          "given": "code that passes literal SQL with separate parameters or uses a configured safe SQL tag",
+          "when": "the rule evaluates the query expression",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should report interpolated or concatenated SQL passed to sinks",
+          "given": "code that passes a template literal with expressions or a string concatenation to a SQL sink",
+          "when": "the rule evaluates the sink call",
+          "then": "a rawSqlInterpolation violation is reported"
+        },
+        {
+          "name": "should report unsafe raw SQL helpers",
+          "given": "code that calls queryRawUnsafe or executeRawUnsafe helpers",
+          "when": "the rule evaluates the call",
+          "then": "an unsafeRawSql violation is reported even for literal strings"
+        }
+      ]
+    }
+  ]
+}

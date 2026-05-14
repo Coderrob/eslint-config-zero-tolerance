@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`no-ts-nocheck` rule**: Added a new built-in rule that blocks `// @ts-nocheck` and `/* @ts-nocheck */` comments so files cannot opt out of TypeScript checking.
+- **Defensive security rules**: Added `no-raw-sql-interpolation`, `no-hardcoded-secrets`, `no-placeholder-implementation`, `no-unsafe-json-parse`, `no-unsafe-code-generation`, `no-shell-command-construction`, and `require-timeout-for-io` to block common AI-generated code failure modes, injection sinks, hardcoded credentials, placeholder implementations, unsafe typed parsing, dynamic code execution, shell command construction, and missing IO cancellation.
+- **Autofix and suggestion expansion**: Added conservative fixes or suggestions for `no-inline-type-import`, `no-re-export`, `no-redundant-boolean`, `no-non-null-assertion`, `no-type-assertion`, `no-indexed-access-types`, `no-return-type`, `require-interface-prefix`, and `require-barrel-relative-exports`, including config-gated indexed-access alias suggestions.
+
+### Fixed
+
+- **`no-export-alias` rule**: Removed unsafe autofixing for true public export aliases so reported aliases require an explicit naming decision instead of silently changing the public API.
+- **`prefer-readonly-parameters` rule**: Added configurable `ignoredTypeNamePatterns` exemptions, with callable defaults such as `Dispatch`, so React state setters and similar function aliases are not rewritten to non-callable `Readonly<...>` types.
+- **`sort-functions` rule**: Updated autofix to sort the full sortable function span in one pass instead of swapping one adjacent out-of-order function pair per lint fix run.
+
 ## [1.2.4] - 2026-04-28
 
 ### Added

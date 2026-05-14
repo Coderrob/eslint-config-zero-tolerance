@@ -80,6 +80,8 @@ const RULE_KEY_REQUIRE_EXHAUSTIVE_SWITCH = 'require-exhaustive-switch';
 const RULE_KEY_REQUIRE_EXPORTED_OBJECT_TYPE = 'require-exported-object-type';
 const RULE_KEY_PREFER_STRUCTURED_CLONE = 'prefer-structured-clone';
 const RULE_NO_BARREL_PARENT_IMPORTS = `${PLUGIN_NAMESPACE}/no-barrel-parent-imports`;
+const MAX_FUNCTION_LINES_RECOMMENDED_MAX = 30;
+const MAX_FUNCTION_LINES_STRICT_MAX = 25;
 
 describe('plugin wiring', () => {
   it('should build prefixed recommended and strict rule maps', () => {
@@ -92,8 +94,14 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBe('error');
     expect(recommendedRules[RULE_NO_EXPLICIT_ANY]).toBe('warn');
     expect(strictRules[RULE_NO_EXPLICIT_ANY]).toBe('error');
-    expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual(['warn', { max: 30 }]);
-    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual(['error', { max: 25 }]);
+    expect(recommendedRules[RULE_MAX_FUNCTION_LINES]).toEqual([
+      'warn',
+      { max: MAX_FUNCTION_LINES_RECOMMENDED_MAX },
+    ]);
+    expect(strictRules[RULE_MAX_FUNCTION_LINES]).toEqual([
+      'error',
+      { max: MAX_FUNCTION_LINES_STRICT_MAX },
+    ]);
     expect(recommendedRules[RULE_NO_FOR_IN]).toBe('warn');
     expect(strictRules[RULE_NO_FOR_IN]).toBe('error');
     expect(recommendedRules[RULE_NO_INDEXED_ACCESS_TYPES]).toBe('warn');
