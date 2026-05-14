@@ -16,7 +16,7 @@
         <link rel="prev" href="../no-dynamic-import/">
       
       
-        <link rel="next" href="../no-barrel-parent-imports/">
+        <link rel="next" href="../no-hardcoded-secrets/">
       
       
         
@@ -1459,6 +1459,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-json-parse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-json-parse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1623,6 +1651,34 @@
     
   
     no-date-now
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-placeholder-implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-placeholder-implementation
   
 
     
@@ -2331,6 +2387,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2384,6 +2451,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-hardcoded-secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-hardcoded-secrets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-raw-sql-interpolation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-raw-sql-interpolation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2460,6 +2583,62 @@
     
   
     no-re-export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-shell-command-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-shell-command-construction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-code-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-code-generation
   
 
     
@@ -2881,6 +3060,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-ts-nocheck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-ts-nocheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-parameter-reassign/" class="md-nav__link">
         
   
@@ -3049,6 +3256,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-timeout-for-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-timeout-for-io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../require-exhaustive-switch/" class="md-nav__link">
         
   
@@ -3127,6 +3362,17 @@
     <span class="md-ellipsis">
       
         Rationale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
       
     </span>
   </a>
@@ -3225,7 +3471,7 @@
 </tr>
 <tr>
 <td><strong>Fixable</strong></td>
-<td>Yes (<code>code</code>)</td>
+<td>No</td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
@@ -3239,6 +3485,8 @@
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
 <p>Export aliases (<code>export { foo as bar }</code>) create a disconnect between the internal name of a value and the name that consumers use. This makes it harder to search for a symbol across the codebase and increases the chance of confusion. Export the value directly, or rename it at the declaration site.</p>
+<h2 id="autofix">Autofix<a class="headerlink" href="#autofix" title="Permanent link">&para;</a></h2>
+<p>This rule intentionally does not autofix true public aliases such as <code>export { foo as bar }</code>, because correcting them safely requires a naming decision. Redundant same-name exports are already valid syntax and are not reported as aliases.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="correct">✅ Correct<a class="headerlink" href="#correct" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fetchUser</span><span class="w"> </span><span class="p">};</span>

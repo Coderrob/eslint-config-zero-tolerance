@@ -1408,6 +1408,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1565,6 +1576,34 @@
     
   
     require-exported-object-type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-json-parse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-json-parse
   
 
     
@@ -1742,6 +1781,34 @@
     
   
     no-date-now
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-placeholder-implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-placeholder-implementation
   
 
     
@@ -2396,6 +2463,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-hardcoded-secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-hardcoded-secrets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-raw-sql-interpolation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-raw-sql-interpolation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-barrel-parent-imports/" class="md-nav__link">
         
   
@@ -2460,6 +2583,62 @@
     
   
     no-re-export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-shell-command-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-shell-command-construction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-code-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-code-generation
   
 
     
@@ -2881,6 +3060,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-ts-nocheck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-ts-nocheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-parameter-reassign/" class="md-nav__link">
         
   
@@ -3049,6 +3256,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-timeout-for-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-timeout-for-io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../require-exhaustive-switch/" class="md-nav__link">
         
   
@@ -3127,6 +3362,17 @@
     <span class="md-ellipsis">
       
         Rationale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
       
     </span>
   </a>
@@ -3225,7 +3471,7 @@
 </tr>
 <tr>
 <td><strong>Fixable</strong></td>
-<td>No</td>
+<td>Yes</td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
@@ -3239,6 +3485,8 @@
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
 <p>Inline type import queries make dependencies harder to scan and enforce inconsistently across files. Requiring top-level <code>import type</code> statements keeps imports explicit, grouped, and easier to maintain.</p>
+<h2 id="autofix">Autofix<a class="headerlink" href="#autofix" title="Permanent link">&para;</a></h2>
+<p>Simple <code>import("module").Name</code> references are fixed by replacing the inline reference with <code>Name</code> and adding or reusing a top-level <code>import type</code> declaration. The fixer refuses cases where the generated type name would collide with an existing top-level binding.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="correct">✅ Correct<a class="headerlink" href="#correct" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PipelineContext</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../types/pipeline&#39;</span><span class="p">;</span>

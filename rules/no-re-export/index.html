@@ -16,7 +16,7 @@
         <link rel="prev" href="../no-parent-internal-access/">
       
       
-        <link rel="next" href="../require-node-protocol/">
+        <link rel="next" href="../no-shell-command-construction/">
       
       
         
@@ -1459,6 +1459,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-json-parse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-json-parse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1623,6 +1651,34 @@
     
   
     no-date-now
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-placeholder-implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-placeholder-implementation
   
 
     
@@ -2277,6 +2333,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-hardcoded-secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-hardcoded-secrets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-raw-sql-interpolation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-raw-sql-interpolation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-barrel-parent-imports/" class="md-nav__link">
         
   
@@ -2415,6 +2527,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2479,6 +2602,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-shell-command-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-shell-command-construction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unsafe-code-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-code-generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2892,6 +3071,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-ts-nocheck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-ts-nocheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-parameter-reassign/" class="md-nav__link">
         
   
@@ -3060,6 +3267,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../require-timeout-for-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-timeout-for-io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../require-exhaustive-switch/" class="md-nav__link">
         
   
@@ -3138,6 +3373,17 @@
     <span class="md-ellipsis">
       
         Rationale
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autofix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autofix
       
     </span>
   </a>
@@ -3247,7 +3493,7 @@
 </tr>
 <tr>
 <td><strong>Fixable</strong></td>
-<td>No</td>
+<td>Yes (<code>code</code>)</td>
 </tr>
 <tr>
 <td><strong>Recommended</strong></td>
@@ -3261,6 +3507,8 @@
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
 <p>Re-export statements that reach outside the current directory (<code>../</code>) create upward dependencies that violate proper module hierarchy. That includes direct re-exports such as <code>export { foo } from '../foo'</code> and pass-through patterns such as <code>import { foo } from '../foo'; export { foo };</code>. Statement ordering does not matter: <code>export { foo }; import { foo } from '../foo';</code> is also reported. Barrel files (<code>index.*</code>) remain exempt from this rule because their re-export path policy is enforced separately by <code>require-barrel-relative-exports</code>. All other files must not re-export from peer modules (<code>../sibling</code>) or ancestors (<code>../../parent</code>, <code>../../../grandparent</code>).</p>
+<h2 id="autofix">Autofix<a class="headerlink" href="#autofix" title="Permanent link">&para;</a></h2>
+<p>The fixer only removes redundant pass-through export specifiers when the same exported name is already directly exported from the same file. Parent-path re-export statements and non-redundant pass-through exports remain report-only.</p>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The barrel-file exemption applies only to single-extension index files such as <code>index.ts</code>, <code>index.js</code>, and <code>index.mts</code>.</li>

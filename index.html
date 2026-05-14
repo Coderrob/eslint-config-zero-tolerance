@@ -1533,6 +1533,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-unsafe-json-parse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-json-parse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1694,6 +1722,34 @@
     
   
     no-date-now
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-placeholder-implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-placeholder-implementation
   
 
     
@@ -2342,6 +2398,62 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-hardcoded-secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-hardcoded-secrets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-raw-sql-interpolation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-raw-sql-interpolation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-barrel-parent-imports/" class="md-nav__link">
         
   
@@ -2406,6 +2518,62 @@
     
   
     no-re-export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-shell-command-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-shell-command-construction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-unsafe-code-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-code-generation
   
 
     
@@ -2824,6 +2992,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-ts-nocheck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-ts-nocheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-parameter-reassign/" class="md-nav__link">
         
   
@@ -2992,6 +3188,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/require-timeout-for-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-timeout-for-io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/require-exhaustive-switch/" class="md-nav__link">
         
   
@@ -3124,7 +3348,7 @@
 
 
 <h1 id="coderrobeslint-plugin-zero-tolerance">@coderrob/eslint-plugin-zero-tolerance<a class="headerlink" href="#coderrobeslint-plugin-zero-tolerance" title="Permanent link">&para;</a></h1>
-<p><strong>69 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
+<p><strong>76 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
 <p><a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img alt="npm version" src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" /></a>
 <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" /></a></p>
 <p><strong>Supports ESLint 8.57+, 9.x, and 10.x</strong></p>
@@ -3144,11 +3368,11 @@
 <tbody>
 <tr>
 <td><strong>Type Safety</strong></td>
-<td>Ban unsafe assertions (<code>as</code>, <code>!</code>), literal unions, inline imports, and untyped exports</td>
+<td>Ban unsafe assertions (<code>as</code>, <code>!</code>), unsafe JSON parsing, literal unions, inline imports, and untyped exports</td>
 </tr>
 <tr>
 <td><strong>Code Quality</strong></td>
-<td>Limit function size and parameters, eliminate magic values, enforce immutability and sort order</td>
+<td>Limit function size and parameters, eliminate placeholders, magic values, immutability, and sort order</td>
 </tr>
 <tr>
 <td><strong>Testing</strong></td>
@@ -3156,7 +3380,7 @@
 </tr>
 <tr>
 <td><strong>Bug Prevention</strong></td>
-<td>Flag identical expressions, redundant booleans, missing awaits, floating promises, and flag arguments</td>
+<td>Flag identical expressions, redundant booleans, missing awaits, floating promises, missing IO timeouts, and flag arguments</td>
 </tr>
 <tr>
 <td><strong>Error Handling</strong></td>
@@ -3164,7 +3388,7 @@
 </tr>
 <tr>
 <td><strong>Imports</strong></td>
-<td>Keep barrels clean, require descendant-relative barrel re-exports, ban dynamic imports, and prevent upward traversal</td>
+<td>Keep barrels clean, ban risky imports, block injection sinks, and prevent upward traversal</td>
 </tr>
 <tr>
 <td><strong>Documentation</strong></td>

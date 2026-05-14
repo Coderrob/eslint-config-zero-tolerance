@@ -1594,6 +1594,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-unsafe-json-parse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-json-parse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1758,6 +1786,34 @@
     
   
     no-date-now
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-placeholder-implementation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-placeholder-implementation
   
 
     
@@ -2412,6 +2468,62 @@
   
   
     <li class="md-nav__item">
+      <a href="no-hardcoded-secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-hardcoded-secrets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-raw-sql-interpolation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-raw-sql-interpolation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-barrel-parent-imports/" class="md-nav__link">
         
   
@@ -2476,6 +2588,62 @@
     
   
     no-re-export
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-shell-command-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-shell-command-construction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-unsafe-code-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unsafe-code-generation
   
 
     
@@ -2897,6 +3065,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-ts-nocheck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-ts-nocheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-parameter-reassign/" class="md-nav__link">
         
   
@@ -3045,6 +3241,34 @@
     
   
     no-query-side-effects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="require-timeout-for-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-timeout-for-io
   
 
     
@@ -3241,7 +3465,7 @@
 
 
 <h1 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h1>
-<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>69 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
+<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>76 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
 <table>
 <thead>
 <tr>
@@ -3268,12 +3492,12 @@
 </tr>
 <tr>
 <td><a href="#type-safety">Type Safety</a></td>
-<td style="text-align: right;">11</td>
+<td style="text-align: right;">12</td>
 <td>Assertions, unions, imports, exported types</td>
 </tr>
 <tr>
 <td><a href="#code-quality">Code Quality</a></td>
-<td style="text-align: right;">15</td>
+<td style="text-align: right;">16</td>
 <td>Function size, magic values, immutability, sorting</td>
 </tr>
 <tr>
@@ -3283,12 +3507,12 @@
 </tr>
 <tr>
 <td><a href="#imports">Imports</a></td>
-<td style="text-align: right;">8</td>
+<td style="text-align: right;">13</td>
 <td>Barrels, re-exports, dynamic imports, node protocol</td>
 </tr>
 <tr>
 <td><a href="#bug-prevention">Bug Prevention</a></td>
-<td style="text-align: right;">18</td>
+<td style="text-align: right;">19</td>
 <td>Identical code, control flow, async safety</td>
 </tr>
 </tbody>
@@ -3465,6 +3689,11 @@
 <td>suggestion</td>
 <td>Require exported object constants to declare an explicit type annotation</td>
 </tr>
+<tr>
+<td><a href="no-unsafe-json-parse/">no-unsafe-json-parse</a></td>
+<td>problem</td>
+<td>Disallow treating JSON.parse results as typed data without validation</td>
+</tr>
 </tbody>
 </table>
 <h2 id="code-quality">Code Quality<a class="headerlink" href="#code-quality" title="Permanent link">&para;</a></h2>
@@ -3496,6 +3725,11 @@
 <td><a href="no-date-now/">no-date-now</a></td>
 <td>suggestion</td>
 <td>Disallow <code>Date.now()</code> and no-arg <code>new Date()</code> usage</td>
+</tr>
+<tr>
+<td><a href="no-placeholder-implementation/">no-placeholder-implementation</a></td>
+<td>problem</td>
+<td>Disallow placeholder, stub, TODO, and not implemented production code</td>
 </tr>
 <tr>
 <td><a href="no-magic-numbers/">no-magic-numbers</a></td>
@@ -3612,6 +3846,16 @@
 <td>Prevent use of aliases in export statements</td>
 </tr>
 <tr>
+<td><a href="no-hardcoded-secrets/">no-hardcoded-secrets</a></td>
+<td>problem</td>
+<td>Disallow hardcoded secrets, credentials, tokens, and secret env defaults</td>
+</tr>
+<tr>
+<td><a href="no-raw-sql-interpolation/">no-raw-sql-interpolation</a></td>
+<td>problem</td>
+<td>Disallow interpolated raw SQL and unsafe raw query helpers</td>
+</tr>
+<tr>
 <td><a href="no-barrel-parent-imports/">no-barrel-parent-imports</a></td>
 <td>suggestion</td>
 <td>Disallow parent-directory traversal in barrel-file import paths</td>
@@ -3625,6 +3869,16 @@
 <td><a href="no-re-export/">no-re-export</a></td>
 <td>suggestion</td>
 <td>Disallow direct or pass-through re-exports from parent/grandparent modules</td>
+</tr>
+<tr>
+<td><a href="no-shell-command-construction/">no-shell-command-construction</a></td>
+<td>problem</td>
+<td>Disallow shell command construction through subprocess APIs</td>
+</tr>
+<tr>
+<td><a href="no-unsafe-code-generation/">no-unsafe-code-generation</a></td>
+<td>problem</td>
+<td>Disallow eval, Function constructors, string timers, and vm execution APIs</td>
 </tr>
 <tr>
 <td><a href="require-node-protocol/">require-node-protocol</a></td>
@@ -3727,6 +3981,11 @@
 <td><a href="no-query-side-effects/">no-query-side-effects</a></td>
 <td>suggestion</td>
 <td>Disallow side effects in query-style functions</td>
+</tr>
+<tr>
+<td><a href="require-timeout-for-io/">require-timeout-for-io</a></td>
+<td>problem</td>
+<td>Require timeout or cancellation options for external IO calls</td>
 </tr>
 <tr>
 <td><a href="require-exhaustive-switch/">require-exhaustive-switch</a></td>
