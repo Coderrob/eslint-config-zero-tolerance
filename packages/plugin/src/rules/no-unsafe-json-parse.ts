@@ -48,13 +48,15 @@ type NoUnsafeJsonParseContext = Readonly<
  * Checks assertion expressions around JSON.parse.
  *
  * @param context - ESLint rule execution context.
+ * @param options - Normalized rule options.
  * @param node - Assertion expression to inspect.
  */
 function checkJsonParseAssertion(
   context: Readonly<NoUnsafeJsonParseContext>,
+  options: Readonly<IUnsafeJsonParseOptions>,
   node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
 ): void {
-  if (isJsonParseCall(node.expression)) {
+  if (isJsonParseCall(options, node.expression)) {
     reportUnsafeJsonParse(context, node, createUnknownSuggestion(context.sourceCode, node));
   }
 }
@@ -63,17 +65,19 @@ function checkJsonParseAssertion(
  * Checks typed variables initialized from JSON.parse.
  *
  * @param context - ESLint rule execution context.
+ * @param options - Normalized rule options.
  * @param node - Variable declarator to inspect.
  */
 function checkJsonParseVariable(
   context: Readonly<NoUnsafeJsonParseContext>,
+  options: Readonly<IUnsafeJsonParseOptions>,
   node: Readonly<TSESTree.VariableDeclarator>,
 ): void {
   const identifier = getTypedIdentifier(node);
   if (shouldSkipTypedParseVariable(context.sourceCode, identifier)) {
     return;
   }
-  if (isJsonParseCall(node.init)) {
+  if (isJsonParseCall(options, node.init)) {
     reportUnsafeJsonParse(
       context,
       node.init,
@@ -91,11 +95,11 @@ function checkJsonParseVariable(
 function createNoUnsafeJsonParseListeners(
   context: Readonly<NoUnsafeJsonParseContext>,
 ): TSESLint.RuleListener {
-  normalizeOptions(context.options[0]);
+  const options = normalizeOptions(context.options[0]);
   return {
-    TSAsExpression: checkJsonParseAssertion.bind(undefined, context),
-    TSTypeAssertion: checkJsonParseAssertion.bind(undefined, context),
-    VariableDeclarator: checkJsonParseVariable.bind(undefined, context),
+    TSAsExpression: checkJsonParseAssertion.bind(undefined, context, options),
+    TSTypeAssertion: checkJsonParseAssertion.bind(undefined, context, options),
+    VariableDeclarator: checkJsonParseVariable.bind(undefined, context, options),
   };
 }
 
@@ -168,16 +172,18 @@ function isJsonObject(node: Readonly<TSESTree.Expression>): boolean {
 /**
  * Returns true when a call invokes JSON.parse directly.
  *
+ * @param options - Normalized rule options.
  * @param node - Expression to inspect.
  * @returns True when the expression is JSON.parse(...).
  */
 function isJsonParseCall(
+  options: Readonly<IUnsafeJsonParseOptions>,
   node: TSESTree.Expression | TSESTree.PrivateIdentifier | null,
 ): node is TSESTree.CallExpression {
   if (node?.type !== AST_NODE_TYPES.CallExpression) {
     return false;
   }
-  return isJsonParseCallee(node.callee) && !isValidatorParent(node);
+  return isJsonParseCallee(node.callee) && !isSafeParseParent(options, node);
 }
 
 /**
@@ -191,6 +197,27 @@ function isJsonParseCallee(callee: Readonly<TSESTree.Expression>): boolean {
     return false;
   }
   return isJsonObject(callee.object) && getCalleeName(callee) === JSON_PARSE_METHOD_NAME;
+}
+
+/**
+ * Returns true when JSON.parse is immediately passed to a configured validator or wrapper.
+ *
+ * @param options - Normalized rule options.
+ * @param node - JSON.parse call to inspect.
+ * @returns True when a safe call wraps the parse.
+ */
+function isSafeParseParent(
+  options: Readonly<IUnsafeJsonParseOptions>,
+  node: Readonly<TSESTree.CallExpression>,
+): boolean {
+  const parent = node.parent;
+  /* istanbul ignore next */
+  if (parent.type !== AST_NODE_TYPES.CallExpression) {
+    return false;
+  }
+  const safeCallName = getCalleeName(parent.callee);
+  /* istanbul ignore next */
+  return [...options.validatorNames, ...options.allowedWrapperNames].includes(safeCallName ?? '');
 }
 
 /**
@@ -220,23 +247,6 @@ function isUntypedVariableInitializer(node: Readonly<TSESTree.TSAsExpression>): 
     node.parent.id.type === AST_NODE_TYPES.Identifier &&
     node.parent.id.typeAnnotation === undefined
   );
-}
-
-/**
- * Returns true when JSON.parse is immediately passed to a validator.
- *
- * @param node - JSON.parse call to inspect.
- * @returns True when a validator call wraps the parse.
- */
-function isValidatorParent(node: Readonly<TSESTree.CallExpression>): boolean {
-  const parent = node.parent;
-  /* istanbul ignore next */
-  if (parent.type !== AST_NODE_TYPES.CallExpression) {
-    return false;
-  }
-  const validatorName = getCalleeName(parent.callee);
-  /* istanbul ignore next */
-  return DEFAULT_VALIDATOR_NAMES.includes(validatorName ?? '');
 }
 
 /**

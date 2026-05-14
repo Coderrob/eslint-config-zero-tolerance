@@ -22,7 +22,9 @@ import { getStaticString } from './support/security-ast';
 
 const DEFAULT_ALLOWED_PATTERNS = ['test-', 'dummy', 'example', 'fake', 'placeholder'];
 const DEFAULT_MINIMUM_SECRET_LENGTH = 16;
+const ENV_OBJECT_NAME = 'env';
 const MESSAGES_PROPERTY_NAME = 'messages';
+const PROCESS_OBJECT_NAME = 'process';
 const SECRET_NAME_PATTERN =
   /(?:password|passwd|secret|token|apiKey|accessKey|privateKey|clientSecret|connectionString)/iu;
 const PRIVATE_KEY_PATTERN = /BEGIN [A-Z ]*PRIVATE KEY/iu;
@@ -138,10 +140,19 @@ function isEnvFallback(node: Readonly<TSESTree.Expression>): boolean {
   if (parent.type !== AST_NODE_TYPES.LogicalExpression) {
     return false;
   }
-  return (
-    parent.left.type === AST_NODE_TYPES.MemberExpression &&
-    parent.left.object.type === AST_NODE_TYPES.MemberExpression
-  );
+  return isProcessEnvMemberExpression(parent.left);
+}
+
+/**
+ * Returns true when an expression is the env identifier.
+ *
+ * @param node - Expression to inspect.
+ * @returns True when the node is env.
+ */
+function isEnvIdentifier(
+  node: TSESTree.Expression | TSESTree.PrivateIdentifier,
+): node is TSESTree.Identifier {
+  return node.type === AST_NODE_TYPES.Identifier && node.name === ENV_OBJECT_NAME;
 }
 
 /**
@@ -189,6 +200,43 @@ function isIgnoredSecretValue(options: Readonly<IHardcodedSecretsOptions>, value
  */
 function isMessagesProperty(node: Readonly<TSESTree.Property>): boolean {
   return node.key.type === AST_NODE_TYPES.Identifier && node.key.name === MESSAGES_PROPERTY_NAME;
+}
+
+/**
+ * Returns true when an expression reads from process.env.
+ *
+ * @param node - Expression to inspect.
+ * @returns True when the expression is a process.env member expression.
+ */
+function isProcessEnvMemberExpression(
+  node: Readonly<TSESTree.Expression>,
+): node is TSESTree.MemberExpression {
+  return node.type === AST_NODE_TYPES.MemberExpression && isProcessEnvObject(node.object);
+}
+
+/**
+ * Returns true when a member expression object is process.env.
+ *
+ * @param node - Member object to inspect.
+ * @returns True when the object is process.env.
+ */
+function isProcessEnvObject(node: Readonly<TSESTree.Expression>): boolean {
+  if (node.type !== AST_NODE_TYPES.MemberExpression) {
+    return false;
+  }
+  return isProcessIdentifier(node.object) && isEnvIdentifier(node.property);
+}
+
+/**
+ * Returns true when an expression is the process identifier.
+ *
+ * @param node - Expression to inspect.
+ * @returns True when the node is process.
+ */
+function isProcessIdentifier(
+  node: Readonly<TSESTree.Expression>,
+): node is TSESTree.Identifier {
+  return node.type === AST_NODE_TYPES.Identifier && node.name === PROCESS_OBJECT_NAME;
 }
 
 /**

@@ -208,7 +208,7 @@ function isCatchParameterIdentifierInScope(
   if (decision !== null) {
     return decision;
   }
-  return isCatchParameterIdentifierInScope(currentNode.parent, identifierName);
+  return isCatchParameterIdentifierInScope(currentNode.parent ?? null, identifierName);
 }
 
 /**

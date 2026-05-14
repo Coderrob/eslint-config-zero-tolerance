@@ -279,9 +279,9 @@ function getImportSpecifierLocalNames(
 /**
  * Returns fix inputs for simple import("module").Name references.
  *
+ * @param sourceCode - ESLint source code helper.
  * @param node - TS import type node to inspect.
  * @returns Fix inputs, or null when the import type is not safely fixable.
- * @param node TODO: describe parameter
  */
 function getInlineTypeImportFixInputs(
   sourceCode: Readonly<TSESLint.SourceCode>,

@@ -47,10 +47,10 @@
           "then": "a sortFunctions violation is reported and the autofix moves the owned comments together with the reordered declaration block"
         },
         {
-          "name": "should report without autofixing when directive or ambiguous interstitial comments are present",
-          "given": "two out-of-order sortable functions separated by directive comments or standalone comments between declaration blocks",
+          "name": "should report without autofixing when directive comments or non-function content are present",
+          "given": "two out-of-order sortable functions separated by directive comments, standalone comments, or executable statements between declaration blocks",
           "when": "the rule evaluates the Program",
-          "then": "a sortFunctions violation is reported but no autofix is offered because comment ownership is unsafe"
+          "then": "a sortFunctions violation is reported but no autofix is offered because moving declarations across non-whitespace content may be unsafe"
         }
       ]
     }

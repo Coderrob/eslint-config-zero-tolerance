@@ -12,8 +12,8 @@
       "feature": "Typed JSON.parse detection",
       "scenarios": [
         {
-          "name": "should allow unknown-first parsing and validator wrappers",
-          "given": "code assigning JSON.parse to unknown or immediately passing it to an approved validator",
+          "name": "should allow unknown-first parsing and configured safe wrappers",
+          "given": "code assigning JSON.parse to unknown or immediately passing it to a configured validator or wrapper",
           "when": "the rule evaluates the parse call",
           "then": "no violation is reported"
         },

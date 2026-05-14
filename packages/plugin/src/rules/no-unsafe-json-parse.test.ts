@@ -29,8 +29,13 @@ ruleTester.run('no-unsafe-json-parse', noUnsafeJsonParse, {
     },
     {
       name: 'should allow configured validator option syntax',
-      code: 'const config = parse(JSON.parse(input));',
-      options: [{ validatorNames: ['parse'] }],
+      code: 'const config = decode(JSON.parse(input));',
+      options: [{ validatorNames: ['decode'] }],
+    },
+    {
+      name: 'should allow configured wrapper around JSON parse',
+      code: 'const config = safeParseJson(JSON.parse(input));',
+      options: [{ allowedWrapperNames: ['safeParseJson'] }],
     },
     {
       name: 'should allow non JSON parse assertions',

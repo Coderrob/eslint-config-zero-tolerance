@@ -55,7 +55,7 @@ type ImportGroupInputs = Readonly<{
 
 type SortImportsContext = Readonly<TSESLint.RuleContext<string, []>>;
 type SortImportsState = Readonly<{
-  imports: ImportEntry[];
+  imports: readonly ImportEntry[];
   reportedNodes: Set<TSESTree.ImportDeclaration>;
   sourceCode: Readonly<TSESLint.SourceCode>;
 }>;

@@ -209,7 +209,7 @@ function createSortFix(
   functions: ReadonlyArray<SortableFunction>,
 ): TSESLint.ReportFixFunction | null {
   const functionBlocks = getSortableFunctionBlocks(sourceCode, functions);
-  if (functionBlocks === null || hasUnsafeInterBlockComments(sourceCode, functionBlocks)) {
+  if (functionBlocks === null || hasUnsafeInterBlockContent(sourceCode, functionBlocks)) {
     return null;
   }
   return sortSortableFunctionBlocks.bind(undefined, sourceCode, functionBlocks);
@@ -585,23 +585,6 @@ function hasAdjacentPreviousNonLeadingContent(
 }
 
 /**
- * Returns true when non-whitespace text between declaration blocks contains comments.
- *
- * @param sourceCode - ESLint source code helper.
- * @param previousBlock - Earlier sortable block.
- * @param currentBlock - Later sortable block.
- * @returns True when inter-block text contains comments.
- */
-function hasCommentBetweenBlocks(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  previousBlock: Readonly<SortableBlock>,
-  currentBlock: Readonly<SortableBlock>,
-): boolean {
-  const betweenText = sourceCode.text.slice(previousBlock.end, currentBlock.start);
-  return betweenText.includes('//') || betweenText.includes('/*');
-}
-
-/**
  * Returns true when comment text contains directive-style markers that must not move.
  *
  * @param comments - Comments to inspect.
@@ -672,38 +655,38 @@ function hasOwnedLeadingComment(
 }
 
 /**
- * Returns true when text between one sortable block and its previous block contains comments.
+ * Returns true when any text between sortable blocks contains non-whitespace content.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param functionBlocks - Sortable function blocks in source order.
+ * @returns True when inter-block text contains non-whitespace content.
+ */
+function hasUnsafeInterBlockContent(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
+): boolean {
+  return functionBlocks
+    .slice(1)
+    .some(hasUnsafeInterBlockContentAfterPrevious.bind(undefined, sourceCode, functionBlocks));
+}
+
+/**
+ * Returns true when text between one sortable block and its previous block contains non-whitespace.
  *
  * @param sourceCode - ESLint source code helper.
  * @param functionBlocks - Sortable function blocks in source order.
  * @param functionBlock - Current sortable function block.
  * @param index - Index in the collection after dropping the first block.
- * @returns True when the preceding separator contains comments.
+ * @returns True when the preceding separator contains non-whitespace.
  */
-function hasUnsafeInterBlockCommentAfterPrevious(
+function hasUnsafeInterBlockContentAfterPrevious(
   sourceCode: Readonly<TSESLint.SourceCode>,
   functionBlocks: ReadonlyArray<SortableFunctionBlock>,
   functionBlock: Readonly<SortableFunctionBlock>,
   index: number,
 ): boolean {
   const previousBlock = functionBlocks[index].block;
-  return hasCommentBetweenBlocks(sourceCode, previousBlock, functionBlock.block);
-}
-
-/**
- * Returns true when any text between sortable blocks contains comments.
- *
- * @param sourceCode - ESLint source code helper.
- * @param functionBlocks - Sortable function blocks in source order.
- * @returns True when inter-block text contains comments.
- */
-function hasUnsafeInterBlockComments(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  functionBlocks: ReadonlyArray<SortableFunctionBlock>,
-): boolean {
-  return functionBlocks
-    .slice(1)
-    .some(hasUnsafeInterBlockCommentAfterPrevious.bind(undefined, sourceCode, functionBlocks));
+  return !hasOnlyWhitespaceBetweenOffsets(sourceCode, previousBlock.end, functionBlock.block.start);
 }
 
 /**

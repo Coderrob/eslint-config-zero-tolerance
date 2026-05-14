@@ -20,6 +20,10 @@ ruleTester.run('no-hardcoded-secrets', noHardcodedSecrets, {
       code: "const label = 'production database';",
     },
     {
+      name: 'should allow non env fallback strings',
+      code: "const label = config.defaults.name || 'some long display value';",
+    },
+    {
       name: 'should allow ESLint rule message strings with sensitive message ids',
       code: "const rule = { meta: { messages: { hardcodedSecret: 'Hardcoded secrets or credentials are not allowed.' } } };",
     },

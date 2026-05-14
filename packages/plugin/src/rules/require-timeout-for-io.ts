@@ -20,6 +20,7 @@ import { isTestFile } from '../helpers/ast-guards';
 import { createRule } from './support/rule-factory';
 import { getCalleeName, getMemberPath, hasObjectProperty } from './support/security-ast';
 
+const CHILD_PROCESS_MODULES = ['child_process', 'node:child_process'];
 const FETCH_FUNCTION_NAME = 'fetch';
 const TIMEOUT_METHOD_NAME = 'timeout';
 const CANCELLATION_PROPERTIES = new Set(['signal', 'timeout']);
@@ -30,6 +31,11 @@ interface IRequireTimeoutForIoOptions {
   additionalIoFunctionNames?: readonly string[];
   approvedWrapperNames?: readonly string[];
   checkTests?: boolean;
+}
+
+interface IRequireTimeoutForIoState {
+  readonly childProcessImports: Map<string, string>;
+  readonly childProcessNamespaces: Set<string>;
 }
 
 enum RequireTimeoutForIoMessageId {
@@ -44,18 +50,20 @@ type RequireTimeoutForIoContext = Readonly<
  * Checks IO calls for timeout or cancellation configuration.
  *
  * @param context - ESLint rule execution context.
+ * @param state - Import tracking state.
  * @param options - Normalized rule options.
  * @param node - Call expression to inspect.
  */
 function checkIoCall(
   context: Readonly<RequireTimeoutForIoContext>,
+  state: Readonly<IRequireTimeoutForIoState>,
   options: Readonly<Required<IRequireTimeoutForIoOptions>>,
   node: Readonly<TSESTree.CallExpression>,
 ): void {
   if (shouldSkipIoCall(context, options, node)) {
     return;
   }
-  if (shouldRequireTimeout(options, node) && !hasCancellationOption(node)) {
+  if (shouldRequireTimeout(state, options, node) && !hasCancellationOption(node)) {
     context.report({ node, messageId: RequireTimeoutForIoMessageId.MissingTimeout });
   }
 }
@@ -69,10 +77,34 @@ function checkIoCall(
 function createRequireTimeoutForIoListeners(
   context: Readonly<RequireTimeoutForIoContext>,
 ): TSESLint.RuleListener {
+  const state: IRequireTimeoutForIoState = {
+    childProcessImports: new Map(),
+    childProcessNamespaces: new Set(),
+  };
   const options = normalizeOptions(context.options[0]);
   return {
-    CallExpression: checkIoCall.bind(undefined, context, options),
+    ImportDeclaration: trackChildProcessImports.bind(undefined, state),
+    CallExpression: checkIoCall.bind(undefined, context, state, options),
   };
+}
+
+/**
+ * Gets the imported child_process API name for a callee.
+ *
+ * @param state - Import tracking state.
+ * @param callee - Callee expression to inspect.
+ * @returns The original child_process API name.
+ */
+function getChildProcessApiName(
+  state: Readonly<IRequireTimeoutForIoState>,
+  callee: Readonly<TSESTree.Expression>,
+): string | null {
+  const calleeName = getCalleeName(callee);
+  const memberPath = getMemberPath(callee);
+  if (calleeName !== null && state.childProcessImports.has(calleeName)) {
+    return state.childProcessImports.get(calleeName) ?? null;
+  }
+  return getNamespacedChildProcessApiName(state, memberPath);
 }
 
 /**
@@ -83,6 +115,28 @@ function createRequireTimeoutForIoListeners(
  */
 function getDirectCalleeName(callee: Readonly<TSESTree.Expression>): string | null {
   return callee.type === AST_NODE_TYPES.Identifier ? callee.name : null;
+}
+
+/**
+ * Gets a namespaced child_process API name.
+ *
+ * @param state - Import tracking state.
+ * @param memberPath - Dotted callee path.
+ * @returns The API name when the path uses a tracked namespace.
+ */
+function getNamespacedChildProcessApiName(
+  state: Readonly<IRequireTimeoutForIoState>,
+  memberPath: string | null,
+): string | null {
+  if (memberPath === null) {
+    return null;
+  }
+  for (const namespace of state.childProcessNamespaces) {
+    if (memberPath.startsWith(`${namespace}.`)) {
+      return memberPath.slice(namespace.length + 1);
+    }
+  }
+  return null;
 }
 
 /**
@@ -140,19 +194,23 @@ function isApprovedWrapper(
 /**
  * Returns true when a call targets a built-in IO sink.
  *
+ * @param state - Import tracking state.
  * @param node - Call expression to inspect.
  * @param calleeName - Static callee name.
  * @returns True when the call is built-in IO.
  */
 function isBuiltInIoCall(
+  state: Readonly<IRequireTimeoutForIoState>,
   node: Readonly<TSESTree.CallExpression>,
   calleeName: string | null,
 ): boolean {
   const directCalleeName = getDirectCalleeName(node.callee);
+  const childProcessApiName = getChildProcessApiName(state, node.callee);
   return (
     isFetchCall(directCalleeName) ||
     isHttpClientCall(node, calleeName) ||
-    isSubprocessCall(directCalleeName)
+    isSubprocessCall(directCalleeName) ||
+    isSubprocessCall(childProcessApiName)
   );
 }
 
@@ -253,17 +311,19 @@ function normalizeProvidedOptions(
 /**
  * Returns true when a call is a configured or built-in IO sink.
  *
+ * @param state - Import tracking state.
  * @param options - Normalized rule options.
  * @param node - Call expression to inspect.
  * @returns True when a timeout is required.
  */
 function shouldRequireTimeout(
+  state: Readonly<IRequireTimeoutForIoState>,
   options: Readonly<Required<IRequireTimeoutForIoOptions>>,
   node: Readonly<TSESTree.CallExpression>,
 ): boolean {
   const calleeName = getCalleeName(node.callee);
   const directCalleeName = getDirectCalleeName(node.callee);
-  if (isBuiltInIoCall(node, calleeName)) {
+  if (isBuiltInIoCall(state, node, calleeName)) {
     return true;
   }
   return options.additionalIoFunctionNames.includes(directCalleeName ?? '');
@@ -283,6 +343,45 @@ function shouldSkipIoCall(
   node: Readonly<TSESTree.CallExpression>,
 ): boolean {
   return isSkippedFile(context, options) || isApprovedWrapper(options, node);
+}
+
+/**
+ * Tracks child_process imports.
+ *
+ * @param state - Import tracking state.
+ * @param node - Import declaration to inspect.
+ */
+function trackChildProcessImports(
+  state: Readonly<IRequireTimeoutForIoState>,
+  node: Readonly<TSESTree.ImportDeclaration>,
+): void {
+  if (typeof node.source.value !== 'string' || !CHILD_PROCESS_MODULES.includes(node.source.value)) {
+    return;
+  }
+  for (const specifier of node.specifiers) {
+    trackChildProcessSpecifier(state, specifier);
+  }
+}
+
+/**
+ * Tracks a single child_process import specifier.
+ *
+ * @param state - Import tracking state.
+ * @param specifier - Import specifier to inspect.
+ */
+function trackChildProcessSpecifier(
+  state: Readonly<IRequireTimeoutForIoState>,
+  specifier: Readonly<TSESTree.ImportClause>,
+): void {
+  if (specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier) {
+    Reflect.apply(Set.prototype.add, state.childProcessNamespaces, [specifier.local.name]);
+  }
+  if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
+    Reflect.apply(Map.prototype.set, state.childProcessImports, [
+      specifier.local.name,
+      getCalleeName(specifier.imported) ?? '',
+    ]);
+  }
 }
 
 /**

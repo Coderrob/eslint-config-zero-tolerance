@@ -16,6 +16,10 @@ ruleTester.run('require-timeout-for-io', requireTimeoutForIo, {
       code: "spawn('git', ['status'], { timeout: 5000 });",
     },
     {
+      name: 'should allow namespaced subprocess with timeout',
+      code: "import * as cp from 'node:child_process'; cp.exec('git status', { timeout: 5000 });",
+    },
+    {
       name: 'should allow approved IO wrapper',
       code: 'fetchWithTimeout(url);',
       options: [{ approvedWrapperNames: ['fetchWithTimeout'] }],
@@ -36,6 +40,10 @@ ruleTester.run('require-timeout-for-io', requireTimeoutForIo, {
     {
       name: 'should allow dynamic calls without IO names',
       code: '(getClient())(url);',
+    },
+    {
+      name: 'should ignore imports from non child process modules',
+      code: "import { exec } from 'not-child-process'; const value = 1;",
     },
   ],
   invalid: [
@@ -62,6 +70,16 @@ ruleTester.run('require-timeout-for-io', requireTimeoutForIo, {
     {
       name: 'should report spawn without timeout',
       code: "spawn('git', ['status']);",
+      errors: [{ messageId: 'missingTimeout' }],
+    },
+    {
+      name: 'should report namespaced subprocess without timeout',
+      code: "import * as cp from 'node:child_process'; cp.exec('git status');",
+      errors: [{ messageId: 'missingTimeout' }],
+    },
+    {
+      name: 'should report aliased subprocess import without timeout',
+      code: "import { exec as run } from 'child_process'; run('git status');",
       errors: [{ messageId: 'missingTimeout' }],
     },
     {

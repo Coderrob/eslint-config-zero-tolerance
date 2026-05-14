@@ -100,6 +100,7 @@ const MAX_FUNCTION_LINES_RULE = 'max-function-lines';
 const MAX_PARAMS_RULE = 'max-params';
 
 type RuleEntryTuple = readonly [string, IRuleConfig];
+type ReadonlyRuleEntry = Linter.RuleSeverity | Readonly<Linter.RuleSeverityAndOptions>;
 
 /** Per-rule severity and options for each config preset. */
 export interface IRuleConfig {
@@ -149,10 +150,16 @@ function createDefaultRuleEntry(ruleName: string): RuleEntryTuple {
  */
 function createRuleEntry(
   ruleName: string,
-  recommended: Readonly<Linter.RuleEntry> = WARN_LEVEL,
-  strict: Readonly<Linter.RuleEntry> = ERROR_LEVEL,
+  recommended: Readonly<ReadonlyRuleEntry> = WARN_LEVEL,
+  strict: Readonly<ReadonlyRuleEntry> = ERROR_LEVEL,
 ): RuleEntryTuple {
-  return [ruleName, { recommended, strict }];
+  return [
+    ruleName,
+    {
+      recommended: normalizeRuleEntry(recommended),
+      strict: normalizeRuleEntry(strict),
+    },
+  ];
 }
 
 /**
@@ -167,6 +174,18 @@ function getPresetRuleConfig(
   preset: Readonly<Preset>,
 ): Linter.RuleEntry {
   return preset === Preset.Strict ? config.strict : config.recommended;
+}
+
+/**
+ * Returns true when a rule entry includes options.
+ *
+ * @param ruleEntry - Rule entry to inspect.
+ * @returns True when the entry is a severity-and-options tuple.
+ */
+function isRuleSeverityAndOptions(
+  ruleEntry: Readonly<ReadonlyRuleEntry>,
+): ruleEntry is Readonly<Linter.RuleSeverityAndOptions> {
+  return Array.isArray(ruleEntry);
 }
 
 /**
@@ -197,6 +216,22 @@ function mapRuleForPreset(
   preset: Readonly<Preset>,
 ): readonly [string, Linter.RuleEntry] {
   return [buildPrefixedRuleName(ruleName), getPresetRuleConfig(config, preset)];
+}
+
+/**
+ * Converts readonly rule tuple options back to ESLint's mutable rule entry type.
+ *
+ * @param ruleEntry - Rule entry to normalize.
+ * @returns ESLint-compatible mutable rule entry.
+ */
+function normalizeRuleEntry(ruleEntry: Readonly<ReadonlyRuleEntry>): Linter.RuleEntry {
+  if (!isRuleSeverityAndOptions(ruleEntry)) {
+    return ruleEntry;
+  }
+  const severity = ruleEntry[0];
+  const options = ruleEntry.slice(1);
+  const normalizedRuleEntry: Linter.RuleSeverityAndOptions = [severity, ...options];
+  return normalizedRuleEntry;
 }
 
 /**

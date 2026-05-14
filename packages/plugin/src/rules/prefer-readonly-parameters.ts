@@ -48,13 +48,14 @@ interface IPreferReadonlyParametersOptions {
  * Checks function parameters for mutable object/array-like annotations.
  *
  * @param context - ESLint rule execution context.
+ * @param ignoredTypeNamePatterns - Type-reference name patterns excluded from readonly checks.
  * @param node - Function-like node.
  */
 function checkFunctionNode(
   context: Readonly<PreferReadonlyParametersContext>,
+  ignoredTypeNamePatterns: ReadonlyArray<RegExp>,
   node: Readonly<FunctionNode>,
 ): void {
-  const ignoredTypeNamePatterns = resolveIgnoredTypeNamePatterns(context.options);
   for (const param of node.params) {
     reportIfMutableParameter(context, ignoredTypeNamePatterns, param);
   }
@@ -79,7 +80,8 @@ function createIgnoredTypeNamePattern(pattern: string): RegExp {
 function createPreferReadonlyParametersListeners(
   context: Readonly<PreferReadonlyParametersContext>,
 ): TSESLint.RuleListener {
-  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context));
+  const ignoredTypeNamePatterns = resolveIgnoredTypeNamePatterns(context.options);
+  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context, ignoredTypeNamePatterns));
 }
 
 /**

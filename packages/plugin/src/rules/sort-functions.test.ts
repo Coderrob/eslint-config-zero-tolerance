@@ -217,6 +217,12 @@ ruleTester.run('sort-functions', sortFunctions, {
       errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
     },
     {
+      name: 'should report unsorted functions with executable code between them without fix',
+      code: 'function beta() {}\nconst value = init();\nfunction alpha() {}',
+      output: null,
+      errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+    },
+    {
       name: 'should report unsorted functions with adjacent leading line comments without fix',
       code: 'function beta() {}\n// alpha details\nfunction alpha() {}',
       output: null,

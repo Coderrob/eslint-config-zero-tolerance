@@ -19,7 +19,7 @@
         },
         {
           "name": "should report fetch, HTTP client, and subprocess calls without cancellation",
-          "given": "production code that calls external IO without timeout or signal options",
+          "given": "production code that calls external IO without timeout or signal options, including direct, imported, or namespaced child_process subprocess calls",
           "when": "the rule evaluates the call",
           "then": "a missingTimeout violation is reported"
         },
