@@ -65,7 +65,7 @@ ruleTester.run('prefer-string-raw', preferStringRaw, {
       output: ['(String.raw`C:', 'Users', 'dev`)();'].join(BACKSLASH),
     },
     {
-      code: [`const source = 'C:`, '${name}\';'].join(`${BACKSLASH}${BACKSLASH}`),
+      code: [`const source = 'C:`, "${name}';"].join(`${BACKSLASH}${BACKSLASH}`),
       name: 'should report without autofixing literals containing template interpolation markers',
       errors: [{ messageId: 'preferStringRaw' }],
       output: null,

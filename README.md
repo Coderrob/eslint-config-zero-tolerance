@@ -15,7 +15,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
   <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
-  <img src="https://img.shields.io/badge/coverage-99.82%25-brightgreen" alt="Coverage" />
+  <img src="https://img.shields.io/badge/coverage-99.79%25-brightgreen" alt="Coverage" />
   <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
@@ -146,6 +146,7 @@ module.exports = {
 ```
 
 <!-- GENERATED:README_RULES_START -->
+
 ## Rules
 
 The plugin ships **77 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
@@ -156,133 +157,134 @@ Preset legend:
 - `Strict only` = enabled only by `strict`
 - `Opt-in` = not enabled by either preset
 
-| Category | Rules | Focus |
-| -------- | ----: | ----- |
-| [Naming Conventions](#naming-conventions) |     1 | Interface naming standards |
-| [Documentation](#documentation) |     5 | JSDoc, BDD specs, optional chaining, readonly props |
-| [Testing](#testing) |     8 | Test descriptions, mocks, timers, fetch, interfaces |
-| [Type Safety](#type-safety) |    12 | Assertions, unions, imports, exported types |
-| [Code Quality](#code-quality) |    16 | Function size, magic values, immutability, sorting |
-| [Error Handling](#error-handling) |     3 | Throw safety, empty catches, Result patterns |
-| [Imports](#imports) |    12 | Barrels, re-exports, dynamic imports, node protocol |
-| [Bug Prevention](#bug-prevention) |    20 | Identical code, control flow, async safety |
+| Category                                  | Rules | Focus                                               |
+| ----------------------------------------- | ----: | --------------------------------------------------- |
+| [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
+| [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
+| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
+| [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
+| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Imports](#imports)                       |    12 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention)         |    20 | Identical code, control flow, async safety          |
 
 ### Naming Conventions
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`require-interface-prefix`](docs/rules/require-interface-prefix.md) | `suggestion` | Both | Enforce that interface names start with "I" |
+| Rule                                                                 | Type         | Preset | Description                                 |
+| -------------------------------------------------------------------- | ------------ | ------ | ------------------------------------------- |
+| [`require-interface-prefix`](docs/rules/require-interface-prefix.md) | `suggestion` | Both   | Enforce that interface names start with "I" |
 
 ### Documentation
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`require-bdd-spec`](docs/rules/require-bdd-spec.md) | `suggestion` | Opt-in | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec file |
-| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | `suggestion` | Strict only | Require JSDoc comments on anonymous function-like constructs except in test files and known test callbacks |
-| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md) | `suggestion` | Both | Require JSDoc comments on all functions and require @param/@returns/@throws tags when applicable (except in test files) |
-| [`require-optional-chaining`](docs/rules/require-optional-chaining.md) | `suggestion` | Both | Require optional chaining instead of repeated logical guard access |
-| [`require-readonly-props`](docs/rules/require-readonly-props.md) | `suggestion` | Both | Require readonly typing for JSX component props |
+| Rule                                                                                   | Type         | Preset | Description                                                                                                             |
+| -------------------------------------------------------------------------------------- | ------------ | ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| [`require-bdd-spec`](docs/rules/require-bdd-spec.md)                                   | `suggestion` | Opt-in | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec file                                |
+| [`require-jsdoc-anonymous-functions`](docs/rules/require-jsdoc-anonymous-functions.md) | `suggestion` | Opt-in | Require JSDoc comments on anonymous function-like constructs except in test files and known test callbacks              |
+| [`require-jsdoc-functions`](docs/rules/require-jsdoc-functions.md)                     | `suggestion` | Both   | Require JSDoc comments on all functions and require @param/@returns/@throws tags when applicable (except in test files) |
+| [`require-optional-chaining`](docs/rules/require-optional-chaining.md)                 | `suggestion` | Both   | Require optional chaining instead of repeated logical guard access                                                      |
+| [`require-readonly-props`](docs/rules/require-readonly-props.md)                       | `suggestion` | Both   | Require readonly typing for JSX component props                                                                         |
 
 ### Testing
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`require-test-description-style`](docs/rules/require-test-description-style.md) | `suggestion` | Both | Enforce that test descriptions start with "should" |
-| [`no-jest-have-been-called`](docs/rules/no-jest-have-been-called.md) | `suggestion` | Both | Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead |
-| [`no-mock-implementation`](docs/rules/no-mock-implementation.md) | `suggestion` | Both | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds |
-| [`no-set-timeout-in-tests`](docs/rules/no-set-timeout-in-tests.md) | `suggestion` | Both | Disallow setTimeout usage in test files |
-| [`no-set-interval-in-tests`](docs/rules/no-set-interval-in-tests.md) | `suggestion` | Both | Disallow setInterval usage in test files |
-| [`no-fetch-in-tests`](docs/rules/no-fetch-in-tests.md) | `suggestion` | Opt-in | Disallow fetch usage in test files |
-| [`no-restricted-imports-in-tests`](docs/rules/no-restricted-imports-in-tests.md) | `suggestion` | Opt-in | Disallow restricted dependency imports in test files |
-| [`no-test-interface-declaration`](docs/rules/no-test-interface-declaration.md) | `suggestion` | Both | Disallow interface declarations in test files; import production types instead |
+| Rule                                                                             | Type         | Preset | Description                                                                                                                                                                                                                                                          |
+| -------------------------------------------------------------------------------- | ------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`require-test-description-style`](docs/rules/require-test-description-style.md) | `suggestion` | Both   | Enforce that test descriptions start with "should"                                                                                                                                                                                                                   |
+| [`no-jest-have-been-called`](docs/rules/no-jest-have-been-called.md)             | `suggestion` | Both   | Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead |
+| [`no-mock-implementation`](docs/rules/no-mock-implementation.md)                 | `suggestion` | Both   | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds                                                                                                                                                                                 |
+| [`no-set-timeout-in-tests`](docs/rules/no-set-timeout-in-tests.md)               | `suggestion` | Both   | Disallow setTimeout usage in test files                                                                                                                                                                                                                              |
+| [`no-set-interval-in-tests`](docs/rules/no-set-interval-in-tests.md)             | `suggestion` | Both   | Disallow setInterval usage in test files                                                                                                                                                                                                                             |
+| [`no-fetch-in-tests`](docs/rules/no-fetch-in-tests.md)                           | `suggestion` | Opt-in | Disallow fetch usage in test files                                                                                                                                                                                                                                   |
+| [`no-restricted-imports-in-tests`](docs/rules/no-restricted-imports-in-tests.md) | `suggestion` | Opt-in | Disallow restricted dependency imports in test files                                                                                                                                                                                                                 |
+| [`no-test-interface-declaration`](docs/rules/no-test-interface-declaration.md)   | `suggestion` | Both   | Disallow interface declarations in test files; import production types instead                                                                                                                                                                                       |
 
 ### Type Safety
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`no-type-assertion`](docs/rules/no-type-assertion.md) | `suggestion` | Both | Prevent use of TypeScript "as" type assertions |
-| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md) | `problem` | Both | Disallow non-null assertions using the "!" postfix operator |
-| [`no-explicit-any`](docs/rules/no-explicit-any.md) | `problem` | Both | Disallow explicit any; model unknown values precisely and narrow them explicitly |
-| [`no-indexed-access-types`](docs/rules/no-indexed-access-types.md) | `problem` | Both | Disallow TypeScript indexed access types |
-| [`no-literal-unions`](docs/rules/no-literal-unions.md) | `suggestion` | Both | Ban literal unions in favor of enums |
-| [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md) | `suggestion` | Both | Require property literal unions to use named domain types |
-| [`no-inline-type-import`](docs/rules/no-inline-type-import.md) | `problem` | Both | Disallow TypeScript inline type imports using import("...") |
-| [`no-return-type`](docs/rules/no-return-type.md) | `problem` | Both | Disallow TypeScript ReturnType utility usage |
-| [`require-union-type-alias`](docs/rules/require-union-type-alias.md) | `suggestion` | Both | Require inline union types with three or more members and multiple type references to be extracted into named type aliases |
-| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | `suggestion` | Both | Disallow inline object type literals on destructured parameters; require a named type instead |
-| [`require-exported-object-type`](docs/rules/require-exported-object-type.md) | `suggestion` | Both | Require exported object constants to declare an explicit type annotation |
-| [`no-unsafe-json-parse`](docs/rules/no-unsafe-json-parse.md) | `problem` | Both | Disallow treating JSON.parse results as typed data without validation |
+| Rule                                                                                             | Type         | Preset | Description                                                                                                                |
+| ------------------------------------------------------------------------------------------------ | ------------ | ------ | -------------------------------------------------------------------------------------------------------------------------- |
+| [`no-type-assertion`](docs/rules/no-type-assertion.md)                                           | `suggestion` | Both   | Prevent use of TypeScript "as" type assertions                                                                             |
+| [`no-non-null-assertion`](docs/rules/no-non-null-assertion.md)                                   | `problem`    | Both   | Disallow non-null assertions using the "!" postfix operator                                                                |
+| [`no-explicit-any`](docs/rules/no-explicit-any.md)                                               | `problem`    | Both   | Disallow explicit any; model unknown values precisely and narrow them explicitly                                           |
+| [`no-indexed-access-types`](docs/rules/no-indexed-access-types.md)                               | `problem`    | Both   | Disallow TypeScript indexed access types                                                                                   |
+| [`no-literal-unions`](docs/rules/no-literal-unions.md)                                           | `suggestion` | Both   | Ban literal unions in favor of enums                                                                                       |
+| [`no-literal-property-unions`](docs/rules/no-literal-property-unions.md)                         | `suggestion` | Both   | Require property literal unions to use named domain types                                                                  |
+| [`no-inline-type-import`](docs/rules/no-inline-type-import.md)                                   | `problem`    | Both   | Disallow TypeScript inline type imports using import("...")                                                                |
+| [`no-return-type`](docs/rules/no-return-type.md)                                                 | `problem`    | Both   | Disallow TypeScript ReturnType utility usage                                                                               |
+| [`require-union-type-alias`](docs/rules/require-union-type-alias.md)                             | `suggestion` | Both   | Require inline union types with three or more members and multiple type references to be extracted into named type aliases |
+| [`no-destructured-parameter-type-literal`](docs/rules/no-destructured-parameter-type-literal.md) | `suggestion` | Both   | Disallow inline object type literals on destructured parameters; require a named type instead                              |
+| [`require-exported-object-type`](docs/rules/require-exported-object-type.md)                     | `suggestion` | Both   | Require exported object constants to declare an explicit type annotation                                                   |
+| [`no-unsafe-json-parse`](docs/rules/no-unsafe-json-parse.md)                                     | `problem`    | Both   | Disallow treating JSON.parse results as typed data without validation                                                      |
 
 ### Code Quality
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`max-function-lines`](docs/rules/max-function-lines.md) | `suggestion` | Both | Enforce a maximum number of lines per function body |
-| [`max-params`](docs/rules/max-params.md) | `suggestion` | Both | Enforce a maximum number of function parameters |
-| [`no-array-mutation`](docs/rules/no-array-mutation.md) | `suggestion` | Both | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted |
-| [`no-date-now`](docs/rules/no-date-now.md) | `suggestion` | Both | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior |
-| [`no-placeholder-implementation`](docs/rules/no-placeholder-implementation.md) | `problem` | Both | Disallow placeholder, stub, TODO, and not implemented production code |
-| [`no-magic-numbers`](docs/rules/no-magic-numbers.md) | `suggestion` | Both | Disallow magic numbers; use named constants instead of raw numeric literals |
-| [`no-magic-strings`](docs/rules/no-magic-strings.md) | `suggestion` | Both | Disallow magic strings in comparisons and switch cases; use named constants instead |
-| [`no-map-set-mutation`](docs/rules/no-map-set-mutation.md) | `suggestion` | Both | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place |
-| [`no-object-mutation`](docs/rules/no-object-mutation.md) | `suggestion` | Both | Disallow direct object-property mutation; prefer creating new objects with immutable update patterns |
-| [`sort-imports`](docs/rules/sort-imports.md) | `suggestion` | Both | Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group |
-| [`sort-functions`](docs/rules/sort-functions.md) | `suggestion` | Both | Require top-level functions to be sorted alphabetically |
-| [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md) | `suggestion` | Both | Prefer nullish coalescing instead of a nullish guard ternary |
-| [`prefer-object-spread`](docs/rules/prefer-object-spread.md) | `suggestion` | Both | Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument |
-| [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md) | `suggestion` | Both | Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs |
-| [`prefer-string-raw`](docs/rules/prefer-string-raw.md) | `suggestion` | Both | Prefer String.raw for string literals containing escaped backslashes (Sonar S7780) |
-| [`prefer-structured-clone`](docs/rules/prefer-structured-clone.md) | `suggestion` | Both | Prefer structuredClone(...) over JSON.parse(JSON.stringify(...)) when creating a deep clone |
+| Rule                                                                           | Type         | Preset | Description                                                                                                                                           |
+| ------------------------------------------------------------------------------ | ------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`max-function-lines`](docs/rules/max-function-lines.md)                       | `suggestion` | Both   | Enforce a maximum number of lines per function body                                                                                                   |
+| [`max-params`](docs/rules/max-params.md)                                       | `suggestion` | Both   | Enforce a maximum number of function parameters                                                                                                       |
+| [`no-array-mutation`](docs/rules/no-array-mutation.md)                         | `suggestion` | Both   | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted                                                    |
+| [`no-date-now`](docs/rules/no-date-now.md)                                     | `suggestion` | Both   | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior                                                                 |
+| [`no-placeholder-implementation`](docs/rules/no-placeholder-implementation.md) | `problem`    | Both   | Disallow placeholder, stub, TODO, and not implemented production code                                                                                 |
+| [`no-magic-numbers`](docs/rules/no-magic-numbers.md)                           | `suggestion` | Both   | Disallow magic numbers; use named constants instead of raw numeric literals                                                                           |
+| [`no-magic-strings`](docs/rules/no-magic-strings.md)                           | `suggestion` | Both   | Disallow magic strings in comparisons and switch cases; use named constants instead                                                                   |
+| [`no-map-set-mutation`](docs/rules/no-map-set-mutation.md)                     | `suggestion` | Both   | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place                                                   |
+| [`no-object-mutation`](docs/rules/no-object-mutation.md)                       | `suggestion` | Both   | Disallow direct object-property mutation; prefer creating new objects with immutable update patterns                                                  |
+| [`sort-imports`](docs/rules/sort-imports.md)                                   | `suggestion` | Both   | Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group |
+| [`sort-functions`](docs/rules/sort-functions.md)                               | `suggestion` | Both   | Require top-level functions to be sorted alphabetically                                                                                               |
+| [`prefer-nullish-coalescing`](docs/rules/prefer-nullish-coalescing.md)         | `suggestion` | Both   | Prefer nullish coalescing instead of a nullish guard ternary                                                                                          |
+| [`prefer-object-spread`](docs/rules/prefer-object-spread.md)                   | `suggestion` | Both   | Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument                                              |
+| [`prefer-readonly-parameters`](docs/rules/prefer-readonly-parameters.md)       | `suggestion` | Both   | Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs                                                  |
+| [`prefer-string-raw`](docs/rules/prefer-string-raw.md)                         | `suggestion` | Both   | Prefer String.raw for string literals containing escaped backslashes (Sonar S7780)                                                                    |
+| [`prefer-structured-clone`](docs/rules/prefer-structured-clone.md)             | `suggestion` | Both   | Prefer structuredClone(...) over JSON.parse(JSON.stringify(...)) when creating a deep clone                                                           |
 
 ### Error Handling
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`no-empty-catch`](docs/rules/no-empty-catch.md) | `problem` | Both | Disallow empty catch blocks that silently swallow errors |
-| [`no-throw-literal`](docs/rules/no-throw-literal.md) | `problem` | Both | Disallow throwing literals, objects, or templates; always throw a new Error instance |
+| Rule                                                         | Type         | Preset      | Description                                                                                               |
+| ------------------------------------------------------------ | ------------ | ----------- | --------------------------------------------------------------------------------------------------------- |
+| [`no-empty-catch`](docs/rules/no-empty-catch.md)             | `problem`    | Both        | Disallow empty catch blocks that silently swallow errors                                                  |
+| [`no-throw-literal`](docs/rules/no-throw-literal.md)         | `problem`    | Both        | Disallow throwing literals, objects, or templates; always throw a new Error instance                      |
 | [`prefer-result-return`](docs/rules/prefer-result-return.md) | `suggestion` | Strict only | Prefer Result-style return values instead of throw statements to make error flows explicit and composable |
 
 ### Imports
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`require-clean-barrel`](docs/rules/require-clean-barrel.md) | `suggestion` | Both | Require barrel files (index.*) to contain only module re-export declarations |
-| [`require-barrel-relative-exports`](docs/rules/require-barrel-relative-exports.md) | `suggestion` | Both | Require barrel re-export declarations to use current-directory descendant paths that start with './' |
-| [`no-dynamic-import`](docs/rules/no-dynamic-import.md) | `problem` | Both | Ban await import() and require() except in test files |
-| [`no-export-alias`](docs/rules/no-export-alias.md) | `suggestion` | Both | Prevent use of alias in export statements |
-| [`no-hardcoded-secrets`](docs/rules/no-hardcoded-secrets.md) | `problem` | Both | Disallow hardcoded secrets, credentials, tokens, and secret env defaults |
-| [`no-raw-sql-interpolation`](docs/rules/no-raw-sql-interpolation.md) | `problem` | Both | Disallow interpolated raw SQL and unsafe raw query helpers |
-| [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md) | `suggestion` | Both | Disallow parent-directory imports (`..` and `../*`) inside barrel files (`index.*`) across import declarations, import expressions, require calls, and import-equals declarations |
-| [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md) | `suggestion` | Opt-in | Disallow parent-relative access into protected internal directories such as src |
-| [`no-re-export`](docs/rules/no-re-export.md) | `suggestion` | Both | Disallow direct or indirect re-export statements from parent or ancestor modules; barrel files (index.*) are exempt from this restriction |
-| [`no-shell-command-construction`](docs/rules/no-shell-command-construction.md) | `problem` | Both | Disallow shell command construction through subprocess APIs |
-| [`no-unsafe-code-generation`](docs/rules/no-unsafe-code-generation.md) | `problem` | Both | Disallow eval, Function constructors, string timers, and vm code execution APIs |
-| [`require-node-protocol`](docs/rules/require-node-protocol.md) | `suggestion` | Both | Require Node.js built-in module imports to use the `node:` protocol prefix |
+| Rule                                                                               | Type         | Preset | Description                                                                                                                                                                       |
+| ---------------------------------------------------------------------------------- | ------------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`require-clean-barrel`](docs/rules/require-clean-barrel.md)                       | `suggestion` | Both   | Require barrel files (index.\*) to contain only module re-export declarations                                                                                                     |
+| [`require-barrel-relative-exports`](docs/rules/require-barrel-relative-exports.md) | `suggestion` | Both   | Require barrel re-export declarations to use current-directory descendant paths that start with './'                                                                              |
+| [`no-dynamic-import`](docs/rules/no-dynamic-import.md)                             | `problem`    | Both   | Ban await import() and require() except in test files                                                                                                                             |
+| [`no-export-alias`](docs/rules/no-export-alias.md)                                 | `suggestion` | Both   | Prevent use of alias in export statements                                                                                                                                         |
+| [`no-hardcoded-secrets`](docs/rules/no-hardcoded-secrets.md)                       | `problem`    | Both   | Disallow hardcoded secrets, credentials, tokens, and secret env defaults                                                                                                          |
+| [`no-raw-sql-interpolation`](docs/rules/no-raw-sql-interpolation.md)               | `problem`    | Both   | Disallow interpolated raw SQL and unsafe raw query helpers                                                                                                                        |
+| [`no-barrel-parent-imports`](docs/rules/no-barrel-parent-imports.md)               | `suggestion` | Both   | Disallow parent-directory imports (`..` and `../*`) inside barrel files (`index.*`) across import declarations, import expressions, require calls, and import-equals declarations |
+| [`no-parent-internal-access`](docs/rules/no-parent-internal-access.md)             | `suggestion` | Opt-in | Disallow parent-relative access into protected internal directories such as src                                                                                                   |
+| [`no-re-export`](docs/rules/no-re-export.md)                                       | `suggestion` | Both   | Disallow direct or indirect re-export statements from parent or ancestor modules; barrel files (index.\*) are exempt from this restriction                                        |
+| [`no-shell-command-construction`](docs/rules/no-shell-command-construction.md)     | `problem`    | Both   | Disallow shell command construction through subprocess APIs                                                                                                                       |
+| [`no-unsafe-code-generation`](docs/rules/no-unsafe-code-generation.md)             | `problem`    | Both   | Disallow eval, Function constructors, string timers, and vm code execution APIs                                                                                                   |
+| [`require-node-protocol`](docs/rules/require-node-protocol.md)                     | `suggestion` | Both   | Require Node.js built-in module imports to use the `node:` protocol prefix                                                                                                        |
 
 ### Bug Prevention
 
-| Rule | Type | Preset | Description |
-| ---- | ---- | ------ | ----------- |
-| [`no-identical-expressions`](docs/rules/no-identical-expressions.md) | `problem` | Both | Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764) |
-| [`no-identical-branches`](docs/rules/no-identical-branches.md) | `suggestion` | Both | Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments |
-| [`no-boolean-return-trap`](docs/rules/no-boolean-return-trap.md) | `suggestion` | Both | Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites |
-| [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md) | `suggestion` | Both | Disallow redundant comparisons to boolean literals (Sonar S1125) |
-| [`no-for-in`](docs/rules/no-for-in.md) | `problem` | Both | Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration |
-| [`no-labels`](docs/rules/no-labels.md) | `problem` | Both | Disallow labels because they make control flow harder to reason about |
-| [`no-with`](docs/rules/no-with.md) | `problem` | Both | Disallow with statements because they make scope resolution unpredictable |
-| [`no-await-in-loop`](docs/rules/no-await-in-loop.md) | `problem` | Both | Disallow await expressions inside loops; use Promise.all() for parallel execution |
-| [`no-floating-promises`](docs/rules/no-floating-promises.md) | `problem` | Both | Disallow floating promises; explicitly handle with await, void, or rejection handlers |
-| [`no-math-random`](docs/rules/no-math-random.md) | `problem` | Both | Disallow Math.random(); inject randomness explicitly or use a dedicated random source |
-| [`no-eslint-disable`](docs/rules/no-eslint-disable.md) | `suggestion` | Both | Prevent use of eslint-disable comments |
-| [`no-ts-nocheck`](docs/rules/no-ts-nocheck.md) | `problem` | Both | Prevent use of @ts-nocheck comments |
-| [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md) | `suggestion` | Both | Disallow assignments and updates to function parameters; use a new local variable instead |
-| [`no-process-env-outside-config`](docs/rules/no-process-env-outside-config.md) | `problem` | Both | Disallow process.env reads outside configuration modules; import typed config instead |
-| [`no-flag-argument`](docs/rules/no-flag-argument.md) | `suggestion` | Both | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects |
-| [`prefer-guard-clauses`](docs/rules/prefer-guard-clauses.md) | `suggestion` | Both | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow |
-| [`prefer-shortcut-return`](docs/rules/prefer-shortcut-return.md) | `suggestion` | Both | Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions |
-| [`no-query-side-effects`](docs/rules/no-query-side-effects.md) | `suggestion` | Both | Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier |
-| [`require-timeout-for-io`](docs/rules/require-timeout-for-io.md) | `problem` | Both | Require timeout or cancellation options for external IO calls |
-| [`require-exhaustive-switch`](docs/rules/require-exhaustive-switch.md) | `suggestion` | Both | Require exhaustive switch statements over finite union, enum, and boolean discriminants |
+| Rule                                                                           | Type         | Preset | Description                                                                                                   |
+| ------------------------------------------------------------------------------ | ------------ | ------ | ------------------------------------------------------------------------------------------------------------- |
+| [`no-identical-expressions`](docs/rules/no-identical-expressions.md)           | `problem`    | Both   | Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)                    |
+| [`no-identical-branches`](docs/rules/no-identical-branches.md)                 | `suggestion` | Both   | Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments   |
+| [`no-boolean-return-trap`](docs/rules/no-boolean-return-trap.md)               | `suggestion` | Both   | Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites |
+| [`no-redundant-boolean`](docs/rules/no-redundant-boolean.md)                   | `suggestion` | Both   | Disallow redundant comparisons to boolean literals (Sonar S1125)                                              |
+| [`no-for-in`](docs/rules/no-for-in.md)                                         | `problem`    | Both   | Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration                     |
+| [`no-labels`](docs/rules/no-labels.md)                                         | `problem`    | Both   | Disallow labels because they make control flow harder to reason about                                         |
+| [`no-with`](docs/rules/no-with.md)                                             | `problem`    | Both   | Disallow with statements because they make scope resolution unpredictable                                     |
+| [`no-await-in-loop`](docs/rules/no-await-in-loop.md)                           | `problem`    | Both   | Disallow await expressions inside loops; use Promise.all() for parallel execution                             |
+| [`no-floating-promises`](docs/rules/no-floating-promises.md)                   | `problem`    | Both   | Disallow floating promises; explicitly handle with await, void, or rejection handlers                         |
+| [`no-math-random`](docs/rules/no-math-random.md)                               | `problem`    | Both   | Disallow Math.random(); inject randomness explicitly or use a dedicated random source                         |
+| [`no-eslint-disable`](docs/rules/no-eslint-disable.md)                         | `suggestion` | Both   | Prevent use of eslint-disable comments                                                                        |
+| [`no-ts-nocheck`](docs/rules/no-ts-nocheck.md)                                 | `problem`    | Both   | Prevent use of @ts-nocheck comments                                                                           |
+| [`no-parameter-reassign`](docs/rules/no-parameter-reassign.md)                 | `suggestion` | Both   | Disallow assignments and updates to function parameters; use a new local variable instead                     |
+| [`no-process-env-outside-config`](docs/rules/no-process-env-outside-config.md) | `problem`    | Both   | Disallow process.env reads outside configuration modules; import typed config instead                         |
+| [`no-flag-argument`](docs/rules/no-flag-argument.md)                           | `suggestion` | Both   | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects          |
+| [`prefer-guard-clauses`](docs/rules/prefer-guard-clauses.md)                   | `suggestion` | Both   | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow            |
+| [`prefer-shortcut-return`](docs/rules/prefer-shortcut-return.md)               | `suggestion` | Both   | Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions     |
+| [`no-query-side-effects`](docs/rules/no-query-side-effects.md)                 | `suggestion` | Both   | Disallow side effects in query-style functions (get*/is*/has*/can*/should\*); separate query from modifier    |
+| [`require-timeout-for-io`](docs/rules/require-timeout-for-io.md)               | `problem`    | Both   | Require timeout or cancellation options for external IO calls                                                 |
+| [`require-exhaustive-switch`](docs/rules/require-exhaustive-switch.md)         | `suggestion` | Both   | Require exhaustive switch statements over finite union, enum, and boolean discriminants                       |
+
 <!-- GENERATED:README_RULES_END -->
 
 ## Development

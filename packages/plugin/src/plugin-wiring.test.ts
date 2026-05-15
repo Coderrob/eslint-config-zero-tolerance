@@ -117,7 +117,7 @@ describe('plugin wiring', () => {
     expect(recommendedRules[RULE_NO_RETURN_TYPE]).toBe('warn');
     expect(strictRules[RULE_NO_RETURN_TYPE]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
-    expect(strictRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('warn');
+    expect(strictRules[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
     expect(recommendedRules[RULE_REQUIRE_BARREL_RELATIVE_EXPORTS]).toBe('warn');
     expect(strictRules[RULE_REQUIRE_BARREL_RELATIVE_EXPORTS]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_CLEAN_BARREL]).toBe('warn');

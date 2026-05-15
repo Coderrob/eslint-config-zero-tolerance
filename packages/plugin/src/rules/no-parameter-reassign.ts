@@ -138,8 +138,11 @@ function reportIfParameterReassigned(
   parameterStack: Readonly<ParameterScopeStack>,
   node: Readonly<TSESTree.Identifier>,
 ): void {
-  const currentScope = parameterStack.at(-1);
-  if (currentScope === undefined || !currentScope.has(node.name)) {
+  if (parameterStack.length === 0) {
+    return;
+  }
+  const currentScope = parameterStack[parameterStack.length - 1];
+  if (!currentScope.has(node.name)) {
     return;
   }
   context.report({

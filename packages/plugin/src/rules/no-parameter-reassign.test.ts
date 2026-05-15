@@ -35,6 +35,10 @@ ruleTester.run('no-parameter-reassign', noParameterReassign, {
       name: 'should allow rest parameter with array pattern argument',
       code: 'function f(...[first]: string[]) { return first; }',
     },
+    {
+      name: 'should allow reassignment outside a function parameter scope',
+      code: 'let value = 1; value = 2;',
+    },
   ],
   invalid: [
     {
