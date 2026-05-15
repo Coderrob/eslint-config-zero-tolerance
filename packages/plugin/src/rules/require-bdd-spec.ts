@@ -568,7 +568,7 @@ function extractNamedExports(content: string): Set<string> {
  */
 function extractSegmentName(parts: ReadonlyArray<string>): string | null {
   /* istanbul ignore next */
-  const rawValue = parts.at(-1) ?? '';
+  const rawValue = parts[parts.length - 1] ?? '';
   const candidate = rawValue.trim();
   /* istanbul ignore next */
   return /^\w+$/u.test(candidate) ? candidate : null;

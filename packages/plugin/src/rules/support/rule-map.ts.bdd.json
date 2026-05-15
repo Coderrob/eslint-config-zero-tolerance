@@ -84,10 +84,10 @@
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {
-          "name": "should include require-jsdoc-anonymous-functions in built-in presets",
+          "name": "should keep require-jsdoc-anonymous-functions disabled in both built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-jsdoc-anonymous-functions' entries are read",
-          "then": "the rule is set to off in Recommended and warn in Strict"
+          "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
         },
         {
           "name": "should include require-barrel-relative-exports in built-in presets",

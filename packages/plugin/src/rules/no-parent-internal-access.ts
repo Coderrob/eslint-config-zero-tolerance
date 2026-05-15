@@ -204,7 +204,9 @@ function getFirstNonParentSegment(importPath: string): string | null {
  */
 function getProtectedDirectories(protectedDirectories: readonly string[] | undefined): Set<string> {
   const configuredDirectories = protectedDirectories ?? DEFAULT_PROTECTED_DIRECTORIES;
-  return new Set(configuredDirectories.map(normalizeProtectedDirectoryName).filter(isDirectoryName));
+  return new Set(
+    configuredDirectories.map(normalizeProtectedDirectoryName).filter(isDirectoryName),
+  );
 }
 
 /**

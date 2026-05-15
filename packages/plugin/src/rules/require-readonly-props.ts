@@ -211,8 +211,11 @@ function markJsxReturn(
   stateStack: readonly IFunctionState[],
   node: Readonly<TSESTree.ReturnStatement>,
 ): void {
-  const currentState = stateStack.at(-1);
-  if (currentState === undefined || node.argument === null) {
+  if (stateStack.length === 0) {
+    return;
+  }
+  const currentState = stateStack[stateStack.length - 1];
+  if (node.argument === null) {
     return;
   }
   if (isJsxExpression(node.argument)) {

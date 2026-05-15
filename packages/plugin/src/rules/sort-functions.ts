@@ -371,7 +371,7 @@ function getSortableBlockEnd(
   node: Readonly<TSESTree.Node>,
   trailingComments: ReadonlyArray<TSESTree.Comment>,
 ): number {
-  return trailingComments.at(-1)?.range[1] ?? node.range[1];
+  return trailingComments[trailingComments.length - 1]?.range[1] ?? node.range[1];
 }
 
 /**
@@ -420,7 +420,7 @@ function getSortableBlockStart(
   node: Readonly<TSESTree.Node>,
   leadingComments: ReadonlyArray<TSESTree.Comment>,
 ): number {
-  return leadingComments.at(0)?.range[0] ?? node.range[0];
+  return leadingComments[0]?.range[0] ?? node.range[0];
 }
 
 /**
@@ -714,7 +714,9 @@ function insertSortedFunctionBlock(
   sortedBlocks: ReadonlyArray<SortableFunctionBlock>,
   functionBlock: Readonly<SortableFunctionBlock>,
 ): ReadonlyArray<SortableFunctionBlock> {
-  const insertionIndex = sortedBlocks.findIndex(isSortableFunctionBlockAfter.bind(undefined, functionBlock));
+  const insertionIndex = sortedBlocks.findIndex(
+    isSortableFunctionBlockAfter.bind(undefined, functionBlock),
+  );
   if (insertionIndex === -1) {
     return [...sortedBlocks, functionBlock];
   }

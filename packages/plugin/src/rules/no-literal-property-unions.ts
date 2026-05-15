@@ -99,10 +99,12 @@ function getPropertyTypeNode(node: Readonly<PropertyNode>): TSESTree.TypeNode | 
  * @param computed - Whether the key is computed.
  * @returns Property name for simple keys, or null.
  */
-function getUncomputedPropertyName(property: Readonly<{
-  computed: boolean;
-  key: TSESTree.PropertyName;
-}>): string | null {
+function getUncomputedPropertyName(
+  property: Readonly<{
+    computed: boolean;
+    key: TSESTree.PropertyName;
+  }>,
+): string | null {
   if (property.computed) {
     return null;
   }

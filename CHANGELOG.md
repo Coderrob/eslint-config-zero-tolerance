@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-05-15
+
 ### Added
 
 - **`no-ts-nocheck` rule**: Added a new built-in rule that blocks `// @ts-nocheck` and `/* @ts-nocheck */` comments so files cannot opt out of TypeScript checking.
@@ -19,6 +21,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`no-export-alias` rule**: Removed unsafe autofixing for true public export aliases so reported aliases require an explicit naming decision instead of silently changing the public API.
 - **`prefer-readonly-parameters` rule**: Added configurable `ignoredTypeNamePatterns` exemptions, with callable defaults such as `Dispatch`, so React state setters and similar function aliases are not rewritten to non-callable `Readonly<...>` types.
 - **`sort-functions` rule**: Updated autofix to sort the full sortable function span in one pass instead of swapping one adjacent out-of-order function pair per lint fix run.
+
+### Changed
+
+- **Dependency refresh**: Updated workspace, plugin, and config package dependencies to current compatible versions, including ESLint, TypeScript ESLint, Jest tooling, Prettier, Publint, ts-jest, tsup, rimraf, and Node/Jest type packages.
+- **Package metadata**: Added explicit side-effect-free package metadata for the plugin and config packages so bundlers can safely tree-shake unused exports.
+- **Preset defaults**: Kept both `require-bdd-spec` and `require-jsdoc-anonymous-functions` disabled in recommended and strict presets so they remain opt-in rules by default.
 
 ## [1.2.4] - 2026-04-28
 

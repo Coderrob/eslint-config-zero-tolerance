@@ -254,7 +254,7 @@ const ruleEntries: RuleEntryTuple[] = [
   createRuleEntry('no-parent-internal-access', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('no-fetch-in-tests', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('no-restricted-imports-in-tests', OFF_LEVEL, OFF_LEVEL),
-  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
+  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 

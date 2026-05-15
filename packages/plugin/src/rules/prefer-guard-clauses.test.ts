@@ -12,6 +12,10 @@ ruleTester.run('prefer-guard-clauses', preferGuardClauses, {
       code: 'if (ok) { doA(); } else { doB(); }',
     },
     {
+      name: 'should allow if else when consequent block is empty',
+      code: 'if (ok) {} else { doB(); }',
+    },
+    {
       name: 'should allow else-if chains',
       code: 'if (a) { doA(); } else if (b) { return 2; }',
     },

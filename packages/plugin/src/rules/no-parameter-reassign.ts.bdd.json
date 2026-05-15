@@ -22,6 +22,12 @@
           "given": "const local = param + 1 inside a function body",
           "when": "the rule evaluates the code",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow reassignment outside a function parameter scope",
+          "given": "a top-level variable assignment that is not inside a function parameter scope",
+          "when": "the rule evaluates the assignment",
+          "then": "no violation is reported"
         }
       ]
     },

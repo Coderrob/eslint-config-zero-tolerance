@@ -71,15 +71,17 @@ function addImportEntry(
   node: Readonly<TSESTree.ImportDeclaration>,
 ): void {
   const importPath = getImportSourceValue(node);
-  Reflect.apply(Array.prototype.push, imports, [{
-    group: getImportGroup({
-      importPath,
-      isSideEffect: node.specifiers.length === 0,
-    }),
-    node,
-    value: importPath,
-    valueLower: importPath.toLowerCase(),
-  }]);
+  Reflect.apply(Array.prototype.push, imports, [
+    {
+      group: getImportGroup({
+        importPath,
+        isSideEffect: node.specifiers.length === 0,
+      }),
+      node,
+      value: importPath,
+      valueLower: importPath.toLowerCase(),
+    },
+  ]);
 }
 
 /**

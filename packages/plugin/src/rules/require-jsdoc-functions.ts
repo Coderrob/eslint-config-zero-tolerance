@@ -276,7 +276,9 @@ function getMissingParamTagNames(
   if (existingParamTags >= node.params.length) {
     return [];
   }
-  return node.params.slice(existingParamTags).map(getParamTagNameAfterOffset.bind(undefined, existingParamTags));
+  return node.params
+    .slice(existingParamTags)
+    .map(getParamTagNameAfterOffset.bind(undefined, existingParamTags));
 }
 
 /**
@@ -362,9 +364,7 @@ function getSummaryDescriptionLine(node: Readonly<FunctionNode>): string {
  * @param parent - Parent node to inspect.
  * @returns True when parent has an identifier key.
  */
-function hasIdentifierKey(
-  parent: TSESTree.Node | null | undefined,
-): parent is NamedKeyParentNode {
+function hasIdentifierKey(parent: TSESTree.Node | null | undefined): parent is NamedKeyParentNode {
   return isNamedKeyParentNode(parent) && isIdentifierNode(parent.key);
 }
 
@@ -490,9 +490,7 @@ function isMissingThrowsTag(
  * @param node - Node to inspect.
  * @returns True when node can have a named key.
  */
-function isNamedKeyParentNode(
-  node: TSESTree.Node | null | undefined,
-): node is NamedKeyParentNode {
+function isNamedKeyParentNode(node: TSESTree.Node | null | undefined): node is NamedKeyParentNode {
   return node !== null && node !== undefined && NAMED_KEY_PARENT_TYPES.has(node.type);
 }
 

@@ -62,7 +62,7 @@ module.exports = {
 
 ## Rules Included in Each Preset
 
-Nearly all core rules are included in every preset. `require-bdd-spec`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
+Nearly all core rules are included in every preset. `require-bdd-spec`, `require-jsdoc-anonymous-functions`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.
 
 | Rule                                     | Recommended    | Strict          |
 | ---------------------------------------- | -------------- | --------------- |
@@ -126,7 +126,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `require-exported-object-type`           | warn           | error           |
 | `require-exhaustive-switch`              | warn           | error           |
 | `require-interface-prefix`               | warn           | error           |
-| `require-jsdoc-anonymous-functions`      | off            | warn            |
+| `require-jsdoc-anonymous-functions`      | off            | off             |
 | `require-jsdoc-functions`                | warn           | error           |
 | `require-node-protocol`                  | warn           | error           |
 | `require-optional-chaining`              | warn           | error           |
@@ -136,7 +136,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `no-pare
 | `sort-functions`                         | warn           | error           |
 | `sort-imports`                           | warn           | error           |
 
-`require-bdd-spec`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available but intentionally not enabled by default in presets.
+`require-bdd-spec`, `require-jsdoc-anonymous-functions`, `no-parent-internal-access`, `no-fetch-in-tests`, and `no-restricted-imports-in-tests` are available but intentionally not enabled by default in presets.
 
 ## Disabling Individual Rules
 
