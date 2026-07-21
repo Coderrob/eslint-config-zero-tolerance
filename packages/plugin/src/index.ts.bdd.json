@@ -138,13 +138,13 @@
           "name": "should expose a legacy recommended config preset",
           "given": "the plugin default export is imported",
           "when": "plugin.configs['legacy-recommended'] is read",
-          "then": "returns a legacy ESLint config object with parser and rules"
+          "then": "returns a legacy ESLint config object using the '@coderrob/zero-tolerance' plugin shorthand and scoped rule identifiers"
         },
         {
           "name": "should expose a legacy strict config preset",
           "given": "the plugin default export is imported",
           "when": "plugin.configs['legacy-strict'] is read",
-          "then": "returns a legacy ESLint config object with parser and rules set to error severity"
+          "then": "returns a legacy ESLint config object using scoped rule identifiers set to error severity"
         }
       ]
     }

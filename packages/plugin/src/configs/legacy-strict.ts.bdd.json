@@ -21,7 +21,7 @@
           "name": "should include error-level rules matching the flat strict preset",
           "given": "legacyStrictConfig is imported",
           "when": "a rule entry from legacyStrictConfig.rules is read",
-          "then": "the severity is 'error'"
+          "then": "the severity is 'error' and the rule identifier begins with '@coderrob/zero-tolerance/'"
         }
       ]
     }

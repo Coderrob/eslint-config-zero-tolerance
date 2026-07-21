@@ -21,7 +21,7 @@
           "name": "should include warn-level rules matching the flat recommended preset",
           "given": "legacyRecommendedConfig is imported",
           "when": "a rule entry from legacyRecommendedConfig.rules is read",
-          "then": "the severity is 'warn'"
+          "then": "the severity is 'warn' and the rule identifier begins with '@coderrob/zero-tolerance/'"
         }
       ]
     }

@@ -1,0 +1,65 @@
+/**
+ * Copyright 2026 Robert Lindley
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, rmSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const outputDirectory = resolve(repoRoot, process.argv[2] ?? 'compatibility-packages');
+const pnpmExecutable = process.env.npm_execpath;
+
+/** Returns a platform-safe pnpm command and its leading arguments. */
+function getPnpmInvocation() {
+  if (pnpmExecutable !== undefined) {
+    return { arguments: [pnpmExecutable], command: process.execPath };
+  }
+  return {
+    arguments: [],
+    command: process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
+  };
+}
+
+/** Packs a workspace package using pnpm so workspace peer ranges are publishable. */
+function packWorkspace(relativePackageDirectory) {
+  const pnpmInvocation = getPnpmInvocation();
+  const result = spawnSync(
+    pnpmInvocation.command,
+    [
+      ...pnpmInvocation.arguments,
+      '--config.ignore-scripts=true',
+      '--dir',
+      resolve(repoRoot, relativePackageDirectory),
+      'pack',
+      '--pack-destination',
+      outputDirectory,
+    ],
+    { encoding: 'utf8', stdio: 'inherit' },
+  );
+
+  if (result.error !== undefined) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    throw new Error(`Failed to pack ${relativePackageDirectory}`);
+  }
+}
+
+rmSync(outputDirectory, { force: true, recursive: true });
+mkdirSync(outputDirectory, { recursive: true });
+packWorkspace('packages/plugin');
+packWorkspace('packages/config');

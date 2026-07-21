@@ -165,36 +165,6 @@ function collectParentImportEqualsBindings(
 }
 
 /**
- * Creates the default-export listener for non-barrel files.
- *
- * @param context - ESLint rule execution context.
- * @param importedBindings - Precomputed imported binding names from parent paths.
- * @returns Default export declaration listener.
- */
-function createExportDefaultDeclarationListener(
-  context: Readonly<NoReExportContext>,
-  importedBindings: Readonly<ImportedBindingNames>,
-): TSESLint.RuleFunction<TSESTree.ExportDefaultDeclaration> {
-  return checkExportDefaultDeclaration.bind(undefined, context, importedBindings);
-}
-
-/**
- * Creates the named-export listener for non-barrel files.
- *
- * @param context - ESLint rule execution context.
- * @param importedBindings - Precomputed imported binding names from parent paths.
- * @param directExportNames - Direct exported declaration names.
- * @returns Named export declaration listener.
- */
-function createExportNamedDeclarationListener(
-  context: Readonly<NoReExportContext>,
-  importedBindings: Readonly<ImportedBindingNames>,
-  directExportNames: Readonly<DirectExportNames>,
-): TSESLint.RuleFunction<TSESTree.ExportNamedDeclaration> {
-  return checkExportNamedDeclaration.bind(undefined, context, importedBindings, directExportNames);
-}
-
-/**
  * Creates a fix for redundant named pass-through exports.
  *
  * @param context - ESLint rule execution context.
@@ -223,22 +193,25 @@ function createIndirectParentReExportFix(
  * @param directExportNames - Direct exported declaration names.
  * @returns Rule listeners.
  */
-function createNonBarrelNoReExportListeners(
+const createNonBarrelNoReExportListeners = (
   context: Readonly<NoReExportContext>,
   importedBindings: Readonly<ImportedBindingNames>,
   directExportNames: Readonly<DirectExportNames>,
-): TSESLint.RuleListener {
-  return {
-    ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
-    ExportDefaultDeclaration: createExportDefaultDeclarationListener(context, importedBindings),
-    ExportNamedDeclaration: createExportNamedDeclarationListener(
-      context,
-      importedBindings,
-      directExportNames,
-    ),
-    TSExportAssignment: checkTsExportAssignment.bind(undefined, context, importedBindings),
-  };
-}
+): TSESLint.RuleListener => ({
+  ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
+  ExportDefaultDeclaration: checkExportDefaultDeclaration.bind(
+    undefined,
+    context,
+    importedBindings,
+  ),
+  ExportNamedDeclaration: checkExportNamedDeclaration.bind(
+    undefined,
+    context,
+    importedBindings,
+    directExportNames,
+  ),
+  TSExportAssignment: checkTsExportAssignment.bind(undefined, context, importedBindings),
+});
 
 /**
  * Creates listeners for no-re-export rule execution.

@@ -10,12 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Add Copyright Headers
-        uses: CoderRob/add-copyright@v1
+        uses: CoderRob/add-copyright@5cf31ae93e0c55c47584fc647bfe0192465c31d5 # v1.0.0
         with:
           name: 'Robert Lindley'
           license: 'Apache-2.0'

@@ -48,7 +48,7 @@ export default [zeroTolerance.configs.strict];
 
 ```js title=".eslintrc.js"
 module.exports = {
-  extends: ['plugin:zero-tolerance/legacy-recommended'],
+  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
 };
 ```
 
@@ -56,9 +56,12 @@ module.exports = {
 
 ```js title=".eslintrc.js"
 module.exports = {
-  extends: ['plugin:zero-tolerance/legacy-strict'],
+  extends: ['plugin:@coderrob/zero-tolerance/legacy-strict'],
 };
 ```
+
+ESLint 8 resolves the published scoped plugin with the `@coderrob/zero-tolerance` shorthand. Rules
+added manually to a legacy config must use `@coderrob/zero-tolerance/<rule-name>` identifiers.
 
 ## Rules Included in Each Preset
 

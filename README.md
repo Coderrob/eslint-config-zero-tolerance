@@ -138,10 +138,10 @@ export default [
 
 ```javascript
 module.exports = {
-  plugins: ['zero-tolerance'],
-  extends: ['plugin:zero-tolerance/legacy-recommended'],
+  plugins: ['@coderrob/zero-tolerance'],
+  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
   // or for strict mode:
-  // extends: ['plugin:zero-tolerance/legacy-strict'],
+  // extends: ['plugin:@coderrob/zero-tolerance/legacy-strict'],
 };
 ```
 

@@ -16,7 +16,7 @@
 
 import type { Linter } from 'eslint';
 import { Preset } from '../constants';
-import { buildRules } from '../rules/support/rule-map';
+import { buildLegacyRules } from '../rules/support/rule-map';
 import { legacyParserOptions } from './legacy-base';
 
 /**
@@ -24,5 +24,5 @@ import { legacyParserOptions } from './legacy-base';
  */
 export const legacyStrictConfig: Linter.LegacyConfig = {
   ...legacyParserOptions,
-  rules: buildRules(Preset.Strict),
+  rules: buildLegacyRules(Preset.Strict),
 };

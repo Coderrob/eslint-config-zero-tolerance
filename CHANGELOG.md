@@ -8,10 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Packed package compatibility tests**: Added isolated consumer tests for the latest ESLint 8, 9, and 10 releases using legacy or flat configuration as appropriate, Node.js 18/20/22/24 LTS support, CommonJS and ESM loading, and config-package subpath exports.
+- **README synchronization tests**: Added focused coverage for idempotency, generated-section formatting, marker validation, rule-count updates, stale checks, configuration fallback, and failure-safe writes.
+
 ### Fixed
 
-- **Transitive dependency security**: Updated pnpm overrides and the plugin npm lockfile to patched Babel, brace-expansion, and js-yaml releases.
-- **README synchronization**: Format generated README content with the repository Prettier configuration so `readme:sync`, `format`, and `validate:readme` produce the same deterministic result.
+- **Dependency graph consistency**: Removed the nested npm lockfile, aligned config-package development peers with the canonical pnpm graph, and raised the published Node.js engine floor to the dependency-supported 18.18 release.
+- **Legacy scoped plugin presets**: Registered the scoped `@coderrob/zero-tolerance` shorthand and generated scoped legacy rule IDs so ESLint 8 can load the published legacy recommended and strict presets.
+- **Transitive dependency security**: Updated pnpm overrides and the workspace lockfile to patched Babel, brace-expansion, and js-yaml releases.
+- **Published plugin documentation**: Corrected the rule count, Node.js compatibility requirements, and preset exceptions in the plugin package README.
+- **README synchronization**: Limited Prettier formatting to the generated rules block so synchronization preserves handwritten content, and rejected missing, duplicated, or misordered generation markers.
+
+### Changed
+
+- **GitHub Actions supply-chain security**: Updated every workflow action to its latest stable release and pinned each reference to the release's immutable commit SHA.
+- **`no-re-export` listener wiring**: Removed one-use listener factories and bound the existing handlers directly without changing rule behavior.
 
 ## [1.2.5] - 2026-05-15
 

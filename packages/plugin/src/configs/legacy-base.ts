@@ -15,7 +15,7 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, TYPESCRIPT_ESLINT_PARSER } from '../constants';
+import { LEGACY_PLUGIN_NAMESPACE, TYPESCRIPT_ESLINT_PARSER } from '../constants';
 
 const LEGACY_ECMA_VERSION = 2020;
 
@@ -28,5 +28,5 @@ export const legacyParserOptions: Linter.LegacyConfig = {
     ecmaVersion: LEGACY_ECMA_VERSION,
     sourceType: 'module',
   },
-  plugins: [PLUGIN_NAMESPACE],
+  plugins: [LEGACY_PLUGIN_NAMESPACE],
 };

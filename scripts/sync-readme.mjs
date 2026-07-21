@@ -480,26 +480,17 @@ function buildRulesSection(catalog, ruleMetadata, presets) {
  * @param {string} rulesSection - Generated rules section.
  * @returns {string} README with the generated block applied.
  */
-function applyGeneratedRulesSection(readmeContent, rulesSection) {
-  const generatedBlock = `${GENERATED_START}\n${rulesSection}\n${GENERATED_END}`;
-  if (readmeContent.includes(GENERATED_START) && readmeContent.includes(GENERATED_END)) {
-    return readmeContent.replace(
-      new RegExp(String.raw`${GENERATED_START}[\s\S]*?${GENERATED_END}`, 'u'),
-      generatedBlock,
-    );
+export function applyGeneratedRulesSection(readmeContent, rulesSection) {
+  const generatedBlock = `${GENERATED_START}\n\n${rulesSection}\n\n${GENERATED_END}`;
+  const startIndex = readmeContent.indexOf(GENERATED_START);
+  const endIndex = readmeContent.indexOf(GENERATED_END);
+  const hasSingleStart =
+    startIndex !== -1 && startIndex === readmeContent.lastIndexOf(GENERATED_START);
+  const hasSingleEnd = endIndex !== -1 && endIndex === readmeContent.lastIndexOf(GENERATED_END);
+  if (!hasSingleStart || !hasSingleEnd || endIndex <= startIndex) {
+    throw new Error('README.md must contain one ordered pair of generated rules markers');
   }
-
-  const rulesHeadingIndex = readmeContent.indexOf('## Rules');
-  const developmentHeadingIndex = readmeContent.indexOf('## Development');
-  if (
-    rulesHeadingIndex === -1 ||
-    developmentHeadingIndex === -1 ||
-    developmentHeadingIndex <= rulesHeadingIndex
-  ) {
-    throw new Error('README.md is missing the expected "## Rules" or "## Development" headings');
-  }
-
-  return `${readmeContent.slice(0, rulesHeadingIndex)}${generatedBlock}\n\n${readmeContent.slice(developmentHeadingIndex)}`;
+  return `${readmeContent.slice(0, startIndex)}${generatedBlock}${readmeContent.slice(endIndex + GENERATED_END.length)}`;
 }
 
 /**
@@ -509,7 +500,7 @@ function applyGeneratedRulesSection(readmeContent, rulesSection) {
  * @param {number} ruleCount - Canonical rule count.
  * @returns {string} Updated README content.
  */
-function applyRuleCountReplacements(readmeContent, ruleCount) {
+export function applyRuleCountReplacements(readmeContent, ruleCount) {
   if (!HERO_COUNT_PATTERN.test(readmeContent)) {
     throw new Error('README.md is missing the expected hero rule-count pattern');
   }
@@ -523,14 +514,75 @@ function applyRuleCountReplacements(readmeContent, ruleCount) {
 }
 
 /**
- * Formats generated README content using the repository Prettier configuration.
+ * Formats the generated rules section using the repository Prettier configuration.
  *
- * @param {string} readmeContent - Generated README content.
- * @returns {Promise<string>} Canonically formatted README content.
+ * @param {string} rulesSection - Generated rules section.
+ * @param {{ formatMarkdown?: typeof format, readmePath?: string, resolvePrettierConfig?: typeof resolveConfig }} [options] - Formatting dependencies.
+ * @returns {Promise<string>} Canonically formatted rules section.
  */
-async function formatReadme(readmeContent) {
-  const prettierConfig = (await resolveConfig(README_PATH)) ?? {};
-  return format(readmeContent, { ...prettierConfig, filepath: README_PATH });
+export async function formatRulesSection(
+  rulesSection,
+  { formatMarkdown = format, readmePath = README_PATH, resolvePrettierConfig = resolveConfig } = {},
+) {
+  const prettierConfig = (await resolvePrettierConfig(readmePath)) ?? {};
+  const formattedSection = await formatMarkdown(rulesSection, {
+    ...prettierConfig,
+    filepath: readmePath,
+  });
+  return formattedSection.trimEnd();
+}
+
+/**
+ * Produces canonical README content without modifying handwritten sections.
+ *
+ * @param {string} currentReadme - Current README content.
+ * @param {string} rulesSection - Unformatted generated rules section.
+ * @param {number} ruleCount - Canonical number of rules.
+ * @param {(section: string) => Promise<string>} [sectionFormatter] - Section formatter.
+ * @returns {Promise<string>} Synchronized README content.
+ */
+export async function synchronizeReadmeContent(
+  currentReadme,
+  rulesSection,
+  ruleCount,
+  sectionFormatter = formatRulesSection,
+) {
+  const formattedSection = await sectionFormatter(rulesSection);
+  return applyRuleCountReplacements(
+    applyGeneratedRulesSection(currentReadme, formattedSection),
+    ruleCount,
+  );
+}
+
+/**
+ * Synchronizes one README file after all transformations complete successfully.
+ *
+ * @param {{ checkMode: boolean, readFile?: typeof readFileSync, readmePath?: string, ruleCount: number, rulesSection: string, sectionFormatter?: (section: string) => Promise<string>, writeFile?: typeof writeFileSync }} options - Synchronization options.
+ * @returns {Promise<boolean>} True when the file was already current.
+ */
+export async function synchronizeReadmeFile({
+  checkMode,
+  readFile = readFileSync,
+  readmePath = README_PATH,
+  ruleCount,
+  rulesSection,
+  sectionFormatter = formatRulesSection,
+  writeFile = writeFileSync,
+}) {
+  const currentReadme = readFile(readmePath, 'utf8');
+  const syncedReadme = await synchronizeReadmeContent(
+    currentReadme,
+    rulesSection,
+    ruleCount,
+    sectionFormatter,
+  );
+  if (syncedReadme === currentReadme) {
+    return true;
+  }
+  if (!checkMode) {
+    writeFile(readmePath, syncedReadme);
+  }
+  return false;
 }
 
 /**
@@ -548,14 +600,13 @@ async function main() {
   );
 
   const { section, ruleCount } = buildRulesSection(catalog, ruleMetadata, presets);
-  const currentReadme = readFileSync(README_PATH, 'utf8');
-  const generatedReadme = applyRuleCountReplacements(
-    applyGeneratedRulesSection(currentReadme, section),
+  const isCurrent = await synchronizeReadmeFile({
+    checkMode: CHECK_MODE,
     ruleCount,
-  );
-  const syncedReadme = await formatReadme(generatedReadme);
+    rulesSection: section,
+  });
 
-  if (syncedReadme === currentReadme) {
+  if (isCurrent) {
     console.log(
       green(`\n✓ README.md already matches deterministic rule metadata (${ruleCount} rules).`),
     );
@@ -568,10 +619,11 @@ async function main() {
     return;
   }
 
-  writeFileSync(README_PATH, syncedReadme);
   console.log(
     green(`\n✓ Updated README.md from deterministic rule metadata (${ruleCount} rules).`),
   );
 }
 
-await main();
+if (resolve(process.argv[1] ?? '') === __filename) {
+  await main();
+}

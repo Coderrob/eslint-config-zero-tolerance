@@ -6,7 +6,7 @@ Thank you for contributing to `@coderrob/eslint-plugin-zero-tolerance`! This gui
 
 | Tool    | Version                                |
 | ------- | -------------------------------------- |
-| Node.js | 20+                                    |
+| Node.js | 20.20.2, 22.23.1, or 24.18.0 (LTS)     |
 | pnpm    | 10+                                    |
 | Python  | 3.x (only if working on the docs site) |
 

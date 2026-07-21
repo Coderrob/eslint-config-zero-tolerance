@@ -20,6 +20,9 @@
  */
 export const PLUGIN_NAMESPACE = 'zero-tolerance';
 
+/** Scoped plugin shorthand required by legacy ESLint package-name resolution. */
+export const LEGACY_PLUGIN_NAMESPACE = '@coderrob/zero-tolerance';
+
 /** Fully-qualified flat config name for the recommended preset. */
 export const CONFIG_NAME_RECOMMENDED = `${PLUGIN_NAMESPACE}/recommended`;
 

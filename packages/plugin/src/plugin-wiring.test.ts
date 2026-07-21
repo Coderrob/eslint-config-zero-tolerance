@@ -25,12 +25,13 @@ import {
   CONFIG_KEY_LEGACY_STRICT,
   CONFIG_NAME_RECOMMENDED,
   CONFIG_NAME_STRICT,
+  LEGACY_PLUGIN_NAMESPACE,
   PLUGIN_NAMESPACE,
   PLUGIN_PACKAGE_NAME,
   Preset,
   TYPESCRIPT_ESLINT_PARSER,
 } from './constants';
-import { buildRules, ruleMap } from './rules/support/rule-map';
+import { buildLegacyRules, buildRules, ruleMap } from './rules/support/rule-map';
 import eslintPlugin from './index';
 
 const RULE_NO_EXPORT_ALIAS = `${PLUGIN_NAMESPACE}/no-export-alias`;
@@ -51,6 +52,8 @@ const RULE_REQUIRE_EXHAUSTIVE_SWITCH = `${PLUGIN_NAMESPACE}/require-exhaustive-s
 const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_PREFER_STRUCTURED_CLONE = `${PLUGIN_NAMESPACE}/prefer-structured-clone`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
+const LEGACY_RULE_SORT_IMPORTS = `${LEGACY_PLUGIN_NAMESPACE}/sort-imports`;
+const LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${LEGACY_PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_NO_PARENT_INTERNAL_ACCESS = `${PLUGIN_NAMESPACE}/no-parent-internal-access`;
 const RULE_REQUIRE_EXPORTED_OBJECT_TYPE = `${PLUGIN_NAMESPACE}/require-exported-object-type`;
 const RULE_NO_LITERAL_PROPERTY_UNIONS = `${PLUGIN_NAMESPACE}/no-literal-property-unions`;
@@ -158,13 +161,31 @@ describe('plugin wiring', () => {
     expect(strict.plugins?.[PLUGIN_NAMESPACE]).toBe(eslintPlugin);
     expect(recommended.rules?.[RULE_NO_EXPORT_ALIAS]).toBe('warn');
     expect(strict.rules?.[RULE_NO_EXPORT_ALIAS]).toBe('error');
+    expect(recommended.rules?.[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
+    expect(strict.rules?.[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
+  });
+
+  it('should build scoped rule identifiers for legacy ESLint package resolution', () => {
+    const recommendedRules = buildLegacyRules(Preset.Recommended);
+    const strictRules = buildLegacyRules(Preset.Strict);
+
+    expect(recommendedRules[LEGACY_RULE_SORT_IMPORTS]).toBe('warn');
+    expect(strictRules[LEGACY_RULE_SORT_IMPORTS]).toBe('error');
+    expect(recommendedRules[RULE_SORT_IMPORTS]).toBeUndefined();
+    expect(strictRules[RULE_SORT_IMPORTS]).toBeUndefined();
+    expect(Object.keys(recommendedRules)).toHaveLength(Object.keys(ruleMap).length);
+    expect(Object.keys(strictRules)).toHaveLength(Object.keys(ruleMap).length);
   });
 
   it('should expose legacy configs with parser options and mapped rules', () => {
     expect(legacyRecommendedConfig.parser).toBe(TYPESCRIPT_ESLINT_PARSER);
-    expect(legacyRecommendedConfig.plugins).toEqual([PLUGIN_NAMESPACE]);
-    expect(legacyRecommendedConfig.rules?.[RULE_SORT_IMPORTS]).toBe('warn');
-    expect(legacyStrictConfig.rules?.[RULE_SORT_IMPORTS]).toBe('error');
+    expect(legacyRecommendedConfig.plugins).toEqual([LEGACY_PLUGIN_NAMESPACE]);
+    expect(legacyRecommendedConfig.rules?.[LEGACY_RULE_SORT_IMPORTS]).toBe('warn');
+    expect(legacyStrictConfig.rules?.[LEGACY_RULE_SORT_IMPORTS]).toBe('error');
+    expect(legacyRecommendedConfig.rules?.[LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe(
+      'off',
+    );
+    expect(legacyStrictConfig.rules?.[LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
   });
 
   it('should export plugin metadata, rules, and all config presets from index', () => {
@@ -193,7 +214,21 @@ describe('plugin wiring', () => {
     expect(eslintPlugin.rules?.[RULE_KEY_PREFER_STRUCTURED_CLONE]).toBeDefined();
     expect(eslintPlugin.configs.recommended.name).toBe(CONFIG_NAME_RECOMMENDED);
     expect(eslintPlugin.configs.strict.name).toBe(CONFIG_NAME_STRICT);
+    expect(eslintPlugin.configs.recommended.rules?.[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe(
+      'off',
+    );
+    expect(eslintPlugin.configs.strict.rules?.[RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS]).toBe('off');
     expect(eslintPlugin.configs[CONFIG_KEY_LEGACY_RECOMMENDED]).toBe(legacyRecommendedConfig);
     expect(eslintPlugin.configs[CONFIG_KEY_LEGACY_STRICT]).toBe(legacyStrictConfig);
+    expect(
+      eslintPlugin.configs[CONFIG_KEY_LEGACY_RECOMMENDED].rules?.[
+        LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS
+      ],
+    ).toBe('off');
+    expect(
+      eslintPlugin.configs[CONFIG_KEY_LEGACY_STRICT].rules?.[
+        LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS
+      ],
+    ).toBe('off');
   });
 });
