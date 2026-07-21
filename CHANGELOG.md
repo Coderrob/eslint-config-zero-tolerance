@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **Transitive dependency security**: Updated pnpm overrides and the plugin npm lockfile to patched Babel, brace-expansion, and js-yaml releases.
+- **README synchronization**: Format generated README content with the repository Prettier configuration so `readme:sync`, `format`, and `validate:readme` produce the same deterministic result.
+
 ## [1.2.5] - 2026-05-15
 
 ### Added

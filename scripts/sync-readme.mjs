@@ -30,6 +30,7 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { format, resolveConfig } from 'prettier';
 import ts from 'typescript';
 import { fileURLToPath } from 'node:url';
 
@@ -522,9 +523,20 @@ function applyRuleCountReplacements(readmeContent, ruleCount) {
 }
 
 /**
+ * Formats generated README content using the repository Prettier configuration.
+ *
+ * @param {string} readmeContent - Generated README content.
+ * @returns {Promise<string>} Canonically formatted README content.
+ */
+async function formatReadme(readmeContent) {
+  const prettierConfig = (await resolveConfig(README_PATH)) ?? {};
+  return format(readmeContent, { ...prettierConfig, filepath: README_PATH });
+}
+
+/**
  * Main entrypoint for README synchronization.
  */
-function main() {
+async function main() {
   console.log(
     bold(`${CHECK_MODE ? 'Checking' : 'Synchronizing'} README.md from deterministic metadata...`),
   );
@@ -537,10 +549,11 @@ function main() {
 
   const { section, ruleCount } = buildRulesSection(catalog, ruleMetadata, presets);
   const currentReadme = readFileSync(README_PATH, 'utf8');
-  const syncedReadme = applyRuleCountReplacements(
+  const generatedReadme = applyRuleCountReplacements(
     applyGeneratedRulesSection(currentReadme, section),
     ruleCount,
   );
+  const syncedReadme = await formatReadme(generatedReadme);
 
   if (syncedReadme === currentReadme) {
     console.log(
@@ -561,4 +574,4 @@ function main() {
   );
 }
 
-main();
+await main();
