@@ -35,7 +35,13 @@ const BDD_EXTENSION = '.bdd.json';
 const TEST_SUFFIX = '.test.ts';
 const TS_EXTENSION = '.ts';
 
-/** Recursively returns files whose names satisfy a predicate. */
+/**
+ * Recursively returns files whose names satisfy a predicate.
+ *
+ * @param directory - Directory to traverse.
+ * @param predicate - Filename predicate selecting returned files.
+ * @returns Absolute paths of matching files beneath the directory.
+ */
 export function walkDirectory(directory, predicate) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = join(directory, entry.name);
@@ -44,12 +50,20 @@ export function walkDirectory(directory, predicate) {
   });
 }
 
-/** Returns all BDD documents under the plugin source tree. */
+/**
+ * Returns all BDD documents under the plugin source tree.
+ *
+ * @returns Absolute paths of discovered BDD documents.
+ */
 export function collectBddFiles() {
   return walkDirectory(PLUGIN_SRC, (name) => name.endsWith(BDD_EXTENSION));
 }
 
-/** Returns all implementation TypeScript files that require BDD documents. */
+/**
+ * Returns all implementation TypeScript files that require BDD documents.
+ *
+ * @returns Absolute paths of non-test TypeScript source files.
+ */
 export function collectSourceFiles() {
   return walkDirectory(
     PLUGIN_SRC,
@@ -57,69 +71,79 @@ export function collectSourceFiles() {
   );
 }
 
-/** Adds every identifier declared by a binding name to the target set. */
-function addBindingNames(bindingName, names) {
-  if (ts.isIdentifier(bindingName)) {
-    names.add(bindingName.text);
-    return;
-  }
-  for (const element of bindingName.elements) {
-    if (ts.isBindingElement(element)) addBindingNames(element.name, names);
-  }
+/**
+ * Returns every identifier declared by a binding name.
+ *
+ * @param bindingName - TypeScript identifier or destructuring binding pattern.
+ * @returns Identifier names declared by the binding.
+ */
+function getBindingNames(bindingName) {
+  if (ts.isIdentifier(bindingName)) return [bindingName.text];
+  return bindingName.elements.flatMap((element) =>
+    ts.isBindingElement(element) ? getBindingNames(element.name) : [],
+  );
 }
 
-/** Returns whether a node has a particular modifier. */
+/**
+ * Returns whether a node has a particular modifier.
+ *
+ * @param node - TypeScript syntax node to inspect.
+ * @param modifierKind - Modifier syntax kind to locate.
+ * @returns Whether the node declares the requested modifier.
+ */
 function hasModifier(node, modifierKind) {
   return node.modifiers?.some((modifier) => modifier.kind === modifierKind) ?? false;
 }
 
-/** Adds names declared by an export clause to the target set. */
-function addExportClauseNames(exportClause, names) {
-  if (!ts.isNamedExports(exportClause)) {
-    names.add(exportClause.name.text);
-    return;
-  }
-  for (const element of exportClause.elements) names.add(element.name.text);
+/**
+ * Returns names declared by an export declaration.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns Names exported by an export declaration, or an empty array.
+ */
+function getExportDeclarationNames(statement) {
+  if (!ts.isExportDeclaration(statement)) return [];
+  const exportClause = statement.exportClause;
+  if (exportClause === undefined) return [];
+  if (!ts.isNamedExports(exportClause)) return [exportClause.name.text];
+  return exportClause.elements.map((element) => element.name.text);
 }
 
-/** Adds names declared by an export declaration to the target set. */
-function addExportDeclarationNames(statement, names) {
-  if (!ts.isExportDeclaration(statement)) return;
-  if (statement.exportClause === undefined) return;
-  addExportClauseNames(statement.exportClause, names);
+/**
+ * Returns the identifier declared by a named statement.
+ *
+ * @param statement - TypeScript statement that may declare a name.
+ * @returns The declared identifier name, or an empty array.
+ */
+function getDeclarationName(statement) {
+  if (!('name' in statement)) return [];
+  if (statement.name === undefined) return [];
+  if (!ts.isIdentifier(statement.name)) return [];
+  return [statement.name.text];
 }
 
-/** Returns whether a statement is a named exported declaration. */
-function isNamedExport(statement) {
-  if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return false;
-  return !hasModifier(statement, ts.SyntaxKind.DefaultKeyword);
+/**
+ * Returns names declared directly by an exported statement.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns Names declared by a non-default exported statement.
+ */
+function getDirectExportNames(statement) {
+  if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return [];
+  if (hasModifier(statement, ts.SyntaxKind.DefaultKeyword)) return [];
+  if (!ts.isVariableStatement(statement)) return getDeclarationName(statement);
+  return statement.declarationList.declarations.flatMap((declaration) =>
+    getBindingNames(declaration.name),
+  );
 }
 
-/** Adds binding names from an exported variable statement. */
-function addVariableStatementNames(statement, names) {
-  if (!ts.isVariableStatement(statement)) return false;
-  for (const declaration of statement.declarationList.declarations) {
-    addBindingNames(declaration.name, names);
-  }
-  return true;
-}
-
-/** Adds the identifier declared by an exported declaration. */
-function addDeclarationName(statement, names) {
-  if (!('name' in statement)) return;
-  if (statement.name === undefined) return;
-  if (!ts.isIdentifier(statement.name)) return;
-  names.add(statement.name.text);
-}
-
-/** Adds names declared directly by a named exported statement. */
-function addNamedStatementExports(statement, names) {
-  if (!isNamedExport(statement)) return;
-  if (addVariableStatementNames(statement, names)) return;
-  addDeclarationName(statement, names);
-}
-
-/** Extracts named exports from TypeScript syntax without depending on formatting. */
+/**
+ * Extracts named exports from TypeScript syntax without depending on formatting.
+ *
+ * @param sourceText - TypeScript source text to parse.
+ * @param fileName - Filename used for parser context and diagnostics.
+ * @returns Set of names exported by the source text.
+ */
 export function extractNamedExports(sourceText, fileName = 'source.ts') {
   const sourceFile = ts.createSourceFile(
     fileName,
@@ -131,24 +155,42 @@ export function extractNamedExports(sourceText, fileName = 'source.ts') {
   const exports = new Set();
 
   for (const statement of sourceFile.statements) {
-    addExportDeclarationNames(statement, exports);
-    addNamedStatementExports(statement, exports);
+    const statementExports = [
+      ...getExportDeclarationNames(statement),
+      ...getDirectExportNames(statement),
+    ];
+    for (const name of statementExports) exports.add(name);
   }
   return exports;
 }
 
-/** Creates the draft-2020-12 validator used for every BDD document. */
+/**
+ * Creates the draft-2020-12 validator used for every BDD document.
+ *
+ * @param schema - JSON Schema document to compile.
+ * @returns Compiled Ajv validation function.
+ */
 export function createSchemaValidator(schema) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema);
 }
 
-/** Formats an Ajv error as a compact repository-facing diagnostic. */
+/**
+ * Formats an Ajv error as a compact repository-facing diagnostic.
+ *
+ * @param error - Ajv validation error to format.
+ * @returns Path-qualified validation message.
+ */
 function formatSchemaError(error) {
   const location = error.instancePath || '/';
   return `${location} ${error.message ?? 'is invalid'}`;
 }
 
-/** Parses a JSON file, returning either its document or one parse diagnostic. */
+/**
+ * Parses a JSON file, returning either its document or one parse diagnostic.
+ *
+ * @param specPath - BDD document path to read.
+ * @returns Parsed specification and an empty error list, or one parse error.
+ */
 function readSpec(specPath) {
   try {
     return { spec: JSON.parse(readFileSync(specPath, 'utf8')), errors: [] };
@@ -157,7 +199,13 @@ function readSpec(specPath) {
   }
 }
 
-/** Runs schema validation on every BDD document. */
+/**
+ * Runs schema validation on every BDD document.
+ *
+ * @param bddFiles - BDD document paths to validate.
+ * @param validate - Compiled Ajv validation function.
+ * @returns File-qualified schema validation failures.
+ */
 export function checkSchemaCompliance(bddFiles, validate) {
   return bddFiles.flatMap((file) => {
     const parsed = readSpec(file);
@@ -167,17 +215,34 @@ export function checkSchemaCompliance(bddFiles, validate) {
   });
 }
 
-/** Finds BDD documents without the sibling source file implied by their name. */
+/**
+ * Finds BDD documents without the sibling source file implied by their name.
+ *
+ * @param bddFiles - BDD document paths to inspect.
+ * @param sourceFileSet - Known implementation source paths.
+ * @returns BDD documents whose source sibling is absent.
+ */
 export function checkOrphanedSpecs(bddFiles, sourceFileSet) {
   return bddFiles.filter((bddPath) => !sourceFileSet.has(bddPath.slice(0, -BDD_EXTENSION.length)));
 }
 
-/** Finds implementation files without sibling BDD documents. */
+/**
+ * Finds implementation files without sibling BDD documents.
+ *
+ * @param sourceFiles - Implementation source paths to inspect.
+ * @param bddFileSet - Known BDD document paths.
+ * @returns Source files whose BDD sibling is absent.
+ */
 export function checkMissingSpecs(sourceFiles, bddFileSet) {
   return sourceFiles.filter((sourcePath) => !bddFileSet.has(sourcePath + BDD_EXTENSION));
 }
 
-/** Verifies that sourceFile identifies the source sibling using a workspace path. */
+/**
+ * Verifies that sourceFile identifies the source sibling using a workspace path.
+ *
+ * @param bddFiles - BDD document paths to inspect.
+ * @returns Incorrect source-file reference diagnostics.
+ */
 export function checkSourceFileReferences(bddFiles) {
   return bddFiles.flatMap((file) => {
     const { spec } = readSpec(file);
@@ -188,7 +253,12 @@ export function checkSourceFileReferences(bddFiles) {
   });
 }
 
-/** Verifies exact parity between documented and actual named TypeScript exports. */
+/**
+ * Verifies exact parity between documented and actual named TypeScript exports.
+ *
+ * @param spec - Parsed BDD specification.
+ * @returns Documented export-name set, or undefined for an invalid shape.
+ */
 function getDocumentedExports(spec) {
   if (spec === undefined) return undefined;
   if (spec.module === undefined) return undefined;
@@ -196,7 +266,12 @@ function getDocumentedExports(spec) {
   return new Set(spec.module.exports);
 }
 
-/** Returns export-parity failures for one BDD document. */
+/**
+ * Returns export-parity failures for one BDD document.
+ *
+ * @param file - BDD document path to compare with its source sibling.
+ * @returns Export-parity failure for the document, or an empty array.
+ */
 function checkFileExportParity(file) {
   const sourcePath = file.slice(0, -BDD_EXTENSION.length);
   if (!existsSync(sourcePath)) return [];
@@ -209,16 +284,42 @@ function checkFileExportParity(file) {
   return [{ file, missingInSource, missingInSpec }];
 }
 
-/** Verifies exact parity between documented and actual named TypeScript exports. */
+/**
+ * Verifies exact parity between documented and actual named TypeScript exports.
+ *
+ * @param bddFiles - BDD document paths to compare.
+ * @returns Named-export parity failures across all documents.
+ */
 export function checkExportParity(bddFiles) {
   return bddFiles.flatMap(checkFileExportParity);
 }
 
 const NO_COLOR = process.env['NO_COLOR'] !== undefined;
+/**
+ * Applies an ANSI color code unless color output is disabled.
+ *
+ * @param code - ANSI color code.
+ * @param text - Text to decorate.
+ * @returns Decorated text, or the original text when `NO_COLOR` is set.
+ */
 const color = (code, text) => (NO_COLOR ? text : `\x1b[${code}m${text}\x1b[0m`);
+
+/**
+ * Returns a normalized repository-relative display path.
+ *
+ * @param file - Absolute filesystem path.
+ * @returns Forward-slash path relative to the repository root.
+ */
 const displayPath = (file) => relative(REPO_ROOT, file).replaceAll('\\', '/');
 
-/** Prints one grouped collection and returns whether it contained failures. */
+/**
+ * Prints one grouped collection and returns whether it contained failures.
+ *
+ * @param heading - Diagnostic group heading.
+ * @param failures - Failures belonging to the group.
+ * @param describe - Callback that prints one failure.
+ * @returns Whether the group contained at least one failure.
+ */
 function printGroup(heading, failures, describe) {
   if (failures.length === 0) return false;
   console.error(color(31, `\n${heading} (${failures.length}):`));
@@ -226,36 +327,51 @@ function printGroup(heading, failures, describe) {
   return true;
 }
 
-/** Prints one schema-validation failure. */
-function printSchemaFailure({ file, errors }) {
+/**
+ * Prints one schema-validation failure.
+ *
+ * @param failure - File path and schema-error collection to print.
+ */
+function printSchemaFailure(failure) {
+  const { file, errors } = failure;
   console.error(`  ${displayPath(file)}`);
   for (const error of errors) console.error(`    - ${error}`);
 }
 
-/** Prints one file path as a list item. */
+/**
+ * Prints one file path as a list item.
+ *
+ * @param file - Absolute path to print.
+ */
 function printFileFailure(file) {
   console.error(`  - ${displayPath(file)}`);
 }
 
-/** Prints one incorrect source-file reference. */
-function printSourceReference(failure) {
-  console.error(`  ${displayPath(failure.file)}: expected "${failure.expected}"`);
-}
-
-/** Prints one named-export parity failure. */
+/**
+ * Prints one named-export parity failure.
+ *
+ * @param failure - Export-parity diagnostic to print.
+ */
 function printExportFailure(failure) {
   console.error(`  ${displayPath(failure.file)}`);
   for (const name of failure.missingInSource) console.error(`    - source lacks "${name}"`);
   for (const name of failure.missingInSpec) console.error(`    - spec lacks "${name}"`);
 }
 
-/** Prints grouped validation failures and returns whether any exist. */
+/**
+ * Prints grouped validation failures and returns whether any exist.
+ *
+ * @param results - Aggregated BDD validation results.
+ * @returns Whether any validation group contains failures.
+ */
 function report(results) {
   const groupResults = [
     printGroup('Schema violations', results.schemaFailures, printSchemaFailure),
     printGroup('BDD files without source siblings', results.orphans, printFileFailure),
     printGroup('Source files without BDD siblings', results.missing, printFileFailure),
-    printGroup('Incorrect sourceFile references', results.sourceReferences, printSourceReference),
+    printGroup('Incorrect sourceFile references', results.sourceReferences, (failure) =>
+      console.error(`  ${displayPath(failure.file)}: expected "${failure.expected}"`),
+    ),
     printGroup('Named export mismatches', results.exportFailures, printExportFailure),
   ];
   const failed = groupResults.includes(true);

@@ -11,17 +11,14 @@
     "@types/node": "^25.8.0",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
-    "@typescript-eslint/utils": "^8.59.3",
     "ajv": "^8.20.0",
     "eslint": "^10.3.0",
     "eslint-doc-generator": "^3.7.0",
     "eslint-plugin-eslint-plugin": "^7.5.0",
-    "jest": "^29.7.0",
+    "knip": "^6.27.0",
     "madge": "^8.0.0",
     "prettier": "^3.8.3",
     "publint": "^0.3.21",
-    "ts-jest": "^29.4.9",
-    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "keywords": [
@@ -46,7 +43,7 @@
     "deps:graph": "madge --extensions ts packages/plugin/src/index.ts",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "pnpm build && eslint . && pnpm validate:bdd && pnpm validate:rules && pnpm validate:readme && pnpm validate:publint",
+    "lint": "pnpm build && eslint . && pnpm validate:dead-code && pnpm validate:bdd && pnpm validate:rules && pnpm validate:readme && pnpm validate:publint",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
     "pack:compat": "node scripts/pack-compatibility-packages.mjs",
     "readme:sync": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance build && eslint-doc-generator packages/plugin",
@@ -56,9 +53,10 @@
     "test": "pnpm -r --if-present test && node --test scripts/validation.test.mjs",
     "test:compat": "node scripts/test-package-compatibility.mjs",
     "validate:bdd": "node scripts/validate-bdd-specs.mjs",
+    "validate:dead-code": "knip",
     "validate:readme": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance build && eslint-doc-generator packages/plugin --check",
     "validate:rules": "node scripts/validate-rule-naming.mjs",
-    "validate:publint": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec publint && pnpm --filter @coderrob/eslint-config-zero-tolerance exec publint"
+    "validate:publint": "publint packages/plugin && publint packages/config"
   },
   "version": "1.0.0",
   "pnpm": {

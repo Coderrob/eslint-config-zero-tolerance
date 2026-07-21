@@ -36,7 +36,11 @@ const RULE_TEST_SUFFIX = '.test.ts';
 const RULE_BDD_SUFFIX = '.ts.bdd.json';
 const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
-/** Returns direct rule implementation files, excluding tests and support code. */
+/**
+ * Returns direct rule implementation files, excluding tests and support code.
+ *
+ * @returns Sorted absolute paths of rule implementation files.
+ */
 export function collectRuleSourceFiles() {
   return readdirSync(RULES_DIR)
     .filter((name) => name.endsWith('.ts') && !name.endsWith(RULE_TEST_SUFFIX))
@@ -44,17 +48,34 @@ export function collectRuleSourceFiles() {
     .sort();
 }
 
-/** Converts a kebab-case rule identifier to its required camelCase export. */
+/**
+ * Converts a kebab-case rule identifier to its required camelCase export.
+ *
+ * @param ruleName - Canonical kebab-case rule name.
+ * @returns Required camelCase export name.
+ */
 export function toCamelCase(ruleName) {
   return ruleName.replace(/-([a-z0-9])/gu, (_, character) => character.toUpperCase());
 }
 
-/** Returns whether a syntax node has a particular modifier. */
+/**
+ * Returns whether a syntax node has a particular modifier.
+ *
+ * @param node - TypeScript syntax node to inspect.
+ * @param kind - Modifier syntax kind to locate.
+ * @returns Whether the node declares the requested modifier.
+ */
 function hasModifier(node, kind) {
   return node.modifiers?.some((modifier) => modifier.kind === kind) ?? false;
 }
 
-/** Returns a statically declared string property from an object literal. */
+/**
+ * Returns a statically declared string property from an object literal.
+ *
+ * @param property - Object-literal property to inspect.
+ * @param propertyName - Identifier or string-literal property name to match.
+ * @returns Whether the property is an assignment with the requested name.
+ */
 function propertyHasName(property, propertyName) {
   if (!ts.isPropertyAssignment(property)) return false;
   if (ts.isIdentifier(property.name)) return property.name.text === propertyName;
@@ -62,16 +83,27 @@ function propertyHasName(property, propertyName) {
   return false;
 }
 
-/** Returns a statically declared string property from an object literal. */
+/**
+ * Returns a statically declared string property from an object literal.
+ *
+ * @param objectLiteral - TypeScript object literal to inspect.
+ * @param propertyName - Property name whose value should be read.
+ * @returns Static string value, or undefined when it cannot be resolved.
+ */
 function getStringProperty(objectLiteral, propertyName) {
   const property = objectLiteral.properties.find((candidate) =>
     propertyHasName(candidate, propertyName),
   );
-  if (!property || !ts.isPropertyAssignment(property)) return undefined;
+  if (property === undefined) return undefined;
   return ts.isStringLiteralLike(property.initializer) ? property.initializer.text : undefined;
 }
 
-/** Returns a call expression initialized by an identifier, when present. */
+/**
+ * Returns a call expression initialized by an identifier, when present.
+ *
+ * @param declaration - Variable declaration to inspect.
+ * @returns Identifier-based call expression, or undefined for another initializer shape.
+ */
 function getIdentifierCall(declaration) {
   if (declaration.initializer === undefined) return undefined;
   if (!ts.isCallExpression(declaration.initializer)) return undefined;
@@ -79,7 +111,12 @@ function getIdentifierCall(declaration) {
   return declaration.initializer;
 }
 
-/** Returns the configured rule name from a createRule call. */
+/**
+ * Returns the configured rule name from a createRule call.
+ *
+ * @param callExpression - `createRule` call expression to inspect.
+ * @returns Static `name` option, or undefined when it cannot be resolved.
+ */
 function getConfiguredRuleName(callExpression) {
   const [options] = callExpression.arguments;
   if (options === undefined) return undefined;
@@ -87,7 +124,12 @@ function getConfiguredRuleName(callExpression) {
   return getStringProperty(options, 'name');
 }
 
-/** Inspects one variable declaration for an exported createRule call. */
+/**
+ * Inspects one variable declaration for an exported createRule call.
+ *
+ * @param declaration - Exported variable declaration candidate.
+ * @returns Rule export inspection, or undefined when the declaration is not `createRule`.
+ */
 function inspectCreateRuleDeclaration(declaration) {
   if (!ts.isIdentifier(declaration.name)) return undefined;
   const callExpression = getIdentifierCall(declaration);
@@ -99,19 +141,26 @@ function inspectCreateRuleDeclaration(declaration) {
   };
 }
 
-/** Returns whether a value is defined. */
-function isDefined(value) {
-  return value !== undefined;
-}
-
-/** Inspects an exported variable statement for a createRule declaration. */
+/**
+ * Inspects an exported variable statement for a createRule declaration.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns First exported `createRule` inspection, or undefined when absent.
+ */
 function inspectCreateRuleStatement(statement) {
   if (!ts.isVariableStatement(statement)) return undefined;
   if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return undefined;
-  return statement.declarationList.declarations.map(inspectCreateRuleDeclaration).find(isDefined);
+  return statement.declarationList.declarations
+    .map(inspectCreateRuleDeclaration)
+    .find((inspection) => inspection !== undefined);
 }
 
-/** Returns the identifier from a default export assignment. */
+/**
+ * Returns the identifier from a default export assignment.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns Default-exported identifier, or undefined for another statement shape.
+ */
 function inspectDefaultExport(statement) {
   if (!ts.isExportAssignment(statement)) return undefined;
   if (statement.isExportEquals) return undefined;
@@ -119,7 +168,12 @@ function inspectDefaultExport(statement) {
   return statement.expression.text;
 }
 
-/** Reads the naming-relevant declarations from a rule using TypeScript syntax. */
+/**
+ * Reads the naming-relevant declarations from a rule using TypeScript syntax.
+ *
+ * @param rulePath - Absolute path to a rule implementation.
+ * @returns Named export, configured rule name, and default export discovered in the source.
+ */
 export function inspectRuleSource(rulePath) {
   const sourceFile = ts.createSourceFile(
     rulePath,
@@ -141,7 +195,15 @@ export function inspectRuleSource(rulePath) {
   return { namedExport, configuredName, defaultExport };
 }
 
-/** Returns naming failures for one rule inspection. */
+/**
+ * Returns naming failures for one rule inspection.
+ *
+ * @param filename - Rule source filename used in diagnostics.
+ * @param ruleName - Canonical rule name derived from the filename.
+ * @param expectedExport - Required camelCase export name.
+ * @param inspection - Naming values extracted from the rule source.
+ * @returns Naming diagnostics for mismatched values.
+ */
 function collectNamingFailures(filename, ruleName, expectedExport, inspection) {
   const checks = [
     [
@@ -161,7 +223,13 @@ function collectNamingFailures(filename, ruleName, expectedExport, inspection) {
   return checks.flatMap(([valid, message]) => (valid ? [] : [message]));
 }
 
-/** Returns required sibling-file failures for one rule. */
+/**
+ * Returns required sibling-file failures for one rule.
+ *
+ * @param filename - Rule source filename used in diagnostics.
+ * @param ruleName - Canonical rule name used to derive sibling paths.
+ * @returns Diagnostics for missing tests, BDD metadata, or documentation.
+ */
 function collectSiblingFailures(filename, ruleName) {
   const requiredSiblings = [
     [join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`), `${ruleName}${RULE_TEST_SUFFIX}`],
@@ -173,7 +241,12 @@ function collectSiblingFailures(filename, ruleName) {
     .map(([, displayName]) => `${filename}: missing "${displayName}"`);
 }
 
-/** Validates repository-local naming and sibling-file requirements for a rule. */
+/**
+ * Validates repository-local naming and sibling-file requirements for a rule.
+ *
+ * @param rulePath - Absolute path to a rule implementation.
+ * @returns Canonical rule name and all layout diagnostics.
+ */
 export function validateRuleLayout(rulePath) {
   const filename = basename(rulePath);
   const ruleName = filename.slice(0, -'.ts'.length);
@@ -186,12 +259,25 @@ export function validateRuleLayout(rulePath) {
   return { ruleName, failures };
 }
 
-/** Removes a plugin namespace from a configured rule key. */
+/**
+ * Removes a plugin namespace from a configured rule key.
+ *
+ * @param ruleName - Qualified or unqualified configured rule key.
+ * @returns Rule name without its plugin namespace.
+ */
 function unprefixRuleName(ruleName) {
   return ruleName.slice(ruleName.lastIndexOf('/') + 1);
 }
 
-/** Finds names absent from an actual rule-name set. */
+/**
+ * Finds names absent from an actual rule-name set.
+ *
+ * @param expected - Names that must exist.
+ * @param actual - Set against which required names are checked.
+ * @param context - Registry or preset label used in diagnostics.
+ * @param qualifier - Diagnostic qualifier such as `missing` or `unexpected`.
+ * @returns Diagnostics for names absent from the actual set.
+ */
 function findMissingNames(expected, actual, context, qualifier) {
   const failures = [];
   for (const name of expected) {
@@ -200,7 +286,14 @@ function findMissingNames(expected, actual, context, qualifier) {
   return failures;
 }
 
-/** Finds differences between an expected and actual rule-name collection. */
+/**
+ * Finds differences between an expected and actual rule-name collection.
+ *
+ * @param expected - Required rule-name collection.
+ * @param actual - Observed rule-name collection.
+ * @param context - Registry or preset label used in diagnostics.
+ * @returns Missing and unexpected rule-name diagnostics.
+ */
 function compareNames(expected, actual, context) {
   return [
     ...findMissingNames(expected, new Set(actual), context, 'missing'),
@@ -208,13 +301,13 @@ function compareNames(expected, actual, context) {
   ];
 }
 
-/** Returns registered rule names from the built plugin. */
-function getRegisteredRuleNames(plugin) {
-  if (plugin.rules === undefined) return [];
-  return Object.keys(plugin.rules);
-}
-
-/** Returns normalized rule names from one built preset. */
+/**
+ * Returns normalized rule names from one built preset.
+ *
+ * @param plugin - Built plugin API object.
+ * @param presetName - Preset key to inspect.
+ * @returns Configured rule names without plugin namespaces.
+ */
 function getPresetRuleNames(plugin, presetName) {
   if (plugin.configs === undefined) return [];
   const preset = plugin.configs[presetName];
@@ -223,10 +316,16 @@ function getPresetRuleNames(plugin, presetName) {
   return Object.keys(preset.rules).map(unprefixRuleName);
 }
 
-/** Validates registry and preset coverage by inspecting the built package API. */
+/**
+ * Validates registry and preset coverage by inspecting the built package API.
+ *
+ * @param plugin - Built plugin API object.
+ * @param sourceRuleNames - Canonical names derived from rule source files.
+ * @returns Registry and preset coverage diagnostics.
+ */
 export function validateBuiltRegistration(plugin, sourceRuleNames) {
   const failures = [];
-  const registeredRules = getRegisteredRuleNames(plugin);
+  const registeredRules = Object.keys(plugin.rules ?? {});
   failures.push(...compareNames(sourceRuleNames, registeredRules, 'plugin rules registry'));
 
   for (const presetName of ['recommended', 'strict', 'legacy-recommended', 'legacy-strict']) {
@@ -236,7 +335,12 @@ export function validateBuiltRegistration(plugin, sourceRuleNames) {
   return failures;
 }
 
-/** Loads the already-built plugin used by repository lint and validation. */
+/**
+ * Loads the already-built plugin used by repository lint and validation.
+ *
+ * @returns Built plugin API object with a cache-busting module URL.
+ * @throws {Error} When the plugin build output is missing.
+ */
 async function loadBuiltPlugin() {
   if (!existsSync(BUILT_PLUGIN_PATH)) {
     throw new Error('Plugin build is missing; run "pnpm build" before validating rules.');

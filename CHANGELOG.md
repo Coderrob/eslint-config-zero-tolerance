@@ -28,7 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Coverage reporting**: Replaced the generated point-in-time README coverage percentage with a static badge for the enforced per-file 95% coverage contract.
 - **Documentation automation**: Replaced the bespoke README parser, formatter, and test suite with `eslint-doc-generator`, retaining only repository-specific category metadata and count synchronization.
 - **Repository validation**: Delegated BDD structure to Ajv and generic rule-authoring checks to `eslint-plugin-eslint-plugin`; the remaining validators now enforce only cross-file and repository-specific policy using the TypeScript compiler API and built plugin exports.
-- **Script quality checks**: Added ESLint coverage for maintained Node.js scripts using the same complexity and nesting limits as source files, and replaced manual compatibility-test option parsing with Node's built-in argument parser.
+- **Script quality checks**: Added ESLint coverage for maintained Node.js scripts using the same complexity, nesting, and functional JSDoc requirements as source files, and replaced manual compatibility-test option parsing with Node's built-in argument parser.
+- **Dead-code validation**: Added Knip to CI-facing repository validation, removed abandoned exports and redundant root tooling dependencies, and documented intentional rule-export and dynamic ATTW integration boundaries.
 - **Compatibility fixtures**: Replaced generated consumer source files with shared checked-in CommonJS, ESM, type-resolution, legacy, and flat-config fixtures.
 - **`no-re-export` listener wiring**: Removed one-use listener factories and bound the existing handlers directly without changing rule behavior.
 

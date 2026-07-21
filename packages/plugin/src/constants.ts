@@ -35,9 +35,6 @@ export enum Preset {
   Strict = 'strict',
 }
 
-/** Canonical ordered list of preset enum values. */
-export const PRESET_VALUES: readonly Preset[] = [Preset.Recommended, Preset.Strict];
-
 /** Parser package name required by legacy (ESLint <9) config consumers. */
 export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';
 

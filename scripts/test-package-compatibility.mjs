@@ -31,7 +31,14 @@ const CONSUMER_FIXTURES = {
   legacy: 'eslint-8-legacy',
 };
 
-/** Returns a required parsed command-line option. */
+/**
+ * Returns a required parsed command-line option.
+ *
+ * @param value - Parsed option value, or undefined when the option was omitted.
+ * @param optionName - User-facing option name for error reporting.
+ * @returns The required option value.
+ * @throws {Error} When the required option was omitted.
+ */
 function requireOption(value, optionName) {
   if (value === undefined) {
     throw new Error(`Missing required option ${optionName}`);
@@ -39,46 +46,59 @@ function requireOption(value, optionName) {
   return value;
 }
 
-/** Returns the child-process stream mode requested by the caller. */
-function getStdio(capture) {
-  if (capture) return 'pipe';
-  return 'inherit';
-}
-
-/** Returns whether a child-process status is accepted by the caller. */
-function isAllowedStatus(status, allowedStatuses) {
-  if (status === 0) return true;
-  return allowedStatuses.includes(status);
-}
-
-/** Returns captured process output without rendering absent values. */
+/**
+ * Returns captured process output without rendering absent values.
+ *
+ * @param output - Captured standard output or standard error value.
+ * @returns Captured output, or an empty string when no output was captured.
+ */
 function formatProcessOutput(output) {
   if (output === undefined) return '';
   if (output === null) return '';
   return output;
 }
 
-/** Throws when a child process failed to start or exited unexpectedly. */
+/**
+ * Throws when a child process failed to start or exited unexpectedly.
+ *
+ * @param result - Synchronous child-process result to validate.
+ * @param command - Executed command name or path.
+ * @param arguments_ - Arguments supplied to the command.
+ * @param allowedStatuses - Additional accepted nonzero exit statuses.
+ * @throws {Error} When the process could not start or returned an unexpected status.
+ */
 function assertCommandSucceeded(result, command, arguments_, allowedStatuses) {
   if (result.error !== undefined) throw result.error;
-  if (isAllowedStatus(result.status, allowedStatuses)) return;
+  if (result.status === 0) return;
+  if (allowedStatuses.includes(result.status)) return;
   throw new Error(
     `${command} ${arguments_.join(' ')} exited with ${String(result.status)}\n${formatProcessOutput(result.stdout)}\n${formatProcessOutput(result.stderr)}`,
   );
 }
 
-/** Runs a child process and throws when it does not exit successfully. */
+/**
+ * Runs a child process and throws when it does not exit successfully.
+ *
+ * @param command - Command name or executable path.
+ * @param arguments_ - Arguments supplied to the command.
+ * @param options - Working directory, capture mode, and accepted-status configuration.
+ * @returns The completed synchronous child-process result.
+ */
 function run(command, arguments_, options) {
   const result = spawnSync(command, arguments_, {
     cwd: options.cwd,
     encoding: 'utf8',
-    stdio: getStdio(options.capture),
+    stdio: options.capture ? 'pipe' : 'inherit',
   });
   assertCommandSucceeded(result, command, arguments_, options.allowedStatuses ?? []);
   return result;
 }
 
-/** Returns a platform-safe npm command and its leading arguments. */
+/**
+ * Returns a platform-safe npm command and its leading arguments.
+ *
+ * @returns Command executable and arguments required to invoke npm.
+ */
 function getNpmInvocation() {
   const npmCliPath = resolve(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
   if (existsSync(npmCliPath)) {
@@ -90,7 +110,14 @@ function getNpmInvocation() {
   };
 }
 
-/** Locates exactly one packed artifact for a package prefix. */
+/**
+ * Locates exactly one packed artifact for a package prefix.
+ *
+ * @param packageDirectory - Directory containing packed package artifacts.
+ * @param filePrefix - Expected tarball filename prefix.
+ * @returns Absolute path to the single matching tarball.
+ * @throws {Error} When the directory does not contain exactly one matching tarball.
+ */
 function findPackedPackage(packageDirectory, filePrefix) {
   const matches = readdirSync(packageDirectory)
     .filter((fileName) => fileName.startsWith(filePrefix) && fileName.endsWith('.tgz'))
@@ -101,7 +128,13 @@ function findPackedPackage(packageDirectory, filePrefix) {
   return matches[0];
 }
 
-/** Returns ESLint arguments for a checked-in consumer fixture. */
+/**
+ * Returns ESLint arguments for a checked-in consumer fixture.
+ *
+ * @param configStyle - Consumer configuration style to execute.
+ * @returns ESLint arguments required by the selected configuration style.
+ * @throws {Error} When the configuration style is unsupported.
+ */
 function getEslintConfigArguments(configStyle) {
   if (configStyle === 'legacy') {
     return ['--no-eslintrc', '--config', '.eslintrc.cjs'];

@@ -70,7 +70,7 @@ export function getMemberPath(node: Readonly<TSESTree.Expression>): string | nul
  * @param property - Property node to inspect.
  * @returns The property name when it is statically known.
  */
-export function getPropertyName(
+function getPropertyName(
   property: TSESTree.Expression | TSESTree.PrivateIdentifier,
 ): string | null {
   if (property.type === AST_NODE_TYPES.Identifier) {

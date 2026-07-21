@@ -168,7 +168,13 @@ const scriptConfig = {
     },
     sourceType: 'module',
   },
-  rules: CORE_QUALITY_RULES,
+  plugins: {
+    'zero-tolerance': zeroTolerancePlugin,
+  },
+  rules: {
+    ...CORE_QUALITY_RULES,
+    'zero-tolerance/require-jsdoc-functions': 'error',
+  },
 };
 
 /**

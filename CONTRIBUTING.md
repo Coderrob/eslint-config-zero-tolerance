@@ -69,6 +69,8 @@ Rule naming is validated automatically by `pnpm validate:rules`. It verifies the
 
 README synchronization is also automated with `eslint-doc-generator`. `pnpm readme:sync` regenerates the root `README.md` rule catalog from the built plugin and repository category metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
 
+Dead code and abandoned dependencies are checked with Knip. Run `pnpm validate:dead-code`; the command fails for unused files, exports, dependencies, or stale Knip configuration hints.
+
 ## Adding a New Rule
 
 Follow these steps in order. Each step has a concrete example using a hypothetical `no-foo` rule.
@@ -188,6 +190,7 @@ Add an entry under `## [Unreleased]` in `CHANGELOG.md`:
 
 ```bash
 pnpm validate:readme  # root README must match generated rule metadata
+pnpm validate:dead-code # Knip must find no unused files, exports, or dependencies
 pnpm validate:rules  # rule filenames, exports, docs, and registration must stay aligned
 pnpm test     # all tests must pass
 pnpm build    # TypeScript must compile cleanly

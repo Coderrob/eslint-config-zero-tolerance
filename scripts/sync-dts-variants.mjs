@@ -22,11 +22,6 @@ import { join } from 'node:path';
 const entryNames = process.argv.slice(2);
 const DEFAULT_ONLY_EXPORT_PATTERN = /export \{ (\w+) as default \};\s*$/u;
 
-/** Converts a default-only ESM declaration into the matching CommonJS export assignment. */
-function createCommonJsDeclaration(declaration) {
-  return declaration.replace(DEFAULT_ONLY_EXPORT_PATTERN, 'export = $1;\n');
-}
-
 if (entryNames.length === 0) {
   console.error('Usage: node scripts/sync-dts-variants.mjs <entry-name> [entry-name...]');
   process.exit(1);
@@ -43,5 +38,6 @@ for (const entryName of entryNames) {
   }
 
   copyFileSync(sourcePath, esmTypesPath);
-  writeFileSync(cjsTypesPath, createCommonJsDeclaration(readFileSync(sourcePath, 'utf8')));
+  const declaration = readFileSync(sourcePath, 'utf8');
+  writeFileSync(cjsTypesPath, declaration.replace(DEFAULT_ONLY_EXPORT_PATTERN, 'export = $1;\n'));
 }

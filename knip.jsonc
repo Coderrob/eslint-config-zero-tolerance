@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "treatConfigHintsAsErrors": true,
+  "workspaces": {
+    ".": {
+      "entry": [
+        ".eslint-doc-generatorrc.cjs",
+        "scripts/*.mjs",
+        "test/consumers/**/.eslintrc.cjs",
+        "test/consumers/**/*.{cjs,mjs,cts,mts,ts}",
+      ],
+      "project": [
+        "scripts/**/*.mjs",
+        "test/consumers/**/.eslintrc.cjs",
+        "test/consumers/**/*.{cjs,mjs,cts,mts,ts}",
+      ],
+      // The compatibility packer invokes ATTW dynamically against generated tarballs.
+      "ignoreDependencies": ["@arethetypeswrong/cli"],
+    },
+    "packages/plugin": {
+      // Repository convention requires every rule to expose matching named and default exports.
+      "ignoreIssues": {
+        "src/rules/*.ts": ["duplicates"],
+      },
+    },
+  },
+}

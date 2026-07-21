@@ -23,7 +23,11 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outputDirectory = resolve(repoRoot, process.argv[2] ?? 'compatibility-packages');
 const pnpmExecutable = process.env.npm_execpath;
 
-/** Returns a platform-safe pnpm command and its leading arguments. */
+/**
+ * Returns a platform-safe pnpm command and its leading arguments.
+ *
+ * @returns Command executable and arguments required to invoke pnpm.
+ */
 function getPnpmInvocation() {
   if (pnpmExecutable !== undefined) {
     return { arguments: [pnpmExecutable], command: process.execPath };
@@ -34,7 +38,12 @@ function getPnpmInvocation() {
   };
 }
 
-/** Packs a workspace package using pnpm so workspace peer ranges are publishable. */
+/**
+ * Packs a workspace package using pnpm so workspace peer ranges are publishable.
+ *
+ * @param relativePackageDirectory - Workspace directory relative to the repository root.
+ * @throws {Error} When pnpm cannot start or the package cannot be packed.
+ */
 function packWorkspace(relativePackageDirectory) {
   const pnpmInvocation = getPnpmInvocation();
   const result = spawnSync(
@@ -59,7 +68,11 @@ function packWorkspace(relativePackageDirectory) {
   }
 }
 
-/** Validates every packed artifact's ESM, CommonJS, and declaration resolution. */
+/**
+ * Validates every packed artifact's ESM, CommonJS, and declaration resolution.
+ *
+ * @throws {Error} When ATTW cannot start or reports an invalid package artifact.
+ */
 function validatePackedTypes() {
   const pnpmInvocation = getPnpmInvocation();
   const tarballs = readdirSync(outputDirectory)
