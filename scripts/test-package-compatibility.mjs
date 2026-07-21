@@ -15,44 +15,66 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
-const PLUGIN_PACKAGE = '@coderrob/eslint-plugin-zero-tolerance';
-const CONFIG_PACKAGE = '@coderrob/eslint-config-zero-tolerance';
 const PARSER_VERSION = '8.59.3';
 const TYPESCRIPT_VERSION = '5.9.3';
 const EXPECTED_RULE_ID = 'zero-tolerance/no-date-now';
 const LEGACY_EXPECTED_RULE_ID = '@coderrob/zero-tolerance/no-date-now';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const CONSUMER_FIXTURES = {
+  flat: 'eslint-flat',
+  legacy: 'eslint-8-legacy',
+};
 
-/** Returns the value following a required command-line option. */
-function readOption(optionName) {
-  const optionIndex = process.argv.indexOf(optionName);
-  const value = process.argv[optionIndex + 1];
-  if (optionIndex === -1 || value === undefined || value.startsWith('--')) {
+/** Returns a required parsed command-line option. */
+function requireOption(value, optionName) {
+  if (value === undefined) {
     throw new Error(`Missing required option ${optionName}`);
   }
   return value;
 }
 
+/** Returns the child-process stream mode requested by the caller. */
+function getStdio(capture) {
+  if (capture) return 'pipe';
+  return 'inherit';
+}
+
+/** Returns whether a child-process status is accepted by the caller. */
+function isAllowedStatus(status, allowedStatuses) {
+  if (status === 0) return true;
+  return allowedStatuses.includes(status);
+}
+
+/** Returns captured process output without rendering absent values. */
+function formatProcessOutput(output) {
+  if (output === undefined) return '';
+  if (output === null) return '';
+  return output;
+}
+
+/** Throws when a child process failed to start or exited unexpectedly. */
+function assertCommandSucceeded(result, command, arguments_, allowedStatuses) {
+  if (result.error !== undefined) throw result.error;
+  if (isAllowedStatus(result.status, allowedStatuses)) return;
+  throw new Error(
+    `${command} ${arguments_.join(' ')} exited with ${String(result.status)}\n${formatProcessOutput(result.stdout)}\n${formatProcessOutput(result.stderr)}`,
+  );
+}
+
 /** Runs a child process and throws when it does not exit successfully. */
-function run(command, arguments_, options = {}) {
+function run(command, arguments_, options) {
   const result = spawnSync(command, arguments_, {
     cwd: options.cwd,
     encoding: 'utf8',
-    stdio: options.capture ? 'pipe' : 'inherit',
+    stdio: getStdio(options.capture),
   });
-  if (result.error !== undefined) {
-    throw result.error;
-  }
-  if (!options.allowedStatuses?.includes(result.status) && result.status !== 0) {
-    throw new Error(
-      `${command} ${arguments_.join(' ')} exited with ${String(result.status)}\n${result.stdout ?? ''}\n${result.stderr ?? ''}`,
-    );
-  }
+  assertCommandSucceeded(result, command, arguments_, options.allowedStatuses ?? []);
   return result;
 }
 
@@ -79,95 +101,41 @@ function findPackedPackage(packageDirectory, filePrefix) {
   return matches[0];
 }
 
-/** Writes the CommonJS and ESM package export smoke tests. */
-function writeModuleSmokeTests(consumerDirectory) {
-  writeFileSync(
-    join(consumerDirectory, 'verify-cjs.cjs'),
-    `const assert = require('node:assert/strict');
-const plugin = require('${PLUGIN_PACKAGE}');
-const configs = require('${CONFIG_PACKAGE}');
-const recommended = require('${CONFIG_PACKAGE}/recommended');
-const strict = require('${CONFIG_PACKAGE}/strict');
-assert.equal(plugin.meta.name, '${PLUGIN_PACKAGE}');
-assert.ok(plugin.rules['no-date-now']);
-assert.ok(configs.recommended.rules['${EXPECTED_RULE_ID}']);
-assert.ok(configs.strict.rules['${EXPECTED_RULE_ID}']);
-assert.ok(configs.legacyRecommended.rules);
-assert.ok(configs.legacyStrict.rules);
-assert.ok((recommended.default ?? recommended).rules['${EXPECTED_RULE_ID}']);
-assert.ok((strict.default ?? strict).rules['${EXPECTED_RULE_ID}']);
-`,
-  );
-  writeFileSync(
-    join(consumerDirectory, 'verify-esm.mjs'),
-    `import assert from 'node:assert/strict';
-import plugin from '${PLUGIN_PACKAGE}';
-import configs, {
-  legacyRecommended,
-  legacyStrict,
-  recommended as namedRecommended,
-  strict as namedStrict,
-} from '${CONFIG_PACKAGE}';
-import recommended from '${CONFIG_PACKAGE}/recommended';
-import strict from '${CONFIG_PACKAGE}/strict';
-assert.equal(plugin.meta.name, '${PLUGIN_PACKAGE}');
-assert.ok(plugin.rules['no-date-now']);
-assert.equal(configs.recommended, namedRecommended);
-assert.equal(configs.strict, namedStrict);
-assert.equal(configs.legacyRecommended, legacyRecommended);
-assert.equal(configs.legacyStrict, legacyStrict);
-assert.ok(recommended.rules['${EXPECTED_RULE_ID}']);
-assert.ok(strict.rules['${EXPECTED_RULE_ID}']);
-`,
-  );
-}
-
-/** Writes the requested legacy or flat ESLint consumer configuration. */
-function writeEslintConfig(consumerDirectory, configStyle) {
+/** Returns ESLint arguments for a checked-in consumer fixture. */
+function getEslintConfigArguments(configStyle) {
   if (configStyle === 'legacy') {
-    writeFileSync(
-      join(consumerDirectory, '.eslintrc.cjs'),
-      `module.exports = {
-  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@coderrob/zero-tolerance'],
-  rules: { '${LEGACY_EXPECTED_RULE_ID}': 'error' },
-};
-`,
-    );
     return ['--no-eslintrc', '--config', '.eslintrc.cjs'];
   }
   if (configStyle === 'flat') {
-    writeFileSync(
-      join(consumerDirectory, 'eslint.config.mjs'),
-      `import parser from '@typescript-eslint/parser';
-import plugin from '${PLUGIN_PACKAGE}';
-export default [{
-  files: ['**/*.ts'],
-  languageOptions: { parser },
-  plugins: { 'zero-tolerance': plugin },
-  rules: { '${EXPECTED_RULE_ID}': 'error' },
-}];
-`,
-    );
     return [];
   }
   throw new Error(`Unsupported config style: ${configStyle}`);
 }
 
-const packageDirectory = resolve(repoRoot, readOption('--package-dir'));
-const eslintVersion = readOption('--eslint-version');
-const configStyle = readOption('--config-style');
+const { values: options } = parseArgs({
+  options: {
+    'config-style': { type: 'string' },
+    'eslint-version': { type: 'string' },
+    'package-dir': { type: 'string' },
+  },
+  strict: true,
+});
+const packageDirectory = resolve(repoRoot, requireOption(options['package-dir'], '--package-dir'));
+const eslintVersion = requireOption(options['eslint-version'], '--eslint-version');
+const configStyle = requireOption(options['config-style'], '--config-style');
 const expectedLintRuleId = configStyle === 'legacy' ? LEGACY_EXPECTED_RULE_ID : EXPECTED_RULE_ID;
 const pluginTarball = findPackedPackage(packageDirectory, 'coderrob-eslint-plugin-zero-tolerance-');
 const configTarball = findPackedPackage(packageDirectory, 'coderrob-eslint-config-zero-tolerance-');
 const consumerDirectory = mkdtempSync(join(tmpdir(), 'zero-tolerance-consumer-'));
 const npmInvocation = getNpmInvocation();
+const fixtureName = CONSUMER_FIXTURES[configStyle];
 
-writeFileSync(
-  join(consumerDirectory, 'package.json'),
-  `${JSON.stringify({ name: 'zero-tolerance-compatibility-consumer', private: true }, null, 2)}\n`,
-);
+if (fixtureName === undefined) {
+  throw new Error(`Unsupported config style: ${configStyle}`);
+}
+
+cpSync(resolve(repoRoot, 'test', 'consumers', 'common'), consumerDirectory, { recursive: true });
+cpSync(resolve(repoRoot, 'test', 'consumers', fixtureName), consumerDirectory, { recursive: true });
 run(
   npmInvocation.command,
   [
@@ -186,12 +154,27 @@ run(
   { cwd: consumerDirectory },
 );
 
-writeModuleSmokeTests(consumerDirectory);
 run(process.execPath, ['verify-cjs.cjs'], { cwd: consumerDirectory });
 run(process.execPath, ['verify-esm.mjs'], { cwd: consumerDirectory });
+run(
+  process.execPath,
+  [
+    join(consumerDirectory, 'node_modules', 'typescript', 'bin', 'tsc'),
+    '--module',
+    'Node16',
+    '--moduleResolution',
+    'Node16',
+    '--noEmit',
+    '--strict',
+    '--target',
+    'ES2022',
+    'verify-types.cts',
+    'verify-types.mts',
+  ],
+  { cwd: consumerDirectory },
+);
 
-writeFileSync(join(consumerDirectory, 'fixture.ts'), 'const timestamp = Date.now();\n');
-const configArguments = writeEslintConfig(consumerDirectory, configStyle);
+const configArguments = getEslintConfigArguments(configStyle);
 const eslintResult = run(
   process.execPath,
   [

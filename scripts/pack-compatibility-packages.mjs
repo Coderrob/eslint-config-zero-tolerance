@@ -15,7 +15,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, rmSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -59,7 +59,41 @@ function packWorkspace(relativePackageDirectory) {
   }
 }
 
+/** Validates every packed artifact's ESM, CommonJS, and declaration resolution. */
+function validatePackedTypes() {
+  const pnpmInvocation = getPnpmInvocation();
+  const tarballs = readdirSync(outputDirectory)
+    .filter((fileName) => fileName.endsWith('.tgz'))
+    .toSorted();
+
+  for (const tarball of tarballs) {
+    const result = spawnSync(
+      pnpmInvocation.command,
+      [
+        ...pnpmInvocation.arguments,
+        'exec',
+        'attw',
+        resolve(outputDirectory, tarball),
+        '--profile',
+        'node16',
+        // The package requires Node 18+; Node 10 reads the legacy `types` field instead of
+        // the conditional CommonJS declaration that is validated by the Node 16+ profile.
+        '--ignore-rules',
+        'false-export-default',
+      ],
+      { encoding: 'utf8', stdio: 'inherit' },
+    );
+    if (result.error !== undefined) {
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      throw new Error(`Type and export validation failed for ${tarball}`);
+    }
+  }
+}
+
 rmSync(outputDirectory, { force: true, recursive: true });
 mkdirSync(outputDirectory, { recursive: true });
 packWorkspace('packages/plugin');
 packWorkspace('packages/config');
+validatePackedTypes();

@@ -1,22 +1,101 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CoderRob/eslint-config-zero-tolerance/blob/main/bdd-spec.schema.json",
+  "title": "Zero Tolerance BDD specification",
+  "description": "Living Given/When/Then documentation for one TypeScript source module.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["$schema", "schemaVersion", "sourceFile", "module", "specifications"],
   "properties": {
     "$schema": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?:\\.\\./)+bdd-spec\\.schema\\.json$"
     },
     "schemaVersion": {
       "const": "1.0.0"
     },
     "sourceFile": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^packages/plugin/src/(?:[^/]+/)*[^/]+\\.ts$"
     },
     "module": {
-      "type": "object"
+      "$ref": "#/$defs/module"
     },
     "specifications": {
-      "type": "array"
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/feature"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "description", "exports"],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "exports": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$"
+          }
+        }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "scenarios"],
+      "properties": {
+        "feature": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/scenario"
+          }
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "given", "when", "then"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^should(?:\\s|$)"
+        },
+        "given": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "when": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "then": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
     }
   }
 }

@@ -200,7 +200,8 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
 5. Run `pnpm test` and confirm all tests pass.
 6. Run `pnpm build` to validate the TypeScript compilation.
-7. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+7. Add a Changeset for user-facing changes. On release, run `pnpm release:version`, review and commit the generated version changes,
+   then publish via `pnpm release:publish` after CI passes.
 
 ---
 

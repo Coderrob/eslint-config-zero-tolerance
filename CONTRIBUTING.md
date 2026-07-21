@@ -67,7 +67,7 @@ Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md
 
 Rule naming is validated automatically by `pnpm validate:rules`. It verifies the rule filename, exported camelCase constant, `createRule({ name: ... })` value, default export, sibling test/BDD/docs filenames, and plugin registration all stay aligned.
 
-README synchronization is also automated. `pnpm readme:sync` regenerates the root `README.md` rule catalog from deterministic metadata and rule source metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
+README synchronization is also automated with `eslint-doc-generator`. `pnpm readme:sync` regenerates the root `README.md` rule catalog from the built plugin and repository category metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
 
 ## Adding a New Rule
 

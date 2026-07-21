@@ -10,8 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- **Packed package compatibility tests**: Added isolated consumer tests for the latest ESLint 8, 9, and 10 releases using legacy or flat configuration as appropriate, Node.js 18/20/22/24 LTS support, CommonJS and ESM loading, and config-package subpath exports.
-- **README synchronization tests**: Added focused coverage for idempotency, generated-section formatting, marker validation, rule-count updates, stale checks, configuration fallback, and failure-safe writes.
+- **Packed package compatibility tests**: Added isolated consumer tests for the latest ESLint 8, 9, and 10 releases using legacy or flat configuration as appropriate, Node.js 18/20/22/24 LTS support, CommonJS and ESM loading, TypeScript declaration resolution, config-package subpath exports, and ATTW package analysis.
+- **Validator tests**: Added focused coverage for JSON Schema enforcement, TypeScript export discovery, formatting-independent rule inspection, and built preset registration.
 
 ### Fixed
 
@@ -19,11 +19,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Legacy scoped plugin presets**: Registered the scoped `@coderrob/zero-tolerance` shorthand and generated scoped legacy rule IDs so ESLint 8 can load the published legacy recommended and strict presets.
 - **Transitive dependency security**: Updated pnpm overrides and the workspace lockfile to patched Babel, brace-expansion, and js-yaml releases.
 - **Published plugin documentation**: Corrected the rule count, Node.js compatibility requirements, and preset exceptions in the plugin package README.
-- **README synchronization**: Limited Prettier formatting to the generated rules block so synchronization preserves handwritten content, and rejected missing, duplicated, or misordered generation markers.
+- **CommonJS declarations**: Generate `export =` declarations for default-only CommonJS entrypoints so supported Node module resolution modes consume the published plugin types correctly.
 
 ### Changed
 
 - **GitHub Actions supply-chain security**: Updated every workflow action to its latest stable release and pinned each reference to the release's immutable commit SHA.
+- **Release management**: Replaced the custom manifest rewriting, versioning, tagging, and publishing scripts with Changesets and pnpm's `workspace:^` publish transformation while preserving independent plugin and config package versions.
+- **Coverage reporting**: Replaced the generated point-in-time README coverage percentage with a static badge for the enforced per-file 95% coverage contract.
+- **Documentation automation**: Replaced the bespoke README parser, formatter, and test suite with `eslint-doc-generator`, retaining only repository-specific category metadata and count synchronization.
+- **Repository validation**: Delegated BDD structure to Ajv and generic rule-authoring checks to `eslint-plugin-eslint-plugin`; the remaining validators now enforce only cross-file and repository-specific policy using the TypeScript compiler API and built plugin exports.
+- **Script quality checks**: Added ESLint coverage for maintained Node.js scripts using the same complexity and nesting limits as source files, and replaced manual compatibility-test option parsing with Node's built-in argument parser.
+- **Compatibility fixtures**: Replaced generated consumer source files with shared checked-in CommonJS, ESM, type-resolution, legacy, and flat-config fixtures.
 - **`no-re-export` listener wiring**: Removed one-use listener factories and bound the existing handlers directly without changing rule behavior.
 
 ## [1.2.5] - 2026-05-15
