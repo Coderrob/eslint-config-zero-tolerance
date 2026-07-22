@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../img/zero-tolerance-icon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3750,16 +3750,18 @@
 <h2 id="legacy-config-presets-eslint-8">Legacy Config Presets (ESLint 8)<a class="headerlink" href="#legacy-config-presets-eslint-8" title="Permanent link">&para;</a></h2>
 <h3 id="legacy-recommended"><code>legacy-recommended</code><a class="headerlink" href="#legacy-recommended" title="Permanent link">&para;</a></h3>
 <div class="highlight"><span class="filename">.eslintrc.js</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="k">extends</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;plugin:zero-tolerance/legacy-recommended&#39;</span><span class="p">],</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="k">extends</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;plugin:@coderrob/zero-tolerance/legacy-recommended&#39;</span><span class="p">],</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">};</span>
 </code></pre></div>
 <h3 id="legacy-strict"><code>legacy-strict</code><a class="headerlink" href="#legacy-strict" title="Permanent link">&para;</a></h3>
 <div class="highlight"><span class="filename">.eslintrc.js</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="k">extends</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;plugin:zero-tolerance/legacy-strict&#39;</span><span class="p">],</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="k">extends</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;plugin:@coderrob/zero-tolerance/legacy-strict&#39;</span><span class="p">],</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">};</span>
 </code></pre></div>
+<p>ESLint 8 resolves the published scoped plugin with the <code>@coderrob/zero-tolerance</code> shorthand. Rules
+added manually to a legacy config must use <code>@coderrob/zero-tolerance/&lt;rule-name&gt;</code> identifiers.</p>
 <h2 id="rules-included-in-each-preset">Rules Included in Each Preset<a class="headerlink" href="#rules-included-in-each-preset" title="Permanent link">&para;</a></h2>
-<p>Nearly all core rules are included in every preset. <code>require-bdd-spec</code>, <code>no-parent-internal-access</code>, <code>no-fetch-in-tests</code>, and <code>no-restricted-imports-in-tests</code> are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.</p>
+<p>Nearly all core rules are included in every preset. <code>require-bdd-spec</code>, <code>require-jsdoc-anonymous-functions</code>, <code>no-parent-internal-access</code>, <code>no-fetch-in-tests</code>, and <code>no-restricted-imports-in-tests</code> are available as opt-in rules and are disabled by default in the built-in presets. Other preset differences are the severity level and the tighter limits for configurable rules.</p>
 <table>
 <thead>
 <tr>
@@ -4072,7 +4074,7 @@
 <tr>
 <td><code>require-jsdoc-anonymous-functions</code></td>
 <td>off</td>
-<td>warn</td>
+<td>off</td>
 </tr>
 <tr>
 <td><code>require-jsdoc-functions</code></td>
@@ -4116,7 +4118,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>require-bdd-spec</code>, <code>no-parent-internal-access</code>, <code>no-fetch-in-tests</code>, and <code>no-restricted-imports-in-tests</code> are available but intentionally not enabled by default in presets.</p>
+<p><code>require-bdd-spec</code>, <code>require-jsdoc-anonymous-functions</code>, <code>no-parent-internal-access</code>, <code>no-fetch-in-tests</code>, and <code>no-restricted-imports-in-tests</code> are available but intentionally not enabled by default in presets.</p>
 <h2 id="disabling-individual-rules">Disabling Individual Rules<a class="headerlink" href="#disabling-individual-rules" title="Permanent link">&para;</a></h2>
 <p>Override any rule to <code>off</code> inside your config:</p>
 <div class="highlight"><span class="filename">eslint.config.js</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@coderrob/eslint-plugin-zero-tolerance&#39;</span><span class="p">;</span>
@@ -4261,7 +4263,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit", "content.tooltips"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
