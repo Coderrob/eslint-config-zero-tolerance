@@ -27,9 +27,7 @@ import { createFunctionNodeEnterExitListeners } from './support/function-listene
 import { createRule } from './support/rule-factory';
 
 type FunctionNode =
-  | TSESTree.ArrowFunctionExpression
-  | TSESTree.FunctionDeclaration
-  | TSESTree.FunctionExpression;
+  TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression;
 type RequireReadonlyPropsContext = Readonly<TSESLint.RuleContext<'requireReadonlyProps', []>>;
 
 interface IFunctionState {

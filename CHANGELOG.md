@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Consolidated BDD structure validation in the Ajv-backed `validate:bdd` command, while the opt-in ESLint rule now focuses on sibling, source-reference, and AST-based export-parity relationships.
+
 ### Added
 
 - **Packed package compatibility tests**: Added isolated consumer tests for the latest ESLint 8, 9, and 10 releases using legacy or flat configuration as appropriate, Node.js 18/20/22/24 LTS support, CommonJS and ESM loading, TypeScript declaration resolution, config-package subpath exports, and ATTW package analysis.
@@ -30,6 +32,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Repository validation**: Delegated BDD structure to Ajv and generic rule-authoring checks to `eslint-plugin-eslint-plugin`; the remaining validators now enforce only cross-file and repository-specific policy using the TypeScript compiler API and built plugin exports.
 - **Script quality checks**: Added ESLint coverage for maintained Node.js scripts using the same complexity, nesting, and functional JSDoc requirements as source files, and replaced manual compatibility-test option parsing with Node's built-in argument parser.
 - **Dead-code validation**: Added Knip to CI-facing repository validation, removed abandoned exports and redundant root tooling dependencies, and documented intentional rule-export and dynamic ATTW integration boundaries.
+- **Dependency refresh**: Updated ESLint, TypeScript ESLint, ts-jest, Prettier, and Node.js typings to current releases compatible with the declared Node, ESLint, and TypeScript support matrix.
+- **Dependency version management**: Centralized shared workspace toolchain versions in the pnpm catalog while preserving published peer ranges and explicitly versioned compatibility fixtures.
+- **Compatibility tooling**: Removed the custom package-packing wrapper in favor of direct `pnpm pack --json` and ATTW commands, and reduced the consumer runner with `tinyexec`, workspace-resolved parser and TypeScript versions, and guaranteed temporary-directory cleanup.
+- **`require-jsdoc-functions` parameter documentation**: Bare `@param` tags now fail validation unless they include a functional description, using `comment-parser` for maintainable structured JSDoc parsing.
 - **Compatibility fixtures**: Replaced generated consumer source files with shared checked-in CommonJS, ESM, type-resolution, legacy, and flat-config fixtures.
 - **`no-re-export` listener wiring**: Removed one-use listener factories and bound the existing handlers directly without changing rule behavior.
 

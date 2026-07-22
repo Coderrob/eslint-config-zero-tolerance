@@ -24,10 +24,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 const THIS_PARAMETER_NAME = 'this';
 
 type AnnotatableParameter =
-  | TSESTree.ArrayPattern
-  | TSESTree.Identifier
-  | TSESTree.ObjectPattern
-  | TSESTree.RestElement;
+  TSESTree.ArrayPattern | TSESTree.Identifier | TSESTree.ObjectPattern | TSESTree.RestElement;
 
 /**
  * Returns the type annotation from a directly annotatable parameter shape.

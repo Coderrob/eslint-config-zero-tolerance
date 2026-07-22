@@ -13,9 +13,9 @@ Enforce that every TypeScript source file has a valid sibling `.ts.bdd.json` BDD
 
 ## Rationale
 
-Every non-test TypeScript source file in the plugin must be accompanied by a sibling `.ts.bdd.json` file that documents its behaviour in BDD (Given/When/Then) format. This rule validates that the file exists and that its content is semantically valid: required fields are present, types are correct, the `specifications` array is non-empty, all scenario names start with `"should"`, and the `module.exports` list exactly matches the named exports in the source file.
+Every non-test TypeScript source file in the plugin must be accompanied by a sibling `.ts.bdd.json` file that documents its behaviour in BDD (Given/When/Then) format. The rule verifies the repository relationships available while ESLint is parsing the source: sibling presence, the exact `sourceFile` reference, and parity between `module.exports` and named exports discovered from the Program AST.
 
-Violations are reported as an aggregated list of errors so all problems are visible in a single ESLint run.
+BDD document structure is intentionally validated only once, by `pnpm validate:bdd`. That command compiles the canonical `bdd-spec.schema.json` with Ajv, so required fields, types, scenario collections, and scenario naming have one implementation and one source of truth.
 
 This rule is intentionally **opt-in** and is disabled by default in the built-in `recommended` and `strict` presets. Enable it explicitly for repositories that require BDD spec files.
 
@@ -71,16 +71,6 @@ BDD spec with a scenario name that does not start with `"should"`:
       "then": "..."
     }
   ]
-}
-```
-
-BDD spec whose `module.exports` does not match the source file's named exports:
-
-```json
-{
-  "module": {
-    "exports": ["myRule", "nonExistentExport"]
-  }
 }
 ```
 

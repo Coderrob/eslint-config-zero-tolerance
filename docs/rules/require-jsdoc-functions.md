@@ -13,7 +13,7 @@ Require JSDoc documentation comments on named function-like constructs outside o
 
 ## Rationale
 
-JSDoc comments are essential for self-documenting code and support IDE tooling, generated API documentation, and clear intent communication to future maintainers. This rule is automatically skipped in test files (`.test.*` / `.spec.*`).
+JSDoc comments are essential for self-documenting code and support IDE tooling, generated API documentation, and clear intent communication to future maintainers. Every `@param` tag must include both the parameter name and a non-empty functional description; a bare tag such as `@param tools` does not satisfy the rule. This rule is automatically skipped in test files (`.test.*` / `.spec.*`).
 
 Anonymous function-like constructs are enforced by the companion rule `require-jsdoc-anonymous-functions`.
 
@@ -24,6 +24,8 @@ Anonymous function-like constructs are enforced by the companion rule `require-j
 ```typescript
 /**
  * Fetches a user record by ID.
+ * @param id - User identifier to retrieve.
+ * @returns The matching user record.
  */
 async function fetchUser(id: string): Promise<IUser> {
   return db.users.findById(id);
@@ -31,11 +33,15 @@ async function fetchUser(id: string): Promise<IUser> {
 
 /**
  * Validates that the given email address is well-formed.
+ * @param email - Address to validate.
+ * @returns Whether the address is well-formed.
  */
 const isValidEmail = (email: string): boolean => /^[^@]+@[^@]+$/.test(email);
 
 /**
  * Returns a normalized display label.
+ * @param input - Display label to normalize.
+ * @returns The normalized label.
  */
 export const getLabel = (input: string): string => input.trim();
 

@@ -32,9 +32,7 @@ type DirectNamedExportDeclaration =
   | TSESTree.TSInterfaceDeclaration
   | TSESTree.TSTypeAliasDeclaration;
 type IndirectParentReExportNode =
-  | TSESTree.ExportDefaultDeclaration
-  | TSESTree.ExportNamedDeclaration
-  | TSESTree.TSExportAssignment;
+  TSESTree.ExportDefaultDeclaration | TSESTree.ExportNamedDeclaration | TSESTree.TSExportAssignment;
 type SourcedExportDeclaration = TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration;
 
 /**

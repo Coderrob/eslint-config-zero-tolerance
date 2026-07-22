@@ -7,19 +7,20 @@
     "@arethetypeswrong/cli": "^0.18.5",
     "@changesets/cli": "^2.31.1",
     "@eslint/js": "^10.0.1",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^25.8.0",
-    "@typescript-eslint/eslint-plugin": "^8.59.3",
-    "@typescript-eslint/parser": "^8.59.3",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
     "ajv": "^8.20.0",
-    "eslint": "^10.3.0",
+    "eslint": "catalog:",
     "eslint-doc-generator": "^3.7.0",
     "eslint-plugin-eslint-plugin": "^7.5.0",
     "knip": "^6.27.0",
     "madge": "^8.0.0",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.6",
     "publint": "^0.3.21",
-    "typescript": "^5.9.3"
+    "tinyexec": "catalog:",
+    "typescript": "catalog:"
   },
   "keywords": [
     "eslint",
@@ -45,7 +46,6 @@
     "format:check": "prettier . --check",
     "lint": "pnpm build && eslint . && pnpm validate:dead-code && pnpm validate:bdd && pnpm validate:rules && pnpm validate:readme && pnpm validate:publint",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
-    "pack:compat": "node scripts/pack-compatibility-packages.mjs",
     "readme:sync": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance build && eslint-doc-generator packages/plugin",
     "release:publish": "pnpm build && pnpm test && changeset publish",
     "release:status": "changeset status",
@@ -60,19 +60,23 @@
   },
   "version": "1.0.0",
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver"
+    ],
     "overrides": {
       "@babel/core@<=7.29.0": "7.29.7",
       "ajv@<6.14.0": "6.14.0",
       "anymatch>picomatch": "4.0.4",
       "brace-expansion@<1.1.16": "1.1.16",
       "brace-expansion@>=4.0.0 <5.0.7": "5.0.7",
+      "esbuild@>=0.27.3 <0.28.1": "0.28.1",
       "flatted@<3.4.2": "3.4.2",
       "handlebars@<4.7.9": "4.7.9",
       "js-yaml@<3.15.0": "3.15.0",
       "minimatch@<3.1.4": "3.1.4",
       "picomatch@<2.3.2": "2.3.2",
       "picomatch@>=4.0.0 <4.0.4": "4.0.4",
-      "postcss@<8.5.10": "8.5.12",
       "rollup@>=4.0.0 <4.59.0": "4.60.2"
     }
   }

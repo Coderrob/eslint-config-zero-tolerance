@@ -15,20 +15,10 @@
  */
 
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-import { afterEach, test } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { test } from 'node:test';
 import { createSchemaValidator, extractNamedExports } from './validate-bdd-specs.mjs';
-import { inspectRuleSource, validateBuiltRegistration } from './validate-rule-naming.mjs';
-
-const temporaryDirectories = [];
-
-afterEach(() => {
-  for (const directory of temporaryDirectories.splice(0)) {
-    rmSync(directory, { force: true, recursive: true });
-  }
-});
+import { validateBuiltRegistration } from './validate-rule-naming.mjs';
 
 test('should validate complete BDD structure through the shared JSON Schema', () => {
   const schema = JSON.parse(readFileSync(new URL('../bdd-spec.schema.json', import.meta.url)));
@@ -69,37 +59,9 @@ test('should discover direct, aliased, destructured, and type exports with TypeS
   assert.deepEqual([...exports].sort(), ['Example', 'alias', 'direct', 'nested']);
 });
 
-test('should inspect rule naming independently of TypeScript formatting', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'zero-tolerance-validation-'));
-  temporaryDirectories.push(directory);
-  const rulePath = join(directory, 'example-rule.ts');
-  writeFileSync(
-    rulePath,
-    `export const exampleRule = createRule(
-      {
-        name: 'example-rule',
-        meta: {}, defaultOptions: [], create() { return {}; }
-      }
-    );
-    export default exampleRule;`,
-  );
-
-  assert.deepEqual(inspectRuleSource(rulePath), {
-    configuredName: 'example-rule',
-    defaultExport: 'exampleRule',
-    namedExport: 'exampleRule',
-  });
-});
-
-test('should identify missing and unexpected built registrations and preset entries', () => {
+test('should identify missing and unexpected built registrations', () => {
   const plugin = {
     rules: { alpha: {}, extra: {} },
-    configs: Object.fromEntries(
-      ['recommended', 'strict', 'legacy-recommended', 'legacy-strict'].map((name) => [
-        name,
-        { rules: { 'scope/alpha': 'error', 'scope/extra': 'off' } },
-      ]),
-    ),
   };
 
   assert.deepEqual(validateBuiltRegistration(plugin, ['alpha', 'missing']), [

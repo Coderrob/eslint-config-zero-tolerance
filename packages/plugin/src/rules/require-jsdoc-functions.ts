@@ -16,6 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { parse, type Spec } from 'comment-parser';
 import { ANONYMOUS_FUNCTION_NAME } from '../constants';
 import { type FunctionNode, isIdentifierNode, isTestFile } from '../helpers/ast-guards';
 import {
@@ -54,9 +55,7 @@ const SUMMARY_DESCRIPTION_PLACEHOLDER = 'TODO: describe';
 const THROWS_DESCRIPTION_PLACEHOLDER = 'TODO: describe error condition';
 
 type NamedKeyParentNode =
-  | TSESTree.MethodDefinition
-  | TSESTree.PropertyDefinition
-  | TSESTree.Property;
+  TSESTree.MethodDefinition | TSESTree.PropertyDefinition | TSESTree.Property;
 
 /**
  * Appends one line to a line accumulator.
@@ -231,6 +230,17 @@ function createRequireJsdocFunctionsListeners(
 }
 
 /**
+ * Returns the number of `@param` tags that include parameter descriptions.
+ *
+ * @param comment - JSDoc block comment.
+ * @returns Number of documented parameter tags.
+ */
+function getDocumentedJsdocParamTagCount(comment: Readonly<TSESTree.Comment>): number {
+  const [block] = parse(`/*${comment.value}*/`);
+  return block.tags.filter(isDocumentedParamTag).length;
+}
+
+/**
  * Returns a function name inferred from common declaration and assignment patterns.
  *
  * @param node - Function node to name.
@@ -251,17 +261,6 @@ function getFunctionName(node: Readonly<FunctionNode>): string {
 }
 
 /**
- * Returns the number of `@param` tags present in a JSDoc comment.
- *
- * @param comment - JSDoc block comment.
- * @returns Number of parameter tags.
- */
-function getJsdocParamTagCount(comment: Readonly<TSESTree.Comment>): number {
-  const matches = comment.value.match(new RegExp(String.raw`@${JsdocTagName.Param}\b`, 'gu'));
-  return matches === null ? 0 : matches.length;
-}
-
-/**
  * Returns expected `@param` tag names that are missing from JSDoc.
  *
  * @param node - Function node to inspect.
@@ -272,7 +271,8 @@ function getMissingParamTagNames(
   node: Readonly<FunctionNode>,
   jsdocComment: TSESTree.Comment | null,
 ): ReadonlyArray<string> {
-  const existingParamTags = jsdocComment === null ? 0 : getJsdocParamTagCount(jsdocComment);
+  const existingParamTags =
+    jsdocComment === null ? 0 : getDocumentedJsdocParamTagCount(jsdocComment);
   if (existingParamTags >= node.params.length) {
     return [];
   }
@@ -434,6 +434,18 @@ function hasThrowStatement(
 }
 
 /**
+ * Returns whether a parsed tag provides functional parameter documentation.
+ *
+ * @param tag - Parsed JSDoc tag.
+ * @returns Whether the tag names and describes a parameter.
+ */
+function isDocumentedParamTag(tag: Readonly<Spec>): boolean {
+  if (tag.tag !== JsdocTagName.Param) return false;
+  if (tag.name.trim().length === 0) return false;
+  return tag.description.trim().length > 0;
+}
+
+/**
  * Returns true when node is an arrow function with an expression body.
  *
  * @param node - Function node to inspect.
@@ -588,7 +600,7 @@ function reportMissingJsdocParam(
   if (node.params.length === 0) {
     return;
   }
-  if (getJsdocParamTagCount(jsdocComment) >= node.params.length) {
+  if (getDocumentedJsdocParamTagCount(jsdocComment) >= node.params.length) {
     return;
   }
   context.report({
@@ -687,7 +699,7 @@ export const requireJsdocFunctions = createRule({
     messages: {
       missingJsdoc: 'Function "{{name}}" is missing a JSDoc comment',
       missingJsdocParam:
-        'Function "{{name}}" has parameters but its JSDoc is missing required @param tags',
+        'Function "{{name}}" has parameters but its JSDoc is missing required @param documentation',
       missingJsdocReturns:
         'Function "{{name}}" returns a value but its JSDoc is missing an @returns tag',
       missingJsdocThrows: 'Function "{{name}}" throws but its JSDoc is missing an @throws tag',

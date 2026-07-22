@@ -14,8 +14,6 @@
         "test/consumers/**/.eslintrc.cjs",
         "test/consumers/**/*.{cjs,mjs,cts,mts,ts}",
       ],
-      // The compatibility packer invokes ATTW dynamically against generated tarballs.
-      "ignoreDependencies": ["@arethetypeswrong/cli"],
     },
     "packages/plugin": {
       // Repository convention requires every rule to expose matching named and default exports.
