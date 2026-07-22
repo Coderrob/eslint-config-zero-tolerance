@@ -25,9 +25,7 @@ enum NoReturnTypeMessageId {
   UseExplicitReturnType = 'useExplicitReturnType',
 }
 type FunctionLikeNode =
-  | TSESTree.ArrowFunctionExpression
-  | TSESTree.FunctionDeclaration
-  | TSESTree.FunctionExpression;
+  TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression;
 type NoReturnTypeContext = Readonly<TSESLint.RuleContext<NoReturnTypeMessageId, []>>;
 
 /**

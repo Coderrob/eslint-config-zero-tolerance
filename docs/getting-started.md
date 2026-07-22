@@ -4,12 +4,12 @@ Get from zero to linting in under five minutes. This guide covers installation, 
 
 ## Requirements
 
-| Dependency                  | Version                                                   |
-| --------------------------- | --------------------------------------------------------- |
-| Node.js                     | 18+ (for ESLint 8.57+ or 9.x), 20+ (recommended for 10.x) |
-| TypeScript                  | 5.x                                                       |
-| ESLint                      | 8.57+ or 9.x (Node 18+), or 10.x (Node 20+ recommended)   |
-| `@typescript-eslint/parser` | 8.x                                                       |
+| Dependency                  | Version                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Node.js                     | LTS releases tested in CI: 18.20.8, 20.20.2, 22.23.1, and 24.18.0              |
+| TypeScript                  | 5.x                                                                            |
+| ESLint                      | 8.57.1, 9.39.5, and 10.7.0 tested; package ranges support 8.57+, 9.x, and 10.x |
+| `@typescript-eslint/parser` | 8.x                                                                            |
 
 ## Installation
 
@@ -112,12 +112,16 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
   },
-  plugins: ['zero-tolerance'],
-  extends: ['plugin:zero-tolerance/legacy-recommended'],
+  plugins: ['@coderrob/zero-tolerance'],
+  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
   // or for strict mode:
-  // extends: ['plugin:zero-tolerance/legacy-strict'],
+  // extends: ['plugin:@coderrob/zero-tolerance/legacy-strict'],
 };
 ```
+
+The `@coderrob/zero-tolerance` value is ESLint's legacy shorthand for the published scoped plugin
+package. Custom legacy rule entries therefore use `@coderrob/zero-tolerance/<rule-name>`; flat
+configs use `zero-tolerance/<rule-name>`.
 
 ## Typical TypeScript Project Setup
 

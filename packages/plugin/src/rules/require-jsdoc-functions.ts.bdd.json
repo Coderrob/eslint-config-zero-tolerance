@@ -59,6 +59,12 @@
           "then": "a requireJsdocFunctions violation is reported"
         },
         {
+          "name": "should report parameter tags without functional descriptions",
+          "given": "a function whose JSDoc contains bare @param names without descriptions",
+          "when": "the rule evaluates the function",
+          "then": "a requireJsdocFunctions violation is reported and autofix appends documented parameter tags"
+        },
+        {
           "name": "should report a function with a JSDoc comment missing @returns for a non-void return",
           "given": "a function that returns a value but has no @returns tag in its JSDoc",
           "when": "the rule evaluates the function",

@@ -170,7 +170,9 @@ function getEnumMemberCaseTexts(symbol: ts.Symbol | undefined): string[] | null 
   if (symbol?.exports === undefined || symbol.exports.size === 0) {
     return null;
   }
-  return Array.from(symbol.exports.values()).map(getEnumMemberCaseText.bind(undefined, symbol.name));
+  return Array.from(symbol.exports.values()).map(
+    getEnumMemberCaseText.bind(undefined, symbol.name),
+  );
 }
 
 /**

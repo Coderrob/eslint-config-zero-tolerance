@@ -85,8 +85,10 @@ function getDirectExportDeclaration(
 function getFirstCallExpressionArgument(
   expression: Readonly<TSESTree.CallExpression>,
 ): TSESTree.Expression | null {
-  const firstArgument = expression.arguments.at(0) ?? null;
-  return firstArgument === null ? null : unwrapCallExpressionArgument(firstArgument);
+  if (expression.arguments.length === 0) {
+    return null;
+  }
+  return unwrapCallExpressionArgument(expression.arguments[0]);
 }
 
 /**

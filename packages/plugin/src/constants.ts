@@ -20,6 +20,9 @@
  */
 export const PLUGIN_NAMESPACE = 'zero-tolerance';
 
+/** Scoped plugin shorthand required by legacy ESLint package-name resolution. */
+export const LEGACY_PLUGIN_NAMESPACE = '@coderrob/zero-tolerance';
+
 /** Fully-qualified flat config name for the recommended preset. */
 export const CONFIG_NAME_RECOMMENDED = `${PLUGIN_NAMESPACE}/recommended`;
 
@@ -31,9 +34,6 @@ export enum Preset {
   Recommended = 'recommended',
   Strict = 'strict',
 }
-
-/** Canonical ordered list of preset enum values. */
-export const PRESET_VALUES: readonly Preset[] = [Preset.Recommended, Preset.Strict];
 
 /** Parser package name required by legacy (ESLint <9) config consumers. */
 export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';

@@ -27,9 +27,7 @@ import { createFunctionNodeEnterExitListeners } from './support/function-listene
 import { createRule } from './support/rule-factory';
 
 type FunctionNode =
-  | TSESTree.ArrowFunctionExpression
-  | TSESTree.FunctionDeclaration
-  | TSESTree.FunctionExpression;
+  TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression;
 type RequireReadonlyPropsContext = Readonly<TSESLint.RuleContext<'requireReadonlyProps', []>>;
 
 interface IFunctionState {
@@ -211,8 +209,11 @@ function markJsxReturn(
   stateStack: readonly IFunctionState[],
   node: Readonly<TSESTree.ReturnStatement>,
 ): void {
-  const currentState = stateStack.at(-1);
-  if (currentState === undefined || node.argument === null) {
+  if (stateStack.length === 0) {
+    return;
+  }
+  const currentState = stateStack[stateStack.length - 1];
+  if (node.argument === null) {
     return;
   }
   if (isJsxExpression(node.argument)) {

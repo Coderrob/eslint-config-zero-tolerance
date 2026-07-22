@@ -22,6 +22,12 @@
           "given": "if (a) { doA(); } else { doB(); }",
           "when": "the rule evaluates the if statement",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow an if/else where the if branch is empty",
+          "given": "if (a) {} else { doB(); }",
+          "when": "the rule evaluates the if statement",
+          "then": "no violation is reported"
         }
       ]
     },

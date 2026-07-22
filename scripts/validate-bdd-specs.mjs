@@ -17,625 +17,393 @@
  */
 
 /**
- * Validates all BDD specification files (.ts.bdd.json) under packages/plugin/src/.
- *
- * Checks performed:
- *   1. Schema compliance — required fields, value types, and constraint validation.
- *   2. No abandoned specs — every .ts.bdd.json must reference an existing source file.
- *   3. No missing specs — every non-test .ts source file must have a sibling .ts.bdd.json.
- *   4. Export coverage — every name in module.exports must exist as a named export in the source.
- *
- * Exits with code 0 on success, 1 on any validation failure.
+ * Validates BDD documents structurally with JSON Schema and enforces the few
+ * relationships that JSON Schema cannot express across repository files.
  */
 
+import Ajv2020 from 'ajv/dist/2020.js';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import ts from 'typescript';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const REPO_ROOT = resolve(__dirname, '..');
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const REPO_ROOT = resolve(dirname(SCRIPT_PATH), '..');
 const PLUGIN_SRC = join(REPO_ROOT, 'packages', 'plugin', 'src');
 const BDD_SCHEMA_PATH = join(REPO_ROOT, 'bdd-spec.schema.json');
 const BDD_EXTENSION = '.bdd.json';
 const TEST_SUFFIX = '.test.ts';
 const TS_EXTENSION = '.ts';
-const BDD_SCHEMA = JSON.parse(readFileSync(BDD_SCHEMA_PATH, 'utf8'));
-
-// ─── File discovery ───────────────────────────────────────────────────────────
 
 /**
- * Recursively walks a directory and returns files matching the predicate.
+ * Recursively returns files whose names satisfy a predicate.
  *
- * @param {string} dir - Absolute directory path to walk.
- * @param {(name: string) => boolean} predicate - Returns true for files to include.
- * @returns {string[]} Absolute paths of matching files.
+ * @param directory - Directory to traverse.
+ * @param predicate - Filename predicate selecting returned files.
+ * @returns Absolute paths of matching files beneath the directory.
  */
-function walkDirectory(dir, predicate) {
-  const results = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...walkDirectory(fullPath, predicate));
-    } else if (predicate(entry.name)) {
-      results.push(fullPath);
-    }
-  }
-  return results;
+export function walkDirectory(directory, predicate) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = join(directory, entry.name);
+    if (entry.isDirectory()) return walkDirectory(entryPath, predicate);
+    return predicate(entry.name) ? [entryPath] : [];
+  });
 }
 
 /**
- * Collects all .ts.bdd.json files under the plugin source directory.
+ * Returns all BDD documents under the plugin source tree.
  *
- * @returns {string[]} Absolute paths of all BDD spec files.
+ * @returns Absolute paths of discovered BDD documents.
  */
-function collectBddFiles() {
+export function collectBddFiles() {
   return walkDirectory(PLUGIN_SRC, (name) => name.endsWith(BDD_EXTENSION));
 }
 
 /**
- * Collects all non-test TypeScript source files under the plugin source directory.
+ * Returns all implementation TypeScript files that require BDD documents.
  *
- * @returns {string[]} Absolute paths of all non-test .ts source files.
+ * @returns Absolute paths of non-test TypeScript source files.
  */
-function collectSourceFiles() {
+export function collectSourceFiles() {
   return walkDirectory(
     PLUGIN_SRC,
-    (name) =>
-      name.endsWith(TS_EXTENSION) && !name.endsWith(TEST_SUFFIX) && !name.endsWith(BDD_EXTENSION),
+    (name) => name.endsWith(TS_EXTENSION) && !name.endsWith(TEST_SUFFIX),
   );
 }
 
-// ─── Named export extraction ──────────────────────────────────────────────────
+/**
+ * Returns every identifier declared by a binding name.
+ *
+ * @param bindingName - TypeScript identifier or destructuring binding pattern.
+ * @returns Identifier names declared by the binding.
+ */
+function getBindingNames(bindingName) {
+  if (ts.isIdentifier(bindingName)) return [bindingName.text];
+  return bindingName.elements.flatMap((element) =>
+    ts.isBindingElement(element) ? getBindingNames(element.name) : [],
+  );
+}
 
 /**
- * Extracts all named (non-default) exports from TypeScript source content using
- * regex heuristics. Handles direct declarations and named export list statements.
+ * Returns whether a node has a particular modifier.
  *
- * @param {string} content - Source file text.
- * @returns {Set<string>} Set of exported identifiers.
+ * @param node - TypeScript syntax node to inspect.
+ * @param modifierKind - Modifier syntax kind to locate.
+ * @returns Whether the node declares the requested modifier.
  */
-function extractNamedExports(content) {
+function hasModifier(node, modifierKind) {
+  return node.modifiers?.some((modifier) => modifier.kind === modifierKind) ?? false;
+}
+
+/**
+ * Returns names declared by an export declaration.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns Names exported by an export declaration, or an empty array.
+ */
+function getExportDeclarationNames(statement) {
+  if (!ts.isExportDeclaration(statement)) return [];
+  const exportClause = statement.exportClause;
+  if (exportClause === undefined) return [];
+  if (!ts.isNamedExports(exportClause)) return [exportClause.name.text];
+  return exportClause.elements.map((element) => element.name.text);
+}
+
+/**
+ * Returns the identifier declared by a named statement.
+ *
+ * @param statement - TypeScript statement that may declare a name.
+ * @returns The declared identifier name, or an empty array.
+ */
+function getDeclarationName(statement) {
+  if (!('name' in statement)) return [];
+  if (statement.name === undefined) return [];
+  if (!ts.isIdentifier(statement.name)) return [];
+  return [statement.name.text];
+}
+
+/**
+ * Returns names declared directly by an exported statement.
+ *
+ * @param statement - TypeScript statement to inspect.
+ * @returns Names declared by a non-default exported statement.
+ */
+function getDirectExportNames(statement) {
+  if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return [];
+  if (hasModifier(statement, ts.SyntaxKind.DefaultKeyword)) return [];
+  if (!ts.isVariableStatement(statement)) return getDeclarationName(statement);
+  return statement.declarationList.declarations.flatMap((declaration) =>
+    getBindingNames(declaration.name),
+  );
+}
+
+/**
+ * Extracts named exports from TypeScript syntax without depending on formatting.
+ *
+ * @param sourceText - TypeScript source text to parse.
+ * @param fileName - Filename used for parser context and diagnostics.
+ * @returns Set of names exported by the source text.
+ */
+export function extractNamedExports(sourceText, fileName = 'source.ts') {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const exports = new Set();
 
-  // export const/let/var/function/function*/class/enum/abstract class/type/interface <name>
-  const declarationPattern =
-    /^export\s+(?:const|let|var|function\*?|class|enum|abstract\s+class|type|interface)\s+(\w+)/gm;
-  let match;
-  while ((match = declarationPattern.exec(content)) !== null) {
-    exports.add(match[1]);
+  for (const statement of sourceFile.statements) {
+    const statementExports = [
+      ...getExportDeclarationNames(statement),
+      ...getDirectExportNames(statement),
+    ];
+    for (const name of statementExports) exports.add(name);
   }
-
-  // export { foo, bar as baz } and export { foo, bar as baz } from './module'
-  const listPattern = /^export\s*\{([^}]+)\}(?:\s*from\s*['"][^'"]+['"])?/gm;
-  while ((match = listPattern.exec(content)) !== null) {
-    for (const segment of match[1].split(',')) {
-      const trimmed = segment.trim();
-      if (!trimmed) continue;
-      // 'local as exported' → take the exported (alias) name
-      const parts = trimmed.split(/\s+as\s+/);
-      const exportedName = (parts.at(-1) ?? '').trim();
-      if (/^\w+$/.test(exportedName)) {
-        exports.add(exportedName);
-      }
-    }
-  }
-
   return exports;
 }
 
 /**
- * Validates top-level fields using the shared JSON schema definition.
+ * Creates the draft-2020-12 validator used for every BDD document.
  *
- * @param {unknown} spec - Parsed JSON content of a .ts.bdd.json file.
- * @returns {string[]} Top-level schema validation errors.
+ * @param schema - JSON Schema document to compile.
+ * @returns Compiled Ajv validation function.
  */
-function validateTopLevelAgainstSchema(spec) {
-  const errors = [];
-
-  if (typeof spec !== 'object' || spec === null) {
-    return ['Root value must be a JSON object'];
-  }
-
-  const requiredFields = Array.isArray(BDD_SCHEMA['required']) ? BDD_SCHEMA['required'] : [];
-  const properties =
-    typeof BDD_SCHEMA['properties'] === 'object' && BDD_SCHEMA['properties'] !== null
-      ? BDD_SCHEMA['properties']
-      : {};
-
-  for (const field of requiredFields) {
-    if (!Object.hasOwn(spec, field)) {
-      errors.push(`  Missing required field: "${field}"`);
-    }
-  }
-
-  for (const [fieldName, schemaDefinition] of Object.entries(properties)) {
-    if (!Object.hasOwn(spec, fieldName)) {
-      continue;
-    }
-
-    const value = spec[fieldName];
-    errors.push(...validateSchemaProperty(fieldName, schemaDefinition, value));
-  }
-
-  return errors;
+export function createSchemaValidator(schema) {
+  return new Ajv2020({ allErrors: true, strict: true }).compile(schema);
 }
 
 /**
- * Validates one top-level property against its schema definition.
+ * Formats an Ajv error as a compact repository-facing diagnostic.
  *
- * @param {string} fieldName - Property name.
- * @param {Record<string, unknown>} schemaDefinition - JSON schema property definition.
- * @param {unknown} value - Property value.
- * @returns {string[]} Validation errors.
+ * @param error - Ajv validation error to format.
+ * @returns Path-qualified validation message.
  */
-function validateSchemaProperty(fieldName, schemaDefinition, value) {
-  const errors = [];
-
-  if (schemaDefinition['type'] === 'string' && typeof value !== 'string') {
-    errors.push(`  "${fieldName}" must be a string`);
-  }
-
-  const isObjectValue = typeof value === 'object' && value !== null && !Array.isArray(value);
-  if (schemaDefinition['type'] === 'object' && !isObjectValue) {
-    errors.push(`  "${fieldName}" must be an object`);
-  }
-
-  if (schemaDefinition['type'] === 'array' && !Array.isArray(value)) {
-    errors.push(`  "${fieldName}" must be an array`);
-  }
-
-  if (Object.hasOwn(schemaDefinition, 'const') && value !== schemaDefinition['const']) {
-    errors.push(
-      `  "${fieldName}" must equal ${JSON.stringify(schemaDefinition['const'])} (got ${JSON.stringify(value)})`,
-    );
-  }
-
-  return errors;
-}
-
-// ─── Schema validation ────────────────────────────────────────────────────────
-
-/**
- * Validates that a value is a non-empty string.
- *
- * @param {unknown} value - Value to test.
- * @returns {boolean} True when value is a non-empty string.
- */
-function isNonEmptyString(value) {
-  return typeof value === 'string' && value.length > 0;
+function formatSchemaError(error) {
+  const location = error.instancePath || '/';
+  return `${location} ${error.message ?? 'is invalid'}`;
 }
 
 /**
- * Validates a single BDD scenario object.
+ * Parses a JSON file, returning either its document or one parse diagnostic.
  *
- * @param {unknown} scenario - Candidate scenario.
- * @param {string} specPath - Path of the BDD file (for error context).
- * @param {string} featureName - Owning feature name (for error context).
- * @param {number} scenarioIndex - Zero-based scenario index.
- * @returns {string[]} List of validation error messages.
+ * @param specPath - BDD document path to read.
+ * @returns Parsed specification and an empty error list, or one parse error.
  */
-function validateScenario(scenario, specPath, featureName, scenarioIndex) {
-  const errors = [];
-  const prefix = `  scenario[${scenarioIndex}] in feature "${featureName}"`;
-
-  if (typeof scenario !== 'object' || scenario === null) {
-    errors.push(`${prefix}: must be an object`);
-    return errors;
+function readSpec(specPath) {
+  try {
+    return { spec: JSON.parse(readFileSync(specPath, 'utf8')), errors: [] };
+  } catch (error) {
+    return { spec: undefined, errors: [`Failed to parse JSON: ${error.message}`] };
   }
-
-  for (const field of ['name', 'given', 'when', 'then']) {
-    if (!isNonEmptyString(scenario[field])) {
-      errors.push(`${prefix}: "${field}" must be a non-empty string`);
-    }
-  }
-
-  if (isNonEmptyString(scenario['name']) && !/^should\b/.test(scenario['name'])) {
-    errors.push(`${prefix}: "name" must start with "should" (got "${scenario['name']}")`);
-  }
-
-  return errors;
 }
 
 /**
- * Validates a single feature object within a BDD spec.
+ * Runs schema validation on every BDD document.
  *
- * @param {unknown} feature - Candidate feature.
- * @param {string} specPath - Path of the BDD file (for error context).
- * @param {number} featureIndex - Zero-based feature index.
- * @returns {string[]} List of validation error messages.
+ * @param bddFiles - BDD document paths to validate.
+ * @param validate - Compiled Ajv validation function.
+ * @returns File-qualified schema validation failures.
  */
-function validateFeature(feature, specPath, featureIndex) {
-  const errors = [];
-  const prefix = `  feature[${featureIndex}]`;
-
-  if (typeof feature !== 'object' || feature === null) {
-    errors.push(`${prefix}: must be an object`);
-    return errors;
-  }
-
-  if (!isNonEmptyString(feature['feature'])) {
-    errors.push(`${prefix}: "feature" must be a non-empty string`);
-  }
-
-  const featureName = isNonEmptyString(feature['feature'])
-    ? feature['feature']
-    : `<index ${featureIndex}>`;
-
-  if (!Array.isArray(feature['scenarios'])) {
-    errors.push(`${prefix}: "scenarios" must be an array`);
-  } else if (feature['scenarios'].length === 0) {
-    errors.push(`${prefix}: "scenarios" must not be empty`);
-  } else {
-    for (let i = 0; i < feature['scenarios'].length; i++) {
-      errors.push(...validateScenario(feature['scenarios'][i], specPath, featureName, i));
-    }
-  }
-
-  return errors;
+export function checkSchemaCompliance(bddFiles, validate) {
+  return bddFiles.flatMap((file) => {
+    const parsed = readSpec(file);
+    if (parsed.errors.length > 0) return [{ file, errors: parsed.errors }];
+    if (validate(parsed.spec)) return [];
+    return [{ file, errors: (validate.errors ?? []).map(formatSchemaError) }];
+  });
 }
 
 /**
- * Validates a parsed BDD spec object against the bdd-spec.schema.json constraints.
+ * Finds BDD documents without the sibling source file implied by their name.
  *
- * @param {unknown} spec - Parsed JSON content of a .ts.bdd.json file.
- * @param {string} specPath - Absolute path to the BDD file (for error messages).
- * @returns {string[]} List of validation error messages; empty when valid.
+ * @param bddFiles - BDD document paths to inspect.
+ * @param sourceFileSet - Known implementation source paths.
+ * @returns BDD documents whose source sibling is absent.
  */
-function validateSchema(spec, specPath) {
-  const errors = validateTopLevelAgainstSchema(spec);
-
-  if (typeof spec !== 'object' || spec === null) {
-    return errors;
-  }
-
-  const detailErrors = [
-    ...validateSourceFileValue(spec),
-    ...validateModuleValue(spec),
-    ...validateSpecificationsValue(spec, specPath),
-  ];
-  errors.push(...detailErrors);
-
-  return errors;
+export function checkOrphanedSpecs(bddFiles, sourceFileSet) {
+  return bddFiles.filter((bddPath) => !sourceFileSet.has(bddPath.slice(0, -BDD_EXTENSION.length)));
 }
 
 /**
- * Validates sourceFile field semantics.
+ * Finds implementation files without sibling BDD documents.
  *
- * @param {Record<string, unknown>} spec - BDD spec object.
- * @returns {string[]} Validation errors.
+ * @param sourceFiles - Implementation source paths to inspect.
+ * @param bddFileSet - Known BDD document paths.
+ * @returns Source files whose BDD sibling is absent.
  */
-function validateSourceFileValue(spec) {
-  const errors = [];
-  const sourceFile = typeof spec['sourceFile'] === 'string' ? spec['sourceFile'] : '';
-  if (isNonEmptyString(sourceFile)) {
-    const resolvedSource = join(REPO_ROOT, sourceFile);
-    if (!existsSync(resolvedSource)) {
-      errors.push(`  "sourceFile" points to a non-existent file: ${sourceFile}`);
-    }
-    return errors;
-  }
-
-  errors.push('  "sourceFile" must be a non-empty string');
-  return errors;
+export function checkMissingSpecs(sourceFiles, bddFileSet) {
+  return sourceFiles.filter((sourcePath) => !bddFileSet.has(sourcePath + BDD_EXTENSION));
 }
 
 /**
- * Validates module object semantics.
+ * Verifies that sourceFile identifies the source sibling using a workspace path.
  *
- * @param {Record<string, unknown>} spec - BDD spec object.
- * @returns {string[]} Validation errors.
+ * @param bddFiles - BDD document paths to inspect.
+ * @returns Incorrect source-file reference diagnostics.
  */
-function validateModuleValue(spec) {
-  const errors = [];
-  const mod = spec['module'];
-  const isModuleObject = typeof mod === 'object' && mod !== null;
-  if (!isModuleObject) {
-    errors.push('  "module" must be an object');
-    return errors;
-  }
-
-  if (!isNonEmptyString(mod['name'])) {
-    errors.push('  "module.name" must be a non-empty string');
-  }
-  if (!isNonEmptyString(mod['description'])) {
-    errors.push('  "module.description" must be a non-empty string');
-  }
-
-  if (Array.isArray(mod['exports'])) {
-    for (let i = 0; i < mod['exports'].length; i++) {
-      if (!isNonEmptyString(mod['exports'][i])) {
-        errors.push(`  "module.exports[${i}]" must be a non-empty string`);
-      }
-    }
-    return errors;
-  }
-
-  errors.push('  "module.exports" must be an array');
-  return errors;
+export function checkSourceFileReferences(bddFiles) {
+  return bddFiles.flatMap((file) => {
+    const { spec } = readSpec(file);
+    if (!spec || typeof spec.sourceFile !== 'string') return [];
+    const sourcePath = file.slice(0, -BDD_EXTENSION.length);
+    const expected = relative(REPO_ROOT, sourcePath).replaceAll('\\', '/');
+    return spec.sourceFile === expected ? [] : [{ file, expected, actual: spec.sourceFile }];
+  });
 }
 
 /**
- * Validates specifications array semantics.
+ * Verifies exact parity between documented and actual named TypeScript exports.
  *
- * @param {Record<string, unknown>} spec - BDD spec object.
- * @param {string} specPath - BDD file path for context.
- * @returns {string[]} Validation errors.
+ * @param spec - Parsed BDD specification.
+ * @returns Documented export-name set, or undefined for an invalid shape.
  */
-function validateSpecificationsValue(spec, specPath) {
-  const errors = [];
-  const specifications = spec['specifications'];
-  if (!Array.isArray(specifications)) {
-    errors.push('  "specifications" must be an array');
-    return errors;
-  }
-
-  if (specifications.length === 0) {
-    errors.push('  "specifications" must not be empty');
-    return errors;
-  }
-
-  for (let i = 0; i < specifications.length; i++) {
-    errors.push(...validateFeature(specifications[i], specPath, i));
-  }
-  return errors;
-}
-
-// ─── Individual checks ────────────────────────────────────────────────────────
-
-/**
- * Runs schema validation on every discovered BDD file.
- *
- * @param {string[]} bddFiles - Absolute paths to all .ts.bdd.json files.
- * @returns {{ file: string; errors: string[] }[]} Files with schema errors.
- */
-function checkSchemaCompliance(bddFiles) {
-  const failures = [];
-  for (const bddPath of bddFiles) {
-    let spec;
-    try {
-      spec = JSON.parse(readFileSync(bddPath, 'utf8'));
-    } catch (err) {
-      failures.push({ file: bddPath, errors: [`  Failed to parse JSON: ${err.message}`] });
-      continue;
-    }
-    const errors = validateSchema(spec, bddPath);
-    if (errors.length > 0) {
-      failures.push({ file: bddPath, errors });
-    }
-  }
-  return failures;
+function getDocumentedExports(spec) {
+  if (spec === undefined) return undefined;
+  if (spec.module === undefined) return undefined;
+  if (!Array.isArray(spec.module.exports)) return undefined;
+  return new Set(spec.module.exports);
 }
 
 /**
- * Finds BDD files that reference a sourceFile which does not exist on disk.
+ * Returns export-parity failures for one BDD document.
  *
- * @param {string[]} bddFiles - Absolute paths to all .ts.bdd.json files.
- * @param {Set<string>} sourceFileSet - Absolute paths of known source files.
- * @returns {string[]} Absolute paths of abandoned BDD files.
+ * @param file - BDD document path to compare with its source sibling.
+ * @returns Export-parity failure for the document, or an empty array.
  */
-function checkOrphanedSpecs(bddFiles, sourceFileSet) {
-  const orphans = [];
-  for (const bddPath of bddFiles) {
-    // Derive expected source path from sibling naming convention
-    const expectedSource = bddPath.slice(0, -BDD_EXTENSION.length);
-    if (!sourceFileSet.has(expectedSource)) {
-      orphans.push(bddPath);
-    }
-  }
-  return orphans;
+function checkFileExportParity(file) {
+  const sourcePath = file.slice(0, -BDD_EXTENSION.length);
+  if (!existsSync(sourcePath)) return [];
+  const documented = getDocumentedExports(readSpec(file).spec);
+  if (documented === undefined) return [];
+  const actual = extractNamedExports(readFileSync(sourcePath, 'utf8'), sourcePath);
+  const missingInSource = [...documented].filter((name) => !actual.has(name));
+  const missingInSpec = [...actual].filter((name) => !documented.has(name));
+  if (missingInSource.length + missingInSpec.length === 0) return [];
+  return [{ file, missingInSource, missingInSpec }];
 }
 
 /**
- * Finds source files that are missing a sibling .ts.bdd.json file.
+ * Verifies exact parity between documented and actual named TypeScript exports.
  *
- * @param {string[]} sourceFiles - Absolute paths of all non-test .ts source files.
- * @param {Set<string>} bddFileSet - Absolute paths of all known BDD files.
- * @returns {string[]} Absolute paths of source files without a BDD spec.
+ * @param bddFiles - BDD document paths to compare.
+ * @returns Named-export parity failures across all documents.
  */
-function checkMissingSpecs(sourceFiles, bddFileSet) {
-  return sourceFiles.filter((srcPath) => !bddFileSet.has(srcPath + BDD_EXTENSION));
+export function checkExportParity(bddFiles) {
+  return bddFiles.flatMap(checkFileExportParity);
 }
 
-/**
- * Verifies that every name listed in module.exports exists as a named export in
- * the corresponding source file.
- *
- * @param {string[]} bddFiles - Absolute paths to all .ts.bdd.json files.
- * @returns {{ file: string; missing: string[] }[]} Files with mismatched exports.
- */
-function checkExportCoverage(bddFiles) {
-  const failures = [];
-  for (const bddPath of bddFiles) {
-    let spec;
-    try {
-      spec = JSON.parse(readFileSync(bddPath, 'utf8'));
-    } catch {
-      // JSON parse errors are already reported in schema check; skip here.
-      continue;
-    }
-
-    const declaredExports = Array.isArray(spec?.module?.exports) ? spec.module.exports : [];
-    if (declaredExports.length === 0) continue;
-
-    const sourcePath = bddPath.slice(0, -BDD_EXTENSION.length);
-    if (!existsSync(sourcePath)) continue; // orphan check covers this
-
-    const sourceContent = readFileSync(sourcePath, 'utf8');
-    const actualExports = extractNamedExports(sourceContent);
-
-    const missingInSource = declaredExports.filter((name) => !actualExports.has(name));
-    const missingInSpec = [...actualExports].filter((name) => !declaredExports.includes(name));
-
-    if (missingInSource.length > 0 || missingInSpec.length > 0) {
-      failures.push({ file: bddPath, missingInSource, missingInSpec });
-    }
-  }
-  return failures;
-}
-
-// ─── Reporting ────────────────────────────────────────────────────────────────
-
-/** ANSI colour helpers (suppressed when NO_COLOR is set). */
 const NO_COLOR = process.env['NO_COLOR'] !== undefined;
-const red = (s) => (NO_COLOR ? s : `\x1b[31m${s}\x1b[0m`);
-const yellow = (s) => (NO_COLOR ? s : `\x1b[33m${s}\x1b[0m`);
-const green = (s) => (NO_COLOR ? s : `\x1b[32m${s}\x1b[0m`);
-const bold = (s) => (NO_COLOR ? s : `\x1b[1m${s}\x1b[0m`);
+/**
+ * Applies an ANSI color code unless color output is disabled.
+ *
+ * @param code - ANSI color code.
+ * @param text - Text to decorate.
+ * @returns Decorated text, or the original text when `NO_COLOR` is set.
+ */
+const color = (code, text) => (NO_COLOR ? text : `\x1b[${code}m${text}\x1b[0m`);
 
 /**
- * Returns a workspace-relative display path for a given absolute path.
+ * Returns a normalized repository-relative display path.
  *
- * @param {string} absolutePath - Absolute file path.
- * @returns {string} Relative path using forward slashes.
+ * @param file - Absolute filesystem path.
+ * @returns Forward-slash path relative to the repository root.
  */
-function relPath(absolutePath) {
-  return absolutePath.replaceAll(REPO_ROOT, '').replaceAll('\\', '/').replace(/^\//, '');
+const displayPath = (file) => relative(REPO_ROOT, file).replaceAll('\\', '/');
+
+/**
+ * Prints one grouped collection and returns whether it contained failures.
+ *
+ * @param heading - Diagnostic group heading.
+ * @param failures - Failures belonging to the group.
+ * @param describe - Callback that prints one failure.
+ * @returns Whether the group contained at least one failure.
+ */
+function printGroup(heading, failures, describe) {
+  if (failures.length === 0) return false;
+  console.error(color(31, `\n${heading} (${failures.length}):`));
+  for (const failure of failures) describe(failure);
+  return true;
 }
 
 /**
- * Prints all validation results and returns whether any failures were found.
+ * Prints one schema-validation failure.
  *
- * @param {object} results - Collected results from all checks.
- * @returns {boolean} True when at least one error was found.
+ * @param failure - File path and schema-error collection to print.
+ */
+function printSchemaFailure(failure) {
+  const { file, errors } = failure;
+  console.error(`  ${displayPath(file)}`);
+  for (const error of errors) console.error(`    - ${error}`);
+}
+
+/**
+ * Prints one file path as a list item.
+ *
+ * @param file - Absolute path to print.
+ */
+function printFileFailure(file) {
+  console.error(`  - ${displayPath(file)}`);
+}
+
+/**
+ * Prints one named-export parity failure.
+ *
+ * @param failure - Export-parity diagnostic to print.
+ */
+function printExportFailure(failure) {
+  console.error(`  ${displayPath(failure.file)}`);
+  for (const name of failure.missingInSource) console.error(`    - source lacks "${name}"`);
+  for (const name of failure.missingInSpec) console.error(`    - spec lacks "${name}"`);
+}
+
+/**
+ * Prints grouped validation failures and returns whether any exist.
+ *
+ * @param results - Aggregated BDD validation results.
+ * @returns Whether any validation group contains failures.
  */
 function report(results) {
-  const { schemaFailures, orphans, missing, exportFailures } = results;
-  const hasErrors =
-    printSchemaFailures(schemaFailures) ||
-    printOrphanFailures(orphans) ||
-    printMissingFailures(missing) ||
-    printExportFailures(exportFailures);
+  const groupResults = [
+    printGroup('Schema violations', results.schemaFailures, printSchemaFailure),
+    printGroup('BDD files without source siblings', results.orphans, printFileFailure),
+    printGroup('Source files without BDD siblings', results.missing, printFileFailure),
+    printGroup('Incorrect sourceFile references', results.sourceReferences, (failure) =>
+      console.error(`  ${displayPath(failure.file)}: expected "${failure.expected}"`),
+    ),
+    printGroup('Named export mismatches', results.exportFailures, printExportFailure),
+  ];
+  const failed = groupResults.includes(true);
 
-  if (!hasErrors) {
+  if (!failed) {
     console.log(
-      green(`\n✓ All ${results.totalBdd} BDD spec file(s) are valid.`) +
-        ` (${results.totalSource} source file(s) checked)`,
+      color(
+        32,
+        `All ${results.totalBdd} BDD documents are valid (${results.totalSource} sources checked).`,
+      ),
     );
   }
-
-  return hasErrors;
+  return failed;
 }
 
-/**
- * Prints schema failures.
- *
- * @param {{ file: string; errors: string[] }[]} schemaFailures - Schema failures.
- * @returns {boolean} True when failures were printed.
- */
-function printSchemaFailures(schemaFailures) {
-  if (schemaFailures.length === 0) {
-    return false;
-  }
-
-  console.error(bold(red(`\nSchema violations (${schemaFailures.length} file(s)):`)));
-  for (const { file, errors } of schemaFailures) {
-    console.error(`  ${red('✗')} ${relPath(file)}`);
-    for (const err of errors) {
-      console.error(`    ${yellow('→')} ${err.trim()}`);
-    }
-  }
-  return true;
-}
-
-/**
- * Prints orphaned BDD file failures.
- *
- * @param {string[]} orphans - Orphaned BDD files.
- * @returns {boolean} True when failures were printed.
- */
-function printOrphanFailures(orphans) {
-  if (orphans.length === 0) {
-    return false;
-  }
-
-  console.error(
-    bold(red(`\nAbandoned BDD files — no matching source file (${orphans.length} file(s)):`)),
-  );
-  for (const file of orphans) {
-    console.error(`  ${red('✗')} ${relPath(file)}`);
-  }
-  return true;
-}
-
-/**
- * Prints missing BDD file failures.
- *
- * @param {string[]} missing - Source files missing BDD specs.
- * @returns {boolean} True when failures were printed.
- */
-function printMissingFailures(missing) {
-  if (missing.length === 0) {
-    return false;
-  }
-
-  console.error(
-    bold(red(`\nMissing BDD specs — source files without a spec (${missing.length} file(s)):`)),
-  );
-  for (const file of missing) {
-    console.error(`  ${red('✗')} ${relPath(file)}`);
-  }
-  return true;
-}
-
-/**
- * Prints export parity failures.
- *
- * @param {{ file: string; missingInSource: string[]; missingInSpec: string[] }[]} exportFailures - Export mismatches.
- * @returns {boolean} True when failures were printed.
- */
-function printExportFailures(exportFailures) {
-  if (exportFailures.length === 0) {
-    return false;
-  }
-
-  console.error(
-    bold(
-      red(
-        `\nExport mismatches — module.exports and named exports must match exactly (${exportFailures.length} file(s)):`,
-      ),
-    ),
-  );
-  for (const { file, missingInSource, missingInSpec } of exportFailures) {
-    console.error(`  ${red('✗')} ${relPath(file)}`);
-    for (const name of missingInSource) {
-      console.error(`    ${yellow('→')} "${name}" is not a named export in the source file`);
-    }
-    for (const name of missingInSpec) {
-      console.error(
-        `    ${yellow('→')} "${name}" is exported by source but missing from module.exports`,
-      );
-    }
-  }
-  return true;
-}
-
-// ─── Entry point ──────────────────────────────────────────────────────────────
-
-/**
- * Runs all BDD validation checks and exits with the appropriate code.
- */
-function run() {
-  console.log(bold('Validating BDD specification files…'));
-
+/** Runs all structural and repository-relational BDD checks. */
+export function run() {
+  console.log('Validating BDD specification files...');
+  const schema = JSON.parse(readFileSync(BDD_SCHEMA_PATH, 'utf8'));
+  const validate = createSchemaValidator(schema);
   const bddFiles = collectBddFiles();
   const sourceFiles = collectSourceFiles();
-
-  const bddFileSet = new Set(bddFiles);
-  const sourceFileSet = new Set(sourceFiles);
-
   const results = {
     totalBdd: bddFiles.length,
     totalSource: sourceFiles.length,
-    schemaFailures: checkSchemaCompliance(bddFiles),
-    orphans: checkOrphanedSpecs(bddFiles, sourceFileSet),
-    missing: checkMissingSpecs(sourceFiles, bddFileSet),
-    exportFailures: checkExportCoverage(bddFiles),
+    schemaFailures: checkSchemaCompliance(bddFiles, validate),
+    orphans: checkOrphanedSpecs(bddFiles, new Set(sourceFiles)),
+    missing: checkMissingSpecs(sourceFiles, new Set(bddFiles)),
+    sourceReferences: checkSourceFileReferences(bddFiles),
+    exportFailures: checkExportParity(bddFiles),
   };
-
-  const hasErrors = report(results);
-  process.exit(hasErrors ? 1 : 0);
+  process.exitCode = report(results) ? 1 : 0;
 }
 
-run();
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) run();

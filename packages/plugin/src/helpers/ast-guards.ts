@@ -24,9 +24,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 /** Union of all function-like AST nodes handled by function-scoped rules. */
 export type FunctionNode =
-  | TSESTree.FunctionDeclaration
-  | TSESTree.FunctionExpression
-  | TSESTree.ArrowFunctionExpression;
+  TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression;
 
 const TEST_FILE_PATTERN = /\.(test|spec|e2e|integration)\.[cm]?[jt]sx?$/;
 const TEST_DIRECTORY_SEGMENT = '/__tests__/';

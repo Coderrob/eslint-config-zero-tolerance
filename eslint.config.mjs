@@ -8,6 +8,7 @@
  */
 
 import eslint from '@eslint/js';
+import eslintPlugin from 'eslint-plugin-eslint-plugin';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import path from 'node:path';
@@ -18,11 +19,20 @@ import zeroTolerancePlugin from './packages/plugin/dist/index.mjs';
 // Constants
 // ============================================================================
 
-/** File patterns for TypeScript source files */
-const TS_JS_FILES = ['**/*.ts', '**/*.tsx'];
+/** File patterns for TypeScript source files. */
+const TYPESCRIPT_FILES = ['**/*.ts', '**/*.tsx'];
+
+/** Executable JavaScript maintained by this repository. */
+const SCRIPT_FILES = ['scripts/**/*.mjs', 'scripts/**/*.cjs'];
 
 /** File patterns for test files and test-only infrastructure. */
 const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts', '**/test-helper.ts'];
+
+/** ESLint rule implementation files. */
+const ESLINT_RULE_FILES = ['packages/plugin/src/rules/*.ts'];
+
+/** ESLint rule test files. */
+const ESLINT_RULE_TEST_FILES = ['packages/plugin/src/rules/*.test.ts'];
 
 /** ECMAScript version for parser options */
 const ECMA_VERSION = 2020;
@@ -58,6 +68,25 @@ const JEST_GLOBALS = {
   test: 'readonly',
 };
 
+/** Language-independent quality rules shared by source files and scripts. */
+const CORE_QUALITY_RULES = {
+  complexity: ['error', { max: MAX_COMPLEXITY }],
+  'max-depth': ['error', MAX_DEPTH],
+  'no-restricted-syntax': [
+    'error',
+    {
+      message: 'Avoid nested ternaries; use explicit conditionals for readability.',
+      selector: 'ConditionalExpression ConditionalExpression',
+    },
+    {
+      message: 'Avoid forEach(async ...); use for...of with await or Promise.all with map.',
+      selector:
+        "CallExpression[callee.type='MemberExpression'][callee.property.name='forEach'] > :matches(FunctionExpression, ArrowFunctionExpression)[async=true]",
+    },
+  ],
+  'no-warning-comments': ['error', { terms: ['TODO', 'FIXME', 'XXX'], location: 'start' }],
+};
+
 /** Files and directories to ignore */
 const IGNORE_PATTERNS = [
   '**/*.d.ts',
@@ -65,7 +94,7 @@ const IGNORE_PATTERNS = [
   '**/dist/**',
   '**/jest.config.js',
   '**/node_modules/**',
-  '**/scripts/**',
+  'test/consumers/**',
   'pnpm-lock.yaml',
 ];
 
@@ -78,7 +107,7 @@ const IGNORE_PATTERNS = [
  * Includes parser setup, plugins, and core rule definitions.
  */
 const baseConfig = {
-  files: TS_JS_FILES,
+  files: TYPESCRIPT_FILES,
   languageOptions: {
     parser: tsParser,
     parserOptions: {
@@ -93,6 +122,7 @@ const baseConfig = {
     'zero-tolerance': zeroTolerancePlugin,
   },
   rules: {
+    ...CORE_QUALITY_RULES,
     // TypeScript ESLint recommended rules
     'no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'off', // We use any for type workarounds
@@ -115,22 +145,7 @@ const baseConfig = {
     '@typescript-eslint/return-await': ['error', 'always'],
     '@typescript-eslint/strict-boolean-expressions': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    complexity: ['error', { max: MAX_COMPLEXITY }],
-    'max-depth': ['error', MAX_DEPTH],
     'no-console': ['error', { allow: ['warn', 'error'] }],
-    'no-restricted-syntax': [
-      'error',
-      {
-        message: 'Avoid nested ternaries; use explicit conditionals for readability.',
-        selector: 'ConditionalExpression ConditionalExpression',
-      },
-      {
-        message: 'Avoid forEach(async ...); use for...of with await or Promise.all with map.',
-        selector:
-          "CallExpression[callee.type='MemberExpression'][callee.property.name='forEach'] > :matches(FunctionExpression, ArrowFunctionExpression)[async=true]",
-      },
-    ],
-    'no-warning-comments': ['error', { terms: ['TODO', 'FIXME', 'XXX'], location: 'start' }],
 
     // Zero-tolerance plugin rules (dogfooding)
     ...ZERO_TOLERANCE_STRICT_RULES,
@@ -138,6 +153,27 @@ const baseConfig = {
     // Repository-specific stricter metrics
     'zero-tolerance/max-function-lines': ['error', { max: MAX_FUNCTION_LINES }],
     'zero-tolerance/max-params': ['error', { max: MAX_PARAMS }],
+  },
+};
+
+/** Node.js quality checks for repository scripts. */
+const scriptConfig = {
+  files: SCRIPT_FILES,
+  languageOptions: {
+    ecmaVersion: 'latest',
+    globals: {
+      URL: 'readonly',
+      console: 'readonly',
+      process: 'readonly',
+    },
+    sourceType: 'module',
+  },
+  plugins: {
+    'zero-tolerance': zeroTolerancePlugin,
+  },
+  rules: {
+    ...CORE_QUALITY_RULES,
+    'zero-tolerance/require-jsdoc-functions': 'error',
   },
 };
 
@@ -169,6 +205,26 @@ const testConfig = {
   },
 };
 
+/** Generic correctness checks for ESLint rule implementations. */
+const eslintRuleConfig = {
+  files: ESLINT_RULE_FILES,
+  plugins: eslintPlugin.configs['rules-recommended'].plugins,
+  rules: {
+    ...eslintPlugin.configs['rules-recommended'].rules,
+    // createRule follows typescript-eslint's top-level defaultOptions contract.
+    'eslint-plugin/require-meta-default-options': 'off',
+    // Existing public option schemas predate descriptions; enforce this after migration.
+    'eslint-plugin/require-meta-schema-description': 'off',
+  },
+};
+
+/** Generic correctness checks for ESLint RuleTester suites. */
+const eslintRuleTestConfig = {
+  files: ESLINT_RULE_TEST_FILES,
+  plugins: eslintPlugin.configs['tests-recommended'].plugins,
+  rules: eslintPlugin.configs['tests-recommended'].rules,
+};
+
 /**
  * Configuration for files and directories to ignore.
  */
@@ -194,6 +250,9 @@ export default [
   eslint.configs.recommended,
   linterOptionsConfig,
   baseConfig,
+  scriptConfig,
   testConfig,
+  eslintRuleConfig,
+  eslintRuleTestConfig,
   ignoreConfig,
 ];

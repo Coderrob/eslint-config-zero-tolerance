@@ -17,336 +17,116 @@
  */
 
 /**
- * Validates that every ESLint rule follows the repository's naming and wiring
- * conventions.
- *
- * Checks performed:
- *   1. Rule source filenames use supported kebab-case prefixes.
- *   2. The exported rule constant matches the filename in camelCase.
- *   3. The createRule name matches the filename exactly.
- *   4. The default export matches the named rule constant.
- *   5. The sibling test, BDD spec, and docs files exist and use matching names.
- *   6. The plugin index and preset rule map reference the same canonical rule name.
- *
- * Exits with code 0 on success, 1 on any validation failure.
+ * Enforces repository relationships not covered by eslint-plugin-eslint-plugin,
+ * eslint-doc-generator, the BDD validator, or rule unit tests.
  */
 
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, readdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const REPO_ROOT = resolve(__dirname, '..');
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const REPO_ROOT = resolve(dirname(SCRIPT_PATH), '..');
 const RULES_DIR = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules');
-const DOCS_RULES_DIR = join(REPO_ROOT, 'docs', 'rules');
-const PLUGIN_INDEX_PATH = join(REPO_ROOT, 'packages', 'plugin', 'src', 'index.ts');
-const RULE_MAP_PATH = join(
-  REPO_ROOT,
-  'packages',
-  'plugin',
-  'src',
-  'rules',
-  'support',
-  'rule-map.ts',
-);
-const RULE_SOURCE_SUFFIX = '.ts';
+const BUILT_PLUGIN_PATH = join(REPO_ROOT, 'packages', 'plugin', 'dist', 'index.mjs');
 const RULE_TEST_SUFFIX = '.test.ts';
-const RULE_BDD_SUFFIX = '.ts.bdd.json';
-const RULE_DOCS_SUFFIX = '.md';
 const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
 /**
- * Returns ANSI-styled bold text.
+ * Returns canonical names derived from direct rule implementation files.
  *
- * @param {string} text - Text to format.
- * @returns {string} Styled text.
+ * @returns Sorted rule names.
  */
-function bold(text) {
-  return `\u001B[1m${text}\u001B[0m`;
-}
-
-/**
- * Returns ANSI-styled green text.
- *
- * @param {string} text - Text to format.
- * @returns {string} Styled text.
- */
-function green(text) {
-  return `\u001B[32m${text}\u001B[0m`;
-}
-
-/**
- * Returns ANSI-styled red text.
- *
- * @param {string} text - Text to format.
- * @returns {string} Styled text.
- */
-function red(text) {
-  return `\u001B[31m${text}\u001B[0m`;
-}
-
-/**
- * Returns all direct rule source files under the rules directory.
- *
- * @returns {string[]} Absolute paths of rule implementation files.
- */
-function collectRuleSourceFiles() {
+export function collectRuleNames() {
   return readdirSync(RULES_DIR)
-    .filter(
-      (name) =>
-        name.endsWith(RULE_SOURCE_SUFFIX) &&
-        !name.endsWith(RULE_TEST_SUFFIX) &&
-        !name.endsWith(RULE_BDD_SUFFIX),
-    )
-    .map((name) => join(RULES_DIR, name))
+    .filter((name) => name.endsWith('.ts') && !name.endsWith(RULE_TEST_SUFFIX))
+    .map((name) => name.slice(0, -'.ts'.length))
     .sort();
 }
 
 /**
- * Converts a kebab-case rule name to its expected camelCase export name.
+ * Finds source rule names that violate repository layout policy.
  *
- * @param {string} ruleName - Kebab-case rule name.
- * @returns {string} CamelCase export identifier.
+ * @param ruleNames - Canonical names derived from source filenames.
+ * @returns Naming and missing-test diagnostics.
  */
-function toCamelCase(ruleName) {
-  return ruleName.replace(/-([a-z0-9])/gu, (_, character) => character.toUpperCase());
-}
-
-/**
- * Extracts the exported rule constant name from one rule source file.
- *
- * @param {string} content - Rule source text.
- * @returns {string | null} Exported rule constant or null when not found.
- */
-function extractNamedRuleExport(content) {
-  const match = /export const (\w+)\s*=\s*createRule\(\{/u.exec(content);
-  return match === null ? null : match[1];
-}
-
-/**
- * Extracts the createRule name property from one rule source file.
- *
- * @param {string} content - Rule source text.
- * @returns {string | null} Rule name or null when not found.
- */
-function extractConfiguredRuleName(content) {
-  const match = /export const \w+\s*=\s*createRule\(\{[\s\S]*?\bname:\s*'([^']+)'/u.exec(content);
-  return match === null ? null : match[1];
-}
-
-/**
- * Extracts the default export identifier from one rule source file.
- *
- * @param {string} content - Rule source text.
- * @returns {string | null} Default export identifier or null when not found.
- */
-function extractDefaultExport(content) {
-  const match = /export default (\w+);/u.exec(content);
-  return match === null ? null : match[1];
-}
-
-/**
- * Returns the first markdown heading from a docs file.
- *
- * @param {string} content - Markdown file text.
- * @returns {string | null} First heading text or null when absent.
- */
-function extractFirstHeading(content) {
-  const match = /^# (.+)$/mu.exec(content);
-  return match === null ? null : match[1];
-}
-
-/**
- * Returns true when the plugin index imports the rule with the expected local identifier.
- *
- * @param {string} pluginIndexContent - Plugin index source text.
- * @param {string} ruleName - Canonical rule name.
- * @param {string} exportName - Expected local identifier.
- * @returns {boolean} True when the import statement exists.
- */
-function hasPluginIndexImport(pluginIndexContent, ruleName, exportName) {
-  const pattern = new RegExp(`import ${exportName} from './rules/${ruleName}';`, 'u');
-  return pattern.test(pluginIndexContent);
-}
-
-/**
- * Returns true when the plugin rules map contains the canonical rule key and local identifier.
- *
- * @param {string} pluginIndexContent - Plugin index source text.
- * @param {string} ruleName - Canonical rule name.
- * @param {string} exportName - Expected local identifier.
- * @returns {boolean} True when the rules map entry exists.
- */
-function hasPluginIndexRuleEntry(pluginIndexContent, ruleName, exportName) {
-  const pattern = new RegExp(`'${ruleName}': ${exportName},`, 'u');
-  return pattern.test(pluginIndexContent);
-}
-
-/**
- * Returns true when the preset rule map references the canonical rule name.
- *
- * @param {string} ruleMapContent - Rule map source text.
- * @param {string} ruleName - Canonical rule name.
- * @returns {boolean} True when the rule name appears in the rule map source.
- */
-function hasRuleMapEntry(ruleMapContent, ruleName) {
-  const pattern = new RegExp(`'${ruleName}'`, 'u');
-  return pattern.test(ruleMapContent);
-}
-
-/**
- * Returns true when a test file imports the expected named rule export from its sibling rule file.
- *
- * @param {string} testContent - Test source text.
- * @param {string} ruleName - Canonical rule name.
- * @param {string} exportName - Expected named export.
- * @returns {boolean} True when the import statement exists.
- */
-function hasNamedRuleImport(testContent, ruleName, exportName) {
-  const pattern = new RegExp(
-    String.raw`import\s*\{[\s\S]*?\b${exportName}\b[\s\S]*?\}\s*from\s*'\./${ruleName}';`,
-    'u',
-  );
-  return pattern.test(testContent);
-}
-
-/**
- * Returns true when a test file registers a rule tester suite under the canonical rule name.
- *
- * @param {string} testContent - Test source text.
- * @param {string} ruleName - Canonical rule name.
- * @returns {boolean} True when at least one suite name starts with the canonical rule name.
- */
-function hasCanonicalRuleTesterRun(testContent, ruleName) {
-  const pattern = new RegExp(String.raw`\.run\('${ruleName}(?:'|\s)`, 'u');
-  return pattern.test(testContent);
-}
-
-/**
- * Validates one rule implementation and returns any failures.
- *
- * @param {string} rulePath - Absolute path to the rule source file.
- * @param {string} pluginIndexContent - Plugin index source text.
- * @param {string} ruleMapContent - Rule map source text.
- * @returns {string[]} Validation failures for the rule.
- */
-function validateRule(rulePath, pluginIndexContent, ruleMapContent) {
-  const failures = [];
-  const filename = basename(rulePath);
-  const ruleName = filename.slice(0, -RULE_SOURCE_SUFFIX.length);
-  const expectedExportName = toCamelCase(ruleName);
-  const sourceContent = readFileSync(rulePath, 'utf8');
-  const namedExport = extractNamedRuleExport(sourceContent);
-  const configuredRuleName = extractConfiguredRuleName(sourceContent);
-  const defaultExport = extractDefaultExport(sourceContent);
-  const testPath = join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`);
-  const bddPath = join(RULES_DIR, `${ruleName}${RULE_BDD_SUFFIX}`);
-  const docsPath = join(DOCS_RULES_DIR, `${ruleName}${RULE_DOCS_SUFFIX}`);
-
-  if (!RULE_NAME_PATTERN.test(ruleName)) {
-    failures.push(
-      `${filename}: rule filename must use kebab-case with one of the supported prefixes (max-, no-, prefer-, require-, sort-)`,
-    );
-  }
-
-  if (namedExport !== expectedExportName) {
-    failures.push(
-      `${filename}: named export must be "${expectedExportName}" to match the filename`,
-    );
-  }
-
-  if (configuredRuleName !== ruleName) {
-    failures.push(`${filename}: createRule name must be "${ruleName}"`);
-  }
-
-  if (defaultExport !== expectedExportName) {
-    failures.push(
-      `${filename}: default export must be "${expectedExportName}" to match the named rule export`,
-    );
-  }
-
-  if (existsSync(testPath)) {
-    const testContent = readFileSync(testPath, 'utf8');
-    if (!hasNamedRuleImport(testContent, ruleName, expectedExportName)) {
-      failures.push(
-        `${filename}: test file must import the named rule export "${expectedExportName}" from "./${ruleName}"`,
-      );
+export function validateSourceLayout(ruleNames) {
+  return ruleNames.flatMap((ruleName) => {
+    const failures = [];
+    if (!RULE_NAME_PATTERN.test(ruleName)) {
+      failures.push(`${ruleName}.ts: unsupported prefix or non-kebab-case rule name`);
     }
-    if (!hasCanonicalRuleTesterRun(testContent, ruleName)) {
-      failures.push(
-        `${filename}: test file must register at least one rule tester suite whose name starts with "${ruleName}"`,
-      );
+    if (!existsSync(join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`))) {
+      failures.push(`${ruleName}.ts: missing "${ruleName}${RULE_TEST_SUFFIX}"`);
     }
-  } else {
-    failures.push(`${filename}: missing sibling test file "${ruleName}${RULE_TEST_SUFFIX}"`);
-  }
-
-  if (!existsSync(bddPath)) {
-    failures.push(`${filename}: missing sibling BDD spec "${ruleName}${RULE_BDD_SUFFIX}"`);
-  }
-
-  if (existsSync(docsPath)) {
-    const docsHeading = extractFirstHeading(readFileSync(docsPath, 'utf8'));
-    if (docsHeading !== ruleName) {
-      failures.push(`${filename}: docs page heading must be "# ${ruleName}"`);
-    }
-  } else {
-    failures.push(`${filename}: missing docs page "docs/rules/${ruleName}.md"`);
-  }
-
-  if (!hasPluginIndexImport(pluginIndexContent, ruleName, expectedExportName)) {
-    failures.push(
-      `${filename}: plugin index must import "${expectedExportName}" from "./rules/${ruleName}"`,
-    );
-  }
-
-  if (!hasPluginIndexRuleEntry(pluginIndexContent, ruleName, expectedExportName)) {
-    failures.push(
-      `${filename}: plugin index rules map must register "${ruleName}" with "${expectedExportName}"`,
-    );
-  }
-
-  if (!hasRuleMapEntry(ruleMapContent, ruleName)) {
-    failures.push(`${filename}: preset rule map must reference "${ruleName}"`);
-  }
-
-  return failures;
+    return failures;
+  });
 }
 
 /**
- * Prints validation failures with a stable, readable layout.
+ * Finds differences between required and observed rule names.
  *
- * @param {string[]} failures - Validation failures.
+ * @param expected - Required rule names.
+ * @param actual - Observed rule names.
+ * @param context - Registry or preset label used in diagnostics.
+ * @returns Missing and unexpected rule diagnostics.
  */
-function printFailures(failures) {
-  console.error(bold(red(`\nRule naming validation failed (${failures.length} issue(s)):`)));
-  for (const failure of failures) {
-    console.error(`  - ${failure}`);
-  }
+function compareNames(expected, actual, context) {
+  const expectedSet = new Set(expected);
+  const actualSet = new Set(actual);
+  return [
+    ...expected
+      .filter((name) => !actualSet.has(name))
+      .map((name) => `${context}: missing rule "${name}"`),
+    ...actual
+      .filter((name) => !expectedSet.has(name))
+      .map((name) => `${context}: unexpected rule "${name}"`),
+  ];
 }
 
 /**
- * Runs rule naming validation for every plugin rule file.
+ * Validates source-to-registry parity.
+ *
+ * @param plugin - Built plugin API object.
+ * @param sourceRuleNames - Canonical names derived from source filenames.
+ * @returns Registry coverage diagnostics.
  */
-function main() {
-  console.log(bold('Validating rule naming conventions...'));
+export function validateBuiltRegistration(plugin, sourceRuleNames) {
+  const registeredRules = Object.keys(plugin.rules ?? {});
+  return compareNames(sourceRuleNames, registeredRules, 'plugin rules registry');
+}
 
-  const pluginIndexContent = readFileSync(PLUGIN_INDEX_PATH, 'utf8');
-  const ruleMapContent = readFileSync(RULE_MAP_PATH, 'utf8');
-  const ruleSourceFiles = collectRuleSourceFiles();
-  const failures = ruleSourceFiles.flatMap((rulePath) =>
-    validateRule(rulePath, pluginIndexContent, ruleMapContent),
-  );
+/**
+ * Loads the built plugin used for source-to-registry validation.
+ *
+ * @returns Built plugin API object.
+ * @throws {Error} When the plugin build output is missing.
+ */
+async function loadBuiltPlugin() {
+  if (!existsSync(BUILT_PLUGIN_PATH)) {
+    throw new Error('Plugin build is missing; run "pnpm build" before validating rules.');
+  }
+  const module = await import(`${pathToFileURL(BUILT_PLUGIN_PATH).href}?validation=${Date.now()}`);
+  return module.default ?? module;
+}
 
+/** Runs repository-specific source-layout and registration validation. */
+export async function run() {
+  console.log('Validating repository rule conventions...');
+  const ruleNames = collectRuleNames();
+  const failures = [
+    ...validateSourceLayout(ruleNames),
+    ...validateBuiltRegistration(await loadBuiltPlugin(), ruleNames),
+  ];
   if (failures.length > 0) {
-    printFailures(failures);
+    console.error(`\nRule convention validation failed (${failures.length} issue(s)):`);
+    for (const failure of failures) console.error(`  - ${failure}`);
     process.exitCode = 1;
     return;
   }
-
-  console.log(green(`\n✓ All ${ruleSourceFiles.length} rule file(s) follow naming conventions.`));
+  console.log(`All ${ruleNames.length} rules satisfy repository conventions.`);
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  await run();
+}

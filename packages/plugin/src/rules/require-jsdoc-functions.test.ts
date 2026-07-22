@@ -74,8 +74,8 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       filename: 'src/utils.ts',
     },
     {
-      code: '/** Adds values.\n * @param a first value\n * @param b second value\n * @returns sum\n */\nfunction add(a: number, b: number) { return a + b; }',
-      name: 'should allow function with params and return when JSDoc includes @param and @returns',
+      code: '/** Adds values.\n * @param {number} a - First value.\n * @param b - Second value.\n * @returns sum\n */\nfunction add(a: number, b: number) { return a + b; }',
+      name: 'should allow typed and hyphenated parameter descriptions',
       filename: 'src/utils.ts',
     },
     {
@@ -298,6 +298,19 @@ ruleTester.run('require-jsdoc-functions', requireJsdocFunctions, {
       ],
       output:
         '/**\n * Adds values.\n * @param a TODO: describe parameter\n * @param b TODO: describe parameter\n * @returns TODO: describe return value\n */\nfunction add(a: number, b: number) { return a + b; }',
+    },
+    {
+      code: '/**\n * Writes discovered proxy tool details.\n * @param tools\n * @param runtime\n */\nfunction writeProxyToolDetails(tools: string[], runtime: string) {}',
+      name: 'should report parameter tags without functional descriptions',
+      filename: 'src/utils.ts',
+      errors: [
+        {
+          messageId: RequireJsdocFunctionsMessageId.MissingJsdocParam,
+          data: { name: 'writeProxyToolDetails' },
+        },
+      ],
+      output:
+        '/**\n * Writes discovered proxy tool details.\n * @param tools\n * @param runtime\n * @param tools TODO: describe parameter\n * @param runtime TODO: describe parameter\n */\nfunction writeProxyToolDetails(tools: string[], runtime: string) {}',
     },
     {
       code: '/** Computes a value.\n * @param value input value\n */\nconst compute = (value: number) => value * 2;',

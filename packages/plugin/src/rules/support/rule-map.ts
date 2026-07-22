@@ -15,7 +15,7 @@
  */
 
 import type { Linter } from 'eslint';
-import { PLUGIN_NAMESPACE, Preset } from '../../constants';
+import { LEGACY_PLUGIN_NAMESPACE, PLUGIN_NAMESPACE, Preset } from '../../constants';
 
 const WARN_LEVEL = 'warn';
 const ERROR_LEVEL = 'error';
@@ -109,13 +109,24 @@ export interface IRuleConfig {
 }
 
 /**
+ * Builds legacy rules using the scoped ESLint plugin shorthand.
+ *
+ * @param preset - Requested preset.
+ * @returns Rules record compatible with legacy scoped-package resolution.
+ */
+export function buildLegacyRules(preset: Readonly<Preset>): Linter.RulesRecord {
+  return buildRulesForNamespace(preset, LEGACY_PLUGIN_NAMESPACE);
+}
+
+/**
  * Creates a prefixed ESLint rule key.
  *
+ * @param namespace - Plugin namespace used in the rule identifier.
  * @param ruleName - Unprefixed plugin rule name.
  * @returns Rule key with plugin namespace.
  */
-function buildPrefixedRuleName(ruleName: string): string {
-  return `${PLUGIN_NAMESPACE}/${ruleName}`;
+function buildPrefixedRuleName(namespace: string, ruleName: string): string {
+  return `${namespace}/${ruleName}`;
 }
 
 /**
@@ -125,8 +136,19 @@ function buildPrefixedRuleName(ruleName: string): string {
  * @returns Rules record for ESLint config consumption.
  */
 export function buildRules(preset: Readonly<Preset>): Linter.RulesRecord {
+  return buildRulesForNamespace(preset, PLUGIN_NAMESPACE);
+}
+
+/**
+ * Builds prefixed ESLint rules for one preset and namespace.
+ *
+ * @param preset - Requested preset.
+ * @param namespace - Plugin namespace used in rule identifiers.
+ * @returns Rules record for ESLint config consumption.
+ */
+function buildRulesForNamespace(preset: Readonly<Preset>, namespace: string): Linter.RulesRecord {
   return Object.fromEntries(
-    Object.entries(ruleMap).map(mapRuleEntryForPreset.bind(undefined, preset)),
+    Object.entries(ruleMap).map(mapRuleEntryForPreset.bind(undefined, preset, namespace)),
   );
 }
 
@@ -192,30 +214,34 @@ function isRuleSeverityAndOptions(
  * Maps one rule map entry to its configured preset value.
  *
  * @param preset - Requested preset.
+ * @param namespace - Plugin namespace used in the rule identifier.
  * @param entry - Rule map entry.
  * @returns Prefixed rule name and ESLint rule setting.
  */
 function mapRuleEntryForPreset(
   preset: Readonly<Preset>,
+  namespace: string,
   [name, config]: Readonly<RuleEntryTuple>,
 ): readonly [string, Linter.RuleEntry] {
-  return mapRuleForPreset(name, config, preset);
+  return mapRuleForPreset(namespace, name, config, preset);
 }
 
 /**
  * Converts one rule entry tuple into a prefixed ESLint rules tuple.
  *
+ * @param namespace - Plugin namespace used in the rule identifier.
  * @param ruleName - Rule name.
  * @param config - Rule config.
  * @param preset - Requested preset.
  * @returns Prefixed rule tuple for ESLint rules record construction.
  */
 function mapRuleForPreset(
+  namespace: string,
   ruleName: string,
   config: Readonly<IRuleConfig>,
   preset: Readonly<Preset>,
 ): readonly [string, Linter.RuleEntry] {
-  return [buildPrefixedRuleName(ruleName), getPresetRuleConfig(config, preset)];
+  return [buildPrefixedRuleName(namespace, ruleName), getPresetRuleConfig(config, preset)];
 }
 
 /**
@@ -254,7 +280,7 @@ const ruleEntries: RuleEntryTuple[] = [
   createRuleEntry('no-parent-internal-access', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('no-fetch-in-tests', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('no-restricted-imports-in-tests', OFF_LEVEL, OFF_LEVEL),
-  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, WARN_LEVEL),
+  createRuleEntry('require-jsdoc-anonymous-functions', OFF_LEVEL, OFF_LEVEL),
   createRuleEntry('require-bdd-spec', OFF_LEVEL, OFF_LEVEL),
 ];
 

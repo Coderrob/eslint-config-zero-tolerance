@@ -81,7 +81,9 @@ function createPreferReadonlyParametersListeners(
   context: Readonly<PreferReadonlyParametersContext>,
 ): TSESLint.RuleListener {
   const ignoredTypeNamePatterns = resolveIgnoredTypeNamePatterns(context.options);
-  return createFunctionNodeListeners(checkFunctionNode.bind(undefined, context, ignoredTypeNamePatterns));
+  return createFunctionNodeListeners(
+    checkFunctionNode.bind(undefined, context, ignoredTypeNamePatterns),
+  );
 }
 
 /**

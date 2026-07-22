@@ -6,7 +6,7 @@ Thank you for contributing to `@coderrob/eslint-plugin-zero-tolerance`! This gui
 
 | Tool    | Version                                |
 | ------- | -------------------------------------- |
-| Node.js | 20+                                    |
+| Node.js | 20.20.2, 22.23.1, or 24.18.0 (LTS)     |
 | pnpm    | 10+                                    |
 | Python  | 3.x (only if working on the docs site) |
 
@@ -65,9 +65,11 @@ Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md
 - No parent-relative re-exports (`no-re-export`)
 - No `eslint-disable` comments — fix the underlying issue (`no-eslint-disable`)
 
-Rule naming is validated automatically by `pnpm validate:rules`. It verifies the rule filename, exported camelCase constant, `createRule({ name: ... })` value, default export, sibling test/BDD/docs filenames, and plugin registration all stay aligned.
+Repository rule layout is validated automatically by `pnpm validate:rules`. It verifies the supported kebab-case filename, sibling unit test, and source-to-built-plugin registry parity. Generic rule correctness is enforced by `eslint-plugin-eslint-plugin`, BDD siblings by `pnpm validate:bdd`, documentation by `eslint-doc-generator`, and preset behavior by unit tests.
 
-README synchronization is also automated. `pnpm readme:sync` regenerates the root `README.md` rule catalog from deterministic metadata and rule source metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
+README synchronization is also automated with `eslint-doc-generator`. `pnpm readme:sync` regenerates the root `README.md` rule catalog from the built plugin and repository category metadata, while `pnpm validate:readme` fails if the generated output would differ from the checked-in README.
+
+Dead code and abandoned dependencies are checked with Knip. Run `pnpm validate:dead-code`; the command fails for unused files, exports, dependencies, or stale Knip configuration hints.
 
 ## Adding a New Rule
 
@@ -188,7 +190,8 @@ Add an entry under `## [Unreleased]` in `CHANGELOG.md`:
 
 ```bash
 pnpm validate:readme  # root README must match generated rule metadata
-pnpm validate:rules  # rule filenames, exports, docs, and registration must stay aligned
+pnpm validate:dead-code # Knip must find no unused files, exports, or dependencies
+pnpm validate:rules  # rule filenames, test siblings, and built registration must stay aligned
 pnpm test     # all tests must pass
 pnpm build    # TypeScript must compile cleanly
 ```

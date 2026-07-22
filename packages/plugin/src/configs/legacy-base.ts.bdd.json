@@ -30,10 +30,10 @@
           "then": "its value is 'module'"
         },
         {
-          "name": "should register the zero-tolerance plugin",
+          "name": "should register the scoped plugin shorthand required by legacy ESLint",
           "given": "legacyParserOptions is imported",
           "when": "legacyParserOptions.plugins is read",
-          "then": "the plugins array contains 'zero-tolerance'"
+          "then": "the plugins array contains '@coderrob/zero-tolerance'"
         }
       ]
     }

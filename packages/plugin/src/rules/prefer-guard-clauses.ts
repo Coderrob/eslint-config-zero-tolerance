@@ -80,8 +80,11 @@ function createPreferGuardClausesListeners(
  */
 function hasTerminatingConsequent(consequent: Readonly<TSESTree.Statement>): boolean {
   if (consequent.type === AST_NODE_TYPES.BlockStatement) {
-    const last = consequent.body.at(-1);
-    return last !== undefined && isTerminator(last);
+    if (consequent.body.length === 0) {
+      return false;
+    }
+    const last = consequent.body[consequent.body.length - 1];
+    return isTerminator(last);
   }
   return isTerminator(consequent);
 }

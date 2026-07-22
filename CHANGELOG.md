@@ -8,6 +8,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Consolidated BDD structure validation in the Ajv-backed `validate:bdd` command, while the opt-in ESLint rule now focuses on sibling, source-reference, and AST-based export-parity relationships.
+
+### Added
+
+- **Packed package compatibility tests**: Added isolated consumer tests for the latest ESLint 8, 9, and 10 releases using legacy or flat configuration as appropriate, Node.js 18/20/22/24 LTS support, CommonJS and ESM loading, TypeScript declaration resolution, config-package subpath exports, and ATTW package analysis.
+- **Validator tests**: Added focused coverage for JSON Schema enforcement, TypeScript export discovery, formatting-independent rule inspection, and built preset registration.
+
+### Fixed
+
+- **Dependency graph consistency**: Removed the nested npm lockfile, aligned config-package development peers with the canonical pnpm graph, and raised the published Node.js engine floor to the dependency-supported 18.18 release.
+- **Legacy scoped plugin presets**: Registered the scoped `@coderrob/zero-tolerance` shorthand and generated scoped legacy rule IDs so ESLint 8 can load the published legacy recommended and strict presets.
+- **Transitive dependency security**: Updated pnpm overrides and the workspace lockfile to patched Babel, brace-expansion, and js-yaml releases.
+- **Published plugin documentation**: Corrected the rule count, Node.js compatibility requirements, and preset exceptions in the plugin package README.
+- **CommonJS declarations**: Generate `export =` declarations for default-only CommonJS entrypoints so supported Node module resolution modes consume the published plugin types correctly.
+
+### Changed
+
+- **GitHub Actions supply-chain security**: Updated every workflow action to its latest stable release and pinned each reference to the release's immutable commit SHA.
+- **Release management**: Replaced the custom manifest rewriting, versioning, tagging, and publishing scripts with Changesets and pnpm's `workspace:^` publish transformation while preserving independent plugin and config package versions.
+- **Coverage reporting**: Replaced the generated point-in-time README coverage percentage with a static badge for the enforced per-file 95% coverage contract.
+- **Documentation automation**: Replaced the bespoke README parser, formatter, and test suite with `eslint-doc-generator`, retaining only repository-specific category metadata and count synchronization.
+- **Repository validation**: Delegated BDD structure to Ajv and generic rule-authoring checks to `eslint-plugin-eslint-plugin`; the remaining validators now enforce only cross-file and repository-specific policy using the TypeScript compiler API and built plugin exports.
+- **Script quality checks**: Added ESLint coverage for maintained Node.js scripts using the same complexity, nesting, and functional JSDoc requirements as source files, and replaced manual compatibility-test option parsing with Node's built-in argument parser.
+- **Dead-code validation**: Added Knip to CI-facing repository validation, removed abandoned exports and redundant root tooling dependencies, and documented intentional rule-export and dynamic ATTW integration boundaries.
+- **Dependency refresh**: Updated ESLint, TypeScript ESLint, ts-jest, Prettier, and Node.js typings to current releases compatible with the declared Node, ESLint, and TypeScript support matrix.
+- **Dependency version management**: Centralized shared workspace toolchain versions in the pnpm catalog while preserving published peer ranges and explicitly versioned compatibility fixtures.
+- **Compatibility tooling**: Removed the custom package-packing wrapper in favor of direct `pnpm pack --json` and ATTW commands, and reduced the consumer runner with `tinyexec`, workspace-resolved parser and TypeScript versions, and guaranteed temporary-directory cleanup.
+- **`require-jsdoc-functions` parameter documentation**: Bare `@param` tags now fail validation unless they include a functional description, using `comment-parser` for maintainable structured JSDoc parsing.
+- **Compatibility fixtures**: Replaced generated consumer source files with shared checked-in CommonJS, ESM, type-resolution, legacy, and flat-config fixtures.
+- **`no-re-export` listener wiring**: Removed one-use listener factories and bound the existing handlers directly without changing rule behavior.
+
+## [1.2.5] - 2026-05-15
+
 ### Added
 
 - **`no-ts-nocheck` rule**: Added a new built-in rule that blocks `// @ts-nocheck` and `/* @ts-nocheck */` comments so files cannot opt out of TypeScript checking.
@@ -19,6 +52,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **`no-export-alias` rule**: Removed unsafe autofixing for true public export aliases so reported aliases require an explicit naming decision instead of silently changing the public API.
 - **`prefer-readonly-parameters` rule**: Added configurable `ignoredTypeNamePatterns` exemptions, with callable defaults such as `Dispatch`, so React state setters and similar function aliases are not rewritten to non-callable `Readonly<...>` types.
 - **`sort-functions` rule**: Updated autofix to sort the full sortable function span in one pass instead of swapping one adjacent out-of-order function pair per lint fix run.
+
+### Changed
+
+- **Dependency refresh**: Updated workspace, plugin, and config package dependencies to current compatible versions, including ESLint, TypeScript ESLint, Jest tooling, Prettier, Publint, ts-jest, tsup, rimraf, and Node/Jest type packages.
+- **Package metadata**: Added explicit side-effect-free package metadata for the plugin and config packages so bundlers can safely tree-shake unused exports.
+- **Preset defaults**: Kept both `require-bdd-spec` and `require-jsdoc-anonymous-functions` disabled in recommended and strict presets so they remain opt-in rules by default.
 
 ## [1.2.4] - 2026-04-28
 

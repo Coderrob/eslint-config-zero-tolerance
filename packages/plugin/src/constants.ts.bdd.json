@@ -7,10 +7,10 @@
     "description": "Plugin-level string constants and enumerations used across the plugin entry point and config builders.",
     "exports": [
       "PLUGIN_NAMESPACE",
+      "LEGACY_PLUGIN_NAMESPACE",
       "CONFIG_NAME_RECOMMENDED",
       "CONFIG_NAME_STRICT",
       "Preset",
-      "PRESET_VALUES",
       "TYPESCRIPT_ESLINT_PARSER",
       "PLUGIN_PACKAGE_NAME",
       "PLUGIN_PACKAGE_VERSION",
@@ -29,6 +29,17 @@
           "given": "the constants module is imported",
           "when": "PLUGIN_NAMESPACE is read",
           "then": "its value is 'zero-tolerance'"
+        }
+      ]
+    },
+    {
+      "feature": "LEGACY_PLUGIN_NAMESPACE",
+      "scenarios": [
+        {
+          "name": "should export the scoped shorthand used by legacy ESLint",
+          "given": "the constants module is imported",
+          "when": "LEGACY_PLUGIN_NAMESPACE is read",
+          "then": "its value is '@coderrob/zero-tolerance'"
         }
       ]
     },

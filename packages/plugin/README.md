@@ -7,8 +7,8 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **76 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
-- **Two presets** — `recommended` (warn severity for gradual adoption) and `strict` (error severity for full enforcement)
+- **77 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **Two presets** — `recommended` generally uses warning severity for gradual adoption, while `strict` generally uses error severity; strict-only and opt-in exceptions are identified below
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
 - Built with `@typescript-eslint/utils` for full TypeScript AST support
@@ -16,9 +16,11 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 ## Requirements
 
 - Node.js
-  - > 17 when using ESLint 8.57.0+ or 9.x
-  - > 19 when using ESLint 10.x
+  - 18.18.0+ when using ESLint 8.57.0+ or 9.x
+  - 20.19.0+, 22.13.0+, or 24.0.0+ when using ESLint 10.x
+  - CI-tested LTS releases: 18.20.8, 20.20.2, 22.23.1, and 24.18.0
 - ESLint 8.57.0+, 9.x, or 10.x
+  - CI-tested major releases: 8.57.1, 9.39.5, and 10.7.0
 - `@typescript-eslint/parser` 8.x
 - TypeScript 5.x
 
@@ -44,10 +46,14 @@ export default [zeroTolerance.configs.recommended];
 ```javascript
 // .eslintrc.js
 module.exports = {
-  plugins: ['zero-tolerance'],
-  extends: ['plugin:zero-tolerance/legacy-recommended'],
+  plugins: ['@coderrob/zero-tolerance'],
+  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
 };
 ```
+
+Legacy ESLint resolves the scoped package through the `@coderrob/zero-tolerance` shorthand, so
+manually selected legacy rule IDs use `@coderrob/zero-tolerance/<rule-name>`. Flat configs continue
+to use the `zero-tolerance` namespace shown below.
 
 ### Custom Rule Selection
 
@@ -77,6 +83,8 @@ export default [
 | Strict             | `error`  | `configs.strict`      |
 | Legacy Recommended | `warn`   | `legacy-recommended`  |
 | Legacy Strict      | `error`  | `legacy-strict`       |
+
+Preset severities describe the default for enabled rules. `prefer-result-return` is strict-only, while `require-bdd-spec`, `require-jsdoc-anonymous-functions`, `no-fetch-in-tests`, `no-parent-internal-access`, and `no-restricted-imports-in-tests` remain opt-in in both presets. See the [full rule documentation](https://coderrob.github.io/eslint-config-zero-tolerance/rules/) for each rule's preset status.
 
 ## Rules
 

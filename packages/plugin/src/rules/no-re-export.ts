@@ -32,9 +32,7 @@ type DirectNamedExportDeclaration =
   | TSESTree.TSInterfaceDeclaration
   | TSESTree.TSTypeAliasDeclaration;
 type IndirectParentReExportNode =
-  | TSESTree.ExportDefaultDeclaration
-  | TSESTree.ExportNamedDeclaration
-  | TSESTree.TSExportAssignment;
+  TSESTree.ExportDefaultDeclaration | TSESTree.ExportNamedDeclaration | TSESTree.TSExportAssignment;
 type SourcedExportDeclaration = TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration;
 
 /**
@@ -193,18 +191,25 @@ function createIndirectParentReExportFix(
  * @param directExportNames - Direct exported declaration names.
  * @returns Rule listeners.
  */
-function createNonBarrelNoReExportListeners(
+const createNonBarrelNoReExportListeners = (
   context: Readonly<NoReExportContext>,
   importedBindings: Readonly<ImportedBindingNames>,
   directExportNames: Readonly<DirectExportNames>,
-): TSESLint.RuleListener {
-  return {
-    ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
-    ExportDefaultDeclaration: checkExportDefaultDeclaration.bind(undefined, context, importedBindings),
-    ExportNamedDeclaration: checkExportNamedDeclaration.bind(undefined, context, importedBindings, directExportNames),
-    TSExportAssignment: checkTsExportAssignment.bind(undefined, context, importedBindings),
-  };
-}
+): TSESLint.RuleListener => ({
+  ExportAllDeclaration: checkExportAllDeclaration.bind(undefined, context),
+  ExportDefaultDeclaration: checkExportDefaultDeclaration.bind(
+    undefined,
+    context,
+    importedBindings,
+  ),
+  ExportNamedDeclaration: checkExportNamedDeclaration.bind(
+    undefined,
+    context,
+    importedBindings,
+    directExportNames,
+  ),
+  TSExportAssignment: checkTsExportAssignment.bind(undefined, context, importedBindings),
+});
 
 /**
  * Creates listeners for no-re-export rule execution.

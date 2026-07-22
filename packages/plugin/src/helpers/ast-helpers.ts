@@ -229,7 +229,10 @@ export function getVisitorChildNodes(
  * @param key - Visitor key.
  * @returns Child nodes for the key.
  */
-function getVisitorChildNodesForKey(node: Readonly<TSESTree.Node>, key: string): ReadonlyArray<TSESTree.Node> {
+function getVisitorChildNodesForKey(
+  node: Readonly<TSESTree.Node>,
+  key: string,
+): ReadonlyArray<TSESTree.Node> {
   return getVisitorArrayNodes(Reflect.get(node, key));
 }
 

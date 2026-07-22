@@ -233,9 +233,7 @@ function isProcessEnvObject(node: Readonly<TSESTree.Expression>): boolean {
  * @param node - Expression to inspect.
  * @returns True when the node is process.
  */
-function isProcessIdentifier(
-  node: Readonly<TSESTree.Expression>,
-): node is TSESTree.Identifier {
+function isProcessIdentifier(node: Readonly<TSESTree.Expression>): node is TSESTree.Identifier {
   return node.type === AST_NODE_TYPES.Identifier && node.name === PROCESS_OBJECT_NAME;
 }
 

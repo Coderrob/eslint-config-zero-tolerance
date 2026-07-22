@@ -69,6 +69,7 @@ eslint-config-zero-tolerance/
 ### JSDoc
 
 - All exported functions and rule implementations must have a JSDoc comment describing their purpose.
+- Every named function in `scripts/` must document its purpose and all applicable `@param`, `@returns`, and `@throws` contracts. This is enforced by ESLint.
 - Test files are exempt from the JSDoc requirement.
 
 ### Imports
@@ -104,7 +105,7 @@ These checks are mandatory whenever a rule is **added**, **updated**, or **remov
    - The `module.exports` array must match the current named exports of the rule file.
 3. Update `CHANGELOG.md` under `[Unreleased]` with the rule change details.
 
-4. Run required validations and ensure they all pass: `pnpm validate:bdd`, `pnpm validate:rules`, `pnpm validate:readme`, `pnpm lint`, `pnpm test`, `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`, `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`, and `pnpm build`.
+4. Run required validations and ensure they all pass: `pnpm validate:bdd`, `pnpm validate:dead-code`, `pnpm validate:rules`, `pnpm validate:readme`, `pnpm lint`, `pnpm test`, `pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit`, `pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit`, and `pnpm build`.
 
 ### Rule Template
 
@@ -200,7 +201,8 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
 5. Run `pnpm test` and confirm all tests pass.
 6. Run `pnpm build` to validate the TypeScript compilation.
-7. On release, update `CHANGELOG.md` with the version number and date, then publish via `pnpm release:prepare`.
+7. Add a Changeset for user-facing changes. On release, run `pnpm release:version`, review and commit the generated version changes,
+   then publish via `pnpm release:publish` after CI passes.
 
 ---
 
@@ -209,12 +211,13 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 Before considering any rule or behavior change complete:
 
 1. Run `pnpm validate:bdd` and ensure it passes.
-2. Run `pnpm validate:rules` and ensure it passes.
-3. Run `pnpm validate:readme` and ensure it passes.
-4. Run `pnpm lint` and ensure it passes.
-5. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
-6. Run type checks for plugin and config packages and ensure they pass.
-7. Run `pnpm build` and ensure it passes.
-8. Update `CHANGELOG.md` under `[Unreleased]`.
-9. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
-10. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.
+2. Run `pnpm validate:dead-code` and ensure Knip reports no unused files, exports, or dependencies.
+3. Run `pnpm validate:rules` and ensure it passes.
+4. Run `pnpm validate:readme` and ensure it passes.
+5. Run `pnpm lint` and ensure it passes.
+6. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
+7. Run type checks for plugin and config packages and ensure they pass.
+8. Run `pnpm build` and ensure it passes.
+9. Update `CHANGELOG.md` under `[Unreleased]`.
+10. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
+11. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.

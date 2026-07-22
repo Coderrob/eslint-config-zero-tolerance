@@ -232,7 +232,7 @@ function exitFunctionScope(
  * @returns Current scope info, or null.
  */
 function getCurrentScope(functionStack: Readonly<QueryScopeStack>): QueryScopeInfo | null {
-  return functionStack.at(-1) ?? null;
+  return functionStack[functionStack.length - 1] ?? null;
 }
 
 /**

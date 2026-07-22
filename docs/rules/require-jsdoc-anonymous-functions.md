@@ -9,7 +9,7 @@ Require JSDoc documentation comments on anonymous function-like constructs outsi
 | **Type**        | `suggestion`  |
 | **Fixable**     | Yes (`--fix`) |
 | **Recommended** | `off`         |
-| **Strict**      | `warn`        |
+| **Strict**      | `off`         |
 
 ## Rationale
 
@@ -64,6 +64,7 @@ registerCommand(() => {
 This rule has no options:
 
 ```js
+// Opt in when anonymous function JSDoc is required for your codebase.
 'zero-tolerance/require-jsdoc-anonymous-functions': 'warn'
 ```
 

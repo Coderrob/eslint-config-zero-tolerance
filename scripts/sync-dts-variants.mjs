@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-import { copyFileSync, existsSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const entryNames = process.argv.slice(2);
+const DEFAULT_ONLY_EXPORT_PATTERN = /export \{ (\w+) as default \};\s*$/u;
 
 if (entryNames.length === 0) {
   console.error('Usage: node scripts/sync-dts-variants.mjs <entry-name> [entry-name...]');
@@ -37,5 +38,6 @@ for (const entryName of entryNames) {
   }
 
   copyFileSync(sourcePath, esmTypesPath);
-  copyFileSync(sourcePath, cjsTypesPath);
+  const declaration = readFileSync(sourcePath, 'utf8');
+  writeFileSync(cjsTypesPath, declaration.replace(DEFAULT_ONLY_EXPORT_PATTERN, 'export = $1;\n'));
 }

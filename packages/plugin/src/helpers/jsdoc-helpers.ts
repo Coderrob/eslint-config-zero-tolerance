@@ -44,7 +44,7 @@ export function getJsdocComment(
 ): TSESTree.Comment | null {
   const comments = sourceCode.getCommentsBefore(node);
   const jsdocComments = comments.filter(isJsdocBlockComment);
-  return jsdocComments.at(-1) ?? null;
+  return jsdocComments[jsdocComments.length - 1] ?? null;
 }
 
 /**

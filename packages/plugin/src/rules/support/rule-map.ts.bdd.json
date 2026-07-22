@@ -5,7 +5,7 @@
   "module": {
     "name": "rule-map",
     "description": "Builds the canonical plugin rule map and exports preset-aware rule configurations for consumption by flat and legacy config builders.",
-    "exports": ["IRuleConfig", "buildRules", "ruleMap"]
+    "exports": ["IRuleConfig", "buildLegacyRules", "buildRules", "ruleMap"]
   },
   "specifications": [
     {
@@ -84,10 +84,10 @@
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {
-          "name": "should include require-jsdoc-anonymous-functions in built-in presets",
+          "name": "should keep require-jsdoc-anonymous-functions disabled in both built-in presets",
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/require-jsdoc-anonymous-functions' entries are read",
-          "then": "the rule is set to off in Recommended and warn in Strict"
+          "then": "both preset entries are set to 'off' so the rule stays opt-in by default"
         },
         {
           "name": "should include require-barrel-relative-exports in built-in presets",
@@ -172,6 +172,23 @@
           "given": "buildRules is called for the Recommended and Strict presets",
           "when": "the 'zero-tolerance/prefer-structured-clone' entries are read",
           "then": "the rule is set to warn in Recommended and error in Strict"
+        }
+      ]
+    },
+    {
+      "feature": "buildLegacyRules",
+      "scenarios": [
+        {
+          "name": "should prefix legacy rule keys with the scoped plugin shorthand",
+          "given": "a preset is passed to buildLegacyRules",
+          "when": "the returned rule keys are inspected",
+          "then": "every key starts with '@coderrob/zero-tolerance/' for ESLint 8 package resolution"
+        },
+        {
+          "name": "should preserve preset-specific severities in legacy rules",
+          "given": "Recommended and Strict presets are passed to buildLegacyRules",
+          "when": "the scoped sort-imports entries are read",
+          "then": "Recommended is warn and Strict is error"
         }
       ]
     }
