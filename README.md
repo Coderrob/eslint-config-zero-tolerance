@@ -352,7 +352,7 @@ pnpm test
 pnpm release:publish:plugin
 ```
 
-The publish command targets only `packages/plugin`; its `prepack` lifecycle rebuilds the package before `npm publish --access public`. The internal config workspace package is not published.
+The publish command targets only `packages/plugin`; its `prepack` lifecycle rebuilds the package before `pnpm publish --access public`. The internal config workspace package is not published.
 
 ## License
 
