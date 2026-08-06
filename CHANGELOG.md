@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Plugin metadata version**: Derived the exported plugin version from `packages/plugin/package.json` so release version bumps cannot leave stale hard-coded metadata in the built plugin.
 - **TypeScript module resolution**: Migrated build-facing TypeScript projects from deprecated `node`/`node10` resolution to `Bundler` resolution with preserved module syntax, while keeping Jest on modern Node resolution.
 - **AST helper tests**: Replaced `unknown` casts in the call-helper tests with concrete parser-produced `TSESTree` nodes.
+- **Test suite structure**: Added one explicit root `describe` to every test file and repository validation for both `.test.*` and `.spec.*` naming conventions.
+- **Documentation and release workflow**: Corrected the public package status and 77-rule documentation index, restored `no-ts-nocheck` to the rules overview, and documented the plugin-only publish command.
 
 ## [1.2.5] - 2026-07-23
 

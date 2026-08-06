@@ -50,12 +50,13 @@ The result is a codebase where **the rules are the culture** and the culture is 
 
 ## Packages
 
-This monorepo publishes two packages:
+This monorepo publishes one package:
 
-| Package                                                                                                          | Description                                         |
-| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 77 custom rules                 |
-| [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built `recommended` and `strict` config presets |
+| Package                                                                                                          | Description                         |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 77 custom rules |
+
+`packages/config` is retained as an internal workspace package for development and compatibility testing; it is not published to npm.
 
 ## Requirements
 
@@ -93,20 +94,6 @@ import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   zeroTolerance.configs.strict,
-  // your other configs...
-];
-```
-
-**Alternative: Import presets directly from the config package:**
-
-```javascript
-// eslint.config.js
-import recommended from '@coderrob/eslint-config-zero-tolerance/recommended';
-// or
-import strict from '@coderrob/eslint-config-zero-tolerance/strict';
-
-export default [
-  recommended, // or strict
   // your other configs...
 ];
 ```
@@ -357,41 +344,15 @@ pnpm deps:circular
 
 ## Publishing
 
-This monorepo uses Changesets to version and publish the plugin and config packages independently. Add a changeset with each user-facing change:
+Only `@coderrob/eslint-plugin-zero-tolerance` is published. Update its version and the dated changelog entry in the release PR, then run the full validation suite. After that commit has passed CI, publish from a clean, authenticated checkout:
 
 ```bash
-pnpm changeset
-```
-
-Choose each affected package and its semantic-version bump. Commit the generated file under `.changeset/` with the implementation.
-
-To inspect pending releases without modifying manifests:
-
-```bash
-pnpm release:status
-```
-
-When preparing a release, consume the pending changesets and update package versions:
-
-```bash
-pnpm release:version
-```
-
-Review and commit the resulting package manifests and removed changeset files. The root package is private and is not versioned. The plugin and config packages retain independent versions; Changesets bumps a dependent package when an internal dependency range requires it.
-
-After the version commit has passed CI, publish from a clean, authenticated checkout:
-
-```bash
-pnpm release:publish
-```
-
-This command rebuilds and tests the workspace before `changeset publish`. The plugin manifest uses npm-compatible dependency specifications, so npm can install or inspect it without resolving pnpm-only dependency protocols.
-
-To publish only the plugin package, run:
-
-```bash
+pnpm lint
+pnpm test
 pnpm release:publish:plugin
 ```
+
+The publish command targets only `packages/plugin`; its `prepack` lifecycle rebuilds the package before `npm publish --access public`. The internal config workspace package is not published.
 
 ## License
 
