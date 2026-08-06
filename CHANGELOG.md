@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- **Published plugin dependencies**: Bundled `@typescript-eslint/utils` into the plugin build and retained it only as a development dependency so npm consumers no longer receive an unresolved `catalog:` dependency.
+- **Published plugin dependencies**: Bundled `@typescript-eslint/utils` into the plugin build and replaced pnpm-only `catalog:` entries in the plugin manifest with npm-compatible version ranges so npm can install the plugin directory and published artifact.
 - **Plugin metadata version**: Derived the exported plugin version from `packages/plugin/package.json` so release version bumps cannot leave stale hard-coded metadata in the built plugin.
 - **TypeScript module resolution**: Migrated build-facing TypeScript projects from deprecated `node`/`node10` resolution to `Bundler` resolution with preserved module syntax, while keeping Jest on modern Node resolution.
 - **AST helper tests**: Replaced `unknown` casts in the call-helper tests with concrete parser-produced `TSESTree` nodes.

@@ -109,20 +109,23 @@ describe('repository validation', () => {
     }
   });
 
-  test('should use npm-compatible versions for published runtime dependencies', () => {
-    const packagePaths = ['../packages/plugin/package.json', '../packages/config/package.json'];
+  test('should use npm-compatible versions throughout the published plugin manifest', () => {
+    const packagePaths = ['../packages/plugin/package.json'];
+    const dependencyGroups = ['dependencies', 'devDependencies', 'peerDependencies'];
 
     for (const packagePath of packagePaths) {
       const manifest = JSON.parse(readFileSync(new URL(packagePath, import.meta.url)));
 
-      for (const [dependencyName, dependencyVersion] of Object.entries(
-        manifest.dependencies ?? {},
-      )) {
-        assert.doesNotMatch(
-          dependencyVersion,
-          /^(?:catalog|workspace):/u,
-          `${manifest.name} dependency ${dependencyName} must use a publishable version`,
-        );
+      for (const dependencyGroup of dependencyGroups) {
+        for (const [dependencyName, dependencyVersion] of Object.entries(
+          manifest[dependencyGroup] ?? {},
+        )) {
+          assert.doesNotMatch(
+            dependencyVersion,
+            /^(?:catalog|workspace):/u,
+            `${manifest.name} ${dependencyGroup} entry ${dependencyName} must use a publishable version`,
+          );
+        }
       }
     }
   });

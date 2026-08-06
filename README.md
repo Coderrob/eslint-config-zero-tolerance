@@ -385,7 +385,13 @@ After the version commit has passed CI, publish from a clean, authenticated chec
 pnpm release:publish
 ```
 
-This command rebuilds and tests the workspace before `changeset publish`. pnpm converts the config package's `workspace:^` plugin peer to a normal caret range in the published manifest, so no manifest rewriting or restoration step is needed.
+This command rebuilds and tests the workspace before `changeset publish`. The plugin manifest uses npm-compatible dependency specifications, so npm can install or inspect it without resolving pnpm-only dependency protocols.
+
+To publish only the plugin package, run:
+
+```bash
+pnpm release:publish:plugin
+```
 
 ## License
 
