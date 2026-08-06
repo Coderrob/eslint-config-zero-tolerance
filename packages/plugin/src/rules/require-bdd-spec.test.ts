@@ -86,62 +86,64 @@ const exportMismatchSource = createFixture('export-mismatch', 'export const actu
   'documented',
 ]);
 
-ruleTester.run('require-bdd-spec', requireBddSpec, {
-  valid: [
-    {
-      name: 'should skip test files',
-      code: 'export const example = true;',
-      filename: join(temporaryDirectory, 'example.test.ts'),
-    },
-    {
-      name: 'should accept matching source references and exports',
-      code: 'export const example = true;',
-      filename: validSource,
-    },
-    {
-      name: 'should derive direct, destructured, type, aliased, and literal exports from the AST',
-      code: allExportFormsCode,
-      filename: allExportForms,
-    },
-    {
-      name: 'should leave structural schema validation to the workspace validator',
-      code: 'const internal = true;',
-      filename: structuralOnlySource,
-    },
-    {
-      name: 'should leave missing structural module fields to the workspace validator',
-      code: 'const internal = true;',
-      filename: missingModuleSource,
-    },
-    {
-      name: 'should leave missing structural export fields to the workspace validator',
-      code: 'const internal = true;',
-      filename: missingExportsSource,
-    },
-    {
-      name: 'should leave malformed JSON diagnostics to the workspace validator',
-      code: 'export const example = true;',
-      filename: malformedSource,
-    },
-  ],
-  invalid: [
-    {
-      name: 'should report a missing sibling BDD document',
-      code: 'export const example = true;',
-      filename: join(temporaryDirectory, 'missing.ts'),
-      errors: [{ messageId: RequireBddSpecMessageId.MissingBddSpec }],
-    },
-    {
-      name: 'should report an incorrect source reference',
-      code: 'export const example = true;',
-      filename: wrongReferenceSource,
-      errors: [{ messageId: RequireBddSpecMessageId.InvalidBddSpec }],
-    },
-    {
-      name: 'should report documented and actual export differences together',
-      code: 'export const actual = true;',
-      filename: exportMismatchSource,
-      errors: [{ messageId: RequireBddSpecMessageId.InvalidBddSpec }],
-    },
-  ],
+describe('require-bdd-spec', () => {
+  ruleTester.run('require-bdd-spec', requireBddSpec, {
+    valid: [
+      {
+        name: 'should skip test files',
+        code: 'export const example = true;',
+        filename: join(temporaryDirectory, 'example.test.ts'),
+      },
+      {
+        name: 'should accept matching source references and exports',
+        code: 'export const example = true;',
+        filename: validSource,
+      },
+      {
+        name: 'should derive direct, destructured, type, aliased, and literal exports from the AST',
+        code: allExportFormsCode,
+        filename: allExportForms,
+      },
+      {
+        name: 'should leave structural schema validation to the workspace validator',
+        code: 'const internal = true;',
+        filename: structuralOnlySource,
+      },
+      {
+        name: 'should leave missing structural module fields to the workspace validator',
+        code: 'const internal = true;',
+        filename: missingModuleSource,
+      },
+      {
+        name: 'should leave missing structural export fields to the workspace validator',
+        code: 'const internal = true;',
+        filename: missingExportsSource,
+      },
+      {
+        name: 'should leave malformed JSON diagnostics to the workspace validator',
+        code: 'export const example = true;',
+        filename: malformedSource,
+      },
+    ],
+    invalid: [
+      {
+        name: 'should report a missing sibling BDD document',
+        code: 'export const example = true;',
+        filename: join(temporaryDirectory, 'missing.ts'),
+        errors: [{ messageId: RequireBddSpecMessageId.MissingBddSpec }],
+      },
+      {
+        name: 'should report an incorrect source reference',
+        code: 'export const example = true;',
+        filename: wrongReferenceSource,
+        errors: [{ messageId: RequireBddSpecMessageId.InvalidBddSpec }],
+      },
+      {
+        name: 'should report documented and actual export differences together',
+        code: 'export const actual = true;',
+        filename: exportMismatchSource,
+        errors: [{ messageId: RequireBddSpecMessageId.InvalidBddSpec }],
+      },
+    ],
+  });
 });

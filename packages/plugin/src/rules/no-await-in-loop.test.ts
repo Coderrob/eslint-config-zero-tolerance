@@ -3,62 +3,64 @@ import { noAwaitInLoop } from './no-await-in-loop';
 
 const TOP_LEVEL_AWAIT_ECMA_VERSION = 2022;
 
-ruleTester.run('no-await-in-loop', noAwaitInLoop, {
-  valid: [
-    {
-      name: 'should allow await outside loop',
-      code: 'async function main() { await fetch(url); }',
-    },
-    {
-      name: 'should allow Promise.all usage',
-      code: 'async function main() { const results = await Promise.all(items.map(x => process(x))); }',
-    },
-    {
-      name: 'should allow await inside nested async function within loop',
-      code: 'async function main() { for (const x of items) { const fn = async () => { await process(x); }; fn(); } }',
-    },
-    {
-      name: 'should allow await in nested async function inside while loop',
-      code: 'async function main() { while (true) { const fn = async () => await work(); } }',
-    },
-    {
-      name: 'should allow Promise.allSettled usage',
-      code: 'async function main() { await Promise.allSettled(items.map(x => process(x))); }',
-    },
-    {
-      name: 'should allow top-level await outside any loop',
-      code: 'await fetch(url);',
-      languageOptions: {
-        ecmaVersion: TOP_LEVEL_AWAIT_ECMA_VERSION,
-        sourceType: 'module',
+describe('no-await-in-loop', () => {
+  ruleTester.run('no-await-in-loop', noAwaitInLoop, {
+    valid: [
+      {
+        name: 'should allow await outside loop',
+        code: 'async function main() { await fetch(url); }',
       },
-    },
-  ],
-  invalid: [
-    {
-      name: 'should report await in for-of loop',
-      code: 'async function main() { for (const x of items) { await process(x); } }',
-      errors: [{ messageId: 'noAwaitInLoop' }],
-    },
-    {
-      name: 'should report await in for loop',
-      code: 'async function main() { for (let i = 0; i < 10; i++) { await step(i); } }',
-      errors: [{ messageId: 'noAwaitInLoop' }],
-    },
-    {
-      name: 'should report await in while loop',
-      code: 'async function main() { while (condition()) { await poll(); } }',
-      errors: [{ messageId: 'noAwaitInLoop' }],
-    },
-    {
-      name: 'should report await in do-while loop',
-      code: 'async function main() { do { await tick(); } while (running); }',
-      errors: [{ messageId: 'noAwaitInLoop' }],
-    },
-    {
-      name: 'should report await in for-in loop',
-      code: 'async function main() { for (const k in obj) { await handle(k); } }',
-      errors: [{ messageId: 'noAwaitInLoop' }],
-    },
-  ],
+      {
+        name: 'should allow Promise.all usage',
+        code: 'async function main() { const results = await Promise.all(items.map(x => process(x))); }',
+      },
+      {
+        name: 'should allow await inside nested async function within loop',
+        code: 'async function main() { for (const x of items) { const fn = async () => { await process(x); }; fn(); } }',
+      },
+      {
+        name: 'should allow await in nested async function inside while loop',
+        code: 'async function main() { while (true) { const fn = async () => await work(); } }',
+      },
+      {
+        name: 'should allow Promise.allSettled usage',
+        code: 'async function main() { await Promise.allSettled(items.map(x => process(x))); }',
+      },
+      {
+        name: 'should allow top-level await outside any loop',
+        code: 'await fetch(url);',
+        languageOptions: {
+          ecmaVersion: TOP_LEVEL_AWAIT_ECMA_VERSION,
+          sourceType: 'module',
+        },
+      },
+    ],
+    invalid: [
+      {
+        name: 'should report await in for-of loop',
+        code: 'async function main() { for (const x of items) { await process(x); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should report await in for loop',
+        code: 'async function main() { for (let i = 0; i < 10; i++) { await step(i); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should report await in while loop',
+        code: 'async function main() { while (condition()) { await poll(); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should report await in do-while loop',
+        code: 'async function main() { do { await tick(); } while (running); }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should report await in for-in loop',
+        code: 'async function main() { for (const k in obj) { await handle(k); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+    ],
+  });
 });

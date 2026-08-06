@@ -26,7 +26,13 @@ const TYPESCRIPT_FILES = ['**/*.ts', '**/*.tsx'];
 const SCRIPT_FILES = ['scripts/**/*.mjs', 'scripts/**/*.cjs'];
 
 /** File patterns for test files and test-only infrastructure. */
-const TEST_FILES = ['**/*.test.ts', '**/*.spec.ts', '**/test-helper.ts'];
+const TEST_FILES = [
+  '**/*.test.mjs',
+  '**/*.test.ts',
+  '**/*.spec.mjs',
+  '**/*.spec.ts',
+  '**/test-helper.ts',
+];
 
 /** ESLint rule implementation files. */
 const ESLINT_RULE_FILES = ['packages/plugin/src/rules/*.ts'];
@@ -112,7 +118,13 @@ const baseConfig = {
     parser: tsParser,
     parserOptions: {
       ecmaVersion: ECMA_VERSION,
-      projectService: true,
+      projectService: {
+        allowDefaultProject: [
+          'packages/plugin/tsup.config.ts',
+          'packages/plugin/typescript-eslint-utils-runtime.ts',
+        ],
+        defaultProject: 'packages/plugin/tsconfig.tools.json',
+      },
       sourceType: 'module',
       tsconfigRootDir: ROOT_DIR,
     },

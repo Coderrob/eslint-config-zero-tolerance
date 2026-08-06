@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import pluginPackage from '#plugin-package';
 import {
   createRecommendedConfig,
   createStrictConfig,
@@ -28,6 +29,7 @@ import {
   LEGACY_PLUGIN_NAMESPACE,
   PLUGIN_NAMESPACE,
   PLUGIN_PACKAGE_NAME,
+  PLUGIN_PACKAGE_VERSION,
   Preset,
   TYPESCRIPT_ESLINT_PARSER,
 } from './constants';
@@ -190,7 +192,8 @@ describe('plugin wiring', () => {
 
   it('should export plugin metadata, rules, and all config presets from index', () => {
     expect(eslintPlugin.meta?.name).toBe(PLUGIN_PACKAGE_NAME);
-    expect(eslintPlugin.meta?.version).toBeDefined();
+    expect(PLUGIN_PACKAGE_VERSION).toBe(pluginPackage.version);
+    expect(eslintPlugin.meta?.version).toBe(pluginPackage.version);
     expect(eslintPlugin.rules?.[RULE_KEY_SORT_IMPORTS]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_DESTRUCTURED_PARAMETER_TYPE_LITERAL]).toBeDefined();
     expect(eslintPlugin.rules?.[RULE_KEY_NO_EXPLICIT_ANY]).toBeDefined();

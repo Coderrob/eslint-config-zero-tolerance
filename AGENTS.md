@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository is a monorepo containing an ESLint plugin (`@coderrob/eslint-plugin-zero-tolerance`) and a config package (`@coderrob/eslint-config-zero-tolerance`). It is published to NPM and enforces zero-tolerance coding standards via custom ESLint rules.
+This repository is a monorepo containing a published ESLint plugin (`@coderrob/eslint-plugin-zero-tolerance`) and an internal config workspace package (`@coderrob/eslint-config-zero-tolerance`). The plugin is published to npm and enforces zero-tolerance coding standards via custom ESLint rules; the config package is not published.
 
 ---
 
@@ -201,8 +201,7 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
 5. Run `pnpm test` and confirm all tests pass.
 6. Run `pnpm build` to validate the TypeScript compilation.
-7. Add a Changeset for user-facing changes. On release, run `pnpm release:version`, review and commit the generated version changes,
-   then publish via `pnpm release:publish` after CI passes.
+7. For a plugin release, update `packages/plugin/package.json` and the dated changelog entry in the release PR. After CI passes, publish only the plugin with `pnpm release:publish:plugin`.
 
 ---
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import pluginPackage from '#plugin-package';
+
 /**
  * The ESLint plugin namespace used as the prefix for all rule names and as
  * the plugin key in flat config `plugins` records.
@@ -42,7 +44,7 @@ export const TYPESCRIPT_ESLINT_PARSER = '@typescript-eslint/parser';
 export const PLUGIN_PACKAGE_NAME = '@coderrob/eslint-plugin-zero-tolerance';
 
 /** Current npm package version of the plugin. */
-export const PLUGIN_PACKAGE_VERSION = '1.2.4';
+export const PLUGIN_PACKAGE_VERSION = pluginPackage.version;
 
 /** Config map key for the legacy recommended preset. */
 export const CONFIG_KEY_LEGACY_RECOMMENDED = 'legacy-recommended';

@@ -85,24 +85,6 @@ export default [
 ];
 ```
 
-### Using the separate config package
-
-If you prefer to import pre-built config presets as separate modules:
-
-```bash
-npm install --save-dev @coderrob/eslint-config-zero-tolerance
-```
-
-```js title="eslint.config.js"
-import recommended from '@coderrob/eslint-config-zero-tolerance/recommended';
-// or
-import strict from '@coderrob/eslint-config-zero-tolerance/strict';
-
-export default [
-  recommended, // or strict
-];
-```
-
 ## ESLint 8.x (Legacy `.eslintrc`)
 
 ```js title=".eslintrc.js"

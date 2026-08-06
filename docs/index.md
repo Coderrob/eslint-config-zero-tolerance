@@ -1,6 +1,6 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
-**76 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
+**77 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
@@ -32,12 +32,11 @@ This plugin takes the opposite approach. Every rule earns its place, every viola
 
 ## Packages
 
-This monorepo publishes two packages:
+This monorepo publishes one package:
 
-| Package                                                                                                          | Description                                     |
-| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin with all custom rules         |
-| [`@coderrob/eslint-config-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-config-zero-tolerance) | Pre-built recommended and strict config presets |
+| Package                                                                                                          | Description                             |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin with all custom rules |
 
 ## Quick Start
 

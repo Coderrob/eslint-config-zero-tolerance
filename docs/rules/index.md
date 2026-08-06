@@ -1,6 +1,6 @@
 # Rules
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **76 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **77 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
@@ -10,8 +10,8 @@
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
-| [Imports](#imports)                       |    13 | Barrels, re-exports, dynamic imports, node protocol |
-| [Bug Prevention](#bug-prevention)         |    19 | Identical code, control flow, async safety          |
+| [Imports](#imports)                       |    12 | Barrels, re-exports, dynamic imports, node protocol |
+| [Bug Prevention](#bug-prevention)         |    20 | Identical code, control flow, async safety          |
 
 ---
 
@@ -122,6 +122,7 @@
 | [no-floating-promises](no-floating-promises.md)                   | problem    | Disallow unhandled promise expressions; require explicit handling            |
 | [no-math-random](no-math-random.md)                               | problem    | Disallow `Math.random()`; inject a random source instead                     |
 | [no-eslint-disable](no-eslint-disable.md)                         | suggestion | Prevent use of `eslint-disable` comments                                     |
+| [no-ts-nocheck](no-ts-nocheck.md)                                 | problem    | Prevent use of `@ts-nocheck` comments                                        |
 | [no-parameter-reassign](no-parameter-reassign.md)                 | suggestion | Disallow reassigning function parameters                                     |
 | [no-process-env-outside-config](no-process-env-outside-config.md) | problem    | Disallow `process.env` reads outside configuration modules                   |
 | [no-flag-argument](no-flag-argument.md)                           | suggestion | Disallow boolean flag parameters in function signatures                      |

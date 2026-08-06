@@ -48,6 +48,7 @@
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
     "readme:sync": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance build && eslint-doc-generator packages/plugin",
     "release:publish": "pnpm build && pnpm test && changeset publish",
+    "release:publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance run publish:public",
     "release:status": "changeset status",
     "release:version": "changeset version",
     "test": "pnpm -r --if-present test && node --test scripts/validation.test.mjs",
