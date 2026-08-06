@@ -86,7 +86,7 @@ describe('repository validation', () => {
       for (const entry of readdirSync(directory, { withFileTypes: true })) {
         const entryPath = join(directory, entry.name);
         if (entry.isDirectory()) pendingDirectories.push(entryPath);
-        else if (/\.test\.(?:mjs|ts)$/u.test(entry.name)) testFiles.push(entryPath);
+        else if (/\.(?:spec|test)\.(?:mjs|ts)$/u.test(entry.name)) testFiles.push(entryPath);
       }
     }
 
