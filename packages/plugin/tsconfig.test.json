@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "types": ["jest", "node"],
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true

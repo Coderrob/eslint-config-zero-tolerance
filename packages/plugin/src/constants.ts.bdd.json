@@ -66,6 +66,17 @@
       ]
     },
     {
+      "feature": "PLUGIN_PACKAGE_VERSION",
+      "scenarios": [
+        {
+          "name": "should derive the current plugin version from its package manifest",
+          "given": "the plugin package manifest declares a version",
+          "when": "PLUGIN_PACKAGE_VERSION is read",
+          "then": "its value matches the version in packages/plugin/package.json"
+        }
+      ]
+    },
+    {
       "feature": "Preset enum",
       "scenarios": [
         {

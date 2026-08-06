@@ -15,40 +15,44 @@
  */
 
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { test } from 'node:test';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 import { createSchemaValidator, extractNamedExports } from './validate-bdd-specs.mjs';
 import { validateBuiltRegistration } from './validate-rule-naming.mjs';
 
-test('should validate complete BDD structure through the shared JSON Schema', () => {
-  const schema = JSON.parse(readFileSync(new URL('../bdd-spec.schema.json', import.meta.url)));
-  const validate = createSchemaValidator(schema);
-  const document = {
-    $schema: '../../../../bdd-spec.schema.json',
-    schemaVersion: '1.0.0',
-    sourceFile: 'packages/plugin/src/rules/example.ts',
-    module: { name: 'example', description: 'Example rule.', exports: ['example'] },
-    specifications: [
-      {
-        feature: 'Example behavior',
-        scenarios: [
-          { name: 'should report an example', given: 'input', when: 'linted', then: 'reported' },
-        ],
-      },
-    ],
-  };
+describe('repository validation', () => {
+  test('should validate complete BDD structure through the shared JSON Schema', () => {
+    const schema = JSON.parse(readFileSync(new URL('../bdd-spec.schema.json', import.meta.url)));
+    const validate = createSchemaValidator(schema);
+    const document = {
+      $schema: '../../../../bdd-spec.schema.json',
+      schemaVersion: '1.0.0',
+      sourceFile: 'packages/plugin/src/rules/example.ts',
+      module: { name: 'example', description: 'Example rule.', exports: ['example'] },
+      specifications: [
+        {
+          feature: 'Example behavior',
+          scenarios: [
+            { name: 'should report an example', given: 'input', when: 'linted', then: 'reported' },
+          ],
+        },
+      ],
+    };
 
-  assert.equal(validate(document), true);
-  document.specifications[0].scenarios[0].name = 'reports an example';
-  assert.equal(validate(document), false);
-  assert.equal(
-    validate.errors?.some((error) => error.keyword === 'pattern'),
-    true,
-  );
-});
+    assert.equal(validate(document), true);
+    document.specifications[0].scenarios[0].name = 'reports an example';
+    assert.equal(validate(document), false);
+    assert.equal(
+      validate.errors?.some((error) => error.keyword === 'pattern'),
+      true,
+    );
+  });
 
-test('should discover direct, aliased, destructured, and type exports with TypeScript syntax', () => {
-  const exports = extractNamedExports(`
+  test('should discover direct, aliased, destructured, and type exports with TypeScript syntax', () => {
+    const exports = extractNamedExports(`
     export const direct = 1, { nested } = value;
     const local = 1;
     export { local as alias };
@@ -56,16 +60,70 @@ test('should discover direct, aliased, destructured, and type exports with TypeS
     export default direct;
   `);
 
-  assert.deepEqual([...exports].sort(), ['Example', 'alias', 'direct', 'nested']);
-});
+    assert.deepEqual([...exports].sort(), ['Example', 'alias', 'direct', 'nested']);
+  });
 
-test('should identify missing and unexpected built registrations', () => {
-  const plugin = {
-    rules: { alpha: {}, extra: {} },
-  };
+  test('should identify missing and unexpected built registrations', () => {
+    const plugin = {
+      rules: { alpha: {}, extra: {} },
+    };
 
-  assert.deepEqual(validateBuiltRegistration(plugin, ['alpha', 'missing']), [
-    'plugin rules registry: missing rule "missing"',
-    'plugin rules registry: unexpected rule "extra"',
-  ]);
+    assert.deepEqual(validateBuiltRegistration(plugin, ['alpha', 'missing']), [
+      'plugin rules registry: missing rule "missing"',
+      'plugin rules registry: unexpected rule "extra"',
+    ]);
+  });
+
+  test('should give every test file exactly one explicit root describe', () => {
+    const pendingDirectories = ['../packages', '.'].map((directory) =>
+      fileURLToPath(new URL(directory, import.meta.url)),
+    );
+    const testFiles = [];
+
+    while (pendingDirectories.length > 0) {
+      const directory = pendingDirectories.pop();
+
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const entryPath = join(directory, entry.name);
+        if (entry.isDirectory()) pendingDirectories.push(entryPath);
+        else if (/\.test\.(?:mjs|ts)$/u.test(entry.name)) testFiles.push(entryPath);
+      }
+    }
+
+    for (const testFile of testFiles) {
+      const sourceFile = ts.createSourceFile(
+        testFile,
+        readFileSync(testFile, 'utf8'),
+        ts.ScriptTarget.Latest,
+        true,
+      );
+      const rootDescribes = sourceFile.statements.filter(
+        (statement) =>
+          ts.isExpressionStatement(statement) &&
+          ts.isCallExpression(statement.expression) &&
+          ts.isIdentifier(statement.expression.expression) &&
+          statement.expression.expression.text === 'describe',
+      );
+
+      assert.equal(rootDescribes.length, 1, `${testFile} must have exactly one root describe`);
+    }
+  });
+
+  test('should use npm-compatible versions for published runtime dependencies', () => {
+    const packagePaths = ['../packages/plugin/package.json', '../packages/config/package.json'];
+
+    for (const packagePath of packagePaths) {
+      const manifest = JSON.parse(readFileSync(new URL(packagePath, import.meta.url)));
+
+      for (const [dependencyName, dependencyVersion] of Object.entries(
+        manifest.dependencies ?? {},
+      )) {
+        assert.doesNotMatch(
+          dependencyVersion,
+          /^(?:catalog|workspace):/u,
+          `${manifest.name} dependency ${dependencyName} must use a publishable version`,
+        );
+      }
+    }
+  });
 });
