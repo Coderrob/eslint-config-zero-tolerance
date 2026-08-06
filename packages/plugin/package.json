@@ -82,8 +82,8 @@
     "clean": "rimraf dist",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "prepack": "npm run build",
-    "publish:public": "npm publish --access public",
+    "prepack": "pnpm run build",
+    "publish:public": "pnpm publish --access public",
     "test": "jest --coverage --runInBand"
   },
   "sideEffects": false,
