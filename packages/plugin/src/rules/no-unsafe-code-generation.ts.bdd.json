@@ -13,13 +13,13 @@
       "scenarios": [
         {
           "name": "should allow function timer callbacks and shadowed global names",
-          "given": "code using function callbacks for timers or local bindings named Function",
+          "given": "code using function callbacks for timers, local bindings named Function or setTimeout, or arbitrary object methods named like timers",
           "when": "the rule evaluates the call",
           "then": "no violation is reported"
         },
         {
           "name": "should report eval, Function, and string timer callbacks",
-          "given": "code that executes source strings through globals or timer callbacks",
+          "given": "code that executes source strings through globals or timer callbacks expressed as literals, static templates, interpolation, or concatenation",
           "when": "the rule evaluates the call or constructor",
           "then": "an unsafeCodeGeneration violation is reported"
         },

@@ -13,6 +13,10 @@ describe('no-hardcoded-secrets', () => {
         code: "const token = 'dummy-secret-token-value';",
       },
       {
+        name: 'should allow strong-looking credentials containing an allowed fixture marker',
+        code: "const token = 'sk_dummy_12345678901234567890';",
+      },
+      {
         name: 'should allow short sensitive literals',
         code: "const password = 'short';",
       },

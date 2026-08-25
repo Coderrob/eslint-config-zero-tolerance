@@ -39,6 +39,12 @@
           "given": "interface config { host: string }",
           "when": "the rule evaluates the interface declaration",
           "then": "a requireInterfacePrefix violation is reported"
+        },
+        {
+          "name": "should rename multiple invalid and merged interfaces in one non-overlapping pass",
+          "given": "a source file contains several invalid interface names or merged declarations sharing one name",
+          "when": "the autofix prefixes collision-free declarations and same-file type references",
+          "then": "one combined fix transaction updates each identifier range exactly once"
         }
       ]
     }

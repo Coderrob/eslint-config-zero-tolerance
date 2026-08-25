@@ -51,6 +51,12 @@
           "given": "two out-of-order sortable functions separated by directive comments, standalone comments, or executable statements between declaration blocks",
           "when": "the rule evaluates the Program",
           "then": "a sortFunctions violation is reported but no autofix is offered because moving declarations across non-whitespace content may be unsafe"
+        },
+        {
+          "name": "should sort named default exported functions without truncating implementations",
+          "given": "named default and named exported multiline functions are out of order",
+          "when": "the autofix reorders the sortable function span",
+          "then": "each complete declaration body and export wrapper moves intact to its final alphabetical position"
         }
       ]
     }

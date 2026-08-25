@@ -39,6 +39,24 @@
           "given": "const pattern = '\\\\d+'",
           "when": "the rule evaluates the string literal",
           "then": "a preferStringRaw violation is reported"
+        },
+        {
+          "name": "should preserve the runtime value when converting regex source strings",
+          "given": "a string containing doubled backslashes that represent regex source text",
+          "when": "the autofix converts the literal to a String.raw tagged template",
+          "then": "the template raw contents evaluate to the same string value as the original literal"
+        },
+        {
+          "name": "should avoid unsafe or grammar-sensitive string conversions",
+          "given": "a literal used as a directive, module source, non-computed key, JSX attribute, inline snapshot, TypeScript literal, or containing mixed runtime escapes, a trailing backslash, a backtick, interpolation syntax, or multiple lines",
+          "when": "the rule evaluates the string literal",
+          "then": "no violation or autofix is produced because String.raw could change behavior or create invalid syntax"
+        },
+        {
+          "name": "should preserve keyword separation and permit computed expression keys",
+          "given": "a safely convertible string immediately follows a return-like keyword or appears in a computed property key",
+          "when": "the autofix creates the String.raw expression",
+          "then": "required whitespace and surrounding expression grammar remain valid"
         }
       ]
     }

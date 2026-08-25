@@ -34,6 +34,12 @@
           "given": "a test that calls jest.fn().mockRejectedValueOnce(error)",
           "when": "the rule evaluates the call",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow inherited object member names",
+          "given": "ordinary code accesses an Object.prototype member such as value.toString() or value.constructor",
+          "when": "the rule evaluates member expressions",
+          "then": "no violation is reported because the name is not an own key of the banned method map"
         }
       ]
     },

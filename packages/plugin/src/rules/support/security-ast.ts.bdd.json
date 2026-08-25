@@ -9,11 +9,9 @@
       "getCalleeName",
       "getMemberPath",
       "getStaticString",
-      "hasObjectProperty",
       "hasTrueObjectProperty",
       "isDynamicString",
-      "isNullLiteral",
-      "isStringLiteral"
+      "isNullLiteral"
     ]
   },
   "specifications": [
@@ -35,8 +33,8 @@
         {
           "name": "should detect option object properties",
           "given": "a rule inspects an object expression used as an options argument",
-          "when": "the helper evaluates property names and literal true values",
-          "then": "matching properties are reported as present"
+          "when": "the helper evaluates a named property's literal true value",
+          "then": "the matching true property is reported as present"
         }
       ]
     }

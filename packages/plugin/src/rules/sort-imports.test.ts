@@ -100,6 +100,10 @@ describe('sort-imports', () => {
         code: "import 'a-polyfill';\nimport 'b-setup';",
       },
       {
+        name: 'should preserve side-effect import order because evaluation order can be significant',
+        code: "import 'z-initialize';\nimport 'a-register';",
+      },
+      {
         name: 'should allow builtin import after side-effect and before external import',
         code: "import 'reflect-metadata';\nimport { dirname } from 'node:path';\nimport { injectable } from 'inversify';",
       },
@@ -148,11 +152,31 @@ describe('sort-imports', () => {
       {
         name: 'should report multiple external imports out of alphabetical order',
         code: "import c from 'c';\nimport a from 'a';\nimport b from 'b';",
-        output: [
-          "import a from 'a';\nimport c from 'c';\nimport b from 'b';",
-          "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
-        ],
+        output: "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
         errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } }],
+      },
+      {
+        name: 'should sort a large reversed import run in one pass',
+        code: [
+          "import zeta from 'zeta';",
+          "import epsilon from 'epsilon';",
+          "import delta from 'delta';",
+          "import beta from 'beta';",
+          "import alpha from 'alpha';",
+        ].join('\n'),
+        output: [
+          "import alpha from 'alpha';",
+          "import beta from 'beta';",
+          "import delta from 'delta';",
+          "import epsilon from 'epsilon';",
+          "import zeta from 'zeta';",
+        ].join('\n'),
+        errors: [
+          { messageId: 'unsortedImport', data: { current: 'epsilon', previous: 'zeta' } },
+          { messageId: 'unsortedImport', data: { current: 'delta', previous: 'epsilon' } },
+          { messageId: 'unsortedImport', data: { current: 'beta', previous: 'delta' } },
+          { messageId: 'unsortedImport', data: { current: 'alpha', previous: 'beta' } },
+        ],
       },
       {
         name: 'should report case-insensitive alphabetical violation within external group',
@@ -359,16 +383,14 @@ describe('sort-imports', () => {
         ],
       },
       {
-        name: 'should report group violation without fix when wrongGroup anchor is non-adjacent',
+        name: 'should sort a non-adjacent wrongGroup violation in one pass',
         code: [
           "import auth from './auth';",
           "import express from 'express';",
           "import path from 'path';",
         ].join('\n'),
-        output: [
-          "import express from 'express';\nimport auth from './auth';\nimport path from 'path';",
+        output:
           "import express from 'express';\nimport path from 'path';\nimport auth from './auth';",
-        ],
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -391,16 +413,14 @@ describe('sort-imports', () => {
         ],
       },
       {
-        name: 'should report group violation without fix when wrongGroupAfter anchor is non-adjacent',
+        name: 'should sort a non-adjacent wrongGroupAfter violation in one pass',
         code: [
           "import auth from './auth';",
           "import users from './users';",
           "import express from 'express';",
         ].join('\n'),
-        output: [
-          "import auth from './auth';\nimport express from 'express';\nimport users from './users';",
+        output:
           "import express from 'express';\nimport auth from './auth';\nimport users from './users';",
-        ],
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -425,7 +445,7 @@ describe('sort-imports', () => {
       {
         name: 'should report external import placed before side-effect import',
         code: "import { injectable } from 'inversify';\nimport 'reflect-metadata';",
-        output: "import 'reflect-metadata';\nimport { injectable } from 'inversify';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -448,11 +468,28 @@ describe('sort-imports', () => {
         ],
       },
       {
-        name: 'should report side-effect imports out of alphabetical order',
-        code: "import 'z-polyfill';\nimport 'a-setup';",
-        output: "import 'a-setup';\nimport 'z-polyfill';",
+        name: 'should preserve stable ordering between multiple side-effect imports during analysis',
+        code: "import value from 'alpha';\nimport 'setup-z';\nimport 'setup-a';",
+        output: null,
         errors: [
-          { messageId: 'unsortedImport', data: { current: 'a-setup', previous: 'z-polyfill' } },
+          {
+            messageId: 'wrongGroupAfter',
+            data: {
+              current: 'alpha',
+              currentGroup: 'external',
+              next: 'setup-z',
+              nextGroup: 'side-effect',
+            },
+          },
+          {
+            messageId: 'wrongGroup',
+            data: {
+              current: 'setup-z',
+              currentGroup: 'side-effect',
+              previous: 'alpha',
+              previousGroup: 'external',
+            },
+          },
         ],
       },
       {
@@ -520,6 +557,18 @@ describe('sort-imports', () => {
             },
           },
         ],
+      },
+      {
+        name: 'should report without fixing when a comment occurs between imports',
+        code: "import zeta from 'zeta';\n// alpha registration\nimport alpha from 'alpha';",
+        output: null,
+        errors: [{ messageId: 'unsortedImport', data: { current: 'alpha', previous: 'zeta' } }],
+      },
+      {
+        name: 'should report without fixing when executable code occurs between imports',
+        code: "import zeta from 'zeta';\ninitialize();\nimport alpha from 'alpha';",
+        output: null,
+        errors: [{ messageId: 'unsortedImport', data: { current: 'alpha', previous: 'zeta' } }],
       },
     ],
   });

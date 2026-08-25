@@ -265,13 +265,10 @@ function isSecretValue(
   node: Readonly<TSESTree.Expression>,
   value: string,
 ): boolean {
-  if (isStrongSecretPattern(value)) {
-    return true;
-  }
   if (isIgnoredSecretValue(options, value)) {
     return false;
   }
-  return isSensitiveLongValue(options, node, value);
+  return isStrongSecretPattern(value) || isSensitiveLongValue(options, node, value);
 }
 
 /**

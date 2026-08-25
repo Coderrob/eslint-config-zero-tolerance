@@ -27,28 +27,6 @@ const TS_INTERFACE_HERITAGE_NODE_TYPE = 'TSInterfaceHeritage';
 type RequireInterfacePrefixContext = Readonly<TSESLint.RuleContext<'interfacePrefix', []>>;
 
 /**
- * Checks a TypeScript interface declaration for proper naming.
- *
- * @param context - ESLint rule execution context.
- * @param node - The TSInterfaceDeclaration node to check.
- */
-function checkTSInterfaceDeclaration(
-  context: Readonly<RequireInterfacePrefixContext>,
-  node: Readonly<TSESTree.TSInterfaceDeclaration>,
-): void {
-  const interfaceName = node.id.name;
-  if (isValidInterfaceName(interfaceName)) {
-    return;
-  }
-  context.report({
-    node: node.id,
-    messageId: 'interfacePrefix',
-    data: { name: interfaceName },
-    fix: createInterfacePrefixFix(context.sourceCode, node),
-  });
-}
-
-/**
  * Adds one property value's child nodes to a collection.
  *
  * @param childNodes - Mutable child node collection.
@@ -110,6 +88,21 @@ function collectInterfaceNameReferenceNodes(
 }
 
 /**
+ * Collects an interface declaration when its name violates the prefix convention.
+ *
+ * @param interfaces - Mutable invalid-interface collection.
+ * @param node - Interface declaration to inspect.
+ */
+function collectInvalidInterface(
+  interfaces: ReadonlyArray<TSESTree.TSInterfaceDeclaration>,
+  node: Readonly<TSESTree.TSInterfaceDeclaration>,
+): void {
+  if (!isValidInterfaceName(node.id.name)) {
+    Reflect.apply(Array.prototype.push, interfaces, [node]);
+  }
+}
+
+/**
  * Creates a same-file interface rename fix when the prefixed name is collision-free.
  *
  * @param sourceCode - ESLint source code helper.
@@ -118,21 +111,13 @@ function collectInterfaceNameReferenceNodes(
  */
 function createInterfacePrefixFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  node: Readonly<TSESTree.TSInterfaceDeclaration>,
+  nodes: ReadonlyArray<TSESTree.TSInterfaceDeclaration>,
 ): TSESLint.ReportFixFunction | null {
-  const replacementName = `${INTERFACE_REQUIRED_PREFIX}${node.id.name}`;
-  if (
-    !isPotentialInterfacePrefixFix(node.id.name) ||
-    hasTopLevelName(sourceCode.ast, replacementName)
-  ) {
+  const fixableNodes = nodes.filter(isFixableInterface.bind(undefined, sourceCode.ast));
+  if (fixableNodes.length === 0) {
     return null;
   }
-  return replaceInterfaceNameReferences.bind(
-    undefined,
-    sourceCode.ast,
-    node.id.name,
-    replacementName,
-  );
+  return replaceInterfaceNameReferences.bind(undefined, sourceCode.ast, fixableNodes);
 }
 
 /**
@@ -144,8 +129,10 @@ function createInterfacePrefixFix(
 function createRequireInterfacePrefixListeners(
   context: Readonly<RequireInterfacePrefixContext>,
 ): TSESLint.RuleListener {
+  const interfaces: TSESTree.TSInterfaceDeclaration[] = [];
   return {
-    TSInterfaceDeclaration: checkTSInterfaceDeclaration.bind(undefined, context),
+    TSInterfaceDeclaration: collectInvalidInterface.bind(undefined, interfaces),
+    'Program:exit': reportInvalidInterfaces.bind(undefined, context, interfaces),
   };
 }
 
@@ -209,6 +196,21 @@ function hasTopLevelName(program: Readonly<TSESTree.Program>, name: string): boo
     }
   }
   return false;
+}
+
+/**
+ * Returns true when one interface can be prefixed without a top-level collision.
+ *
+ * @param program - Program node containing the interface.
+ * @param node - Invalid interface declaration.
+ * @returns True when the generated name is safe.
+ */
+function isFixableInterface(
+  program: Readonly<TSESTree.Program>,
+  node: Readonly<TSESTree.TSInterfaceDeclaration>,
+): boolean {
+  const replacementName = `${INTERFACE_REQUIRED_PREFIX}${node.id.name}`;
+  return isPotentialInterfacePrefixFix(node.id.name) && !hasTopLevelName(program, replacementName);
 }
 
 /**
@@ -333,15 +335,43 @@ function isValidInterfaceName(interfaceName: string): boolean {
  */
 function replaceInterfaceNameReferences(
   program: Readonly<TSESTree.Program>,
-  currentName: string,
-  replacementName: string,
+  nodes: ReadonlyArray<TSESTree.TSInterfaceDeclaration>,
   fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix[] {
   const fixes: TSESLint.RuleFix[] = [];
-  for (const identifier of getInterfaceNameReferenceNodes(program, currentName)) {
-    Reflect.apply(Array.prototype.push, fixes, [fixer.replaceText(identifier, replacementName)]);
+  const interfaceNames = new Set<string>();
+  for (const node of nodes) {
+    Reflect.apply(Set.prototype.add, interfaceNames, [node.id.name]);
+  }
+  for (const interfaceName of interfaceNames) {
+    const replacementName = `${INTERFACE_REQUIRED_PREFIX}${interfaceName}`;
+    for (const identifier of getInterfaceNameReferenceNodes(program, interfaceName)) {
+      Reflect.apply(Array.prototype.push, fixes, [fixer.replaceText(identifier, replacementName)]);
+    }
   }
   return fixes;
+}
+
+/**
+ * Reports all invalid interfaces and attaches one combined non-overlapping fix transaction.
+ *
+ * @param context - ESLint rule execution context.
+ * @param interfaces - Invalid interfaces collected in source order.
+ */
+function reportInvalidInterfaces(
+  context: Readonly<RequireInterfacePrefixContext>,
+  interfaces: ReadonlyArray<TSESTree.TSInterfaceDeclaration>,
+): void {
+  const combinedFix = createInterfacePrefixFix(context.sourceCode, interfaces);
+  for (let index = 0; index < interfaces.length; index += 1) {
+    const node = interfaces[index];
+    context.report({
+      node: node.id,
+      messageId: 'interfacePrefix',
+      data: { name: node.id.name },
+      fix: index === 0 ? combinedFix : null,
+    });
+  }
 }
 
 /**
