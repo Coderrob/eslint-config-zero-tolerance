@@ -6,45 +6,53 @@ describe('no-mock-implementation', () => {
     valid: [
       {
         code: 'jest.fn().mockImplementationOnce(() => 42);',
-        name: 'mockImplementationOnce is allowed',
+        name: 'should allow mockImplementationOnce',
       },
       {
         code: 'jest.fn().mockReturnValueOnce(42);',
-        name: 'mockReturnValueOnce is allowed',
+        name: 'should allow mockReturnValueOnce',
       },
       {
         code: 'jest.fn().mockResolvedValueOnce("value");',
-        name: 'mockResolvedValueOnce is allowed',
+        name: 'should allow mockResolvedValueOnce',
       },
       {
         code: 'jest.fn().mockRejectedValueOnce(new Error("err"));',
-        name: 'mockRejectedValueOnce is allowed',
+        name: 'should allow mockRejectedValueOnce',
       },
       {
         code: 'jest.fn().mockName("myMock");',
-        name: 'unrelated mock method is allowed',
+        name: 'should allow unrelated mock methods',
       },
       {
         code: 'jest.fn().mockClear();',
-        name: 'mockClear is allowed',
+        name: 'should allow mockClear',
       },
       {
         code: 'jest.fn().mockReset();',
-        name: 'mockReset is allowed',
+        name: 'should allow mockReset',
+      },
+      {
+        code: 'const text = value.toString();',
+        name: 'should allow object prototype methods',
+      },
+      {
+        code: 'const factory = value.constructor;',
+        name: 'should allow inherited object property names',
       },
       {
         code: 'const method = "mockReturnValue"; jest.fn()[method](42);',
-        name: 'computed identifier property is ignored',
+        name: 'should ignore computed identifier properties',
       },
       {
         code: 'jest.fn()[1](42);',
-        name: 'computed numeric property is ignored',
+        name: 'should ignore computed numeric properties',
       },
     ],
     invalid: [
       {
         code: 'jest.fn().mockImplementation(() => 42);',
-        name: 'mockImplementation is banned',
+        name: 'should report mockImplementation',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -54,7 +62,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: 'jest.fn().mockReturnValue(42);',
-        name: 'mockReturnValue is banned',
+        name: 'should report mockReturnValue',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -64,7 +72,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: 'jest.fn().mockResolvedValue("value");',
-        name: 'mockResolvedValue is banned',
+        name: 'should report mockResolvedValue',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -74,7 +82,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: 'jest.fn().mockRejectedValue(new Error("err"));',
-        name: 'mockRejectedValue is banned',
+        name: 'should report mockRejectedValue',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -84,7 +92,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: 'myMock.mockImplementation(() => {}).mockReturnValue(true);',
-        name: 'chained banned mock methods',
+        name: 'should report chained banned mock methods',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -98,7 +106,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: "jest.fn()['mockReturnValue'](42);",
-        name: 'computed access of mockReturnValue is banned',
+        name: 'should report computed access of mockReturnValue',
         errors: [
           {
             messageId: 'noMockImplementation',
@@ -108,7 +116,7 @@ describe('no-mock-implementation', () => {
       },
       {
         code: "jest.fn()['mockImplementation'](() => {});",
-        name: 'computed access of mockImplementation is banned',
+        name: 'should report computed access of mockImplementation',
         errors: [
           {
             messageId: 'noMockImplementation',

@@ -44,3 +44,5 @@ const token = process.env.API_TOKEN ?? '12345678901234567890';
   checkTests: false
 }]
 ```
+
+Configured `allowedPatterns` take precedence over all credential-shape checks, so deliberately marked fixtures such as `sk_dummy_...` remain usable without weakening production detection.

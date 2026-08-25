@@ -24,8 +24,49 @@ describe('prefer-string-raw', () => {
         name: 'should allow String.raw tagged templates',
       },
       {
-        code: String.raw`const source = String.raw('C:\\Users\\dev');`,
-        name: 'should allow literals passed directly to String.raw()',
+        code: String.raw`const expression = /\d+\w+/u;`,
+        name: 'should allow regular expression literals',
+      },
+      {
+        code: String.raw`const pattern = '\\d+\n';`,
+        name: 'should allow strings mixing escaped backslashes with runtime escapes',
+      },
+      {
+        code: String.raw`const slash = '\\';`,
+        name: 'should allow strings ending with a backslash that cannot be safely fixed',
+      },
+      {
+        code: [`const source = 'C:`, "${name}';"].join(`${BACKSLASH}${BACKSLASH}`),
+        name: 'should allow strings containing template interpolation syntax that cannot be safely fixed',
+      },
+      {
+        code: String.raw`const patterns = {'\\d+': true};`,
+        name: 'should allow non-computed object property keys',
+      },
+      {
+        code: String.raw`type Pattern = '\\d+';`,
+        name: 'should allow TypeScript literal types',
+      },
+      {
+        code: String.raw`enum Pattern { Digits = '\\d+' }`,
+        name: 'should allow TypeScript enum string values',
+      },
+      {
+        code: String.raw`import value from '.\\generated';`,
+        name: 'should allow module source literals where tagged templates are illegal',
+      },
+      {
+        code: String.raw`'use\\strict'; function run() {}`,
+        name: 'should allow directive literals where conversion changes directive semantics',
+      },
+      {
+        code: String.raw`expect(value).toMatchInlineSnapshot('value\\path');`,
+        name: 'should allow Jest inline snapshot payloads',
+      },
+      {
+        code: String.raw`const element = <Component path='C:\\repo' />;`,
+        filename: 'component.tsx',
+        name: 'should allow JSX attribute string values',
       },
     ],
     invalid: [
@@ -66,10 +107,16 @@ describe('prefer-string-raw', () => {
         output: ['(String.raw`C:', 'Users', 'dev`)();'].join(BACKSLASH),
       },
       {
-        code: [`const source = 'C:`, "${name}';"].join(`${BACKSLASH}${BACKSLASH}`),
-        name: 'should report without autofixing literals containing template interpolation markers',
+        code: String.raw`function pattern() { return'\\d+'; }`,
+        name: 'should preserve keyword separation when fixing a return value',
         errors: [{ messageId: 'preferStringRaw' }],
-        output: null,
+        output: ['function pattern() { return String.raw`', 'd+`; }'].join(BACKSLASH),
+      },
+      {
+        code: String.raw`const patterns = {['\\d+']: true};`,
+        name: 'should fix computed object property keys where expressions are legal',
+        errors: [{ messageId: 'preferStringRaw' }],
+        output: ['const patterns = {[String.raw`', 'd+`]: true};'].join(BACKSLASH),
       },
     ],
   });

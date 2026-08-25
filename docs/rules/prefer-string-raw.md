@@ -43,4 +43,6 @@ This rule has no options:
 
 ## Autofix Notes
 
-Autofix rewrites eligible string literals to `String.raw\`\``form. It intentionally skips unsafe cases such as literals containing template interpolation markers (for example,`${...}`) or backticks.
+Autofix rewrites only eligible string literals to `String.raw\`\`` form after verifying that the resulting template has the same runtime value. Regex literals are never considered; regex-source strings with redundant backslash escaping are fixed only when their value is preserved.
+
+The rule intentionally skips grammar-sensitive positions such as directives, import/export sources, non-computed property keys, JSX attributes, inline Jest snapshots, and TypeScript literal contexts. It also skips mixed runtime escapes, trailing backslashes, multiline strings, template interpolation markers such as `${...}`, and backticks.

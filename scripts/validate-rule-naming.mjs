@@ -21,7 +21,7 @@
  * eslint-doc-generator, the BDD validator, or rule unit tests.
  */
 
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -31,6 +31,69 @@ const RULES_DIR = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules');
 const BUILT_PLUGIN_PATH = join(REPO_ROOT, 'packages', 'plugin', 'dist', 'index.mjs');
 const RULE_TEST_SUFFIX = '.test.ts';
 const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+/**
+ * Returns missing RuleTester fixture-group diagnostics.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param testContent - Rule test source text.
+ * @returns Missing fixture-group diagnostics.
+ */
+function validateFixtureGroups(ruleName, testContent) {
+  return ['valid', 'invalid']
+    .filter((groupName) => !new RegExp(String.raw`\b${groupName}\s*:\s*\[`, 'u').test(testContent))
+    .map((groupName) => `${ruleName}.ts: test file must contain ${groupName} RuleTester fixtures`);
+}
+
+/**
+ * Returns behavior-style fixture-name diagnostics.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param testContent - Rule test source text.
+ * @returns Invalid fixture-name diagnostics.
+ */
+function validateFixtureNames(ruleName, testContent) {
+  const suiteStart = testContent.indexOf('.run(');
+  const suiteContent = suiteStart === -1 ? testContent : testContent.slice(suiteStart);
+  const names = [...suiteContent.matchAll(/^ {8}name:\s*(['"`])([^'"`]+)\1,?$/gmu)].map(
+    (match) => match[2],
+  );
+  return names
+    .filter((name) => !name.startsWith('should'))
+    .map((name) => `${ruleName}.ts: test description must start with "should": "${name}"`);
+}
+
+/**
+ * Returns an autofix-output fixture diagnostic when required.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param sourceContent - Rule implementation source text.
+ * @param testContent - Rule test source text.
+ * @returns Missing autofix-output diagnostics.
+ */
+function validateFixableOutput(ruleName, sourceContent, testContent) {
+  const isFixable = /\bfixable:\s*['"]code['"]/u.test(sourceContent);
+  const hasOutput = /\boutput\s*:/u.test(testContent);
+  return isFixable && !hasOutput
+    ? [`${ruleName}.ts: fixable rule must assert at least one autofix output fixture`]
+    : [];
+}
+
+/**
+ * Validates the behavioral fixture contract for one rule suite.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param sourceContent - Rule implementation source text.
+ * @param testContent - Rule test source text.
+ * @returns Fixture coverage diagnostics.
+ */
+export function validateRuleFixtures(ruleName, sourceContent, testContent) {
+  return [
+    ...validateFixtureGroups(ruleName, testContent),
+    ...validateFixtureNames(ruleName, testContent),
+    ...validateFixableOutput(ruleName, sourceContent, testContent),
+  ];
+}
 
 /**
  * Returns canonical names derived from direct rule implementation files.
@@ -53,11 +116,21 @@ export function collectRuleNames() {
 export function validateSourceLayout(ruleNames) {
   return ruleNames.flatMap((ruleName) => {
     const failures = [];
+    const rulePath = join(RULES_DIR, `${ruleName}.ts`);
+    const testPath = join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`);
     if (!RULE_NAME_PATTERN.test(ruleName)) {
       failures.push(`${ruleName}.ts: unsupported prefix or non-kebab-case rule name`);
     }
-    if (!existsSync(join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`))) {
+    if (!existsSync(testPath)) {
       failures.push(`${ruleName}.ts: missing "${ruleName}${RULE_TEST_SUFFIX}"`);
+    } else {
+      failures.push(
+        ...validateRuleFixtures(
+          ruleName,
+          readFileSync(rulePath, 'utf8'),
+          readFileSync(testPath, 'utf8'),
+        ),
+      );
     }
     return failures;
   });

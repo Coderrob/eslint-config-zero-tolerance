@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Rule fixture validation**: Extended `validate:rules` to require valid and invalid fixture groups, behavior-style test descriptions beginning with `should`, and asserted output fixtures for every autofixable rule.
+
+### Fixed
+
+- **Jest and mock matcher rules**: Prevented inherited object properties such as `toString`, `constructor`, and `valueOf` from colliding with configured matcher replacement maps and producing false Jest diagnostics.
+- **`prefer-string-raw` rule**: Reworked detection and autofix around exact source text and runtime-value equivalence, including regex-source strings, and skipped grammar-sensitive or semantics-changing contexts such as directives, module sources, property keys, JSX, inline snapshots, TypeScript literals, mixed escapes, trailing backslashes, interpolation markers, backticks, and multiline strings.
+- **`sort-imports` rule**: Replaced overlapping adjacent fixes with a safe whole-span one-pass sort, preserved explicit side-effect import order, retained complete declarations, and withheld autofix across comments, executable code, or side-effect position changes.
+- **`sort-functions` rule**: Included named default exported functions in sorting while preserving complete multiline implementations and export wrappers.
+- **`require-interface-prefix` rule**: Combined multi-interface renames into one non-overlapping fix transaction and deduplicated merged interface references.
+- **Defensive security rules**: Made secret fixture allowlists override credential-shape detection, recognized template and concatenated global string timers without flagging shadowed or arbitrary methods, and rejected disabled IO cancellation values such as `timeout: 0`, `signal: undefined`, and empty `.timeout()` calls.
+
 ## [1.2.6] - 2026-08-06
 
 ### Fixed

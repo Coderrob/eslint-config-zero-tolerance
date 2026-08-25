@@ -21,7 +21,7 @@ import { describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { createSchemaValidator, extractNamedExports } from './validate-bdd-specs.mjs';
-import { validateBuiltRegistration } from './validate-rule-naming.mjs';
+import { validateBuiltRegistration, validateRuleFixtures } from './validate-rule-naming.mjs';
 
 describe('repository validation', () => {
   test('should validate complete BDD structure through the shared JSON Schema', () => {
@@ -72,6 +72,28 @@ describe('repository validation', () => {
       'plugin rules registry: missing rule "missing"',
       'plugin rules registry: unexpected rule "extra"',
     ]);
+  });
+
+  test('should enforce complete behavior-named fixtures and autofix output assertions', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "meta: { fixable: 'code' }",
+        "ruleTester.run('example', rule, { valid: [], invalid: [{ name: 'breaks' }] });",
+      ),
+      [
+        'example.ts: test description must start with "should": "breaks"',
+        'example.ts: fixable rule must assert at least one autofix output fixture',
+      ],
+    );
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "meta: { fixable: 'code' }",
+        "ruleTester.run('example', rule, { valid: [], invalid: [{ name: 'should fix', output: 'fixed' }] });",
+      ),
+      [],
+    );
   });
 
   test('should give every test file exactly one explicit root describe', () => {

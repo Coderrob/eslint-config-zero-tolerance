@@ -17,7 +17,7 @@ Prefixing interface names with `I` makes it immediately clear in code that a typ
 
 ## Autofix
 
-The fixer prefixes capitalized interface names and same-file type references when the generated name does not collide with an existing top-level interface or type alias. Lowercase names and collision cases remain report-only.
+The fixer prefixes capitalized interface names and same-file type references when the generated name does not collide with an existing top-level interface or type alias. Multiple invalid interfaces are renamed in one combined, non-overlapping pass; merged declarations sharing a name are updated exactly once per identifier. Lowercase names and collision cases remain report-only.
 
 ## Examples
 
