@@ -94,6 +94,14 @@ describe('repository validation', () => {
       ),
       [],
     );
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        'meta: {}',
+        "ruleTester.run('example', rule, { valid: [{\n  name: 'allows', options: [{ name: 'ignored' }], code: \"name: 'also ignored'\"\n}], invalid: [] });",
+      ),
+      ['example.ts: test description must start with "should": "allows"'],
+    );
   });
 
   test('should give every test file exactly one explicit root describe', () => {

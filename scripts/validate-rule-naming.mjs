@@ -24,6 +24,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import ts from 'typescript';
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(SCRIPT_PATH), '..');
@@ -46,6 +47,74 @@ function validateFixtureGroups(ruleName, testContent) {
 }
 
 /**
+ * Finds a named property assignment in an object literal.
+ *
+ * @param object - TypeScript object literal.
+ * @param name - Property name to find.
+ * @returns Matching property assignment, if present.
+ */
+function findProperty(object, name) {
+  return object.properties.find(
+    (property) =>
+      ts.isPropertyAssignment(property) &&
+      ts.isIdentifier(property.name) &&
+      property.name.text === name,
+  );
+}
+
+/**
+ * Reads the literal behavior name of one RuleTester fixture.
+ *
+ * @param fixture - RuleTester fixture expression.
+ * @returns Literal fixture name, if present.
+ */
+function getFixtureName(fixture) {
+  if (!ts.isObjectLiteralExpression(fixture)) return undefined;
+  const property = findProperty(fixture, 'name');
+  if (!property) return undefined;
+  if (!ts.isStringLiteralLike(property.initializer)) return undefined;
+  return property.initializer.text;
+}
+
+/**
+ * Identifies a RuleTester-style run call.
+ *
+ * @param node - TypeScript syntax node.
+ * @returns Whether the node is a run call.
+ */
+function isRunCall(node) {
+  if (!ts.isCallExpression(node)) return false;
+  if (!ts.isPropertyAccessExpression(node.expression)) return false;
+  return node.expression.name.text === 'run';
+}
+
+/**
+ * Returns the fixture groups of a RuleTester run call.
+ *
+ * @param node - TypeScript syntax node.
+ * @returns RuleTester suite object, if present.
+ */
+function getRunSuite(node) {
+  if (!isRunCall(node)) return undefined;
+  const suite = node.arguments[2];
+  return ts.isObjectLiteralExpression(suite) ? suite : undefined;
+}
+
+/**
+ * Reads literal fixture names from valid and invalid suite groups.
+ *
+ * @param suite - RuleTester suite object.
+ * @returns Literal fixture names.
+ */
+function getSuiteFixtureNames(suite) {
+  return ['valid', 'invalid'].flatMap((groupName) => {
+    const group = findProperty(suite, groupName);
+    if (!group || !ts.isArrayLiteralExpression(group.initializer)) return [];
+    return group.initializer.elements.map(getFixtureName).filter(Boolean);
+  });
+}
+
+/**
  * Returns behavior-style fixture-name diagnostics.
  *
  * @param ruleName - Canonical rule name.
@@ -53,11 +122,15 @@ function validateFixtureGroups(ruleName, testContent) {
  * @returns Invalid fixture-name diagnostics.
  */
 function validateFixtureNames(ruleName, testContent) {
-  const suiteStart = testContent.indexOf('.run(');
-  const suiteContent = suiteStart === -1 ? testContent : testContent.slice(suiteStart);
-  const names = [...suiteContent.matchAll(/^ {8}name:\s*(['"`])([^'"`]+)\1,?$/gmu)].map(
-    (match) => match[2],
-  );
+  const sourceFile = ts.createSourceFile('rule.test.ts', testContent, ts.ScriptTarget.Latest, true);
+  const pending = [sourceFile];
+  const names = [];
+  while (pending.length > 0) {
+    const node = pending.pop();
+    const suite = getRunSuite(node);
+    if (suite) names.push(...getSuiteFixtureNames(suite));
+    ts.forEachChild(node, (child) => pending.push(child));
+  }
   return names
     .filter((name) => !name.startsWith('should'))
     .map((name) => `${ruleName}.ts: test description must start with "should": "${name}"`);
