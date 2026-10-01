@@ -17,11 +17,17 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from './support/rule-factory';
-import { getCalleeName, getMemberPath, isStringLiteral } from './support/security-ast';
+import {
+  getCalleeName,
+  getMemberPath,
+  getStaticString,
+  isDynamicString,
+} from './support/security-ast';
 
 const CODE_GENERATION_GLOBALS = ['eval', 'Function'];
 const FUNCTION_CONSTRUCTOR_NAME = 'Function';
 const TIMER_FUNCTIONS = ['setTimeout', 'setInterval'];
+const TIMER_GLOBAL_OBJECTS = ['global', 'globalThis', 'self', 'window'];
 const VM_MODULES = ['vm', 'node:vm'];
 const VM_METHODS = [
   'runInThisContext',
@@ -56,7 +62,11 @@ function checkCodeGenerationCall(
   state: Readonly<ICodeGenerationState>,
   node: Readonly<TSESTree.CallExpression>,
 ): void {
-  if (isUnsafeGlobalCall(context, node) || isUnsafeTimerCall(node) || isUnsafeVmCall(state, node)) {
+  if (
+    isUnsafeGlobalCall(context, node) ||
+    isUnsafeTimerCall(context, node) ||
+    isUnsafeVmCall(state, node)
+  ) {
     context.report({ node, messageId: NoUnsafeCodeGenerationMessageId.UnsafeCodeGeneration });
   }
 }
@@ -112,6 +122,31 @@ function hasVmMethodPath(namespace: string, memberPath: string): boolean {
 }
 
 /**
+ * Returns true when a member callee names a timer on a known global object.
+ *
+ * @param context - ESLint rule execution context.
+ * @param callee - Member callee to inspect.
+ * @param calleeName - Static timer method name.
+ * @returns True when the member path is a known global timer.
+ */
+function isGlobalTimerMember(
+  context: Readonly<NoUnsafeCodeGenerationContext>,
+  callee: Readonly<TSESTree.Expression>,
+  calleeName: string,
+): boolean {
+  const memberPath = getMemberPath(callee);
+  for (const globalName of TIMER_GLOBAL_OBJECTS) {
+    if (
+      memberPath === `${globalName}.${calleeName}` &&
+      !isShadowedName(context, callee, globalName)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Returns true when an identifier is locally shadowed.
  *
  * @param context - ESLint rule execution context.
@@ -127,9 +162,41 @@ function isShadowedIdentifier(
   if (node.type !== AST_NODE_TYPES.Identifier) {
     return false;
   }
-  const scope = context.sourceCode.getScope(node);
+  return isShadowedName(context, node, name);
+}
+
+/**
+ * Returns true when a name resolves to a local definition in any enclosing scope.
+ *
+ * @param context - ESLint rule execution context.
+ * @param node - Node whose scope should be searched.
+ * @param name - Binding name to resolve.
+ * @returns True when a local definition shadows the global name.
+ */
+function isShadowedName(
+  context: Readonly<NoUnsafeCodeGenerationContext>,
+  node: Readonly<TSESTree.Node>,
+  name: string,
+): boolean {
+  return isShadowedScope(context.sourceCode.getScope(node), name);
+}
+
+/**
+ * Returns true when a scope or one of its parents defines a name locally.
+ *
+ * @param scope - Scope to search.
+ * @param name - Binding name to resolve.
+ * @returns True when an enclosing scope contains a local definition.
+ */
+function isShadowedScope(scope: TSESLint.Scope.Scope | null, name: string): boolean {
+  if (scope === null) {
+    return false;
+  }
   const variable = scope.set.get(name);
-  return variable !== undefined && variable.defs.length > 0;
+  if (variable !== undefined) {
+    return variable.defs.length > 0;
+  }
+  return isShadowedScope(scope.upper, name);
 }
 
 /**
@@ -143,7 +210,41 @@ function isStringFirstArgument(node: Readonly<TSESTree.CallExpression>): boolean
     return false;
   }
   const firstArgument = node.arguments[0];
-  return firstArgument.type !== AST_NODE_TYPES.SpreadElement && isStringLiteral(firstArgument);
+  return (
+    firstArgument.type !== AST_NODE_TYPES.SpreadElement &&
+    (getStaticString(firstArgument) !== null || isDynamicString(firstArgument))
+  );
+}
+
+/**
+ * Returns true when a callee is an unshadowed global timer function.
+ *
+ * @param context - ESLint rule execution context.
+ * @param callee - Call callee to inspect.
+ * @returns True when the callee resolves to a known global timer.
+ */
+function isTimerCallee(
+  context: Readonly<NoUnsafeCodeGenerationContext>,
+  callee: Readonly<TSESTree.Expression>,
+): boolean {
+  const calleeName = getCalleeName(callee);
+  if (!isTimerFunctionName(calleeName)) {
+    return false;
+  }
+  if (callee.type === AST_NODE_TYPES.Identifier) {
+    return !isShadowedIdentifier(context, callee, callee.name);
+  }
+  return isGlobalTimerMember(context, callee, calleeName);
+}
+
+/**
+ * Returns true when a static callee name is a timer function.
+ *
+ * @param calleeName - Static callee name.
+ * @returns True when the name identifies a timer API.
+ */
+function isTimerFunctionName(calleeName: string | null): calleeName is string {
+  return calleeName !== null && TIMER_FUNCTIONS.includes(calleeName);
 }
 
 /**
@@ -201,12 +302,15 @@ function isUnsafeGlobalConstructor(
 /**
  * Returns true when a timer receives a string callback.
  *
+ * @param context - ESLint rule execution context.
  * @param node - Call expression to inspect.
  * @returns True when the timer callback is a string literal.
  */
-function isUnsafeTimerCall(node: Readonly<TSESTree.CallExpression>): boolean {
-  /* istanbul ignore next */
-  if (!TIMER_FUNCTIONS.includes(getCalleeName(node.callee) ?? '')) {
+function isUnsafeTimerCall(
+  context: Readonly<NoUnsafeCodeGenerationContext>,
+  node: Readonly<TSESTree.CallExpression>,
+): boolean {
+  if (!isTimerCallee(context, node.callee)) {
     return false;
   }
   return isStringFirstArgument(node);

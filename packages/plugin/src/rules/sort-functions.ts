@@ -354,7 +354,10 @@ function getSortableBlock(
 ): SortableBlock | null {
   const leadingComments = getOwnedLeadingComments(sourceCode, node);
   const trailingComments = getOwnedTrailingComments(sourceCode, node);
-  if (hasUnsafeOwnedComments(leadingComments, trailingComments)) {
+  if (
+    hasUnsafeOwnedComments(leadingComments, trailingComments) ||
+    hasFileHeaderComment(leadingComments)
+  ) {
     return null;
   }
   return buildSortableBlock(sourceCode, node, leadingComments, trailingComments);
@@ -542,7 +545,10 @@ function getSwappableNode(node: Readonly<SortableFunctionNode>): TSESTree.Node |
  * @returns Swappable statement node.
  */
 function getTopLevelStatementNode(node: Readonly<TSESTree.FunctionDeclaration>): TSESTree.Node {
-  return node.parent.type === AST_NODE_TYPES.ExportNamedDeclaration ? node.parent : node;
+  return node.parent.type === AST_NODE_TYPES.ExportNamedDeclaration ||
+    node.parent.type === AST_NODE_TYPES.ExportDefaultDeclaration
+    ? node.parent
+    : node;
 }
 
 /**
@@ -597,6 +603,18 @@ function hasDirectiveComment(comments: ReadonlyArray<TSESTree.Comment>): boolean
     }
   }
   return false;
+}
+
+/**
+ * Identifies a file-level header that must remain before every declaration.
+ *
+ * @param comments - Owned leading comments.
+ * @returns Whether an owned comment is a file-level header.
+ */
+function hasFileHeaderComment(comments: ReadonlyArray<TSESTree.Comment>): boolean {
+  return comments.some((comment) =>
+    /\b(?:copyright|license|spdx-license-identifier)\b|@(?:file|module)\b/iu.test(comment.value),
+  );
 }
 
 /**
@@ -957,7 +975,8 @@ function isSortableFunctionBlockAfter(
 function isTopLevelFunctionDeclaration(node: Readonly<TSESTree.FunctionDeclaration>): boolean {
   return (
     node.parent.type === AST_NODE_TYPES.Program ||
-    (node.parent.type === AST_NODE_TYPES.ExportNamedDeclaration &&
+    ((node.parent.type === AST_NODE_TYPES.ExportNamedDeclaration ||
+      node.parent.type === AST_NODE_TYPES.ExportDefaultDeclaration) &&
       node.parent.parent.type === AST_NODE_TYPES.Program)
   );
 }
@@ -1003,7 +1022,10 @@ function processFunctionDeclaration(
   if (!isTopLevelFunctionDeclaration(node)) {
     return;
   }
-  appendValue(functions, { name: getFunctionDeclarationName(node), node });
+  const name = getFunctionDeclarationName(node);
+  if (name.length > 0) {
+    appendValue(functions, { name, node });
+  }
 }
 
 /**

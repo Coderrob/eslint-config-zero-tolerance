@@ -22,6 +22,12 @@
           "given": "two external imports 'axios' then 'lodash' in the same group",
           "when": "the rule evaluates the import declarations",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should preserve explicit side-effect import order",
+          "given": "multiple side-effect-only imports appear in a deliberate source order",
+          "when": "the rule evaluates the import declarations",
+          "then": "their relative order is accepted and never alphabetized"
         }
       ]
     },
@@ -45,6 +51,18 @@
           "given": "import './local' appears before import 'lodash' in the source",
           "when": "the rule evaluates the import declarations",
           "then": "a sortImports violation is reported"
+        },
+        {
+          "name": "should autofix a complete import run in one pass without partial declarations",
+          "given": "five or more safely contiguous imports appear in reverse order",
+          "when": "the autofix sorts the declaration span",
+          "then": "one whole-span replacement retains every complete import and produces final order in one pass"
+        },
+        {
+          "name": "should report without autofixing unsafe import spans",
+          "given": "sorting would move a side-effect import or cross comments or executable code between imports",
+          "when": "the rule evaluates the import declarations",
+          "then": "ordering violations are reported but no autofix is offered"
         }
       ]
     }

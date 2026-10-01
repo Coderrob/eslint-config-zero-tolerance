@@ -137,7 +137,7 @@ export function getMappedMemberPropertyName(
   replacements: Readonly<Record<string, string | undefined>>,
 ): { name: string; replacement: string } | null {
   const name = getMemberPropertyName(node);
-  if (name === null) {
+  if (name === null || !Object.prototype.hasOwnProperty.call(replacements, name)) {
     return null;
   }
   const replacement = replacements[name];

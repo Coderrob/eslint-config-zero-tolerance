@@ -21,9 +21,10 @@
  * eslint-doc-generator, the BDD validator, or rule unit tests.
  */
 
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import ts from 'typescript';
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(SCRIPT_PATH), '..');
@@ -31,6 +32,174 @@ const RULES_DIR = join(REPO_ROOT, 'packages', 'plugin', 'src', 'rules');
 const BUILT_PLUGIN_PATH = join(REPO_ROOT, 'packages', 'plugin', 'dist', 'index.mjs');
 const RULE_TEST_SUFFIX = '.test.ts';
 const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+/**
+ * Returns missing RuleTester fixture-group diagnostics.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param suites - RuleTester suite objects.
+ * @returns Missing fixture-group diagnostics.
+ */
+function validateFixtureGroups(ruleName, suites) {
+  return ['valid', 'invalid']
+    .filter((groupName) => !suites.some((suite) => getFixtures(suite, groupName).length > 0))
+    .map((groupName) => `${ruleName}.ts: test file must contain ${groupName} RuleTester fixtures`);
+}
+
+/**
+ * Finds a named property assignment in an object literal.
+ *
+ * @param object - TypeScript object literal.
+ * @param name - Property name to find.
+ * @returns Matching property assignment, if present.
+ */
+function findProperty(object, name) {
+  return object.properties.find(
+    (property) =>
+      ts.isPropertyAssignment(property) &&
+      (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)) &&
+      property.name.text === name,
+  );
+}
+
+/**
+ * Returns the literal fixtures in one suite group.
+ *
+ * @param suite - RuleTester suite object.
+ * @param groupName - Fixture group name.
+ * @returns Fixture expressions, or an empty collection.
+ */
+function getFixtures(suite, groupName) {
+  const group = findProperty(suite, groupName);
+  return group && ts.isArrayLiteralExpression(group.initializer) ? group.initializer.elements : [];
+}
+
+/**
+ * Reads the literal behavior name of one RuleTester fixture.
+ *
+ * @param fixture - RuleTester fixture expression.
+ * @returns Literal fixture name, if present.
+ */
+function getFixtureName(fixture) {
+  if (!ts.isObjectLiteralExpression(fixture)) return undefined;
+  const property = findProperty(fixture, 'name');
+  if (!property) return undefined;
+  if (!ts.isStringLiteralLike(property.initializer)) return undefined;
+  return property.initializer.text;
+}
+
+/**
+ * Identifies a RuleTester-style run call.
+ *
+ * @param node - TypeScript syntax node.
+ * @returns Whether the node is a run call.
+ */
+function isRunCall(node) {
+  if (!ts.isCallExpression(node)) return false;
+  if (!ts.isPropertyAccessExpression(node.expression)) return false;
+  return node.expression.name.text === 'run';
+}
+
+/**
+ * Returns the fixture groups of a RuleTester run call.
+ *
+ * @param node - TypeScript syntax node.
+ * @returns RuleTester suite object, if present.
+ */
+function getRunSuite(node) {
+  if (!isRunCall(node)) return undefined;
+  const suite = node.arguments[2];
+  return ts.isObjectLiteralExpression(suite) ? suite : undefined;
+}
+
+/**
+ * Collects RuleTester suite objects from a test file.
+ *
+ * @param testContent - Rule test source text.
+ * @returns RuleTester suite objects.
+ */
+function getRunSuites(testContent) {
+  const sourceFile = ts.createSourceFile('rule.test.ts', testContent, ts.ScriptTarget.Latest, true);
+  const pending = [sourceFile];
+  const suites = [];
+  while (pending.length > 0) {
+    const node = pending.pop();
+    const suite = getRunSuite(node);
+    if (suite) suites.push(suite);
+    ts.forEachChild(node, (child) => {
+      pending.push(child);
+    });
+  }
+  return suites;
+}
+
+/**
+ * Returns behavior-style fixture-name diagnostics.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param suites - RuleTester suite objects.
+ * @returns Invalid fixture-name diagnostics.
+ */
+function validateFixtureNames(ruleName, suites) {
+  return suites.flatMap((suite) =>
+    ['valid', 'invalid'].flatMap((groupName) =>
+      getFixtures(suite, groupName).flatMap((fixture) => {
+        const name = getFixtureName(fixture);
+        if (name === undefined)
+          return [`${ruleName}.ts: ${groupName} fixture must have a literal name`];
+        return name.startsWith('should')
+          ? []
+          : [`${ruleName}.ts: test description must start with "should": "${name}"`];
+      }),
+    ),
+  );
+}
+
+/**
+ * Returns whether a fixture asserts a concrete autofix result.
+ *
+ * @param fixture - Invalid fixture expression.
+ * @returns Whether output is asserted.
+ */
+function hasAssertedOutput(fixture) {
+  if (!ts.isObjectLiteralExpression(fixture)) return false;
+  const output = findProperty(fixture, 'output');
+  if (!output) return false;
+  return !['null', 'undefined'].includes(output.initializer.getText());
+}
+
+/**
+ * Returns an autofix-output fixture diagnostic when required.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param sourceContent - Rule implementation source text.
+ * @param suites - RuleTester suite objects.
+ * @returns Missing autofix-output diagnostics.
+ */
+function validateFixableOutput(ruleName, sourceContent, suites) {
+  const isFixable = /\bfixable:\s*['"]code['"]/u.test(sourceContent);
+  const hasOutput = suites.some((suite) => getFixtures(suite, 'invalid').some(hasAssertedOutput));
+  return isFixable && !hasOutput
+    ? [`${ruleName}.ts: fixable rule must assert at least one autofix output fixture`]
+    : [];
+}
+
+/**
+ * Validates the behavioral fixture contract for one rule suite.
+ *
+ * @param ruleName - Canonical rule name.
+ * @param sourceContent - Rule implementation source text.
+ * @param testContent - Rule test source text.
+ * @returns Fixture coverage diagnostics.
+ */
+export function validateRuleFixtures(ruleName, sourceContent, testContent) {
+  const suites = getRunSuites(testContent);
+  return [
+    ...validateFixtureGroups(ruleName, suites),
+    ...validateFixtureNames(ruleName, suites),
+    ...validateFixableOutput(ruleName, sourceContent, suites),
+  ];
+}
 
 /**
  * Returns canonical names derived from direct rule implementation files.
@@ -53,11 +222,21 @@ export function collectRuleNames() {
 export function validateSourceLayout(ruleNames) {
   return ruleNames.flatMap((ruleName) => {
     const failures = [];
+    const rulePath = join(RULES_DIR, `${ruleName}.ts`);
+    const testPath = join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`);
     if (!RULE_NAME_PATTERN.test(ruleName)) {
       failures.push(`${ruleName}.ts: unsupported prefix or non-kebab-case rule name`);
     }
-    if (!existsSync(join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`))) {
+    if (!existsSync(testPath)) {
       failures.push(`${ruleName}.ts: missing "${ruleName}${RULE_TEST_SUFFIX}"`);
+    } else {
+      failures.push(
+        ...validateRuleFixtures(
+          ruleName,
+          readFileSync(rulePath, 'utf8'),
+          readFileSync(testPath, 'utf8'),
+        ),
+      );
     }
     return failures;
   });

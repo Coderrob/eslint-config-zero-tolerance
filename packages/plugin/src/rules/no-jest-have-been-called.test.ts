@@ -25,6 +25,14 @@ describe('no-jest-have-been-called', () => {
         name: 'should allow toEqual',
       },
       {
+        code: 'const text = value.toString();',
+        name: 'should allow object prototype methods',
+      },
+      {
+        code: 'const factory = value.constructor;',
+        name: 'should allow inherited object property names',
+      },
+      {
         code: 'const matcher = "toHaveBeenCalled"; expect(fn)[matcher]();',
         name: 'should allow computed identifier property',
       },

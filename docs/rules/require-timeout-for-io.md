@@ -34,6 +34,10 @@ fetch(url);
 
 axios.get(url);
 
+axios.get(url, { timeout: 0 });
+
+fetch(url, { signal: undefined });
+
 spawn('git', ['status']);
 ```
 
@@ -46,3 +50,5 @@ spawn('git', ['status']);
   additionalIoFunctionNames: []
 }]
 ```
+
+Cancellation must be active: positive numeric or runtime timeout expressions and non-null signals are accepted. Disabled forms such as `timeout: 0`, `signal: undefined`, and an empty `.timeout()` chain are reported.

@@ -179,6 +179,12 @@
           "then": "returns null"
         },
         {
+          "name": "should return null when the property exists only on the map prototype",
+          "given": "a MemberExpression whose property name is inherited from Object.prototype but is not an own key of the replacement map",
+          "when": "getMappedMemberPropertyName is called",
+          "then": "returns null"
+        },
+        {
           "name": "should return null when getMemberPropertyName returns null",
           "given": "a computed MemberExpression with a non-string property",
           "when": "getMappedMemberPropertyName is called",
