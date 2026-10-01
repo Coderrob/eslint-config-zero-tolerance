@@ -37,12 +37,12 @@ const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]
  * Returns missing RuleTester fixture-group diagnostics.
  *
  * @param ruleName - Canonical rule name.
- * @param testContent - Rule test source text.
+ * @param suites - RuleTester suite objects.
  * @returns Missing fixture-group diagnostics.
  */
-function validateFixtureGroups(ruleName, testContent) {
+function validateFixtureGroups(ruleName, suites) {
   return ['valid', 'invalid']
-    .filter((groupName) => !new RegExp(String.raw`\b${groupName}\s*:\s*\[`, 'u').test(testContent))
+    .filter((groupName) => !suites.some((suite) => getFixtures(suite, groupName).length > 0))
     .map((groupName) => `${ruleName}.ts: test file must contain ${groupName} RuleTester fixtures`);
 }
 
@@ -57,9 +57,21 @@ function findProperty(object, name) {
   return object.properties.find(
     (property) =>
       ts.isPropertyAssignment(property) &&
-      ts.isIdentifier(property.name) &&
+      (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)) &&
       property.name.text === name,
   );
+}
+
+/**
+ * Returns the literal fixtures in one suite group.
+ *
+ * @param suite - RuleTester suite object.
+ * @param groupName - Fixture group name.
+ * @returns Fixture expressions, or an empty collection.
+ */
+function getFixtures(suite, groupName) {
+  const group = findProperty(suite, groupName);
+  return group && ts.isArrayLiteralExpression(group.initializer) ? group.initializer.elements : [];
 }
 
 /**
@@ -101,39 +113,59 @@ function getRunSuite(node) {
 }
 
 /**
- * Reads literal fixture names from valid and invalid suite groups.
+ * Collects RuleTester suite objects from a test file.
  *
- * @param suite - RuleTester suite object.
- * @returns Literal fixture names.
+ * @param testContent - Rule test source text.
+ * @returns RuleTester suite objects.
  */
-function getSuiteFixtureNames(suite) {
-  return ['valid', 'invalid'].flatMap((groupName) => {
-    const group = findProperty(suite, groupName);
-    if (!group || !ts.isArrayLiteralExpression(group.initializer)) return [];
-    return group.initializer.elements.map(getFixtureName).filter(Boolean);
-  });
+function getRunSuites(testContent) {
+  const sourceFile = ts.createSourceFile('rule.test.ts', testContent, ts.ScriptTarget.Latest, true);
+  const pending = [sourceFile];
+  const suites = [];
+  while (pending.length > 0) {
+    const node = pending.pop();
+    const suite = getRunSuite(node);
+    if (suite) suites.push(suite);
+    ts.forEachChild(node, (child) => {
+      pending.push(child);
+    });
+  }
+  return suites;
 }
 
 /**
  * Returns behavior-style fixture-name diagnostics.
  *
  * @param ruleName - Canonical rule name.
- * @param testContent - Rule test source text.
+ * @param suites - RuleTester suite objects.
  * @returns Invalid fixture-name diagnostics.
  */
-function validateFixtureNames(ruleName, testContent) {
-  const sourceFile = ts.createSourceFile('rule.test.ts', testContent, ts.ScriptTarget.Latest, true);
-  const pending = [sourceFile];
-  const names = [];
-  while (pending.length > 0) {
-    const node = pending.pop();
-    const suite = getRunSuite(node);
-    if (suite) names.push(...getSuiteFixtureNames(suite));
-    ts.forEachChild(node, (child) => pending.push(child));
-  }
-  return names
-    .filter((name) => !name.startsWith('should'))
-    .map((name) => `${ruleName}.ts: test description must start with "should": "${name}"`);
+function validateFixtureNames(ruleName, suites) {
+  return suites.flatMap((suite) =>
+    ['valid', 'invalid'].flatMap((groupName) =>
+      getFixtures(suite, groupName).flatMap((fixture) => {
+        const name = getFixtureName(fixture);
+        if (name === undefined)
+          return [`${ruleName}.ts: ${groupName} fixture must have a literal name`];
+        return name.startsWith('should')
+          ? []
+          : [`${ruleName}.ts: test description must start with "should": "${name}"`];
+      }),
+    ),
+  );
+}
+
+/**
+ * Returns whether a fixture asserts a concrete autofix result.
+ *
+ * @param fixture - Invalid fixture expression.
+ * @returns Whether output is asserted.
+ */
+function hasAssertedOutput(fixture) {
+  if (!ts.isObjectLiteralExpression(fixture)) return false;
+  const output = findProperty(fixture, 'output');
+  if (!output) return false;
+  return !['null', 'undefined'].includes(output.initializer.getText());
 }
 
 /**
@@ -141,12 +173,12 @@ function validateFixtureNames(ruleName, testContent) {
  *
  * @param ruleName - Canonical rule name.
  * @param sourceContent - Rule implementation source text.
- * @param testContent - Rule test source text.
+ * @param suites - RuleTester suite objects.
  * @returns Missing autofix-output diagnostics.
  */
-function validateFixableOutput(ruleName, sourceContent, testContent) {
+function validateFixableOutput(ruleName, sourceContent, suites) {
   const isFixable = /\bfixable:\s*['"]code['"]/u.test(sourceContent);
-  const hasOutput = /\boutput\s*:/u.test(testContent);
+  const hasOutput = suites.some((suite) => getFixtures(suite, 'invalid').some(hasAssertedOutput));
   return isFixable && !hasOutput
     ? [`${ruleName}.ts: fixable rule must assert at least one autofix output fixture`]
     : [];
@@ -161,10 +193,11 @@ function validateFixableOutput(ruleName, sourceContent, testContent) {
  * @returns Fixture coverage diagnostics.
  */
 export function validateRuleFixtures(ruleName, sourceContent, testContent) {
+  const suites = getRunSuites(testContent);
   return [
-    ...validateFixtureGroups(ruleName, testContent),
-    ...validateFixtureNames(ruleName, testContent),
-    ...validateFixableOutput(ruleName, sourceContent, testContent),
+    ...validateFixtureGroups(ruleName, suites),
+    ...validateFixtureNames(ruleName, suites),
+    ...validateFixableOutput(ruleName, sourceContent, suites),
   ];
 }
 

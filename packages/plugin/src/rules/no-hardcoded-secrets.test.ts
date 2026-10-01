@@ -17,6 +17,10 @@ describe('no-hardcoded-secrets', () => {
         code: "const token = 'sk_dummy_12345678901234567890';",
       },
       {
+        name: 'should allow a credential URL with a placeholder password',
+        code: "const url = 'postgres://admin:dummy-password@prod-db.internal';",
+      },
+      {
         name: 'should allow short sensitive literals',
         code: "const password = 'short';",
       },
@@ -56,6 +60,11 @@ describe('no-hardcoded-secrets', () => {
       {
         name: 'should report credential connection strings',
         code: "const url = 'postgres://user:password@database.internal/db';",
+        errors: [{ messageId: 'hardcodedSecret' }],
+      },
+      {
+        name: 'should report a credential URL even when its hostname contains a fixture marker',
+        code: "const url = 'postgres://admin:realpassword@test-db.internal';",
         errors: [{ messageId: 'hardcodedSecret' }],
       },
       {

@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **Review follow-up**: Kept real credentials in test-named hosts detectable, preserved file headers during function sorting, and retained interface renames when an earlier diagnostic is suppressed.
+- **Rule fixture validation**: Required nonempty named fixtures and a concrete invalid-fixture autofix output instead of accepting empty arrays, missing names, comments, or `output: null`.
 - **Rule fixture validation**: Read behavior names from actual RuleTester fixtures regardless of formatting, without treating names inside fixture code or options as test descriptions.
 - **Jest and mock matcher rules**: Prevented inherited object properties such as `toString`, `constructor`, and `valueOf` from colliding with configured matcher replacement maps and producing false Jest diagnostics.
 - **`prefer-string-raw` rule**: Reworked detection and autofix around exact source text and runtime-value equivalence, including regex-source strings, and skipped grammar-sensitive or semantics-changing contexts such as directives, module sources, property keys, JSX, inline snapshots, TypeScript literals, mixed escapes, trailing backslashes, interpolation markers, backticks, and multiline strings.

@@ -45,4 +45,4 @@ const token = process.env.API_TOKEN ?? '12345678901234567890';
 }]
 ```
 
-Configured `allowedPatterns` take precedence over all credential-shape checks, so deliberately marked fixtures such as `sk_dummy_...` remain usable without weakening production detection.
+Configured `allowedPatterns` take precedence over credential-shape checks, so deliberately marked fixtures such as `sk_dummy_...` remain usable. For credential URLs, patterns match the password only; a marker in the hostname does not hide a hardcoded password.

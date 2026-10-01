@@ -276,6 +276,24 @@ describe('sort-functions', () => {
         errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
       },
       {
+        name: 'should keep a file copyright header before sorted functions',
+        code: '/* Copyright 2026 Example Corp. */\nexport default function beta() {}\nfunction alpha() {}',
+        output: null,
+        errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+      },
+      {
+        name: 'should keep a file license header before sorted functions',
+        code: '/** SPDX-License-Identifier: MIT */\nfunction beta() {}\nfunction alpha() {}',
+        output: null,
+        errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+      },
+      {
+        name: 'should keep a module header after imports while sorting following functions',
+        code: "import { value } from './value';\n/** @module tools */\nfunction beta() {}\nfunction alpha() {}",
+        output: "import { value } from './value';\n/** @module tools */\nfunction alpha() {}\nfunction beta() {}",
+        errors: [{ messageId: 'unsortedFunction', data: { current: 'alpha', previous: 'beta' } }],
+      },
+      {
         name: 'should report unsorted functions with trailing directive comments without fix',
         code: 'function beta() {} /* istanbul ignore next */\nfunction alpha() {}',
         output: null,

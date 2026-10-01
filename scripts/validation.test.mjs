@@ -79,7 +79,7 @@ describe('repository validation', () => {
       validateRuleFixtures(
         'example',
         "meta: { fixable: 'code' }",
-        "ruleTester.run('example', rule, { valid: [], invalid: [{ name: 'breaks' }] });",
+        "ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'breaks' }] });",
       ),
       [
         'example.ts: test description must start with "should": "breaks"',
@@ -90,7 +90,7 @@ describe('repository validation', () => {
       validateRuleFixtures(
         'example',
         "meta: { fixable: 'code' }",
-        "ruleTester.run('example', rule, { valid: [], invalid: [{ name: 'should fix', output: 'fixed' }] });",
+        "ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'should fix', output: 'fixed' }] });",
       ),
       [],
     );
@@ -98,9 +98,29 @@ describe('repository validation', () => {
       validateRuleFixtures(
         'example',
         'meta: {}',
-        "ruleTester.run('example', rule, { valid: [{\n  name: 'allows', options: [{ name: 'ignored' }], code: \"name: 'also ignored'\"\n}], invalid: [] });",
+        "ruleTester.run('example', rule, { valid: [{\n  name: 'allows', options: [{ name: 'ignored' }], code: \"name: 'also ignored'\"\n}], invalid: [{ name: 'should reject' }] });",
       ),
       ['example.ts: test description must start with "should": "allows"'],
+    );
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "meta: { fixable: 'code' }",
+        "ruleTester.run('example', rule, { valid: [], invalid: [{ code: 'bad', output: null }] }); // output: 'fixed'",
+      ),
+      [
+        'example.ts: test file must contain valid RuleTester fixtures',
+        'example.ts: invalid fixture must have a literal name',
+        'example.ts: fixable rule must assert at least one autofix output fixture',
+      ],
+    );
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "meta: { fixable: 'code' }",
+        "const unrelated = { output: 'fixed' }; ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'should fail' }] });",
+      ),
+      ['example.ts: fixable rule must assert at least one autofix output fixture'],
     );
   });
 

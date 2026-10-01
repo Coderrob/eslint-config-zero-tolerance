@@ -1,7 +1,28 @@
+import * as tsParser from '@typescript-eslint/parser';
+import { Linter } from 'eslint';
 import { ruleTester } from '../testing/test-helper';
 import { requireInterfacePrefix } from './require-interface-prefix';
 
 describe('require-interface-prefix', () => {
+  it('should fix a later interface when the first diagnostic is suppressed', () => {
+    const source = [
+      '// eslint-disable-next-line zero-tolerance/require-interface-prefix',
+      'interface Alpha {}',
+      'interface Beta {}',
+    ].join('\n');
+    const linter = new Linter();
+    const result = linter.verifyAndFix(source, {
+      languageOptions: { parser: tsParser },
+      plugins: {
+        'zero-tolerance': { rules: { 'require-interface-prefix': requireInterfacePrefix } },
+      },
+      rules: { 'zero-tolerance/require-interface-prefix': 'error' },
+    });
+
+    expect(result.output).toBe(source.replace('interface Beta', 'interface IBeta'));
+    expect(result.messages).toEqual([]);
+  });
+
   ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     valid: [
       {
