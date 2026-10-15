@@ -1,7 +1,28 @@
+import * as tsParser from '@typescript-eslint/parser';
+import { Linter } from 'eslint';
 import { ruleTester } from '../testing/test-helper';
 import { requireInterfacePrefix } from './require-interface-prefix';
 
 describe('require-interface-prefix', () => {
+  it('should fix a later interface when the first diagnostic is suppressed', () => {
+    const source = [
+      '// eslint-disable-next-line zero-tolerance/require-interface-prefix',
+      'interface Alpha {}',
+      'interface Beta {}',
+    ].join('\n');
+    const linter = new Linter();
+    const result = linter.verifyAndFix(source, {
+      languageOptions: { parser: tsParser },
+      plugins: {
+        'zero-tolerance': { rules: { 'require-interface-prefix': requireInterfacePrefix } },
+      },
+      rules: { 'zero-tolerance/require-interface-prefix': 'error' },
+    });
+
+    expect(result.output).toBe(source.replace('interface Beta', 'interface IBeta'));
+    expect(result.messages).toEqual([]);
+  });
+
   ruleTester.run('require-interface-prefix', requireInterfacePrefix, {
     valid: [
       {
@@ -139,10 +160,8 @@ describe('require-interface-prefix', () => {
       {
         code: 'interface User { name: string; }\ntype Account = User;\ninterface Profile extends User {}',
         name: 'should fix same-file type references when prefixing interface',
-        output: [
-          'interface IUser { name: string; }\ntype Account = IUser;\ninterface Profile extends IUser {}',
+        output:
           'interface IUser { name: string; }\ntype Account = IUser;\ninterface IProfile extends IUser {}',
-        ],
         errors: [
           { messageId: 'interfacePrefix', data: { name: 'User' } },
           { messageId: 'interfacePrefix', data: { name: 'Profile' } },
@@ -153,6 +172,15 @@ describe('require-interface-prefix', () => {
         name: 'should not fix interface prefix when replacement collides',
         output: null,
         errors: [{ messageId: 'interfacePrefix', data: { name: 'User' } }],
+      },
+      {
+        code: 'interface User { id: string; }\ninterface User { name: string; }',
+        name: 'should fix merged interface declarations without overlapping edits',
+        output: 'interface IUser { id: string; }\ninterface IUser { name: string; }',
+        errors: [
+          { messageId: 'interfacePrefix', data: { name: 'User' } },
+          { messageId: 'interfacePrefix', data: { name: 'User' } },
+        ],
       },
     ],
   });

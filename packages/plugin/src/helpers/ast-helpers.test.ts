@@ -222,6 +222,19 @@ describe('ast-helpers', () => {
       ).toBeNull();
     });
 
+    it('should return null when member name is inherited from Object prototype', () => {
+      const node = {
+        computed: false,
+        property: { type: 'Identifier', name: 'toString' },
+      };
+
+      expect(
+        getMappedMemberPropertyName(node, {
+          mockImplementation: 'mockImplementationOnce',
+        }),
+      ).toBeNull();
+    });
+
     it('should return null when member property name cannot be resolved', () => {
       const node = {
         computed: true,

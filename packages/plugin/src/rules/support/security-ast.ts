@@ -119,60 +119,6 @@ function getTemplateElementText(element: Readonly<TSESTree.TemplateElement>): st
 }
 
 /**
- * Returns true when any object property has an accepted name.
- *
- * @param properties - Object properties to inspect.
- * @param names - Accepted property names.
- * @returns True when a matching property is present.
- */
-function hasNamedProperty(
-  properties: readonly (TSESTree.Property | TSESTree.SpreadElement)[],
-  names: Readonly<ReadonlySet<string>>,
-): boolean {
-  for (const property of properties) {
-    if (hasPropertyName(property, names)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Returns true when an object expression has a named property.
- *
- * @param node - Expression to inspect.
- * @param names - Accepted property names.
- * @returns True when a matching property is present.
- */
-export function hasObjectProperty(
-  node: TSESTree.Expression | TSESTree.SpreadElement | undefined,
-  names: Readonly<ReadonlySet<string>>,
-): boolean {
-  if (node?.type !== AST_NODE_TYPES.ObjectExpression) {
-    return false;
-  }
-  return hasNamedProperty(node.properties, names);
-}
-
-/**
- * Returns true when an object property matches one of the requested names.
- *
- * @param property - Object property to inspect.
- * @param names - Accepted property names.
- * @returns True when the property name matches.
- */
-function hasPropertyName(
-  property: TSESTree.Property | TSESTree.SpreadElement,
-  names: Readonly<ReadonlySet<string>>,
-): boolean {
-  if (property.type !== AST_NODE_TYPES.Property) {
-    return false;
-  }
-  const name = getPropertyName(property.key);
-  return name !== null && names.has(name);
-}
-
-/**
  * Checks whether an expression contains any string-like branch.
  *
  * @param left - Left expression or private identifier to inspect.
@@ -307,7 +253,7 @@ function isStringLikeExpression(node: TSESTree.Expression | TSESTree.PrivateIden
  * @param node - Expression to inspect.
  * @returns True when the node is a string literal.
  */
-export function isStringLiteral(node: TSESTree.Expression | null): node is TSESTree.StringLiteral {
+function isStringLiteral(node: TSESTree.Expression | null): node is TSESTree.StringLiteral {
   return node?.type === AST_NODE_TYPES.Literal && typeof node.value === 'string';
 }
 

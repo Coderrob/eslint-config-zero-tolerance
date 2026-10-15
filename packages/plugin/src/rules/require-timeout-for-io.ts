@@ -18,12 +18,13 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isTestFile } from '../helpers/ast-guards';
 import { createRule } from './support/rule-factory';
-import { getCalleeName, getMemberPath, hasObjectProperty } from './support/security-ast';
+import { getCalleeName, getMemberPath } from './support/security-ast';
 
 const CHILD_PROCESS_MODULES = ['child_process', 'node:child_process'];
 const FETCH_FUNCTION_NAME = 'fetch';
+const SIGNAL_PROPERTY_NAME = 'signal';
 const TIMEOUT_METHOD_NAME = 'timeout';
-const CANCELLATION_PROPERTIES = new Set(['signal', 'timeout']);
+const UNDEFINED_IDENTIFIER_NAME = 'undefined';
 const HTTP_CLIENTS = ['axios', 'got', 'ky', 'request', 'superagent'];
 const SUBPROCESS_FUNCTIONS = ['spawn', 'spawnSync', 'exec', 'execSync', 'execFile', 'execFileSync'];
 
@@ -86,6 +87,43 @@ function createRequireTimeoutForIoListeners(
     ImportDeclaration: trackChildProcessImports.bind(undefined, state),
     CallExpression: checkIoCall.bind(undefined, context, state, options),
   };
+}
+
+/**
+ * Gets a static cancellation option property name.
+ *
+ * @param key - Object property key to inspect.
+ * @returns The property name when statically known.
+ */
+function getCancellationPropertyName(
+  key: Readonly<TSESTree.Expression | TSESTree.PrivateIdentifier>,
+): string | null {
+  if (key.type === AST_NODE_TYPES.Identifier) {
+    return key.name;
+  }
+  if (key.type === AST_NODE_TYPES.Literal && typeof key.value === 'string') {
+    return key.value;
+  }
+  return null;
+}
+
+/**
+ * Gets an immediately chained timeout call for an IO call.
+ *
+ * @param node - IO call to inspect.
+ * @returns Chained timeout call, or null when absent.
+ */
+function getChainedTimeoutCall(
+  node: Readonly<TSESTree.CallExpression>,
+): TSESTree.CallExpression | null {
+  const parent = node.parent;
+  if (parent.type !== AST_NODE_TYPES.MemberExpression) {
+    return null;
+  }
+  if (getCalleeName(parent) !== TIMEOUT_METHOD_NAME) {
+    return null;
+  }
+  return parent.parent.type === AST_NODE_TYPES.CallExpression ? parent.parent : null;
 }
 
 /**
@@ -157,7 +195,10 @@ function getRootCallName(node: Readonly<TSESTree.CallExpression>): string | null
  */
 function hasCancellationArgument(node: Readonly<TSESTree.CallExpression>): boolean {
   for (const argument of node.arguments) {
-    if (hasObjectProperty(argument, CANCELLATION_PROPERTIES)) {
+    if (
+      argument.type === AST_NODE_TYPES.ObjectExpression &&
+      argument.properties.some(hasUsableCancellationProperty)
+    ) {
       return true;
     }
   }
@@ -175,6 +216,55 @@ function hasCancellationOption(node: Readonly<TSESTree.CallExpression>): boolean
     return true;
   }
   return hasCancellationArgument(node);
+}
+
+/**
+ * Returns true when a call's first argument is a positive timeout value.
+ *
+ * @param node - Timeout call to inspect.
+ * @returns True when its first argument activates a timeout.
+ */
+function hasPositiveTimeoutArgument(node: Readonly<TSESTree.CallExpression>): boolean {
+  if (node.arguments.length === 0) {
+    return false;
+  }
+  const firstArgument = node.arguments[0];
+  if (firstArgument.type === AST_NODE_TYPES.SpreadElement) {
+    return false;
+  }
+  return isPositiveTimeoutValue(firstArgument);
+}
+
+/**
+ * Returns true when a timeout or signal property has a usable value.
+ *
+ * @param property - Object property to inspect.
+ * @returns True when the property provides active cancellation configuration.
+ */
+function hasUsableCancellationProperty(
+  property: TSESTree.Property | TSESTree.SpreadElement,
+): boolean {
+  if (property.type !== AST_NODE_TYPES.Property) {
+    return false;
+  }
+  const propertyName = getCancellationPropertyName(property.key);
+  if (propertyName === SIGNAL_PROPERTY_NAME) {
+    return !isAbsentCancellationValue(property.value);
+  }
+  return propertyName === TIMEOUT_METHOD_NAME && isPositiveTimeoutValue(property.value);
+}
+
+/**
+ * Returns true when an expression is explicitly null or undefined.
+ *
+ * @param value - Property value to inspect.
+ * @returns True when the value cannot provide cancellation.
+ */
+function isAbsentCancellationValue(value: Readonly<TSESTree.Node>): boolean {
+  return (
+    (value.type === AST_NODE_TYPES.Literal && value.value === null) ||
+    (value.type === AST_NODE_TYPES.Identifier && value.name === UNDEFINED_IDENTIFIER_NAME)
+  );
 }
 
 /**
@@ -221,12 +311,8 @@ function isBuiltInIoCall(
  * @returns True when a timeout chain follows the call.
  */
 function isChainedTimeoutCall(node: Readonly<TSESTree.CallExpression>): boolean {
-  const parent = node.parent;
-  return (
-    parent.type === AST_NODE_TYPES.MemberExpression &&
-    getCalleeName(parent) === TIMEOUT_METHOD_NAME &&
-    parent.parent.type === AST_NODE_TYPES.CallExpression
-  );
+  const timeoutCall = getChainedTimeoutCall(node);
+  return timeoutCall !== null && hasPositiveTimeoutArgument(timeoutCall);
 }
 
 /**
@@ -251,6 +337,22 @@ function isHttpClientCall(
   calleeName: string | null,
 ): boolean {
   return HTTP_CLIENTS.includes(getRootCallName(node) ?? calleeName ?? '');
+}
+
+/**
+ * Returns true when a timeout value is known positive or is resolved at runtime.
+ *
+ * @param value - Timeout expression to inspect.
+ * @returns True when the value can impose a positive timeout.
+ */
+function isPositiveTimeoutValue(value: Readonly<TSESTree.Node>): boolean {
+  if (isAbsentCancellationValue(value)) {
+    return false;
+  }
+  if (value.type !== AST_NODE_TYPES.Literal) {
+    return true;
+  }
+  return typeof value.value === 'number' && value.value > 0;
 }
 
 /**

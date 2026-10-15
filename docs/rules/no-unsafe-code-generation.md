@@ -33,6 +33,8 @@ eval(source);
 const fn = new Function(source);
 
 setTimeout('run()', 100);
+
+setInterval(`run(${value})`, 100);
 ```
 
 ## Configuration
@@ -42,3 +44,5 @@ This rule has no options:
 ```js
 'zero-tolerance/no-unsafe-code-generation': 'error'
 ```
+
+Direct timers are checked only when they resolve to unshadowed globals. Known global-object forms such as `globalThis.setTimeout(...)` are also checked, while arbitrary methods such as `scheduler.setTimeout(...)` are left alone.

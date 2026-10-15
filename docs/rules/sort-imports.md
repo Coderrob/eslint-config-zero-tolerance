@@ -15,7 +15,7 @@ Require import declarations to be grouped and sorted: side-effect → builtin �
 
 Consistent import ordering reduces merge conflicts and makes it immediately clear where a dependency comes from. Imports must appear in six groups in order — side-effect (bare) imports, Node.js built-in modules (`node:` protocol), external packages, parent-directory (`../`) imports, peer (`./`) imports, and the index (`.`) import — with each group sorted alphabetically (case-insensitive).
 
-Side-effect imports (`import 'module'`) have no specifiers and often set up runtime prerequisites such as polyfills or reflection metadata. They must appear before all other imports.
+Side-effect imports (`import 'module'`) have no specifiers and often set up runtime prerequisites such as polyfills or reflection metadata. Their explicit relative order is preserved because reordering them can change runtime behavior.
 
 Node.js built-in imports use the `node:` protocol prefix (e.g., `node:path`, `node:fs`) and are placed after side-effect imports but before third-party external packages.
 
@@ -24,7 +24,7 @@ Node.js built-in imports use the `node:` protocol prefix (e.g., `node:path`, `no
 ### ✅ Correct
 
 ```typescript
-// 1. Side-effect imports — alphabetical
+// 1. Side-effect imports — explicit runtime order is preserved
 import 'reflect-metadata';
 
 // 2. Node.js built-in imports — alphabetical
@@ -74,3 +74,7 @@ This rule has no options:
 ```js
 'zero-tolerance/sort-imports': 'error'
 ```
+
+## Autofix Safety
+
+The fixer replaces a complete contiguous import span in one pass, preserving every declaration and its whitespace separators. When sorting would move a side-effect import or cross comments or executable statements between imports, the rule reports the ordering problem without offering an autofix.

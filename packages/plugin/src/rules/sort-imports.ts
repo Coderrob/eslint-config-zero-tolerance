@@ -48,6 +48,12 @@ type ImportEntry = Readonly<{
   value: string;
   valueLower: string;
 }>;
+type SortableImportBlock = ImportEntry &
+  Readonly<{
+    end: number;
+    start: number;
+    text: string;
+  }>;
 type ImportGroupInputs = Readonly<{
   importPath: string;
   isSideEffect: boolean;
@@ -85,19 +91,64 @@ function addImportEntry(
 }
 
 /**
- * Builds a fixer that swaps two import declarations and preserves spacing between them.
+ * Builds a fixer that sorts the complete safe import span in one pass.
  *
- * @param sourceCode - ESLint source code helper.
- * @param previousImport - Import currently before the misplaced import.
- * @param currentImport - Import currently after the misplaced import.
- * @returns ESLint fix callback.
+ * @param state - Shared sort state.
+ * @returns ESLint fix callback, or null when comments, code, or side-effect movement make sorting unsafe.
  */
-function buildSwapFix(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  previousImport: Readonly<TSESTree.ImportDeclaration>,
-  currentImport: Readonly<TSESTree.ImportDeclaration>,
-): TSESLint.ReportFixFunction {
-  return swapImports.bind(undefined, sourceCode, previousImport, currentImport);
+function buildSortFix(state: Readonly<SortImportsState>): TSESLint.ReportFixFunction | null {
+  const blocks = getSortableImportBlocks(state.sourceCode, state.imports);
+  if (hasUnsafeInterImportContent(state.sourceCode, blocks)) {
+    return null;
+  }
+  const sortedBlocks = getSortedImportBlocks(blocks);
+  if (!hasPreservedSideEffectPositions(blocks, sortedBlocks)) {
+    return null;
+  }
+  return sortImportBlocks.bind(undefined, state.sourceCode, blocks, sortedBlocks);
+}
+
+/**
+ * Compares imports by group and then case-insensitive path while preserving side-effect order.
+ *
+ * @param left - Left import entry.
+ * @param right - Right import entry.
+ * @returns Negative when left sorts first, positive when right sorts first, or zero for stable ties.
+ */
+function compareImportEntries(left: Readonly<ImportEntry>, right: Readonly<ImportEntry>): number {
+  const groupComparison = compareImportGroups(left, right);
+  if (groupComparison !== 0) {
+    return groupComparison;
+  }
+  if (left.group === ImportGroup.SideEffect) {
+    return 0;
+  }
+  return compareImportPaths(left, right);
+}
+
+/**
+ * Compares configured import groups.
+ *
+ * @param left - Left import entry.
+ * @param right - Right import entry.
+ * @returns Numeric group-order comparison.
+ */
+function compareImportGroups(left: Readonly<ImportEntry>, right: Readonly<ImportEntry>): number {
+  return left.group - right.group;
+}
+
+/**
+ * Compares normalized import paths.
+ *
+ * @param left - Left import entry.
+ * @param right - Right import entry.
+ * @returns Case-insensitive path-order comparison.
+ */
+function compareImportPaths(left: Readonly<ImportEntry>, right: Readonly<ImportEntry>): number {
+  if (left.valueLower < right.valueLower) {
+    return -1;
+  }
+  return left.valueLower > right.valueLower ? 1 : 0;
 }
 
 /**
@@ -156,6 +207,24 @@ function getImportGroup(inputs: Readonly<ImportGroupInputs>): ImportGroup {
 }
 
 /**
+ * Returns original whitespace between adjacent import declarations.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param blocks - Import blocks in source order.
+ * @param block - Current block.
+ * @param index - Current index after omitting the first block.
+ * @returns Exact separator text.
+ */
+function getImportSeparator(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  blocks: ReadonlyArray<SortableImportBlock>,
+  block: Readonly<SortableImportBlock>,
+  index: number,
+): string {
+  return sourceCode.text.slice(blocks[index].end, block.start);
+}
+
+/**
  * Returns source path text from an import declaration.
  *
  * @param node - Import declaration node.
@@ -179,6 +248,86 @@ function getRelativeImportGroup(importPath: string): ImportGroup {
 }
 
 /**
+ * Returns one exact sortable block for an import entry.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param entry - Import entry to convert.
+ * @returns Import block with declaration range and text.
+ */
+function getSortableImportBlock(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  entry: Readonly<ImportEntry>,
+): SortableImportBlock {
+  return {
+    ...entry,
+    end: entry.node.range[1],
+    start: entry.node.range[0],
+    text: sourceCode.getText(entry.node),
+  };
+}
+
+/**
+ * Returns sortable source blocks for import entries.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param imports - Import entries in source order.
+ * @returns Import blocks with exact declaration text.
+ */
+function getSortableImportBlocks(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  imports: ReadonlyArray<ImportEntry>,
+): ReadonlyArray<SortableImportBlock> {
+  return imports.map(getSortableImportBlock.bind(undefined, sourceCode));
+}
+
+/**
+ * Returns sorted import blocks using stable immutable insertion.
+ *
+ * @param blocks - Import blocks in source order.
+ * @returns Blocks in configured group and alphabetical order.
+ */
+function getSortedImportBlocks(
+  blocks: ReadonlyArray<SortableImportBlock>,
+): ReadonlyArray<SortableImportBlock> {
+  return blocks.reduce<ReadonlyArray<SortableImportBlock>>(insertSortedImportBlock, []);
+}
+
+/**
+ * Returns the full sorted import replacement text with original whitespace separators.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param originalBlocks - Import blocks in source order.
+ * @param sortedBlocks - Import blocks in sorted order.
+ * @returns Complete replacement text.
+ */
+function getSortedImportText(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  originalBlocks: ReadonlyArray<SortableImportBlock>,
+  sortedBlocks: ReadonlyArray<SortableImportBlock>,
+): string {
+  const separators = originalBlocks
+    .slice(1)
+    .map(getImportSeparator.bind(undefined, sourceCode, originalBlocks));
+  return sortedBlocks.map(getSortedImportTextSegment.bind(undefined, separators)).join('');
+}
+
+/**
+ * Returns one sorted declaration segment using its positional separator.
+ *
+ * @param separators - Original whitespace separators.
+ * @param block - Sorted import block.
+ * @param index - Sorted position.
+ * @returns Segment text.
+ */
+function getSortedImportTextSegment(
+  separators: ReadonlyArray<string>,
+  block: Readonly<SortableImportBlock>,
+  index: number,
+): string {
+  return index === 0 ? block.text : `${separators[index - 1]}${block.text}`;
+}
+
+/**
  * Returns true when at least two imports exist.
  *
  * @param imports - Collected imports.
@@ -186,6 +335,73 @@ function getRelativeImportGroup(importPath: string): ImportGroup {
  */
 function hasAtLeastTwoImports(imports: readonly ImportEntry[]): boolean {
   return imports.length >= MIN_IMPORTS_TO_VALIDATE;
+}
+
+/**
+ * Returns true when sorting keeps every explicit side-effect import at its original index.
+ *
+ * @param originalBlocks - Blocks in source order.
+ * @param sortedBlocks - Blocks in proposed sorted order.
+ * @returns True when no side-effect import changes position.
+ */
+function hasPreservedSideEffectPositions(
+  originalBlocks: ReadonlyArray<SortableImportBlock>,
+  sortedBlocks: ReadonlyArray<SortableImportBlock>,
+): boolean {
+  return originalBlocks.every(isSideEffectPositionPreserved.bind(undefined, sortedBlocks));
+}
+
+/**
+ * Returns true when comments or executable code occur between collected imports.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param blocks - Import blocks in source order.
+ * @returns True when a whole-span fix would risk moving non-import content.
+ */
+function hasUnsafeInterImportContent(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  blocks: ReadonlyArray<SortableImportBlock>,
+): boolean {
+  return blocks
+    .slice(1)
+    .some(hasUnsafeInterImportContentAfterPrevious.bind(undefined, sourceCode, blocks));
+}
+
+/**
+ * Returns true when one import separator contains non-whitespace content.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param blocks - Import blocks in source order.
+ * @param block - Current import block.
+ * @param index - Index after dropping the first block.
+ * @returns True when the preceding separator is unsafe.
+ */
+function hasUnsafeInterImportContentAfterPrevious(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  blocks: ReadonlyArray<SortableImportBlock>,
+  block: Readonly<SortableImportBlock>,
+  index: number,
+): boolean {
+  const previousBlock = blocks[index];
+  return sourceCode.text.slice(previousBlock.end, block.start).trim().length > 0;
+}
+
+/**
+ * Inserts one import block into an immutable stable sorted collection.
+ *
+ * @param sortedBlocks - Blocks sorted so far.
+ * @param block - Block to insert.
+ * @returns Updated sorted blocks.
+ */
+function insertSortedImportBlock(
+  sortedBlocks: ReadonlyArray<SortableImportBlock>,
+  block: Readonly<SortableImportBlock>,
+): ReadonlyArray<SortableImportBlock> {
+  const insertionIndex = sortedBlocks.findIndex(isImportBlockAfter.bind(undefined, block));
+  if (insertionIndex === -1) {
+    return [...sortedBlocks, block];
+  }
+  return [...sortedBlocks.slice(0, insertionIndex), block, ...sortedBlocks.slice(insertionIndex)];
 }
 
 /**
@@ -199,6 +415,20 @@ function isBuiltinImportPath(importPath: string): boolean {
 }
 
 /**
+ * Returns true when an existing sorted block should follow the inserted block.
+ *
+ * @param block - Block being inserted.
+ * @param sortedBlock - Existing sorted block.
+ * @returns True when the insertion point is found.
+ */
+function isImportBlockAfter(
+  block: Readonly<SortableImportBlock>,
+  sortedBlock: Readonly<SortableImportBlock>,
+): boolean {
+  return compareImportEntries(block, sortedBlock) < 0;
+}
+
+/**
  * Returns true when path is current-directory index import.
  *
  * @param importPath - Import path to check.
@@ -209,6 +439,22 @@ function isIndexImportPath(importPath: string): boolean {
     return true;
   }
   return INDEX_IMPORT_PATTERN.test(importPath);
+}
+
+/**
+ * Returns true when one side-effect import stays at its source index.
+ *
+ * @param sortedBlocks - Proposed sorted blocks.
+ * @param block - Original import block.
+ * @param index - Original index.
+ * @returns True when the block is not side-effectful or has not moved.
+ */
+function isSideEffectPositionPreserved(
+  sortedBlocks: ReadonlyArray<SortableImportBlock>,
+  block: Readonly<SortableImportBlock>,
+  index: number,
+): boolean {
+  return block.group !== ImportGroup.SideEffect || sortedBlocks[index].node === block.node;
 }
 
 /**
@@ -284,7 +530,7 @@ function reportUnsortedImportIfNeeded(
   previousEntry: Readonly<ImportEntry>,
   currentEntry: Readonly<ImportEntry>,
 ): void {
-  if (state.reportedNodes.has(currentEntry.node) || currentEntry.group !== previousEntry.group) {
+  if (shouldSkipAlphabeticalComparison(state, previousEntry, currentEntry)) {
     return;
   }
   if (currentEntry.valueLower >= previousEntry.valueLower) {
@@ -313,7 +559,7 @@ function reportUnsortedImportViolation(
     node: currentEntry.node,
     messageId: 'unsortedImport',
     data: { current: currentEntry.value, previous: previousEntry.value },
-    fix: buildSwapFix(state.sourceCode, previousEntry.node, currentEntry.node),
+    fix: buildSortFix(state),
   });
 }
 
@@ -362,7 +608,7 @@ function reportWrongGroupAfterViolation(
       next: nextEntry.value,
       nextGroup: getGroupName(nextEntry.group),
     },
-    fix: buildSwapFix(state.sourceCode, currentEntry.node, nextEntry.node),
+    fix: buildSortFix(state),
   });
 }
 
@@ -410,30 +656,49 @@ function reportWrongGroupViolation(
       previous: previousEntry.value,
       previousGroup: getGroupName(previousEntry.group),
     },
-    fix: buildSwapFix(state.sourceCode, previousEntry.node, currentEntry.node),
+    fix: buildSortFix(state),
   });
 }
 
 /**
- * Swaps two import declaration ranges.
+ * Returns true when an adjacent pair should not be checked alphabetically.
+ *
+ * @param state - Shared sort state.
+ * @param previousEntry - Previous import entry.
+ * @param currentEntry - Current import entry.
+ * @returns True for already reported, cross-group, or side-effect pairs.
+ */
+function shouldSkipAlphabeticalComparison(
+  state: Readonly<SortImportsState>,
+  previousEntry: Readonly<ImportEntry>,
+  currentEntry: Readonly<ImportEntry>,
+): boolean {
+  return (
+    state.reportedNodes.has(currentEntry.node) ||
+    currentEntry.group !== previousEntry.group ||
+    currentEntry.group === ImportGroup.SideEffect
+  );
+}
+
+/**
+ * Sorts all import declaration blocks in a single replacement.
  *
  * @param sourceCode - ESLint source code helper.
- * @param previousImport - Previous import declaration.
- * @param currentImport - Current import declaration.
+ * @param originalBlocks - Import blocks in source order.
+ * @param sortedBlocks - Import blocks in sorted order.
  * @param fixer - ESLint fixer.
  * @returns ESLint text replacement fix.
  */
-function swapImports(
+function sortImportBlocks(
   sourceCode: Readonly<TSESLint.SourceCode>,
-  previousImport: Readonly<TSESTree.ImportDeclaration>,
-  currentImport: Readonly<TSESTree.ImportDeclaration>,
+  originalBlocks: ReadonlyArray<SortableImportBlock>,
+  sortedBlocks: ReadonlyArray<SortableImportBlock>,
   fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
-  const previousText = sourceCode.getText(previousImport);
-  const currentText = sourceCode.getText(currentImport);
-  const betweenText = sourceCode.text.slice(previousImport.range[1], currentImport.range[0]);
-  const replacement = `${currentText}${betweenText}${previousText}`;
-  return fixer.replaceTextRange([previousImport.range[0], currentImport.range[1]], replacement);
+  const firstBlock = originalBlocks[0];
+  const lastBlock = originalBlocks[originalBlocks.length - 1];
+  const replacement = getSortedImportText(sourceCode, originalBlocks, sortedBlocks);
+  return fixer.replaceTextRange([firstBlock.start, lastBlock.end], replacement);
 }
 
 /**
@@ -461,7 +726,7 @@ function validateImports(
   Reflect.set(imports, 'length', 0);
 }
 
-/** Enforces top-level import grouping and alphabetical ordering with adjacent-swap fixes. */
+/** Enforces top-level import grouping and safe one-pass alphabetical ordering. */
 export const sortImports = createRule({
   name: 'sort-imports',
   meta: {

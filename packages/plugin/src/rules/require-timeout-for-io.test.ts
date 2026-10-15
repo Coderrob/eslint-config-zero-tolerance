@@ -13,6 +13,14 @@ describe('require-timeout-for-io', () => {
         code: 'axios.get(url, { timeout: 5000 });',
       },
       {
+        name: 'should allow a quoted timeout property',
+        code: "axios.get(url, { 'timeout': 5000 });",
+      },
+      {
+        name: 'should allow a runtime timeout expression',
+        code: 'axios.get(url, { timeout: requestTimeout });',
+      },
+      {
         name: 'should allow subprocess with timeout',
         code: "spawn('git', ['status'], { timeout: 5000 });",
       },
@@ -51,6 +59,46 @@ describe('require-timeout-for-io', () => {
       {
         name: 'should report bare fetch',
         code: 'fetch(url);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report fetch with an undefined signal',
+        code: 'fetch(url, { signal: undefined });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report an explicitly disabled timeout',
+        code: 'axios.get(url, { timeout: 0 });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report an empty chained timeout call',
+        code: 'superagent.get(url).timeout();',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report a non-timeout chain after an uncancelled request',
+        code: 'axios.get(url).then(handle);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report a chained timeout with only spread arguments',
+        code: 'superagent.get(url).timeout(...args);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report an option object containing only spread properties',
+        code: 'fetch(url, { ...options });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report an option object without a named cancellation property',
+        code: 'fetch(url, { 0: true });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report an explicitly undefined timeout',
+        code: 'axios.get(url, { timeout: undefined });',
         errors: [{ messageId: 'missingTimeout' }],
       },
       {

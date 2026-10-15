@@ -13,7 +13,7 @@
       "scenarios": [
         {
           "name": "should allow IO calls with signal, timeout, or approved wrappers",
-          "given": "code that calls fetch, HTTP clients, subprocesses, or custom IO through cancellation-aware options",
+          "given": "code that calls fetch, HTTP clients, subprocesses, or custom IO through a usable signal, a positive or runtime timeout using an identifier or quoted property name, or an approved wrapper",
           "when": "the rule evaluates the call",
           "then": "no violation is reported"
         },
@@ -22,6 +22,12 @@
           "given": "production code that calls external IO without timeout or signal options, including direct, imported, or namespaced child_process subprocess calls",
           "when": "the rule evaluates the call",
           "then": "a missingTimeout violation is reported"
+        },
+        {
+          "name": "should reject cancellation options that are explicitly disabled",
+          "given": "an IO call uses signal undefined, timeout zero, or an empty chained timeout call",
+          "when": "the rule evaluates cancellation configuration",
+          "then": "a missingTimeout violation is reported because the call can still wait indefinitely"
         },
         {
           "name": "should skip tests by default and check them when configured",

@@ -25,6 +25,18 @@ describe('no-unsafe-code-generation', () => {
         code: 'setTimeout();',
       },
       {
+        name: 'should allow locally shadowed timer functions',
+        code: "function schedule(setTimeout: (value: string) => void): void { if (ready) { setTimeout('task'); } }",
+      },
+      {
+        name: 'should allow locally shadowed global timer objects',
+        code: "function schedule(window: Scheduler): void { window.setTimeout('task'); }",
+      },
+      {
+        name: 'should allow similarly named methods on arbitrary objects',
+        code: "scheduler.setTimeout('task');",
+      },
+      {
         name: 'should allow non execution vm namespace members',
         code: "import * as vm from 'node:vm'; vm.createContext({});",
       },
@@ -61,6 +73,21 @@ describe('no-unsafe-code-generation', () => {
       {
         name: 'should report string timer callbacks',
         code: "setTimeout('run()', 100);",
+        errors: [{ messageId: 'unsafeCodeGeneration' }],
+      },
+      {
+        name: 'should report static template timer callbacks',
+        code: 'setInterval(`run()`, 100);',
+        errors: [{ messageId: 'unsafeCodeGeneration' }],
+      },
+      {
+        name: 'should report dynamically constructed string timer callbacks',
+        code: "setTimeout('run(' + value + ')', 100);",
+        errors: [{ messageId: 'unsafeCodeGeneration' }],
+      },
+      {
+        name: 'should report global timer member calls',
+        code: "globalThis.setTimeout('run()', 100);",
         errors: [{ messageId: 'unsafeCodeGeneration' }],
       },
       {
