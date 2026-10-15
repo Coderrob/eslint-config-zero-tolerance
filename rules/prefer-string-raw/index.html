@@ -3492,15 +3492,16 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">regexSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">.</span><span class="nx">raw</span><span class="sb">`\d+\w+`</span><span class="p">;</span>
 </code></pre></div>
 <h3 id="incorrect">❌ Incorrect<a class="headerlink" href="#incorrect" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;C:\\Users\\dev\\repo&#39;</span><span class="p">;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">regexSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;\\d+\\w+&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'C:\\Users\\dev\\repo'</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">regexSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'\\d+\\w+'</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/prefer-string-raw&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">'zero-tolerance/prefer-string-raw'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span>
 </code></pre></div>
 <h2 id="autofix-notes">Autofix Notes<a class="headerlink" href="#autofix-notes" title="Permanent link">&para;</a></h2>
-<p>Autofix rewrites eligible string literals to <code>String.raw\</code>`<code>form. It intentionally skips unsafe cases such as literals containing template interpolation markers (for example,</code>${...}`) or backticks.</p>
+<p>Autofix rewrites only eligible string literals to <code>String.raw\</code>`` form after verifying that the resulting template has the same runtime value. Regex literals are never considered; regex-source strings with redundant backslash escaping are fixed only when their value is preserved.</p>
+<p>The rule intentionally skips grammar-sensitive positions such as directives, import/export sources, non-computed property keys, JSX attributes, inline Jest snapshots, and TypeScript literal contexts. It also skips mixed runtime escapes, trailing backslashes, multiline strings, template interpolation markers such as <code>${...}</code>, and backticks.</p>
 
 
 

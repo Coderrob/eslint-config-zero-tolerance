@@ -3462,8 +3462,8 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
-<p>Alphabetically ordered top-level functions make a module's API easy to navigate and reduce the chance of duplicate function definitions. The check is case-insensitive and applies to both <code>function</code> declarations and <code>const</code> variable declarations that initialise arrow functions or function expressions at the top level of the program. Methods, nested functions, and non-const variable declarations are not checked.</p>
-<p>Autofix reorders the full sortable function span in one pass when it is safe to do so. It preserves and moves own-line block comments that immediately precede a declaration, as well as same-line trailing comments. Line comments and other ambiguous interstitial comments between declarations are not moved and may cause the rule to report without applying <code>--fix</code> to avoid mangling results.</p>
+<p>Alphabetically ordered top-level functions make a module's API easy to navigate and reduce the chance of duplicate function definitions. The check is case-insensitive and applies to named function declarations (including named default exports) and <code>const</code> variable declarations that initialise arrow functions or function expressions at the top level of the program. Anonymous default exports, methods, nested functions, and non-const variable declarations are not checked.</p>
+<p>Autofix reorders the full sortable function span in one pass when it is safe to do so. Each complete multiline implementation and export wrapper moves intact. It preserves and moves own-line block comments that immediately precede a declaration, as well as same-line trailing comments. Line comments, file-level copyright or license headers, and other ambiguous interstitial comments cause the rule to report without applying <code>--fix</code> so comments stay in their intended positions.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="correct">✅ Correct<a class="headerlink" href="#correct" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">function</span><span class="w"> </span><span class="nx">buildReport</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -3489,7 +3489,7 @@
 </code></pre></div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>This rule has no options:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">&#39;zero-tolerance/sort-functions&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;error&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">'zero-tolerance/sort-functions'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span>
 </code></pre></div>
 
 
