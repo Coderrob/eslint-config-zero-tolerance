@@ -2632,6 +2632,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#parsing-and-fix-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsing and fix safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3407,6 +3418,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#parsing-and-fix-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsing and fix safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3483,6 +3505,8 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">'zero-tolerance/no-unsafe-code-generation'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span>
 </code></pre></div>
 <p>Direct timers are checked only when they resolve to unshadowed globals. Known global-object forms such as <code>globalThis.setTimeout(...)</code> are also checked, while arbitrary methods such as <code>scheduler.setTimeout(...)</code> are left alone.</p>
+<h2 id="parsing-and-fix-safety">Parsing and fix safety<a class="headerlink" href="#parsing-and-fix-safety" title="Permanent link">&para;</a></h2>
+<p>Global <code>eval</code> and <code>Function</code> checks resolve direct identifiers and static members on unshadowed global objects. Unrelated methods with these names and dynamic computed keys are ignored.</p>
 
 
 

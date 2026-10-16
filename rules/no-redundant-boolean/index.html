@@ -2848,6 +2848,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#parsing-and-fix-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsing and fix safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3429,6 +3440,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#parsing-and-fix-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsing and fix safety
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3484,7 +3506,7 @@
 </tbody>
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
-<p>Comparing a boolean expression to <code>true</code> or <code>false</code> adds noise without adding meaning. <code>isValid === true</code> is identical to <code>isValid</code>; <code>isActive !== false</code> is identical to <code>isActive</code>. These redundant comparisons obscure intent and are commonly introduced by developers who are uncertain about the type of the value.</p>
+<p>Comparing a known boolean expression to <code>true</code> or <code>false</code> adds noise without adding meaning. These comparisons can be simplified when the operand is boolean. For other types, strict comparisons have different semantics, so the rule reports the pattern without automatically removing the comparison.</p>
 <p><strong>Checked operators:</strong> <code>===</code>, <code>!==</code></p>
 <h2 id="autofix">Autofix<a class="headerlink" href="#autofix" title="Permanent link">&para;</a></h2>
 <p>The fixer removes redundant boolean comparisons, simplifies <code>condition ? true : false</code> and <code>condition ? false : true</code>, and removes <code>!!</code> only when the wrapped expression is syntactically known to already produce a boolean.</p>
@@ -3515,6 +3537,8 @@
 <p>This rule has no options:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">'zero-tolerance/no-redundant-boolean'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span>
 </code></pre></div>
+<h2 id="parsing-and-fix-safety">Parsing and fix safety<a class="headerlink" href="#parsing-and-fix-safety" title="Permanent link">&para;</a></h2>
+<p>Autofixes for strict comparisons are limited to syntactically boolean operands. Unknown types are reported without a fix because <code>value === true</code> and <code>value</code> can differ. Boolean ternaries retain truthiness conversion, and fixes preserve expression grouping.</p>
 
 
 
