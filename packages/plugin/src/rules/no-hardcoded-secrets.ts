@@ -30,7 +30,7 @@ const SECRET_NAME_PATTERN =
 const PRIVATE_KEY_PATTERN = /BEGIN [A-Z ]*PRIVATE KEY/iu;
 const JWT_PATTERN = /^[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}$/u;
 const API_KEY_PATTERN = /^(?:sk_|ghp_|gho_|xox[baprs]-|AKIA)[A-Za-z0-9_-]{12,}$/u;
-const CREDENTIAL_URL_PATTERN = /^[a-z][a-z0-9+.-]*:\/\/[^:@\s]+:[^@\s]+@/iu;
+const CREDENTIAL_URL_PATTERN = /^[a-z][a-z0-9+.-]*:\/\/[^:@\s]+:([^@\s]+)@/iu;
 
 interface INoHardcodedSecretsOptions {
   allowedPatterns?: readonly string[];
@@ -110,23 +110,19 @@ function getSensitiveAssignmentName(node: Readonly<TSESTree.Expression>): string
 }
 
 /**
- * Returns true when a configured allowed pattern matches the value.
+ * Returns true when a configured allowed pattern matches the secret-bearing value.
  *
  * @param options - Normalized rule options.
- * @param value - Static string value.
+ * @param value - Static string value, possibly a credential URL.
  * @returns True when the value is an allowed placeholder.
  */
 function isAllowedSecretPlaceholder(
   options: Readonly<IHardcodedSecretsOptions>,
   value: string,
 ): boolean {
-  const normalizedValue = value.toLowerCase();
-  for (const pattern of options.allowedPatterns) {
-    if (normalizedValue.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-  return false;
+  const credentialPassword = CREDENTIAL_URL_PATTERN.exec(value)?.[1];
+  const normalizedValue = (credentialPassword ?? value).toLowerCase();
+  return options.allowedPatterns.some((pattern) => normalizedValue.includes(pattern.toLowerCase()));
 }
 
 /**

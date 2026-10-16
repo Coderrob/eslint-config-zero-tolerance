@@ -106,7 +106,7 @@ function collectInvalidInterface(
  * Creates a same-file interface rename fix when the prefixed name is collision-free.
  *
  * @param sourceCode - ESLint source code helper.
- * @param node - Interface declaration node.
+ * @param nodes - Interface declaration nodes.
  * @returns Fix callback, or null when unsafe.
  */
 function createInterfacePrefixFix(
@@ -353,7 +353,7 @@ function replaceInterfaceNameReferences(
 }
 
 /**
- * Reports all invalid interfaces and attaches one combined non-overlapping fix transaction.
+ * Reports invalid interfaces with a combined fix and independent fallback fixes.
  *
  * @param context - ESLint rule execution context.
  * @param interfaces - Invalid interfaces collected in source order.
@@ -369,7 +369,7 @@ function reportInvalidInterfaces(
       node: node.id,
       messageId: 'interfacePrefix',
       data: { name: node.id.name },
-      fix: index === 0 ? combinedFix : null,
+      fix: index === 0 ? combinedFix : createInterfacePrefixFix(context.sourceCode, [node]),
     });
   }
 }

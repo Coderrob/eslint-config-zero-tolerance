@@ -155,6 +155,37 @@ describe('repository validation', () => {
     ]);
   });
 
+  test('should inspect fixture names without treating code or option names as descriptions', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        '',
+        `ruleTester.run('example', rule, {
+        valid: [{name: 'allows', options: [{name: 'ignored'}], code: "name: 'also ignored'"}],
+        invalid: [{name: 'should reject', errors: [{}]}]
+      });`,
+      ),
+      ['example.ts: test description must start with "should": "allows"'],
+    );
+  });
+
+  test('should ignore unrelated object outputs when validating autofix fixtures', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "const rule = {meta: {fixable: 'code'}}",
+        `
+        const unrelated = {output: 'fixed'};
+        ruleTester.run('example', rule, {
+          valid: [{name: 'should allow'}],
+          invalid: [{name: 'should reject', errors: [{}]}]
+        });
+      `,
+      ),
+      ['example.ts: fixable rule must assert at least one autofix output fixture'],
+    );
+  });
+
   test('should give every test file exactly one explicit root describe', () => {
     const pendingDirectories = ['../packages', '.'].map((directory) =>
       fileURLToPath(new URL(directory, import.meta.url)),

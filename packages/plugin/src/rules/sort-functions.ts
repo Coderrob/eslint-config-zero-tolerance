@@ -354,7 +354,10 @@ function getSortableBlock(
 ): SortableBlock | null {
   const leadingComments = getOwnedLeadingComments(sourceCode, node);
   const trailingComments = getOwnedTrailingComments(sourceCode, node);
-  if (hasUnsafeOwnedComments(leadingComments, trailingComments)) {
+  if (
+    hasUnsafeOwnedComments(leadingComments, trailingComments) ||
+    hasFileHeaderComment(leadingComments)
+  ) {
     return null;
   }
   return buildSortableBlock(sourceCode, node, leadingComments, trailingComments);
@@ -600,6 +603,18 @@ function hasDirectiveComment(comments: ReadonlyArray<TSESTree.Comment>): boolean
     }
   }
   return false;
+}
+
+/**
+ * Identifies a file-level header that must remain before every declaration.
+ *
+ * @param comments - Owned leading comments.
+ * @returns Whether an owned comment is a file-level header.
+ */
+function hasFileHeaderComment(comments: ReadonlyArray<TSESTree.Comment>): boolean {
+  return comments.some((comment) =>
+    /\b(?:copyright|license|spdx-license-identifier)\b|@(?:file|module)\b/iu.test(comment.value),
+  );
 }
 
 /**
