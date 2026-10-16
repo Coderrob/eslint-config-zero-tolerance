@@ -47,6 +47,17 @@
           "then": "a maxParams violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should honor a zero parameter limit",
+          "given": "a max option of zero",
+          "when": "functions with zero or one parameter are linted",
+          "then": "only the function with a parameter is reported"
+        }
+      ]
     }
   ]
 }

@@ -78,8 +78,8 @@ describe('repository validation', () => {
     assert.deepEqual(
       validateRuleFixtures(
         'example',
-        "meta: { fixable: 'code' }",
-        "ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'breaks' }] });",
+        "const rule = { meta: { fixable: 'code' } };",
+        "ruleTester.run('example', rule, { valid: [{name: 'should allow', code: 'ok'}], invalid: [{ name: 'breaks', code: 'bad', errors: [{}] }] });",
       ),
       [
         'example.ts: test description must start with "should": "breaks"',
@@ -89,36 +89,98 @@ describe('repository validation', () => {
     assert.deepEqual(
       validateRuleFixtures(
         'example',
-        "meta: { fixable: 'code' }",
-        "ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'should fix', output: 'fixed' }] });",
+        "const rule = { meta: { fixable: 'code' } };",
+        "ruleTester.run('example', rule, { valid: [{name: 'should allow', code: 'ok'}], invalid: [{ name: 'should fix', code: 'bad', output: 'fixed', errors: [{}] }] });",
       ),
       [],
     );
+  });
+
+  test('should reject empty fixture groups and ignore comments and fixture source decoys', () => {
     assert.deepEqual(
       validateRuleFixtures(
         'example',
-        'meta: {}',
-        "ruleTester.run('example', rule, { valid: [{\n  name: 'allows', options: [{ name: 'ignored' }], code: \"name: 'also ignored'\"\n}], invalid: [{ name: 'should reject' }] });",
+        '',
+        `
+      // valid: [{name: 'should allow'}], invalid: [{name: 'should report'}]
+      const decoy = { valid: [{}], invalid: [{}] };
+      ruleTester.run('example', rule, { valid: [], invalid: [] });
+    `,
+      ),
+      [
+        'example.ts: test file must contain nonempty valid RuleTester fixtures',
+        'example.ts: test file must contain nonempty invalid RuleTester fixtures',
+      ],
+    );
+  });
+
+  test('should require fixture names and actual diagnostic and output assertions', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        "const rule = {meta: {fixable: 'code'}}",
+        `
+      ruleTester.run('example', rule, {
+        valid: ['const text = "output: fixed";'],
+        invalid: [{ name: 'shoulder', code: 'bad', errors: [], output: null }]
+      });
+    `,
+      ),
+      [
+        'example.ts: test description must start with "should": "<missing>"',
+        'example.ts: test description must start with "should": "shoulder"',
+        'example.ts: fixable rule must assert at least one autofix output fixture',
+        'example.ts: invalid fixture must assert at least one diagnostic',
+      ],
+    );
+  });
+
+  test('should accept quoted keys, numeric diagnostics, and complementary run groups', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        '',
+        `
+      ruleTester.run('example', rule, {'valid': [{'name': 'should allow', code: 'ok'}], invalid: []});
+      ruleTester.run('example', rule, {valid: [], invalid: [{name: 'should reject', code: 'bad', errors: 1}]});
+    `,
+      ),
+      [],
+    );
+  });
+
+  test('should reject syntax errors instead of trusting a partially parsed test file', () => {
+    assert.deepEqual(validateRuleFixtures('example', '', 'ruleTester.run('), [
+      'example.ts: test file must parse as TypeScript',
+    ]);
+  });
+
+  test('should inspect fixture names without treating code or option names as descriptions', () => {
+    assert.deepEqual(
+      validateRuleFixtures(
+        'example',
+        '',
+        `ruleTester.run('example', rule, {
+        valid: [{name: 'allows', options: [{name: 'ignored'}], code: "name: 'also ignored'"}],
+        invalid: [{name: 'should reject', errors: [{}]}]
+      });`,
       ),
       ['example.ts: test description must start with "should": "allows"'],
     );
+  });
+
+  test('should ignore unrelated object outputs when validating autofix fixtures', () => {
     assert.deepEqual(
       validateRuleFixtures(
         'example',
-        "meta: { fixable: 'code' }",
-        "ruleTester.run('example', rule, { valid: [], invalid: [{ code: 'bad', output: null }] }); // output: 'fixed'",
-      ),
-      [
-        'example.ts: test file must contain valid RuleTester fixtures',
-        'example.ts: invalid fixture must have a literal name',
-        'example.ts: fixable rule must assert at least one autofix output fixture',
-      ],
-    );
-    assert.deepEqual(
-      validateRuleFixtures(
-        'example',
-        "meta: { fixable: 'code' }",
-        "const unrelated = { output: 'fixed' }; ruleTester.run('example', rule, { valid: [{ name: 'should pass' }], invalid: [{ name: 'should fail' }] });",
+        "const rule = {meta: {fixable: 'code'}}",
+        `
+        const unrelated = {output: 'fixed'};
+        ruleTester.run('example', rule, {
+          valid: [{name: 'should allow'}],
+          invalid: [{name: 'should reject', errors: [{}]}]
+        });
+      `,
       ),
       ['example.ts: fixable rule must assert at least one autofix output fixture'],
     );

@@ -59,6 +59,23 @@
           "then": "a noRedundantBoolean violation is reported with a fix to remove the redundant double negation"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should withhold fixes for strict comparisons with unknown operand types",
+          "given": "a comparison such as value === true",
+          "when": "the operand is not syntactically boolean",
+          "then": "the comparison is reported without changing its semantics"
+        },
+        {
+          "name": "should preserve boolean coercion and receiver precedence",
+          "given": "a boolean ternary or double negation used as a member receiver",
+          "when": "a fix is applied",
+          "then": "truthiness conversion and expression grouping are preserved"
+        }
+      ]
     }
   ]
 }

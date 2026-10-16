@@ -46,3 +46,7 @@ This rule has no options:
 ```
 
 Direct timers are checked only when they resolve to unshadowed globals. Known global-object forms such as `globalThis.setTimeout(...)` are also checked, while arbitrary methods such as `scheduler.setTimeout(...)` are left alone.
+
+## Parsing and fix safety
+
+Global `eval` and `Function` checks resolve direct identifiers and static members on unshadowed global objects. Unrelated methods with these names and dynamic computed keys are ignored.

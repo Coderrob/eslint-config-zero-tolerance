@@ -1,5 +1,3 @@
-/* istanbul ignore file */
-
 /**
  * Copyright 2026 Robert Lindley
  *
@@ -33,9 +31,20 @@ export function getCalleeName(callee: Readonly<TSESTree.Expression>): string | n
     return callee.name;
   }
   if (callee.type === AST_NODE_TYPES.MemberExpression) {
-    return getPropertyName(callee.property);
+    return getPropertyName(callee);
   }
   return null;
+}
+
+/**
+ * Reads a string literal property key without resolving dynamic expressions.
+ *
+ * @param property - Computed property expression.
+ * @returns Literal string key or null.
+ */
+function getLiteralPropertyName(property: Readonly<TSESTree.Node>): string | null {
+  if (property.type !== AST_NODE_TYPES.Literal) return null;
+  return typeof property.value === 'string' ? property.value : null;
 }
 
 /**
@@ -48,7 +57,7 @@ function getMemberExpressionPath(node: Readonly<TSESTree.Expression>): string | 
   if (node.type !== AST_NODE_TYPES.MemberExpression) {
     return null;
   }
-  return joinMemberPath(getMemberPath(node.object), getPropertyName(node.property));
+  return joinMemberPath(getMemberPath(node.object), getPropertyName(node));
 }
 
 /**
@@ -65,21 +74,19 @@ export function getMemberPath(node: Readonly<TSESTree.Expression>): string | nul
 }
 
 /**
- * Gets a static object property name from an AST property node.
+ * Reads a static member name while respecting computed access syntax.
  *
- * @param property - Property node to inspect.
- * @returns The property name when it is statically known.
+ * @param node - Member or object property shape.
+ * @returns Statically known name or null for dynamic and private keys.
  */
 function getPropertyName(
-  property: TSESTree.Expression | TSESTree.PrivateIdentifier,
+  node: Readonly<{
+    computed: boolean;
+    property: TSESTree.Node;
+  }>,
 ): string | null {
-  if (property.type === AST_NODE_TYPES.Identifier) {
-    return property.name;
-  }
-  if (property.type === AST_NODE_TYPES.Literal && typeof property.value === 'string') {
-    return property.value;
-  }
-  return null;
+  if (node.computed) return getLiteralPropertyName(node.property);
+  return node.property.type === AST_NODE_TYPES.Identifier ? node.property.name : null;
 }
 
 /**
@@ -258,6 +265,16 @@ function isStringLiteral(node: TSESTree.Expression | null): node is TSESTree.Str
 }
 
 /**
+ * Checks for an exact true literal without coercing other values.
+ *
+ * @param node - Property value to inspect.
+ * @returns Whether the value is the true literal.
+ */
+function isTrueLiteral(node: Readonly<TSESTree.Node>): boolean {
+  return node.type === AST_NODE_TYPES.Literal && Object.is(node.value, true);
+}
+
+/**
  * Returns true when an object property has a true literal value.
  *
  * @param property - Object property to inspect.
@@ -268,10 +285,14 @@ function isTrueProperty(
   property: TSESTree.Property | TSESTree.SpreadElement,
   name: string,
 ): boolean {
-  if (property.type !== AST_NODE_TYPES.Property || getPropertyName(property.key) !== name) {
+  if (property.type !== AST_NODE_TYPES.Property) {
     return false;
   }
-  return property.value.type === AST_NODE_TYPES.Literal && Boolean(property.value.value);
+  const propertyName = getPropertyName({
+    computed: property.computed || property.key.type === AST_NODE_TYPES.Literal,
+    property: property.key,
+  });
+  return propertyName === name && isTrueLiteral(property.value);
 }
 
 /**

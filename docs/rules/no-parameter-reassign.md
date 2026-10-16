@@ -44,3 +44,7 @@ This rule has no options:
 ```js
 'zero-tolerance/no-parameter-reassign': 'error'
 ```
+
+## Parsing and fix safety
+
+The rule resolves parameter bindings through ESLint scope analysis. It detects writes from closures, destructured bindings, and destructuring assignments while allowing writes to shadowing local variables.

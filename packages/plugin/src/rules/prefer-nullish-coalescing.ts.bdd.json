@@ -41,6 +41,17 @@
           "then": "a preferNullishCoalescing violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should preserve operand and enclosing expression precedence",
+          "given": "a nullish ternary with logical, conditional, or assignment fallback",
+          "when": "the coalescing fix is applied",
+          "then": "both operands and the full expression retain their grouping"
+        }
+      ]
     }
   ]
 }

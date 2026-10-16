@@ -10,9 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **GitHub Actions releases**: Added dispatchable plugin-only release preparation and npm publication workflows, stable tag/version/changelog guards, npm trusted publishing, and tested release helpers.
+
+- **Parser regression audit**: Added 924 parser compatibility checks across all 77 rules, direct security AST helper tests, and expanded prototype, optional-access, negated matcher, and computed-property fixtures.
+
 - **Rule fixture validation**: Extended `validate:rules` to require valid and invalid fixture groups, behavior-style test descriptions beginning with `should`, and asserted output fixtures for every autofixable rule.
 
 ### Fixed
+
+- **Fixture validation**: Parse RuleTester suites with TypeScript instead of indentation-sensitive regular expressions; reject empty groups, unnamed fixtures, missing diagnostic assertions, and placeholder autofix outputs.
+- **Rule correctness**: Honor `max-params` zero limits, preserve precedence in nullish-coalescing fixes, preserve boolean coercion and restrict unsafe boolean-comparison fixes, resolve parameter writes by lexical binding, and distinguish unrelated or dynamically computed code-generation API names.
 
 - **Review follow-up**: Kept real credentials in test-named hosts detectable, preserved file headers during function sorting, and retained interface renames when an earlier diagnostic is suppressed.
 - **Rule fixture validation**: Required nonempty named fixtures and a concrete invalid-fixture autofix output instead of accepting empty arrays, missing names, comments, or `output: null`.

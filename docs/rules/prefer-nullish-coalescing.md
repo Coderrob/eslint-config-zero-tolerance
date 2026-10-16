@@ -38,3 +38,7 @@ This rule has no options:
 ```js
 'zero-tolerance/prefer-nullish-coalescing': 'error'
 ```
+
+## Parsing and fix safety
+
+Autofixes group both operands and the complete coalescing expression to preserve parsing and precedence for logical, conditional, and assignment fallbacks.

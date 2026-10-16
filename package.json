@@ -51,7 +51,7 @@
     "release:publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance run publish:public",
     "release:status": "changeset status",
     "release:version": "changeset version",
-    "test": "pnpm -r --if-present test && node --test scripts/validation.test.mjs",
+    "test": "pnpm -r --if-present test && node --test scripts/*.test.mjs",
     "test:compat": "node scripts/test-package-compatibility.mjs",
     "validate:bdd": "node scripts/validate-bdd-specs.mjs",
     "validate:dead-code": "knip",

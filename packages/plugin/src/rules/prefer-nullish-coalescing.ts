@@ -51,7 +51,9 @@ function buildCoalesceText(
   candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
-  return `${sourceCode.getText(candidate.expression)} ?? ${sourceCode.getText(candidate.fallback)}`;
+  const expression = getCoalesceOperandText(candidate.expression, sourceCode);
+  const fallback = getCoalesceOperandText(candidate.fallback, sourceCode);
+  return `(${expression} ?? ${fallback})`;
 }
 
 /**
@@ -106,6 +108,20 @@ function createPreferNullishCoalescingListeners(
   return {
     ConditionalExpression: checkConditionalExpression.bind(undefined, context, sourceCode),
   };
+}
+
+/**
+ * Preserves grouping for operands whose precedence conflicts with coalescing.
+ *
+ * @param node - Coalescing operand.
+ * @param sourceCode - ESLint source code helper.
+ * @returns Safely grouped operand text.
+ */
+function getCoalesceOperandText(
+  node: Readonly<TSESTree.Expression>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): string {
+  return `(${sourceCode.getText(node)})`;
 }
 
 /**
