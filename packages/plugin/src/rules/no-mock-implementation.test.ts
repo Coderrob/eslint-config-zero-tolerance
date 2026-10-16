@@ -5,6 +5,11 @@ describe('no-mock-implementation', () => {
   ruleTester.run('no-mock-implementation', noMockImplementation, {
     valid: [
       {
+        name: 'should allow computed and optional prototype properties',
+        code: 'value["toString"](); value?.toString?.(); value.valueOf(); value["hasOwnProperty"]("key"); value.__proto__; value.toLocaleString();',
+      },
+
+      {
         code: 'jest.fn().mockImplementationOnce(() => 42);',
         name: 'should allow mockImplementationOnce',
       },
@@ -50,6 +55,20 @@ describe('no-mock-implementation', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should reject computed promise mock methods and optional access',
+        code: 'mock?.["mockResolvedValue"](value); mock["mockRejectedValue"](error);',
+        errors: [
+          {
+            messageId: 'noMockImplementation',
+            data: { method: 'mockResolvedValue', replacement: 'mockResolvedValueOnce' },
+          },
+          {
+            messageId: 'noMockImplementation',
+            data: { method: 'mockRejectedValue', replacement: 'mockRejectedValueOnce' },
+          },
+        ],
+      },
       {
         code: 'jest.fn().mockImplementation(() => 42);',
         name: 'should report mockImplementation',

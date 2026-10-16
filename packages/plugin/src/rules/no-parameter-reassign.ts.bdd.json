@@ -53,6 +53,23 @@
           "then": "a noParameterReassign violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should distinguish parameter bindings from shadowing locals",
+          "given": "a block local shadows a parameter while a closure writes to the outer parameter",
+          "when": "resolved write references are inspected",
+          "then": "only the write to the parameter binding is reported"
+        },
+        {
+          "name": "should report destructured bindings and destructuring writes",
+          "given": "destructured parameters or assignments targeting parameter bindings",
+          "when": "a write reference changes a parameter",
+          "then": "each reassigned parameter is reported"
+        }
+      ]
     }
   ]
 }

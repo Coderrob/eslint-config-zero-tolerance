@@ -30,6 +30,23 @@
           "then": "an unsafeCodeGeneration violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should ignore unrelated and shadowed eval and Function members",
+          "given": "methods named eval or Function on arbitrary or locally shadowed objects",
+          "when": "calls and constructors are linted",
+          "then": "no global code generation diagnostic is emitted"
+        },
+        {
+          "name": "should distinguish static computed global API access from dynamic keys",
+          "given": "literal string keys and identifier keys on global objects",
+          "when": "the rule resolves the callee",
+          "then": "only statically identified unshadowed global APIs are reported"
+        }
+      ]
     }
   ]
 }

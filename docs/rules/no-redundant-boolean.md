@@ -13,7 +13,7 @@ Disallow redundant comparisons to `true` or `false` (Sonar S1125).
 
 ## Rationale
 
-Comparing a boolean expression to `true` or `false` adds noise without adding meaning. `isValid === true` is identical to `isValid`; `isActive !== false` is identical to `isActive`. These redundant comparisons obscure intent and are commonly introduced by developers who are uncertain about the type of the value.
+Comparing a known boolean expression to `true` or `false` adds noise without adding meaning. These comparisons can be simplified when the operand is boolean. For other types, strict comparisons have different semantics, so the rule reports the pattern without automatically removing the comparison.
 
 **Checked operators:** `===`, `!==`
 
@@ -58,3 +58,7 @@ This rule has no options:
 ```js
 'zero-tolerance/no-redundant-boolean': 'error'
 ```
+
+## Parsing and fix safety
+
+Autofixes for strict comparisons are limited to syntactically boolean operands. Unknown types are reported without a fix because `value === true` and `value` can differ. Boolean ternaries retain truthiness conversion, and fixes preserve expression grouping.

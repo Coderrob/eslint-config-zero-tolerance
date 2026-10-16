@@ -24,6 +24,12 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {
+  getFixtureString,
+  hasFixableMetadata,
+  hasFixtureErrors,
+  readRuleFixtures,
+} from './rule-fixture-helpers.mjs';
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(SCRIPT_PATH), '..');
@@ -36,30 +42,29 @@ const RULE_NAME_PATTERN = /^(?:max|no|prefer|require|sort)-[a-z0-9]+(?:-[a-z0-9]
  * Returns missing RuleTester fixture-group diagnostics.
  *
  * @param ruleName - Canonical rule name.
- * @param testContent - Rule test source text.
+ * @param groups - Parsed fixture groups.
  * @returns Missing fixture-group diagnostics.
  */
-function validateFixtureGroups(ruleName, testContent) {
+function validateFixtureGroups(ruleName, groups) {
   return ['valid', 'invalid']
-    .filter((groupName) => !new RegExp(String.raw`\b${groupName}\s*:\s*\[`, 'u').test(testContent))
-    .map((groupName) => `${ruleName}.ts: test file must contain ${groupName} RuleTester fixtures`);
+    .filter((groupName) => groups[groupName].length === 0)
+    .map(
+      (groupName) =>
+        `${ruleName}.ts: test file must contain nonempty ${groupName} RuleTester fixtures`,
+    );
 }
 
 /**
  * Returns behavior-style fixture-name diagnostics.
  *
  * @param ruleName - Canonical rule name.
- * @param testContent - Rule test source text.
+ * @param fixtures - Parsed fixture objects.
  * @returns Invalid fixture-name diagnostics.
  */
-function validateFixtureNames(ruleName, testContent) {
-  const suiteStart = testContent.indexOf('.run(');
-  const suiteContent = suiteStart === -1 ? testContent : testContent.slice(suiteStart);
-  const names = [...suiteContent.matchAll(/^ {8}name:\s*(['"`])([^'"`]+)\1,?$/gmu)].map(
-    (match) => match[2],
-  );
-  return names
-    .filter((name) => !name.startsWith('should'))
+function validateFixtureNames(ruleName, fixtures) {
+  return fixtures
+    .map((fixture) => getFixtureString(fixture, 'name') ?? '<missing>')
+    .filter((name) => !/^should\b/u.test(name))
     .map((name) => `${ruleName}.ts: test description must start with "should": "${name}"`);
 }
 
@@ -68,12 +73,12 @@ function validateFixtureNames(ruleName, testContent) {
  *
  * @param ruleName - Canonical rule name.
  * @param sourceContent - Rule implementation source text.
- * @param testContent - Rule test source text.
+ * @param fixtures - Parsed invalid fixture objects.
  * @returns Missing autofix-output diagnostics.
  */
-function validateFixableOutput(ruleName, sourceContent, testContent) {
-  const isFixable = /\bfixable:\s*['"]code['"]/u.test(sourceContent);
-  const hasOutput = /\boutput\s*:/u.test(testContent);
+function validateFixableOutput(ruleName, sourceContent, fixtures) {
+  const isFixable = hasFixableMetadata(sourceContent);
+  const hasOutput = fixtures.some((fixture) => getFixtureString(fixture, 'output') !== undefined);
   return isFixable && !hasOutput
     ? [`${ruleName}.ts: fixable rule must assert at least one autofix output fixture`]
     : [];
@@ -88,10 +93,17 @@ function validateFixableOutput(ruleName, sourceContent, testContent) {
  * @returns Fixture coverage diagnostics.
  */
 export function validateRuleFixtures(ruleName, sourceContent, testContent) {
+  const { sourceFile, groups } = readRuleFixtures(testContent);
+  if (sourceFile.parseDiagnostics.length > 0) {
+    return [`${ruleName}.ts: test file must parse as TypeScript`];
+  }
   return [
-    ...validateFixtureGroups(ruleName, testContent),
-    ...validateFixtureNames(ruleName, testContent),
-    ...validateFixableOutput(ruleName, sourceContent, testContent),
+    ...validateFixtureGroups(ruleName, groups),
+    ...validateFixtureNames(ruleName, [...groups.valid, ...groups.invalid]),
+    ...validateFixableOutput(ruleName, sourceContent, groups.invalid),
+    ...groups.invalid
+      .filter((fixture) => !hasFixtureErrors(fixture))
+      .map(() => `${ruleName}.ts: invalid fixture must assert at least one diagnostic`),
   ];
 }
 

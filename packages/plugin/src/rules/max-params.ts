@@ -68,7 +68,7 @@ function resolveListeners(
  */
 function resolveMax(options: readonly unknown[]): number {
   const maxValue = getOptionMaxValue(options[0]);
-  return isNumber(maxValue) && maxValue > 0 ? maxValue : MAX_PARAMS_MAX;
+  return isNumber(maxValue) && maxValue >= 0 ? maxValue : MAX_PARAMS_MAX;
 }
 
 /**

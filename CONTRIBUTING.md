@@ -221,4 +221,14 @@ mkdocs build --strict
 
 ## Release Process
 
-See the [Release Process](AGENTS.md#release-process) section of `AGENTS.md` for the full versioned release workflow.
+Only `@coderrob/eslint-plugin-zero-tolerance` is published. The config workspace is internal.
+
+1. Run **Prepare Release** (`prepare-release.yml`) from the Actions tab on `main`. Choose `revision` (patch), `minor`, or `major`. The workflow bumps `packages/plugin/package.json`, moves Unreleased notes into a dated changelog section, runs all release checks, and opens a `release/vX.Y.Z` PR.
+2. Review and merge the release PR. Create and push tag `vX.Y.Z` on the merged commit. The tag must match the plugin manifest and dated changelog entry.
+3. Pushing the tag starts **Publish To npm** (`publish-npm.yml`). It can also be run using `workflow_dispatch` on `main`, supplying that existing tag. It verifies that the tagged commit belongs to `main`, reruns validation, previews the package, and publishes only `packages/plugin`.
+
+Configure an npm trusted publisher for owner `Coderrob`, repository `eslint-config-zero-tolerance`, and workflow filename `publish-npm.yml`, allowing direct `npm publish`. The workflow uses OIDC and provenance on a GitHub-hosted runner; it needs no npm token. See [npm's trusted publishing setup](https://docs.npmjs.com/trusted-publishers/).
+
+Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings. By default, release PRs use `GITHUB_TOKEN`; GitHub may require a maintainer to select **Approve workflows to run** on the PR before its CI runs. To trigger that CI automatically, add a `RELEASE_PR_TOKEN` secret with repository contents and pull-request write permissions. The preparation workflow always validates the candidate itself. See [GitHub's workflow triggering rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+
+These workflows prepare release files and perform publication only when run on GitHub. Adding them does not publish a release or change the current version. See [AGENTS.md](AGENTS.md#release-process) for manual release instructions.

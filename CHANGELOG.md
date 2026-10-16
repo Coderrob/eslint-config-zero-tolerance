@@ -10,9 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **GitHub Actions releases**: Added dispatchable plugin-only release preparation and npm publication workflows, stable tag/version/changelog guards, npm trusted publishing, and tested release helpers.
+
+- **Parser regression audit**: Added 924 parser compatibility checks across all 77 rules, direct security AST helper tests, and expanded prototype, optional-access, negated matcher, and computed-property fixtures.
+
 - **Rule fixture validation**: Extended `validate:rules` to require valid and invalid fixture groups, behavior-style test descriptions beginning with `should`, and asserted output fixtures for every autofixable rule.
 
 ### Fixed
+
+- **Fixture validation**: Parse RuleTester suites with TypeScript instead of indentation-sensitive regular expressions; reject empty groups, unnamed fixtures, missing diagnostic assertions, and placeholder autofix outputs.
+- **Rule correctness**: Honor `max-params` zero limits, preserve precedence in nullish-coalescing fixes, preserve boolean coercion and restrict unsafe boolean-comparison fixes, resolve parameter writes by lexical binding, and distinguish unrelated or dynamically computed code-generation API names.
 
 - **Jest and mock matcher rules**: Prevented inherited object properties such as `toString`, `constructor`, and `valueOf` from colliding with configured matcher replacement maps and producing false Jest diagnostics.
 - **`prefer-string-raw` rule**: Reworked detection and autofix around exact source text and runtime-value equivalence, including regex-source strings, and skipped grammar-sensitive or semantics-changing contexts such as directives, module sources, property keys, JSX, inline snapshots, TypeScript literals, mixed escapes, trailing backslashes, interpolation markers, backticks, and multiline strings.

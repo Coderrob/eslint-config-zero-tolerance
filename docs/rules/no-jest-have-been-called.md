@@ -56,3 +56,7 @@ This rule has no options:
 ```js
 'zero-tolerance/no-jest-have-been-called': 'error'
 ```
+
+## Parsing and fix safety
+
+Object prototype properties, including optional and bracket access to `toString`, `valueOf`, and `constructor`, are allowed. Async, negated, and computed banned matchers remain reported.

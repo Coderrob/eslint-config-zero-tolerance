@@ -1,5 +1,7 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
+
 Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)

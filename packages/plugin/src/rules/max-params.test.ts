@@ -10,6 +10,11 @@ describe('max-params', () => {
   ruleTester.run('max-params', maxParams, {
     valid: [
       {
+        name: 'should allow parameterless functions with a zero maximum',
+        options: [{ max: 0 }],
+        code: 'function f() {}',
+      },
+      {
         name: 'should pass for 4 params with default limit',
         code: 'function f(a: number, b: number, c: number, d: number) {}',
       },
@@ -32,6 +37,12 @@ describe('max-params', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should reject even one parameter with a zero maximum',
+        options: [{ max: 0 }],
+        code: 'function f(value: string) {}',
+        errors: [{ messageId: 'tooManyParams', data: { name: 'f', count: 1, max: 0 } }],
+      },
       {
         name: 'should error for 5 params with default limit',
         code: 'function f(a: number, b: number, c: number, d: number, e: number) {}',

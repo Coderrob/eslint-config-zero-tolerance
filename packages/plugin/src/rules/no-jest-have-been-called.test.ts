@@ -5,6 +5,11 @@ describe('no-jest-have-been-called', () => {
   ruleTester.run('no-jest-have-been-called', noJestHaveBeenCalled, {
     valid: [
       {
+        name: 'should allow computed and optional prototype properties',
+        code: 'value["toString"](); value?.toString?.(); value.valueOf(); value["hasOwnProperty"]("key"); value.__proto__; value.toLocaleString();',
+      },
+
+      {
         code: 'expect(fn).toHaveBeenCalledTimes(1);',
         name: 'should allow toHaveBeenCalledTimes',
       },
@@ -42,6 +47,20 @@ describe('no-jest-have-been-called', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should reject asynchronous negated computed matchers',
+        code: 'expect(fn).resolves.not["toHaveBeenCalled"](); expect(fn).rejects.toHaveBeenCalledWith("arg");',
+        errors: [
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+          },
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toHaveBeenCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+          },
+        ],
+      },
       {
         code: 'expect(fn).toHaveBeenCalled();',
         name: 'should ban toHaveBeenCalled',

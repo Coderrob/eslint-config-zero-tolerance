@@ -14,142 +14,77 @@
  * limitations under the License.
  */
 
-import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
-import type { FunctionNode } from '../helpers/ast-guards';
-import { getNamedParameterName } from '../helpers/parameter-helpers';
-import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import type { TSESLint } from '@typescript-eslint/utils';
 import { createRule } from './support/rule-factory';
 
 type NoParameterReassignContext = Readonly<TSESLint.RuleContext<'noParameterReassign', []>>;
-type ParameterScopeStack = Array<ReadonlySet<string>>;
+const PARAMETER_DEFINITION_TYPE = 'Parameter';
 
 /**
- * Checks assignment expressions for direct parameter reassignment.
+ * Inspects every resolved binding after scope analysis completes.
  *
- * @param context - ESLint rule execution context.
- * @param parameterStack - Nested function parameter stack.
- * @param node - Assignment expression node.
+ * @param context - ESLint execution context.
  */
-function checkAssignmentExpression(
-  context: Readonly<NoParameterReassignContext>,
-  parameterStack: Readonly<ParameterScopeStack>,
-  node: Readonly<TSESTree.AssignmentExpression>,
-): void {
-  if (node.left.type !== AST_NODE_TYPES.Identifier) {
-    return;
-  }
-  reportIfParameterReassigned(context, parameterStack, node.left);
+function checkParameterBindings(context: Readonly<NoParameterReassignContext>): void {
+  checkScopeBindings(context, context.sourceCode.getScope(context.sourceCode.ast));
 }
 
 /**
- * Checks update expressions for parameter reassignment.
+ * Inspects bindings in a lexical scope and its children.
  *
- * @param context - ESLint rule execution context.
- * @param parameterStack - Nested function parameter stack.
- * @param node - Update expression node.
+ * @param context - ESLint execution context.
+ * @param scope - Lexical scope to inspect.
  */
-function checkUpdateExpression(
+function checkScopeBindings(
   context: Readonly<NoParameterReassignContext>,
-  parameterStack: Readonly<ParameterScopeStack>,
-  node: Readonly<TSESTree.UpdateExpression>,
+  scope: Readonly<TSESLint.Scope.Scope>,
 ): void {
-  if (node.argument.type !== AST_NODE_TYPES.Identifier) {
-    return;
-  }
-  reportIfParameterReassigned(context, parameterStack, node.argument);
+  for (const variable of scope.variables) reportParameterWrites(context, variable);
+  for (const child of scope.childScopes) checkScopeBindings(context, child);
 }
 
 /**
- * Creates listeners that detect parameter reassignments.
+ * Creates listeners for parameter reassignment checks.
  *
- * @param context - ESLint rule execution context.
- * @returns Listener map for the rule.
+ * @param context - ESLint execution context.
+ * @returns Completed-program scope listener.
  */
 function createNoParameterReassignListeners(
   context: Readonly<NoParameterReassignContext>,
 ): TSESLint.RuleListener {
-  const parameterStack: ParameterScopeStack = [];
-  return {
-    ...createFunctionNodeEnterExitListeners(
-      enterFunctionScope.bind(undefined, parameterStack),
-      exitFunctionScope.bind(undefined, parameterStack),
-    ),
-    AssignmentExpression: checkAssignmentExpression.bind(undefined, context, parameterStack),
-    UpdateExpression: checkUpdateExpression.bind(undefined, context, parameterStack),
-  };
+  return { 'Program:exit': checkParameterBindings.bind(undefined, context) };
 }
 
 /**
- * Pushes a parameter scope for a function node.
+ * Checks whether a reference writes after parameter initialization.
  *
- * @param parameterStack - Nested function parameter stack.
- * @param node - Function node being entered.
+ * @param reference - Resolved reference to inspect.
+ * @returns Whether the reference reassigns the parameter.
  */
-function enterFunctionScope(
-  parameterStack: Readonly<ParameterScopeStack>,
-  node: Readonly<FunctionNode>,
-): void {
-  Reflect.apply(Array.prototype.push, parameterStack, [getFunctionParameterNames(node)]);
+function isParameterWrite(reference: Readonly<TSESLint.Scope.Reference>): boolean {
+  return reference.isWrite() && !Object.is(reference.init, true);
 }
 
 /**
- * Pops the current function parameter scope.
+ * Reports write references to parameter bindings across nested lexical scopes.
  *
- * @param parameterStack - Nested function parameter stack.
- * @param _node - Function node being exited.
+ * @param context - ESLint execution context.
+ * @param variable - Resolved binding to inspect.
  */
-function exitFunctionScope(
-  parameterStack: Readonly<ParameterScopeStack>,
-  _node: Readonly<FunctionNode>,
-): void {
-  Reflect.apply(Array.prototype.pop, parameterStack, []);
-}
-
-/**
- * Creates a set of parameter names for one function scope.
- *
- * @param node - Function node to inspect.
- * @returns Set of parameter identifiers in that function signature.
- */
-function getFunctionParameterNames(node: Readonly<FunctionNode>): ReadonlySet<string> {
-  return new Set(node.params.map(getNamedParameterName).filter(isParameterName));
-}
-
-/**
- * Returns true when a parameter name was resolved.
- *
- * @param name - Candidate parameter name.
- * @returns True when the name is non-null.
- */
-function isParameterName(name: string | null): name is string {
-  return name !== null;
-}
-
-/**
- * Reports parameter reassignment when identifier belongs to current scope.
- *
- * @param context - ESLint rule execution context.
- * @param parameterStack - Nested function parameter stack.
- * @param node - Identifier node assigned or updated.
- */
-function reportIfParameterReassigned(
+function reportParameterWrites(
   context: Readonly<NoParameterReassignContext>,
-  parameterStack: Readonly<ParameterScopeStack>,
-  node: Readonly<TSESTree.Identifier>,
+  variable: Readonly<TSESLint.Scope.Variable>,
 ): void {
-  if (parameterStack.length === 0) {
-    return;
+  if (!variable.defs.some((definition) => definition.type === PARAMETER_DEFINITION_TYPE)) return;
+  for (const reference of variable.references) {
+    if (isParameterWrite(reference)) {
+      context.report({
+        node: reference.identifier,
+        messageId: 'noParameterReassign',
+        data: { name: variable.name },
+      });
+    }
   }
-  const currentScope = parameterStack[parameterStack.length - 1];
-  if (!currentScope.has(node.name)) {
-    return;
-  }
-  context.report({
-    node,
-    messageId: 'noParameterReassign',
-    data: { name: node.name },
-  });
 }
 
 /** Disallows reassigning function parameters. */

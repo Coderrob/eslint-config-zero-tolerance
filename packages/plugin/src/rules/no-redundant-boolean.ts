@@ -133,7 +133,10 @@ function createFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.BinaryExpression>,
   fixInputs: Readonly<FixInputs>,
-): TSESLint.ReportFixFunction {
+): TSESLint.ReportFixFunction | null {
+  if (!isBooleanExpression(fixInputs.nonLiteralSide)) {
+    return null;
+  }
   return replaceRedundantBooleanComparison.bind(undefined, sourceCode, node, fixInputs);
 }
 
@@ -169,7 +172,7 @@ function createReplacementText(
 ): string {
   const expressionText = sourceCode.getText(fixInputs.nonLiteralSide);
   if (!shouldNegateComparison(node.operator, { literalValue: fixInputs.literalValue })) {
-    return expressionText;
+    return `(${expressionText})`;
   }
   return `!(${expressionText})`;
 }
@@ -399,7 +402,7 @@ function replaceDoubleNegation(
   innerExpression: Readonly<TSESTree.Expression>,
   fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
-  return fixer.replaceText(node, sourceCode.getText(innerExpression));
+  return fixer.replaceText(node, `(${sourceCode.getText(innerExpression)})`);
 }
 
 /**
@@ -436,7 +439,7 @@ function replaceRedundantBooleanConditional(
   fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const testText = sourceCode.getText(fixInputs.test);
-  const replacementText = fixInputs.shouldNegate ? `!(${testText})` : testText;
+  const replacementText = fixInputs.shouldNegate ? `!(${testText})` : `!!(${testText})`;
   return fixer.replaceText(node, replacementText);
 }
 
