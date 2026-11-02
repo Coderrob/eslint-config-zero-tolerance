@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **npm release publishing**: Authenticate the publish step with the `NPM_TOKEN` Actions secret and allow manual retries for an existing published GitHub Release tag.
+
 ## [1.2.7] - 2026-11-02
 
 ### Changed

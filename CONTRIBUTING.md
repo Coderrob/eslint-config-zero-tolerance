@@ -225,4 +225,4 @@ mkdocs build --strict
 
 ## Release Process
 
-Run the **Prepare plugin release** workflow on `main` with a `major`, `minor`, or `revision` bump. Review its PR, including every change since the previous tag in `CHANGELOG.md`, and merge after CI passes. Tag the merge commit as `v<plugin-version>` and publish a non-prerelease GitHub Release to start npm publication. The plugin's npm trusted publisher must point to `publish-plugin.yml`; see the [publishing instructions](README.md#publishing) for the full setup.
+Run the **Prepare plugin release** workflow on `main` with a `major`, `minor`, or `revision` bump. Review its PR, including every change since the previous tag in `CHANGELOG.md`, and merge after CI passes. Tag the merge commit as `v<plugin-version>` and publish a non-prerelease GitHub Release to start npm publication. Configure the repository Actions secret `NPM_TOKEN` with npm publish access. To retry publication, manually run **Publish plugin to npm** from `main` with the published release tag; see the [publishing instructions](README.md#publishing) for the full setup.
