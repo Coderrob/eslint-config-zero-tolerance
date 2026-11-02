@@ -350,7 +350,9 @@ pnpm deps:circular
 
 Only `@coderrob/eslint-plugin-zero-tolerance` is published. To prepare a release, run the **Prepare plugin release** GitHub Actions workflow on `main` and choose `major`, `minor`, or `revision` (`revision` means a patch bump). The workflow opens a release PR that updates `packages/plugin/package.json`, moves the current `[Unreleased]` changelog entries into a dated version section, and creates a fresh `[Unreleased]` section. It also starts CI for the release branch. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings, then review the changelog and merge the PR after CI passes.
 
-After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin. Configure npm trusted publishing for `@coderrob/eslint-plugin-zero-tolerance` with repository `Coderrob/eslint-config-zero-tolerance` and workflow filename `publish-plugin.yml` before the first automated release.
+After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin with provenance. Add a granular npm access token with direct publishing access as the repository Actions secret `NPM_TOKEN` before publishing.
+
+To retry a failed npm publication, run **Publish plugin to npm** manually from `main` and enter the existing published GitHub Release tag as `release_tag`. The workflow repeats the release checks and uses the same `NPM_TOKEN` secret. npm rejects a retry if that package version has already been published.
 
 The equivalent local checks are:
 
