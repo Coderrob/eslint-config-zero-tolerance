@@ -5,7 +5,7 @@
   "description": "Monorepo for @coderrob/eslint-plugin-zero-tolerance and @coderrob/eslint-config-zero-tolerance — strict ESLint rules and config presets for TypeScript code quality.",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
@@ -13,12 +13,12 @@
     "@typescript-eslint/parser": "catalog:",
     "ajv": "^8.20.0",
     "eslint": "catalog:",
-    "eslint-doc-generator": "^3.7.0",
-    "eslint-plugin-eslint-plugin": "^7.5.0",
-    "knip": "^6.27.0",
+    "eslint-doc-generator": "^3.7.1",
+    "eslint-plugin-eslint-plugin": "^7.6.2",
+    "knip": "^6.44.1",
     "madge": "^8.0.0",
-    "prettier": "^3.9.6",
-    "publint": "^0.3.21",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
     "tinyexec": "catalog:",
     "typescript": "catalog:"
   },
@@ -34,7 +34,7 @@
   ],
   "license": "Apache-2.0",
   "name": "eslint-config-zero-tolerance",
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "pnpm@12.16.1",
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
@@ -47,7 +47,7 @@
     "lint": "pnpm build && eslint . && pnpm validate:dead-code && pnpm validate:bdd && pnpm validate:rules && pnpm validate:readme && pnpm validate:publint",
     "lint:fix": "pnpm build && eslint . --fix && pnpm format",
     "readme:sync": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance build && eslint-doc-generator packages/plugin",
-    "release:publish": "pnpm build && pnpm test && changeset publish",
+    "release:publish": "pnpm build && pnpm test && pnpm release:publish:plugin",
     "release:publish:plugin": "pnpm --filter @coderrob/eslint-plugin-zero-tolerance run publish:public",
     "release:status": "changeset status",
     "release:version": "changeset version",
@@ -60,25 +60,7 @@
     "validate:publint": "publint packages/plugin && publint packages/config"
   },
   "version": "1.0.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "unrs-resolver"
-    ],
-    "overrides": {
-      "@babel/core@<=7.29.0": "7.29.7",
-      "ajv@<6.14.0": "6.14.0",
-      "anymatch>picomatch": "4.0.4",
-      "brace-expansion@<1.1.16": "1.1.16",
-      "brace-expansion@>=4.0.0 <5.0.7": "5.0.7",
-      "esbuild@>=0.27.3 <0.28.1": "0.28.1",
-      "flatted@<3.4.2": "3.4.2",
-      "handlebars@<4.7.9": "4.7.9",
-      "js-yaml@<3.15.0": "3.15.0",
-      "minimatch@<3.1.4": "3.1.4",
-      "picomatch@<2.3.2": "2.3.2",
-      "picomatch@>=4.0.0 <4.0.4": "4.0.4",
-      "rollup@>=4.0.0 <4.59.0": "4.60.2"
-    }
+  "engines": {
+    "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
   }
 }

@@ -30,7 +30,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 | [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
 | [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
 | [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                                           |
-| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                                              |
+| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Report repeated logical guard access for manual review                                                  |
 | [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                                     |
 
 ## Testing
@@ -54,7 +54,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 | [no-non-null-assertion](no-non-null-assertion.md)                                   | problem    | Disallow non-null assertions using the `!` postfix operator                        |
 | [no-explicit-any](no-explicit-any.md)                                               | problem    | Disallow explicit `any`; require precise modeling or explicit narrowing            |
 | [no-indexed-access-types](no-indexed-access-types.md)                               | problem    | Disallow TypeScript indexed access types                                           |
-| [no-literal-unions](no-literal-unions.md)                                           | suggestion | Ban literal union types in favour of enums                                         |
+| [no-literal-unions](no-literal-unions.md)                                           | suggestion | Report literal unions for manual migration to enums                                |
 | [no-literal-property-unions](no-literal-property-unions.md)                         | suggestion | Require property literal unions to use named domain types                          |
 | [no-inline-type-import](no-inline-type-import.md)                                   | problem    | Disallow inline `import("...")` type annotations                                   |
 | [no-return-type](no-return-type.md)                                                 | problem    | Disallow TypeScript `ReturnType` utility usage                                     |
@@ -65,24 +65,24 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 
 ## Code Quality
 
-| Rule                                                              | Type       | Description                                                                             |
-| ----------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
-| [max-function-lines](max-function-lines.md)                       | suggestion | Enforce a maximum number of lines per function body                                     |
-| [max-params](max-params.md)                                       | suggestion | Enforce a maximum number of function parameters                                         |
-| [no-array-mutation](no-array-mutation.md)                         | suggestion | Disallow mutating array methods                                                         |
-| [no-date-now](no-date-now.md)                                     | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
-| [no-placeholder-implementation](no-placeholder-implementation.md) | problem    | Disallow placeholder, stub, TODO, and not implemented production code                   |
-| [no-magic-numbers](no-magic-numbers.md)                           | suggestion | Disallow magic numbers; use named constants instead                                     |
-| [no-magic-strings](no-magic-strings.md)                           | suggestion | Disallow magic strings in comparisons and switch cases                                  |
-| [no-map-set-mutation](no-map-set-mutation.md)                     | suggestion | Disallow direct `Map` and `Set` mutation methods                                        |
-| [no-object-mutation](no-object-mutation.md)                       | suggestion | Disallow direct object-property mutation                                                |
-| [sort-imports](sort-imports.md)                                   | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
-| [sort-functions](sort-functions.md)                               | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
-| [prefer-nullish-coalescing](prefer-nullish-coalescing.md)         | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
-| [prefer-object-spread](prefer-object-spread.md)                   | suggestion | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
-| [prefer-readonly-parameters](prefer-readonly-parameters.md)       | suggestion | Prefer readonly typing for object and array-like parameters                             |
-| [prefer-string-raw](prefer-string-raw.md)                         | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
-| [prefer-structured-clone](prefer-structured-clone.md)             | suggestion | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
+| Rule                                                              | Type       | Description                                                                            |
+| ----------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------- |
+| [max-function-lines](max-function-lines.md)                       | suggestion | Enforce a maximum number of lines per function body                                    |
+| [max-params](max-params.md)                                       | suggestion | Enforce a maximum number of function parameters                                        |
+| [no-array-mutation](no-array-mutation.md)                         | suggestion | Disallow mutating array methods                                                        |
+| [no-date-now](no-date-now.md)                                     | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                    |
+| [no-placeholder-implementation](no-placeholder-implementation.md) | problem    | Disallow placeholder, stub, TODO, and not implemented production code                  |
+| [no-magic-numbers](no-magic-numbers.md)                           | suggestion | Disallow magic numbers; use named constants instead                                    |
+| [no-magic-strings](no-magic-strings.md)                           | suggestion | Disallow magic strings in comparisons and switch cases                                 |
+| [no-map-set-mutation](no-map-set-mutation.md)                     | suggestion | Disallow direct `Map` and `Set` mutation methods                                       |
+| [no-object-mutation](no-object-mutation.md)                       | suggestion | Disallow direct object-property mutation                                               |
+| [sort-imports](sort-imports.md)                                   | suggestion | Report import ordering while preserving runtime dependency order                       |
+| [sort-functions](sort-functions.md)                               | suggestion | Require top-level functions and const function expressions to be sorted alphabetically |
+| [prefer-nullish-coalescing](prefer-nullish-coalescing.md)         | suggestion | Prefer nullish coalescing for locally bound identifier guard ternaries                 |
+| [prefer-object-spread](prefer-object-spread.md)                   | suggestion | Report empty-target Object.assign calls for manual review                              |
+| [prefer-readonly-parameters](prefer-readonly-parameters.md)       | suggestion | Prefer readonly typing for object and array-like parameters                            |
+| [prefer-string-raw](prefer-string-raw.md)                         | suggestion | Prefer native `String.raw` when the constructor is not shadowed                        |
+| [prefer-structured-clone](prefer-structured-clone.md)             | suggestion | Review JSON cloning before considering structuredClone                                 |
 
 ## Error Handling
 
@@ -116,12 +116,12 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 | [no-identical-expressions](no-identical-expressions.md)           | problem    | Disallow identical expressions on both sides of a binary or logical operator |
 | [no-identical-branches](no-identical-branches.md)                 | suggestion | Disallow identical conditional branches                                      |
 | [no-boolean-return-trap](no-boolean-return-trap.md)               | suggestion | Disallow ambiguous boolean-return APIs outside predicate naming              |
-| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Disallow redundant comparisons to boolean literals                           |
-| [no-for-in](no-for-in.md)                                         | problem    | Disallow `for..in` loops                                                     |
+| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Simplify comparisons only when the operand is known to be boolean            |
+| [no-for-in](no-for-in.md)                                         | problem    | Disallow for..in loops without rewriting inherited-key behavior              |
 | [no-labels](no-labels.md)                                         | problem    | Disallow labeled statements                                                  |
 | [no-with](no-with.md)                                             | problem    | Disallow `with` statements                                                   |
 | [no-await-in-loop](no-await-in-loop.md)                           | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |
-| [no-floating-promises](no-floating-promises.md)                   | problem    | Disallow unhandled promise expressions; require explicit handling            |
+| [no-floating-promises](no-floating-promises.md)                   | problem    | Check explicit, local async, and type-resolved promises                      |
 | [no-math-random](no-math-random.md)                               | problem    | Disallow `Math.random()`; inject a random source instead                     |
 | [no-eslint-disable](no-eslint-disable.md)                         | suggestion | Prevent use of `eslint-disable` comments                                     |
 | [no-ts-nocheck](no-ts-nocheck.md)                                 | problem    | Prevent use of `@ts-nocheck` comments                                        |
@@ -129,7 +129,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 | [no-process-env-outside-config](no-process-env-outside-config.md) | problem    | Disallow `process.env` reads outside configuration modules                   |
 | [no-flag-argument](no-flag-argument.md)                           | suggestion | Disallow boolean flag parameters in function signatures                      |
 | [prefer-guard-clauses](prefer-guard-clauses.md)                   | suggestion | Prefer guard clauses by removing else blocks after terminating if branches   |
-| [prefer-shortcut-return](prefer-shortcut-return.md)               | suggestion | Prefer shortcut boolean returns over if branches that return true/false      |
+| [prefer-shortcut-return](prefer-shortcut-return.md)               | suggestion | Simplify boolean returns while retaining comments                            |
 | [no-query-side-effects](no-query-side-effects.md)                 | suggestion | Disallow side effects in query-style functions                               |
 | [require-timeout-for-io](require-timeout-for-io.md)               | problem    | Require timeout or cancellation options for external IO calls                |
 | [require-exhaustive-switch](require-exhaustive-switch.md)         | suggestion | Require exhaustive `switch` statements over finite discriminant types        |

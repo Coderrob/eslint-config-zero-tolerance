@@ -8,9 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Dependency refresh**: Updated npm dependencies to their latest compatible stable releases, including pnpm 12.16.1, ESLint 10.14.0, Jest 30.5.2, tsup 9.0.0, TypeScript-ESLint 8.72.1, and Node 26 types. Retained TypeScript 5.9.3 to satisfy current peer requirements. Migrated pnpm build permissions and overrides to workspace configuration and refreshed transitive security fixes.
+- **Node and workflow support**: Run the full validation suite on Node 24.22.2 and 26.13.0; refresh Node 22 consumer coverage and pinned GitHub Actions. Install consumer-check tooling on Node 24 before selecting the older runtime under test.
+- **Jest 30 coverage contracts**: Added barrel-path, direct export, local test export, anonymous call, and namespace-isolation fixtures; removed an unreachable SQL-report guard after argument validation. Preserve per-rule 95% coverage thresholds.
+
 ### Added
 
-- **GitHub Actions releases**: Added dispatchable plugin-only release preparation and npm publication workflows, stable tag/version/changelog guards, npm trusted publishing, and tested release helpers.
+- **Release automation**: Added a manually dispatched plugin release PR workflow with major, minor, and revision choices, version/changelog rollover fixtures, and a GitHub Release workflow that verifies stable tags, public plugin metadata, and main ancestry before npm trusted publication.
+- **GitHub Actions pinning check**: Added a repository fixture that rejects tag and branch references in external `uses:` steps, requiring full commit SHAs across workflows.
 
 - **Parser regression audit**: Added 924 parser compatibility checks across all 77 rules, direct security AST helper tests, and expanded prototype, optional-access, negated matcher, and computed-property fixtures.
 
@@ -18,6 +25,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- **Behavioral contracts**: Preserve literal-union assignability, runtime dependency ordering, shadowed `String` values, and comments in shortcut returns. Detect stable local async calls, typed promise results, and terminal-handler gaps with positive/negative parameter and state-isolation regressions.
+- **Release reconciliation**: Keep one release-published npm workflow and preserve the merged release checks, explicit tag checkout, main ancestry, provenance, and package preview. Reject inherited release-size names, version overflow, stale metadata, invalid dates, and non-public plugin manifests before writes.
+
+- **Plugin-only publishing**: Marked the internal config package private and restricted the older root publish command to the plugin so release commands cannot publish the config package.
+- **Semantic autofix safety**: Removed automatic rewrites from `no-for-in`, `require-optional-chaining`, `prefer-object-spread`, and `prefer-structured-clone`; made the latter three opt-in because equivalent behavior cannot be established from syntax alone.
+- **Boolean and nullish simplification**: Restricted `no-redundant-boolean` comparisons to syntactically boolean operands, preserved boolean results for ternaries, and limited `prefer-nullish-coalescing` autofixes to repeated locally bound identifiers.
+- **Autofix precedence and comments**: Parenthesized simplified boolean expressions and nullish fallbacks to preserve grouping, and withheld fixes when they would remove comments.
+- **Rule gap fixtures**: Added positive and negative cases for falsy values, inherited keys, getters, prototype keys, JSON cloning differences, and nonboolean operands, with matching BDD scenarios and documentation.
 - **Fixture validation**: Parse RuleTester suites with TypeScript instead of indentation-sensitive regular expressions; reject empty groups, unnamed fixtures, missing diagnostic assertions, and placeholder autofix outputs.
 - **Rule correctness**: Honor `max-params` zero limits, preserve precedence in nullish-coalescing fixes, preserve boolean coercion and restrict unsafe boolean-comparison fixes, resolve parameter writes by lexical binding, and distinguish unrelated or dynamically computed code-generation API names.
 
@@ -26,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Rule fixture validation**: Read behavior names from actual RuleTester fixtures regardless of formatting, without treating names inside fixture code or options as test descriptions.
 - **Jest and mock matcher rules**: Prevented inherited object properties such as `toString`, `constructor`, and `valueOf` from colliding with configured matcher replacement maps and producing false Jest diagnostics.
 - **`prefer-string-raw` rule**: Reworked detection and autofix around exact source text and runtime-value equivalence, including regex-source strings, and skipped grammar-sensitive or semantics-changing contexts such as directives, module sources, property keys, JSX, inline snapshots, TypeScript literals, mixed escapes, trailing backslashes, interpolation markers, backticks, and multiline strings.
-- **`sort-imports` rule**: Replaced overlapping adjacent fixes with a safe whole-span one-pass sort, preserved explicit side-effect import order, retained complete declarations, and withheld autofix across comments, executable code, or side-effect position changes.
+- **`sort-imports` rule**: Replaced overlapping adjacent fixes with a whole-span one-pass sort of explicit type imports, retained complete declarations, and withheld autofix across comments, executable code, or changes to runtime dependency order.
 - **`sort-functions` rule**: Included named default exported functions in sorting while preserving complete multiline implementations and export wrappers.
 - **`require-interface-prefix` rule**: Combined multi-interface renames into one non-overlapping fix transaction and deduplicated merged interface references.
 - **Defensive security rules**: Made secret fixture allowlists override credential-shape detection, recognized template and concatenated global string timers without flagging shadowed or arbitrary methods, and rejected disabled IO cancellation values such as `timeout: 0`, `signal: undefined`, and empty `.timeout()` calls.

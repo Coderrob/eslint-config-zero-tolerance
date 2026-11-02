@@ -21,6 +21,11 @@ describe('no-literal-unions', () => {
   ruleTester.run('no-literal-unions', noLiteralUnions, {
     valid: [
       {
+        name: 'should not reuse constants from another file',
+        code: 'type Status = typeof ACTIVE | typeof IDLE;',
+      },
+
+      {
         code: 'type Numbers = number | string;',
         name: 'should allow non-literal union types',
       },
@@ -126,9 +131,30 @@ describe('no-literal-unions', () => {
     ],
     invalid: [
       {
+        name: 'should preserve assignability of existing literal values',
+        code: 'type Status = "active" | "inactive"; const current: Status = "active";',
+        output: null,
+        errors: [
+          {
+            messageId: 'noLiteralUnions',
+          },
+        ],
+      },
+      {
+        name: 'should resolve constants independently for each file',
+        code: 'const ACTIVE = "active"; const IDLE = "idle"; type Status = typeof ACTIVE | typeof IDLE;',
+        output: null,
+        errors: [
+          {
+            messageId: 'noLiteralUnions',
+          },
+        ],
+      },
+
+      {
         code: 'type Status = "active" | "inactive";',
         name: 'should report string literal union',
-        output: 'enum Status { Active = "active", Inactive = "inactive" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -138,7 +164,7 @@ describe('no-literal-unions', () => {
       {
         code: 'type Size = "small" | "medium" | "large";',
         name: 'should report multiple string literals',
-        output: 'enum Size { Small = "small", Medium = "medium", Large = "large" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -184,7 +210,7 @@ describe('no-literal-unions', () => {
       {
         code: 'type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";',
         name: 'should report HTTP method literals',
-        output: 'enum HttpMethod { GET = "GET", POST = "POST", PUT = "PUT", DELETE = "DELETE" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -203,7 +229,7 @@ describe('no-literal-unions', () => {
       {
         code: 'type Direction = "up" | "down" | "left" | "right";',
         name: 'should report direction literals',
-        output: 'enum Direction { Up = "up", Down = "down", Left = "left", Right = "right" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -221,9 +247,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'export type RequireJsdocFunctionsMessageId = "missingJsdoc" | "missingJsdocParam";',
-        name: 'should autofix exported string literal union type aliases to exported enums',
-        output:
-          'export enum RequireJsdocFunctionsMessageId { MissingJsdoc = "missingJsdoc", MissingJsdocParam = "missingJsdocParam" }',
+        name: 'should report exported string unions without changing the declaration kind',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -232,8 +257,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'type Duplicates = "a-b" | "a b";',
-        name: 'should autofix duplicate enum member names by appending numeric suffixes',
-        output: 'enum Duplicates { AB = "a-b", AB2 = "a b" }',
+        name: 'should report literals whose generated member names would collide without rewriting',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -242,8 +267,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'type EmptyLiteral = "" | "active";',
-        name: 'should autofix empty string literal union members using fallback enum member names',
-        output: 'enum EmptyLiteral { Value1 = "", Active = "active" }',
+        name: 'should report empty string union members without synthesizing enum values',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -252,8 +277,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'type AuthMode = "2fa" | "password";',
-        name: 'should autofix numeric-leading string literals with prefixed enum member names',
-        output: 'enum AuthMode { Value2fa = "2fa", Password = "password" }',
+        name: 'should report numeric-leading string literals without synthesizing enum names',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -262,8 +287,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: String.raw`type Escapes = "\"" | "\\" | "\n";`,
-        name: 'should autofix escaped literals using safe enum initializer serialization',
-        output: String.raw`enum Escapes { Value1 = "\"", Value2 = "\\", Value3 = "\n" }`,
+        name: 'should report escaped literal values without rewriting their representation',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -272,8 +297,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'declare type Stage = "dev" | "prod";',
-        name: 'should preserve declare modifier when autofixing type aliases',
-        output: 'declare enum Stage { Dev = "dev", Prod = "prod" }',
+        name: 'should report ambient type aliases without changing their declaration',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -310,8 +335,7 @@ describe('no-literal-unions', () => {
       {
         code: "const ACTIVE = 'active'; const INACTIVE = 'inactive'; export type Status = typeof ACTIVE | typeof INACTIVE;",
         name: 'should report typeof unions that resolve to string literal const values',
-        output:
-          'const ACTIVE = \'active\'; const INACTIVE = \'inactive\'; export enum Status { ACTIVE = "active", INACTIVE = "inactive" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -321,8 +345,7 @@ describe('no-literal-unions', () => {
       {
         code: "const ACTIVE = 'active'; const INACTIVE = 'inactive'; type Status = typeof ACTIVE | typeof INACTIVE;",
         name: 'should report non-exported typeof unions that resolve to string literal const values',
-        output:
-          'const ACTIVE = \'active\'; const INACTIVE = \'inactive\'; enum Status { ACTIVE = "active", INACTIVE = "inactive" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -332,8 +355,7 @@ describe('no-literal-unions', () => {
       {
         code: "export const ACTIVE = 'active'; const INACTIVE = 'inactive'; export type Status = typeof ACTIVE | typeof INACTIVE;",
         name: 'should report typeof unions that resolve to exported string literal const values',
-        output:
-          'export const ACTIVE = \'active\'; const INACTIVE = \'inactive\'; export enum Status { ACTIVE = "active", INACTIVE = "inactive" }',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -342,9 +364,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: "const ACTIVE = 'active'; export type Status = typeof ACTIVE | 'inactive';",
-        name: 'should autofix mixed string literals and typeof string literal const references to exported enums',
-        output:
-          'const ACTIVE = \'active\'; export enum Status { ACTIVE = "active", Inactive = "inactive" }',
+        name: 'should report exported mixed literal and const-reference unions without rewriting',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -353,9 +374,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: "const ACTIVE = 'active'; type Status = typeof ACTIVE | 'inactive';",
-        name: 'should autofix mixed string literals and typeof string literal const references to enums',
-        output:
-          'const ACTIVE = \'active\'; enum Status { ACTIVE = "active", Inactive = "inactive" }',
+        name: 'should report mixed literal and const-reference unions without rewriting',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',
@@ -364,9 +384,8 @@ describe('no-literal-unions', () => {
       },
       {
         code: 'const ACTIVE = `active`; export type Status = typeof ACTIVE | "inactive";',
-        name: 'should autofix typeof unions that resolve through no-substitution template literal const values',
-        output:
-          'const ACTIVE = `active`; export enum Status { ACTIVE = "active", Inactive = "inactive" }',
+        name: 'should report without rewriting typeof unions that resolve through no-substitution template literal const values',
+        output: null,
         errors: [
           {
             messageId: 'noLiteralUnions',

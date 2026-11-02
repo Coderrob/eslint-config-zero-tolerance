@@ -4,41 +4,66 @@
   "sourceFile": "packages/plugin/src/rules/prefer-nullish-coalescing.ts",
   "module": {
     "name": "prefer-nullish-coalescing",
-    "description": "Prefer nullish coalescing instead of a nullish guard ternary.",
+    "description": "Fix nullish guard ternaries only when the repeated identifier resolves to a local binding.",
     "exports": ["preferNullishCoalescing"]
   },
   "specifications": [
     {
-      "feature": "Nullish coalescing usage",
+      "feature": "Nullish guard simplification",
       "scenarios": [
         {
-          "name": "should allow explicit nullish coalescing operator",
-          "given": "const result = value ?? defaultValue",
+          "name": "should allow direct nullish coalescing and unrelated ternaries",
+          "given": "value ?? fallback or a ternary with an unrelated guard",
           "when": "the rule evaluates the expression",
           "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Nullish guard ternary patterns",
-      "scenarios": [
-        {
-          "name": "should report a null-check ternary that can be replaced with ??",
-          "given": "const result = value !== null ? value : defaultValue",
-          "when": "the rule evaluates the conditional expression",
-          "then": "a preferNullishCoalescing violation is reported"
         },
         {
-          "name": "should report an undefined-check ternary that can be replaced with ??",
-          "given": "const result = value !== undefined ? value : defaultValue",
-          "when": "the rule evaluates the conditional expression",
-          "then": "a preferNullishCoalescing violation is reported"
+          "name": "should fix a repeated identifier nullish guard",
+          "given": "const value = read(); value != null ? value : fallback",
+          "when": "the rule evaluates the ternary",
+          "then": "a preferNullish violation is reported with an autofix that parenthesizes the fallback"
         },
         {
-          "name": "should report a nullish guard using == null that can be replaced with ??",
-          "given": "const result = value == null ? defaultValue : value",
-          "when": "the rule evaluates the conditional expression",
-          "then": "a preferNullishCoalescing violation is reported"
+          "name": "should preserve getter evaluation count",
+          "given": "obj.value != null ? obj.value : fallback",
+          "when": "the rule evaluates the ternary",
+          "then": "no violation or autofix is produced for repeated member access"
+        },
+        {
+          "name": "should preserve function call side effects",
+          "given": "read() != null ? read() : fallback",
+          "when": "the rule evaluates the ternary",
+          "then": "no violation or autofix is produced for repeated calls"
+        },
+        {
+          "name": "should preserve unbound identifiers that may be global accessors",
+          "given": "globalValue != null ? globalValue : fallback with no local binding",
+          "when": "the rule evaluates the ternary",
+          "then": "no violation or autofix is produced because repeated reads may invoke a global getter"
+        },
+        {
+          "name": "should preserve a guarded identifier when the result branch differs",
+          "given": "const user = read(); user != null ? account : fallback",
+          "when": "the rule evaluates the ternary",
+          "then": "no violation or autofix is produced because the selected branch is not the guarded value"
+        },
+        {
+          "name": "should preserve logical fallback grouping",
+          "given": "value != null ? value : fallback && ready",
+          "when": "the rule fixes a locally bound value",
+          "then": "the fallback is parenthesized after ?? so the result parses and retains its grouping"
+        },
+        {
+          "name": "should preserve conditional fallback grouping",
+          "given": "value != null ? value : ready ? left : right",
+          "when": "the rule fixes a locally bound value",
+          "then": "the conditional fallback remains one parenthesized ?? operand"
+        },
+        {
+          "name": "should preserve comments between nullish branches",
+          "given": "value != null ? value : /* keep */ fallback",
+          "when": "the rule evaluates the ternary",
+          "then": "no violation or autofix removes the comment"
         }
       ]
     },
@@ -50,6 +75,23 @@
           "given": "a nullish ternary with logical, conditional, or assignment fallback",
           "when": "the coalescing fix is applied",
           "then": "both operands and the full expression retain their grouping"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve fallback side effects across parameter boundaries",
+          "given": "a locally bound parameter may be nullish or any falsy or truthy non-nullish value and fallback increments a counter",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the fixed expression returns the same value and invokes fallback exactly as many times as the original"
+        },
+        {
+          "name": "should preserve repeated getter state changes",
+          "given": "a property getter increments a counter each time the guarded expression is read",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the source is unchanged and both original getter reads still occur"
         }
       ]
     }

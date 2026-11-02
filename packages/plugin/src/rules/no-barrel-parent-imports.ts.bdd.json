@@ -71,6 +71,17 @@
           "then": "a noParentImport violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Dependency upgrade regression contracts",
+      "scenarios": [
+        {
+          "name": "should allow dynamic and same-directory paths in barrel files",
+          "given": "an index.ts file imports a peer module and a dynamically computed module",
+          "when": "the rule checks each import",
+          "then": "neither import reports a parent-directory violation"
+        }
+      ]
     }
   ]
 }

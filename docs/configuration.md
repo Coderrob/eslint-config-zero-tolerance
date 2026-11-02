@@ -121,8 +121,8 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `require
 | `prefer-result-return`                   | off            | warn            |
 | `prefer-shortcut-return`                 | warn           | error           |
 | `prefer-string-raw`                      | warn           | error           |
-| `prefer-object-spread`                   | warn           | error           |
-| `prefer-structured-clone`                | warn           | error           |
+| `prefer-object-spread`                   | off            | off             |
+| `prefer-structured-clone`                | off            | off             |
 | `require-barrel-relative-exports`        | warn           | error           |
 | `require-bdd-spec`                       | off            | off             |
 | `require-clean-barrel`                   | warn           | error           |
@@ -132,7 +132,7 @@ Nearly all core rules are included in every preset. `require-bdd-spec`, `require
 | `require-jsdoc-anonymous-functions`      | off            | off             |
 | `require-jsdoc-functions`                | warn           | error           |
 | `require-node-protocol`                  | warn           | error           |
-| `require-optional-chaining`              | warn           | error           |
+| `require-optional-chaining`              | off            | off             |
 | `require-readonly-props`                 | warn           | error           |
 | `require-test-description-style`         | warn           | error           |
 | `require-union-type-alias`               | warn           | error           |

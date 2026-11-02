@@ -30,6 +30,17 @@
           "then": "an unsafeRawSql violation is reported even for literal strings"
         }
       ]
+    },
+    {
+      "feature": "Dependency upgrade regression contracts",
+      "scenarios": [
+        {
+          "name": "should report only validated SQL arguments",
+          "given": "SQL sink calls with no arguments, spread arguments, parameterized literals, or interpolated strings",
+          "when": "the rule validates the first argument before reporting",
+          "then": "only interpolated arguments produce rawSqlInterpolation diagnostics and no missing node is reported"
+        }
+      ]
     }
   ]
 }

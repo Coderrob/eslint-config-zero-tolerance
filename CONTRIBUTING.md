@@ -6,8 +6,8 @@ Thank you for contributing to `@coderrob/eslint-plugin-zero-tolerance`! This gui
 
 | Tool    | Version                                |
 | ------- | -------------------------------------- |
-| Node.js | 20.20.2, 22.23.1, or 24.18.0 (LTS)     |
-| pnpm    | 10+                                    |
+| Node.js | 24.22.2 or 26.13.0 (LTS)               |
+| pnpm    | 12.16.1                                |
 | Python  | 3.x (only if working on the docs site) |
 
 ## Setup
@@ -22,6 +22,10 @@ pnpm install
 ```
 
 Use `pnpm install` for the workspace root. `npm install` is supported for consumers installing the published plugin into their own projects, but not for bootstrapping this monorepo.
+
+The workspace uses pnpm 12.16.1 and runs its full build, lint, and test suite on Node 24 and 26. Older Node releases are covered by separate packed-package consumer checks. Build permissions and dependency overrides are configured in `pnpm-workspace.yaml`.
+
+TypeScript remains on 5.9.3, the newest release satisfying all current peer requirements: `madge` requires TypeScript 5, and `@typescript-eslint/parser` does not support TypeScript 7. Upgrade the compiler when the dependency graph supports it without peer overrides.
 
 ## Building
 
@@ -221,14 +225,4 @@ mkdocs build --strict
 
 ## Release Process
 
-Only `@coderrob/eslint-plugin-zero-tolerance` is published. The config workspace is internal.
-
-1. Run **Prepare Release** (`prepare-release.yml`) from the Actions tab on `main`. Choose `revision` (patch), `minor`, or `major`. The workflow bumps `packages/plugin/package.json`, moves Unreleased notes into a dated changelog section, runs all release checks, and opens a `release/vX.Y.Z` PR.
-2. Review and merge the release PR. Create and push tag `vX.Y.Z` on the merged commit. The tag must match the plugin manifest and dated changelog entry.
-3. Pushing the tag starts **Publish To npm** (`publish-npm.yml`). It can also be run using `workflow_dispatch` on `main`, supplying that existing tag. It verifies that the tagged commit belongs to `main`, reruns validation, previews the package, and publishes only `packages/plugin`.
-
-Configure an npm trusted publisher for owner `Coderrob`, repository `eslint-config-zero-tolerance`, and workflow filename `publish-npm.yml`, allowing direct `npm publish`. The workflow uses OIDC and provenance on a GitHub-hosted runner; it needs no npm token. See [npm's trusted publishing setup](https://docs.npmjs.com/trusted-publishers/).
-
-Enable **Allow GitHub Actions to create and approve pull requests** in the repository's Actions settings. By default, release PRs use `GITHUB_TOKEN`; GitHub may require a maintainer to select **Approve workflows to run** on the PR before its CI runs. To trigger that CI automatically, add a `RELEASE_PR_TOKEN` secret with repository contents and pull-request write permissions. The preparation workflow always validates the candidate itself. See [GitHub's workflow triggering rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
-
-These workflows prepare release files and perform publication only when run on GitHub. Adding them does not publish a release or change the current version. See [AGENTS.md](AGENTS.md#release-process) for manual release instructions.
+Run the **Prepare plugin release** workflow on `main` with a `major`, `minor`, or `revision` bump. Review its PR, including every change since the previous tag in `CHANGELOG.md`, and merge after CI passes. Tag the merge commit as `v<plugin-version>` and publish a non-prerelease GitHub Release to start npm publication. The plugin's npm trusted publisher must point to `publish-plugin.yml`; see the [publishing instructions](README.md#publishing) for the full setup.

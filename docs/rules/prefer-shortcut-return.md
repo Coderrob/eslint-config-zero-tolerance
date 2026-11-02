@@ -53,3 +53,7 @@ This rule has no options:
 ```js
 'zero-tolerance/prefer-shortcut-return': 'error'
 ```
+
+## Behavioral contract
+
+The rule skips a replacement when its full source span contains comments, including comments between the `if` and the following return. This retains explanations and tool directives. Eligible rewrites use `!!` or `!` so falsy parameters still return booleans.

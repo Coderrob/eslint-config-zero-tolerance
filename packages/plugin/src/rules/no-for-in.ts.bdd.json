@@ -4,41 +4,30 @@
   "sourceFile": "packages/plugin/src/rules/no-for-in.ts",
   "module": {
     "name": "no-for-in",
-    "description": "Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration.",
+    "description": "Disallow for..in loops without automatically changing inherited-key iteration.",
     "exports": ["noForIn"]
   },
   "specifications": [
     {
-      "feature": "Safe iteration patterns",
+      "feature": "Iteration diagnostics",
       "scenarios": [
         {
-          "name": "should allow for..of loops",
-          "given": "a for..of loop iterating over an array",
+          "name": "should allow for-of and explicit own-key iteration",
+          "given": "a for-of loop or Object.keys iteration",
           "when": "the rule evaluates the loop",
           "then": "no violation is reported"
         },
         {
-          "name": "should allow Object.keys().forEach()",
-          "given": "a call to Object.keys(obj).forEach(fn)",
-          "when": "the rule evaluates the code",
-          "then": "no violation is reported"
+          "name": "should report for-in without rewriting inherited-key behavior",
+          "given": "a for-in loop over an object with inherited enumerable keys",
+          "when": "the rule evaluates the loop",
+          "then": "a noForIn violation is reported without an autofix"
         },
         {
-          "name": "should allow a standard for loop with index",
-          "given": "a for(let i = 0; i < arr.length; i++) loop",
+          "name": "should report assignment-left and nested for-in loops without autofix",
+          "given": "a nested for-in loop with an assignment target",
           "when": "the rule evaluates the loop",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "for..in loop usage",
-      "scenarios": [
-        {
-          "name": "should report a for..in loop over an object",
-          "given": "a for(const key in obj) loop",
-          "when": "the rule evaluates the loop",
-          "then": "a noForIn violation is reported on the ForInStatement"
+          "then": "a noForIn violation is reported without changing the loop"
         }
       ]
     }

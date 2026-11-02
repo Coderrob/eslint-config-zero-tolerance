@@ -5,6 +5,14 @@ describe('no-re-export', () => {
   ruleTester.run('no-re-export', noReExport, {
     valid: [
       {
+        name: 'should allow direct destructured and multiple variable exports',
+        code: 'export const { value } = source; export const first = 1, second = 2;',
+      },
+      {
+        name: 'should allow export assignments of local values and child modules',
+        code: "import child = require('./child'); export = child;",
+      },
+      {
         code: 'export { foo };',
         name: 'should allow direct named export without re-export',
       },

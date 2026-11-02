@@ -5,6 +5,15 @@ describe('no-shell-command-construction', () => {
   ruleTester.run('no-shell-command-construction', noShellCommandConstruction, {
     valid: [
       {
+        name: 'should allow anonymous calls with default wrapper options',
+        code: '(() => {})();',
+        options: [{}],
+      },
+      {
+        name: 'should allow unrelated namespaces after tracking child process imports',
+        code: "import * as cp from 'node:child_process'; other.exec(command); cp.spawn('git', []);",
+      },
+      {
         name: 'should allow spawn with argument vector',
         code: "import { spawn } from 'node:child_process'; spawn('git', ['status']);",
       },

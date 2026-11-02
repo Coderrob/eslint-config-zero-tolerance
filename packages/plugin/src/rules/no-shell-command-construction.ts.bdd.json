@@ -30,6 +30,17 @@
           "then": "a shellCommandConstruction violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Dependency upgrade regression contracts",
+      "scenarios": [
+        {
+          "name": "should keep wrapper defaults and namespace state isolated",
+          "given": "empty options, anonymous calls, and an unrelated exec method after a child_process namespace import",
+          "when": "the rule evaluates the calls",
+          "then": "no shell execution diagnostic is reported for anonymous calls or unrelated namespaces"
+        }
+      ]
     }
   ]
 }

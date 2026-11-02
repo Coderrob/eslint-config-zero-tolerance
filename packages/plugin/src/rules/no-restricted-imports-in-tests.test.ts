@@ -5,6 +5,11 @@ describe('no-restricted-imports-in-tests', () => {
   ruleTester.run('no-restricted-imports-in-tests', noRestrictedImportsInTests, {
     valid: [
       {
+        name: 'should allow local export declarations in test files',
+        filename: 'src/file.test.ts',
+        code: 'export const fixture = 1;',
+      },
+      {
         name: 'should allow restricted imports outside test files',
         code: "import fs from 'node:fs';",
         filename: 'src/file.ts',

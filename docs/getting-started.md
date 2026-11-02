@@ -4,12 +4,12 @@ Get from zero to linting in under five minutes. This guide covers installation, 
 
 ## Requirements
 
-| Dependency                  | Version                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| Node.js                     | LTS releases tested in CI: 18.20.8, 20.20.2, 22.23.1, and 24.18.0              |
-| TypeScript                  | 5.x                                                                            |
-| ESLint                      | 8.57.1, 9.39.5, and 10.7.0 tested; package ranges support 8.57+, 9.x, and 10.x |
-| `@typescript-eslint/parser` | 8.x                                                                            |
+| Dependency                  | Version                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------- |
+| Node.js                     | LTS releases tested in CI: 18.20.8, 20.20.2, 22.23.4, 24.22.2, and 26.13.0      |
+| TypeScript                  | 5.x                                                                             |
+| ESLint                      | 8.57.1, 9.39.5, and 10.14.0 tested; package ranges support 8.57+, 9.x, and 10.x |
+| `@typescript-eslint/parser` | 8.x                                                                             |
 
 ## Installation
 

@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/prefer-shortcut-return.ts",
   "module": {
     "name": "prefer-shortcut-return",
-    "description": "Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions.",
+    "description": "Prefer shortcut boolean returns while preserving comments.",
     "exports": ["preferShortcutReturn"]
   },
   "specifications": [
@@ -39,6 +39,23 @@
           "given": "an if statement whose consequent returns false and the fallthrough returns true",
           "when": "the rule evaluates the if statement",
           "then": "a preferShortcutReturn violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should retain comments throughout the complete replacement span",
+          "given": "a comment occurs in the condition, either branch, or between if and trailing return",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the pattern is left unchanged so explanations and tool directives remain intact"
+        },
+        {
+          "name": "should preserve boolean results for falsy and truthy parameters",
+          "given": "a comment-free conditional returns opposite boolean literals for unknown input",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the fix returns a boolean for undefined, null, zero, empty string, booleans and nonempty values"
         }
       ]
     }

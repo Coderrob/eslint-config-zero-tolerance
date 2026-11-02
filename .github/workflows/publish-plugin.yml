@@ -1,63 +1,54 @@
-name: Publish To npm
+name: Publish plugin to npm
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Existing merged release tag (for example v1.2.7)
-        required: true
-        type: string
-  push:
-    tags:
-      - 'v*'
+  release:
+    types:
+      - published
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
-  group: publish-npm
+  group: publish-plugin
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      id-token: write
     env:
-      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ format('refs/tags/{0}', inputs.tag || github.ref_name) }}
+          ref: ${{ format('refs/tags/{0}', github.event.release.tag_name) }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify release tag ancestry
-        shell: bash
+      - name: Verify tag is on main
         run: |
           [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
-          git fetch origin main:refs/remotes/origin/main
+          git fetch origin '+refs/heads/main:refs/remotes/origin/main'
           test "$(git rev-parse HEAD)" = "$(git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}")"
           git merge-base --is-ancestor HEAD origin/main
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - name: Verify release metadata
+        run: node scripts/release-metadata.mjs verify "$RELEASE_TAG"
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '24.18.0'
-          cache: pnpm
+          node-version: '24.22.2'
           registry-url: https://registry.npmjs.org
-
-      - name: Verify plugin version and release notes
-        run: node scripts/check-release-tag.mjs "$RELEASE_TAG"
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify package
+      - name: Validate release
         run: |
           pnpm lint
           pnpm test
@@ -68,6 +59,6 @@ jobs:
         working-directory: packages/plugin
         run: npm pack --dry-run --ignore-scripts
 
-      - name: Publish plugin through npm trusted publishing
+      - name: Publish plugin
         working-directory: packages/plugin
         run: npm publish --access public --provenance --ignore-scripts

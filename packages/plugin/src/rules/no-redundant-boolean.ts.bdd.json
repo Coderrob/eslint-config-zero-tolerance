@@ -4,59 +4,54 @@
   "sourceFile": "packages/plugin/src/rules/no-redundant-boolean.ts",
   "module": {
     "name": "no-redundant-boolean",
-    "description": "Disallow redundant comparisons to boolean literals (Sonar S1125).",
+    "description": "Simplify comparisons only when operands are syntactically boolean and preserve boolean ternary results.",
     "exports": ["noRedundantBoolean"]
   },
   "specifications": [
     {
-      "feature": "Non-redundant boolean expressions",
+      "feature": "Boolean expression simplification",
       "scenarios": [
         {
-          "name": "should allow using a condition directly without comparing to true",
-          "given": "if (enabled) { ... }",
-          "when": "the rule evaluates the if condition",
-          "then": "no violation is reported"
+          "name": "should allow strict boolean comparisons of unknown-valued operands",
+          "given": "value === true where value may be a number",
+          "when": "the rule evaluates the comparison",
+          "then": "no violation or autofix is produced"
         },
         {
-          "name": "should allow a negated condition without comparing to false",
-          "given": "if (!enabled) { ... }",
-          "when": "the rule evaluates the if condition",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Redundant comparisons to boolean literals",
-      "scenarios": [
-        {
-          "name": "should report a strict equality comparison to true",
-          "given": "if (enabled === true) { ... }",
-          "when": "the rule evaluates the binary expression",
-          "then": "a noRedundantBoolean violation is reported"
+          "name": "should simplify a syntactically boolean comparison",
+          "given": "(value > 0) === true",
+          "when": "the rule evaluates the comparison",
+          "then": "a redundantBoolean violation is reported with a fix to value > 0"
         },
         {
-          "name": "should report a strict equality comparison to false",
-          "given": "if (enabled === false) { ... }",
-          "when": "the rule evaluates the binary expression",
-          "then": "a noRedundantBoolean violation is reported"
+          "name": "should coerce a truthy ternary condition to a boolean",
+          "given": "condition ? true : false where condition may be nonboolean",
+          "when": "the rule evaluates the ternary",
+          "then": "a redundantBoolean violation is reported with a fix to !!condition"
         },
         {
-          "name": "should report a strict inequality comparison to true",
-          "given": "if (enabled !== true) { ... }",
-          "when": "the rule evaluates the binary expression",
-          "then": "a noRedundantBoolean violation is reported"
+          "name": "should negate a truthy ternary condition",
+          "given": "condition ? false : true",
+          "when": "the rule evaluates the ternary",
+          "then": "a redundantBoolean violation is reported with a fix to !condition"
         },
         {
-          "name": "should report and fix redundant boolean ternary branches",
-          "given": "const value = condition ? true : false",
-          "when": "the rule evaluates the conditional expression",
-          "then": "a noRedundantBoolean violation is reported with a fix to use condition directly"
+          "name": "should remove double negation from a boolean comparison",
+          "given": "!!(value > 0)",
+          "when": "the rule evaluates the expression",
+          "then": "a redundantBoolean violation is reported with a parenthesized fix that preserves operator precedence"
         },
         {
-          "name": "should report and fix double negation of a boolean expression",
-          "given": "const value = !!(count > 0)",
-          "when": "the rule evaluates the unary expression",
-          "then": "a noRedundantBoolean violation is reported with a fix to remove the redundant double negation"
+          "name": "should preserve arithmetic and typeof precedence",
+          "given": "1 + !!(value > 0) or typeof !!(value > 0)",
+          "when": "the rule fixes the double negation",
+          "then": "the comparison remains parenthesized in the replacement"
+        },
+        {
+          "name": "should preserve comments inside fix candidates",
+          "given": "a redundant comparison, ternary, or double negation contains a comment",
+          "when": "the rule evaluates the expression",
+          "then": "no violation or autofix removes the comment"
         }
       ]
     },
@@ -74,6 +69,17 @@
           "given": "a boolean ternary or double negation used as a member receiver",
           "when": "a fix is applied",
           "then": "truthiness conversion and expression grouping are preserved"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve runtime boolean results across parameter boundaries",
+          "given": "a ternary is evaluated with undefined, null, false, true, zero, one, empty string or nonempty string",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the fixed expression produces the same boolean result and keeps surrounding precedence"
         }
       ]
     }

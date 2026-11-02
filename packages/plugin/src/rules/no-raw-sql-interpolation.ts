@@ -231,11 +231,9 @@ function normalizeOptions(
  */
 function reportRawSqlInterpolation(
   context: Readonly<NoRawSqlInterpolationContext>,
-  node: TSESTree.Node | undefined,
+  node: Readonly<TSESTree.Node>,
 ): void {
-  if (node !== undefined) {
-    context.report({ node, messageId: NoRawSqlInterpolationMessageId.RawSqlInterpolation });
-  }
+  context.report({ node, messageId: NoRawSqlInterpolationMessageId.RawSqlInterpolation });
 }
 
 /**

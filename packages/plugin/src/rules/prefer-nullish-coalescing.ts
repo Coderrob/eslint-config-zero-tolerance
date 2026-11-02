@@ -21,6 +21,8 @@ import { createRule } from './support/rule-factory';
 const MESSAGE_ID = 'preferNullish';
 const OPERATOR_LOOSE_EQUAL = '==';
 const OPERATOR_LOOSE_NOT_EQUAL = '!=';
+const GLOBAL_SCOPE_TYPE = 'global';
+const WITH_SCOPE_TYPE = 'with';
 
 type NullishCandidate = Readonly<{
   expression: TSESTree.Expression;
@@ -51,9 +53,7 @@ function buildCoalesceText(
   candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
-  const expression = getCoalesceOperandText(candidate.expression, sourceCode);
-  const fallback = getCoalesceOperandText(candidate.fallback, sourceCode);
-  return `(${expression} ?? ${fallback})`;
+  return `((${sourceCode.getText(candidate.expression)}) ?? (${sourceCode.getText(candidate.fallback)}))`;
 }
 
 /**
@@ -68,6 +68,9 @@ function checkConditionalExpression(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.ConditionalExpression>,
 ): void {
+  if (sourceCode.getCommentsInside(node).length > 0) {
+    return;
+  }
   const candidate = getNullishCandidate(node, sourceCode);
   if (candidate === null) {
     return;
@@ -111,20 +114,6 @@ function createPreferNullishCoalescingListeners(
 }
 
 /**
- * Preserves grouping for operands whose precedence conflicts with coalescing.
- *
- * @param node - Coalescing operand.
- * @param sourceCode - ESLint source code helper.
- * @returns Safely grouped operand text.
- */
-function getCoalesceOperandText(
-  node: Readonly<TSESTree.Expression>,
-  sourceCode: Readonly<TSESLint.SourceCode>,
-): string {
-  return `(${sourceCode.getText(node)})`;
-}
-
-/**
  * Returns left-side nullish-check metadata.
  *
  * @param operator - Binary expression operator.
@@ -152,7 +141,7 @@ function getNullishCandidate(
   if (node.test.type !== AST_NODE_TYPES.BinaryExpression) {
     return null;
   }
-  const check = getNullishCheck(node.test);
+  const check = getSafeNullishCheck(node.test, sourceCode);
   if (check === null) {
     return null;
   }
@@ -208,6 +197,44 @@ function getRightNullishCheck(
     return null;
   }
   return { expression: leftExpression, positiveCheck: operator === OPERATOR_LOOSE_NOT_EQUAL };
+}
+
+/**
+ * Returns a nullish check only when the repeated value is a simple identifier.
+ *
+ * @param node - Candidate nullish comparison.
+ * @param sourceCode - ESLint source code helper.
+ * @returns Safe nullish check or null.
+ */
+function getSafeNullishCheck(
+  node: Readonly<TSESTree.BinaryExpression>,
+  sourceCode: Readonly<TSESLint.SourceCode>,
+): NullishCheck | null {
+  const check = getNullishCheck(node);
+  if (check === null || check.expression.type !== AST_NODE_TYPES.Identifier) {
+    return null;
+  }
+  return hasLocalBinding(sourceCode.getScope(check.expression), check.expression.name)
+    ? check
+    : null;
+}
+
+/**
+ * Checks whether an identifier resolves to a declared local binding.
+ *
+ * @param scope - Scope containing the identifier.
+ * @param name - Identifier name.
+ * @returns Whether the binding is local and does not pass through a with scope.
+ */
+function hasLocalBinding(scope: TSESLint.Scope.Scope | null, name: string): boolean {
+  if (scope === null) {
+    return false;
+  }
+  if (isUnsafeBindingScope(scope)) {
+    return false;
+  }
+  const variable = scope.set.get(name);
+  return variable === undefined ? hasLocalBinding(scope.upper, name) : variable.defs.length > 0;
 }
 
 /**
@@ -275,6 +302,16 @@ function isNullLiteral(node: Readonly<TSESTree.Expression>): node is TSESTree.Li
 }
 
 /**
+ * Excludes global and with scopes from local binding resolution.
+ *
+ * @param scope - Scope to inspect.
+ * @returns Whether lookup can have accessor behavior.
+ */
+function isUnsafeBindingScope(scope: Readonly<TSESLint.Scope.Scope>): boolean {
+  return scope.type === GLOBAL_SCOPE_TYPE || scope.type === WITH_SCOPE_TYPE;
+}
+
+/**
  * Applies nullish-coalescing replacement for a conditional expression.
  *
  * @param node - Conditional expression node.
@@ -332,7 +369,7 @@ export const preferNullishCoalescing = createRule({
     type: 'suggestion',
     fixable: 'code',
     docs: {
-      description: 'Prefer nullish coalescing instead of a nullish guard ternary',
+      description: 'Prefer nullish coalescing for locally bound identifier guard ternaries',
     },
     messages: {
       [MESSAGE_ID]: 'Use nullish coalescing instead of this conditional expression',

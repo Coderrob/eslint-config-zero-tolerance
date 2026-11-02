@@ -5,6 +5,11 @@ describe('no-barrel-parent-imports', () => {
   ruleTester.run('no-barrel-parent-imports', noBarrelParentImports, {
     valid: [
       {
+        name: 'should allow dynamic and same-directory paths inside a barrel',
+        filename: '/src/index.ts',
+        code: "import './peer'; const peer = await import(moduleName);",
+      },
+      {
         name: 'should allow external package imports',
         code: "import react from 'react';",
       },

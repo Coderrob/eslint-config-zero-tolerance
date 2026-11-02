@@ -64,6 +64,9 @@ function checkBinaryExpression(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.BinaryExpression>,
 ): void {
+  if (sourceCode.getCommentsInside(node).length > 0) {
+    return;
+  }
   const fixInputs = getFixInputs(node);
   if (fixInputs === null) {
     return;
@@ -87,6 +90,9 @@ function checkConditionalExpression(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.ConditionalExpression>,
 ): void {
+  if (sourceCode.getCommentsInside(node).length > 0) {
+    return;
+  }
   const fixInputs = getConditionalBooleanFixInputs(node);
   if (fixInputs === null) {
     return;
@@ -110,6 +116,9 @@ function checkUnaryExpression(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.UnaryExpression>,
 ): void {
+  if (sourceCode.getCommentsInside(node).length > 0) {
+    return;
+  }
   const innerExpression = getDoubleNegatedBooleanExpression(node);
   if (innerExpression === null) {
     return;
@@ -133,10 +142,7 @@ function createFix(
   sourceCode: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.BinaryExpression>,
   fixInputs: Readonly<FixInputs>,
-): TSESLint.ReportFixFunction | null {
-  if (!isBooleanExpression(fixInputs.nonLiteralSide)) {
-    return null;
-  }
+): TSESLint.ReportFixFunction {
   return replaceRedundantBooleanComparison.bind(undefined, sourceCode, node, fixInputs);
 }
 
@@ -175,6 +181,36 @@ function createReplacementText(
     return `(${expressionText})`;
   }
   return `!(${expressionText})`;
+}
+
+/**
+ * Returns comparison fix inputs only for a syntactically boolean operand.
+ *
+ * @param inputs - Candidate comparison fix inputs.
+ * @returns Safe fix inputs or null.
+ */
+function filterBooleanComparisonFixInputs(inputs: Readonly<FixInputs>): FixInputs | null {
+  return isBooleanExpression(inputs.nonLiteralSide) ? inputs : null;
+}
+
+/**
+ * Preserves boolean results when simplifying a conditional expression.
+ *
+ * @param fixInputs - Conditional expression details.
+ * @param testText - Source text of the condition.
+ * @returns Semantically equivalent replacement text.
+ */
+function getBooleanConditionalReplacementText(
+  fixInputs: Readonly<ConditionalBooleanFixInputs>,
+  testText: string,
+): string {
+  if (fixInputs.shouldNegate) {
+    return `!(${testText})`;
+  }
+  if (isBooleanExpression(fixInputs.test)) {
+    return `(${testText})`;
+  }
+  return `!!(${testText})`;
 }
 
 /**
@@ -224,12 +260,15 @@ function getFixInputs(node: Readonly<TSESTree.BinaryExpression>): FixInputs | nu
     return null;
   }
   if (hasBooleanLiteralLeftOperand(node)) {
-    return { literalValue: node.left.value, nonLiteralSide: node.right };
+    return filterBooleanComparisonFixInputs({
+      literalValue: node.left.value,
+      nonLiteralSide: node.right,
+    });
   }
-  return {
+  return filterBooleanComparisonFixInputs({
     literalValue: node.right.value,
     nonLiteralSide: node.left,
-  };
+  });
 }
 
 /**
@@ -266,10 +305,7 @@ function hasBooleanLiteralOperand(
  * @returns True when the expression is boolean-valued.
  */
 function isBooleanExpression(node: Readonly<TSESTree.Expression>): boolean {
-  return (
-    isBooleanLiteral(node) ||
-    (node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator))
-  );
+  return isBooleanLiteral(node) || isComparisonExpression(node) || isLogicalNotExpression(node);
 }
 
 /**
@@ -299,6 +335,16 @@ function isBooleanLiteralWithValue(
 }
 
 /**
+ * Returns whether an expression is a boolean-valued comparison.
+ *
+ * @param node - Expression to inspect.
+ * @returns Whether the expression is a comparison.
+ */
+function isComparisonExpression(node: Readonly<TSESTree.Expression>): boolean {
+  return node.type === AST_NODE_TYPES.BinaryExpression && isComparisonOperator(node.operator);
+}
+
+/**
  * Returns true when an operator produces a boolean comparison result.
  *
  * @param operator - Operator to inspect.
@@ -319,6 +365,16 @@ function isDirectBooleanConditional(node: Readonly<TSESTree.ConditionalExpressio
     isBooleanLiteralWithValue(node.consequent, { value: true }) &&
     isBooleanLiteralWithValue(node.alternate, { value: false })
   );
+}
+
+/**
+ * Returns whether an expression is a logical negation.
+ *
+ * @param node - Expression to inspect.
+ * @returns Whether the expression uses logical negation.
+ */
+function isLogicalNotExpression(node: Readonly<TSESTree.Expression>): boolean {
+  return node.type === AST_NODE_TYPES.UnaryExpression && node.operator === OPERATOR_LOGICAL_NOT;
 }
 
 /**
@@ -439,7 +495,7 @@ function replaceRedundantBooleanConditional(
   fixer: Readonly<TSESLint.RuleFixer>,
 ): TSESLint.RuleFix {
   const testText = sourceCode.getText(fixInputs.test);
-  const replacementText = fixInputs.shouldNegate ? `!(${testText})` : `!!(${testText})`;
+  const replacementText = getBooleanConditionalReplacementText(fixInputs, testText);
   return fixer.replaceText(node, replacementText);
 }
 

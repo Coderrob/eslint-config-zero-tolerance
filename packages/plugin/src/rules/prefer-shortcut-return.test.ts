@@ -5,6 +5,23 @@ describe('prefer-shortcut-return', () => {
   ruleTester.run('prefer-shortcut-return', preferShortcutReturn, {
     valid: [
       {
+        name: 'should preserve comments inside a return branch',
+        code: 'function read(value) { if (value) { /* contract */ return true; } return false; }',
+      },
+      {
+        name: 'should preserve comments between an if and its trailing return',
+        code: 'function read(value) { if (value) return true; /* contract */ return false; }',
+      },
+      {
+        name: 'should preserve comments inside the condition',
+        code: 'function read(value) { if (/* contract */ value) return true; else return false; }',
+      },
+      {
+        name: 'should preserve comments in the alternate branch',
+        code: 'function read(value) { if (value) return true; else { /* contract */ return false; } }',
+      },
+
+      {
         name: 'should allow already short boolean return expression',
         code: 'function f(cond: unknown) { return !!(cond); }',
       },

@@ -201,7 +201,8 @@ BDD spec files are **not** compiled or executed — they are living documentatio
 4. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
 5. Run `pnpm test` and confirm all tests pass.
 6. Run `pnpm build` to validate the TypeScript compilation.
-7. For a plugin release, update `packages/plugin/package.json` and the dated changelog entry in the release PR. After CI passes, publish only the plugin with `pnpm release:publish:plugin`.
+7. For a plugin release, run **Prepare plugin release** on `main` with a major, minor, or revision bump. Review the generated version and dated changelog in its PR and merge after CI passes.
+8. Tag the merged release commit as `v<plugin-version>` and publish a non-prerelease GitHub Release. The **Publish plugin to npm** workflow validates the tag and publishes only the plugin through npm trusted publishing.
 
 ---
 

@@ -22,6 +22,7 @@ const MIN_IMPORTS_TO_VALIDATE = 2;
 const CURRENT_DIRECTORY_DOT = '.';
 const RELATIVE_PATH_PREFIX = '.';
 const NODE_PROTOCOL_PREFIX = 'node:';
+const TYPE_IMPORT_KIND = 'type';
 const INDEX_IMPORT_PATTERN = /^\.\/index(\.\w+)?$/u;
 
 enum ImportGroup {
@@ -102,7 +103,7 @@ function buildSortFix(state: Readonly<SortImportsState>): TSESLint.ReportFixFunc
     return null;
   }
   const sortedBlocks = getSortedImportBlocks(blocks);
-  if (!hasPreservedSideEffectPositions(blocks, sortedBlocks)) {
+  if (!hasPreservedRuntimeImportOrder(blocks, sortedBlocks)) {
     return null;
   }
   return sortImportBlocks.bind(undefined, state.sourceCode, blocks, sortedBlocks);
@@ -338,17 +339,22 @@ function hasAtLeastTwoImports(imports: readonly ImportEntry[]): boolean {
 }
 
 /**
- * Returns true when sorting keeps every explicit side-effect import at its original index.
+ * Returns true when sorting retains the relative order of every runtime dependency.
  *
  * @param originalBlocks - Blocks in source order.
  * @param sortedBlocks - Blocks in proposed sorted order.
- * @returns True when no side-effect import changes position.
+ * @returns True when runtime evaluation order is unchanged.
  */
-function hasPreservedSideEffectPositions(
+function hasPreservedRuntimeImportOrder(
   originalBlocks: ReadonlyArray<SortableImportBlock>,
   sortedBlocks: ReadonlyArray<SortableImportBlock>,
 ): boolean {
-  return originalBlocks.every(isSideEffectPositionPreserved.bind(undefined, sortedBlocks));
+  const originalRuntimeImports = originalBlocks.filter(isRuntimeImport);
+  const sortedRuntimeImports = sortedBlocks.filter(isRuntimeImport);
+  return originalRuntimeImports.every(
+    /** @param block - Runtime import in original evaluation order. */
+    (block, index) => block.node === sortedRuntimeImports[index].node,
+  );
 }
 
 /**
@@ -442,19 +448,13 @@ function isIndexImportPath(importPath: string): boolean {
 }
 
 /**
- * Returns true when one side-effect import stays at its source index.
+ * Returns whether an import can evaluate its dependency at runtime.
  *
- * @param sortedBlocks - Proposed sorted blocks.
- * @param block - Original import block.
- * @param index - Original index.
- * @returns True when the block is not side-effectful or has not moved.
+ * @param block - Import declaration and its source span.
+ * @returns Whether the candidate satisfies this check.
  */
-function isSideEffectPositionPreserved(
-  sortedBlocks: ReadonlyArray<SortableImportBlock>,
-  block: Readonly<SortableImportBlock>,
-  index: number,
-): boolean {
-  return block.group !== ImportGroup.SideEffect || sortedBlocks[index].node === block.node;
+function isRuntimeImport(block: Readonly<SortableImportBlock>): boolean {
+  return block.node.importKind !== TYPE_IMPORT_KIND;
 }
 
 /**
@@ -733,8 +733,7 @@ export const sortImports = createRule({
     type: 'suggestion',
     fixable: 'code',
     docs: {
-      description:
-        'Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group',
+      description: 'Require grouped alphabetical imports without changing runtime dependency order',
     },
     messages: {
       unsortedImport: 'Import "{{current}}" should come before "{{previous}}"',
