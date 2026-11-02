@@ -178,7 +178,7 @@ function createReplacementText(
 ): string {
   const expressionText = sourceCode.getText(fixInputs.nonLiteralSide);
   if (!shouldNegateComparison(node.operator, { literalValue: fixInputs.literalValue })) {
-    return expressionText;
+    return `(${expressionText})`;
   }
   return `!(${expressionText})`;
 }
@@ -208,7 +208,7 @@ function getBooleanConditionalReplacementText(
     return `!(${testText})`;
   }
   if (isBooleanExpression(fixInputs.test)) {
-    return testText;
+    return `(${testText})`;
   }
   return `!!(${testText})`;
 }

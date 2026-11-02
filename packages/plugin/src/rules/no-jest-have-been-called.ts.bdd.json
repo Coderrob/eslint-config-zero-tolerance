@@ -71,6 +71,17 @@
           "then": "a noJestHaveBeenCalled violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Parsing and false-positive regressions",
+      "scenarios": [
+        {
+          "name": "should allow optional and computed object prototype members",
+          "given": "toString, valueOf, hasOwnProperty, and __proto__ member access",
+          "when": "dot, bracket, and optional access are linted",
+          "then": "no Jest matcher diagnostic is emitted"
+        }
+      ]
     }
   ]
 }

@@ -74,7 +74,7 @@ describe('prefer-string-raw', () => {
         code: String.raw`const path = 'C:\\Users\\dev\\repo';`,
         name: 'should report escaped backslashes in plain string literals',
         errors: [{ messageId: 'preferStringRaw' }],
-        output: ['const path = String.raw`C:', 'Users', 'dev', 'repo`;'].join(BACKSLASH),
+        output: "const path = String.raw`C:\\Users\\dev\\repo`;",
       },
       {
         code: String.raw`const regexSource = '\\d+\\w+';`,

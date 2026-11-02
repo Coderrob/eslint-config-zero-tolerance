@@ -1,0 +1,73 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version increment (revision means patch)
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - revision
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.18.0'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare plugin version and changelog
+        id: release
+        env:
+          RELEASE_BUMP: ${{ inputs.bump }}
+        run: |
+          version="$(node scripts/prepare-release.mjs "$RELEASE_BUMP")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release candidate
+        run: |
+          pnpm lint
+          pnpm test
+          pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+          pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+
+      - name: Open release pull request
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          branch="release/v${VERSION}"
+          if git ls-remote --exit-code --heads origin "$branch"; then
+            echo "Release branch already exists: $branch" >&2
+            exit 1
+          fi
+          git switch -c "$branch"
+          git add packages/plugin/package.json CHANGELOG.md
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "chore: prepare plugin v${VERSION} release"
+          git push origin "$branch"
+          printf 'Release @coderrob/eslint-plugin-zero-tolerance v%s with dated changelog notes.\n\nValidation: lint, tests, package checks, and both TypeScript checks passed.\n\nAfter merging, create tag `v%s` on the merge commit, then run Publish To npm with that tag or push it to trigger publication.\n' "$VERSION" "$VERSION" > "$RUNNER_TEMP/release-pr-body.md"
+          gh pr create --base main --head "$branch" --title "Prepare plugin v${VERSION} release" --body-file "$RUNNER_TEMP/release-pr-body.md"

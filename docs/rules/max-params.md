@@ -62,3 +62,7 @@ function createUser(
 // Custom limit
 'zero-tolerance/max-params': ['error', { max: 3 }]
 ```
+
+## Parsing and fix safety
+
+A `max` of `0` is supported: parameterless functions pass and any function with a parameter is reported.

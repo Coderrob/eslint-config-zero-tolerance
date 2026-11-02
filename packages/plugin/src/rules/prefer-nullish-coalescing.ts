@@ -53,7 +53,7 @@ function buildCoalesceText(
   candidate: Readonly<NullishCandidate>,
   sourceCode: Readonly<TSESLint.SourceCode>,
 ): string {
-  return `${sourceCode.getText(candidate.expression)} ?? (${sourceCode.getText(candidate.fallback)})`;
+  return `((${sourceCode.getText(candidate.expression)}) ?? (${sourceCode.getText(candidate.fallback)}))`;
 }
 
 /**

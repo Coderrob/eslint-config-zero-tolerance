@@ -51,3 +51,7 @@ This rule has no options:
 ```js
 'zero-tolerance/no-mock-implementation': 'error'
 ```
+
+## Parsing and fix safety
+
+Object prototype properties, including optional and bracket access to `toString`, `valueOf`, and `constructor`, are allowed. Only explicit banned names match the replacement map.

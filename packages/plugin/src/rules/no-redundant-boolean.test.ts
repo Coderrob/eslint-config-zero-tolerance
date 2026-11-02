@@ -57,19 +57,19 @@ describe('no-redundant-boolean', () => {
       {
         name: 'should simplify equality with true for a comparison expression',
         code: 'const ok = (value > 0) === true;',
-        output: 'const ok = value > 0;',
+        output: 'const ok = (value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
         name: 'should simplify inequality with false for a comparison expression',
         code: 'const ok = (value > 0) !== false;',
-        output: 'const ok = value > 0;',
+        output: 'const ok = (value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
         name: 'should simplify boolean literal on the left side',
         code: 'const ok = true === (value > 0);',
-        output: 'const ok = value > 0;',
+        output: 'const ok = (value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
@@ -99,7 +99,7 @@ describe('no-redundant-boolean', () => {
       {
         name: 'should keep a boolean ternary condition without coercion',
         code: 'const ok = value > 0 ? true : false;',
-        output: 'const ok = value > 0;',
+        output: 'const ok = (value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {

@@ -1,4 +1,6 @@
 <p align="center">
+
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
   <img
     src="public/img/zero-tolerance-icon.png"
     alt="ESLint Plugin Zero Tolerance"

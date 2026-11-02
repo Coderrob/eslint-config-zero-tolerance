@@ -5,6 +5,18 @@ describe('no-unsafe-code-generation', () => {
   ruleTester.run('no-unsafe-code-generation', noUnsafeCodeGeneration, {
     valid: [
       {
+        name: 'should allow unrelated eval and Function methods and constructors',
+        code: 'service.eval(source); service.Function(source); new service.Function(source);',
+      },
+      {
+        name: 'should ignore dynamic member names resembling global APIs',
+        code: 'globalThis[eval](source); window[setTimeout]("task");',
+      },
+      {
+        name: 'should allow shadowed global code generation objects',
+        code: 'function build(globalThis: Factory) { globalThis.eval(source); return new globalThis.Function(source); }',
+      },
+      {
         name: 'should allow function timer callback',
         code: 'setTimeout(() => run(), 100);',
       },
@@ -50,6 +62,11 @@ describe('no-unsafe-code-generation', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should report computed global code generation calls and constructors',
+        code: 'globalThis["eval"](source); new window["Function"](source);',
+        errors: [{ messageId: 'unsafeCodeGeneration' }, { messageId: 'unsafeCodeGeneration' }],
+      },
       {
         name: 'should report eval calls',
         code: 'eval(source);',

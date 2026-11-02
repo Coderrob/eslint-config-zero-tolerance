@@ -122,14 +122,14 @@ function hasVmMethodPath(namespace: string, memberPath: string): boolean {
 }
 
 /**
- * Returns true when a member callee names a timer on a known global object.
+ * Returns true when a member callee names an API on an unshadowed global object.
  *
  * @param context - ESLint rule execution context.
  * @param callee - Member callee to inspect.
- * @param calleeName - Static timer method name.
- * @returns True when the member path is a known global timer.
+ * @param calleeName - Static API member name.
+ * @returns True when the member path resolves to the global API.
  */
-function isGlobalTimerMember(
+function isGlobalMember(
   context: Readonly<NoUnsafeCodeGenerationContext>,
   callee: Readonly<TSESTree.Expression>,
   calleeName: string,
@@ -234,7 +234,7 @@ function isTimerCallee(
   if (callee.type === AST_NODE_TYPES.Identifier) {
     return !isShadowedIdentifier(context, callee, callee.name);
   }
-  return isGlobalTimerMember(context, callee, calleeName);
+  return isGlobalMember(context, callee, calleeName);
 }
 
 /**
@@ -272,13 +272,16 @@ function isTrackedVmImportSpecifier(
  */
 function isUnsafeGlobalCall(
   context: Readonly<NoUnsafeCodeGenerationContext>,
-  node: Readonly<TSESTree.CallExpression>,
+  node: Readonly<TSESTree.CallExpression | TSESTree.NewExpression>,
 ): boolean {
   const calleeName = getCalleeName(node.callee);
   if (calleeName === null || !CODE_GENERATION_GLOBALS.includes(calleeName)) {
     return false;
   }
-  return !isShadowedIdentifier(context, node.callee, calleeName);
+  if (node.callee.type === AST_NODE_TYPES.Identifier) {
+    return !isShadowedIdentifier(context, node.callee, calleeName);
+  }
+  return isGlobalMember(context, node.callee, calleeName);
 }
 
 /**
@@ -293,9 +296,7 @@ function isUnsafeGlobalConstructor(
   node: Readonly<TSESTree.NewExpression>,
 ): boolean {
   return (
-    node.callee.type === AST_NODE_TYPES.Identifier &&
-    node.callee.name === FUNCTION_CONSTRUCTOR_NAME &&
-    !isShadowedIdentifier(context, node.callee, node.callee.name)
+    getCalleeName(node.callee) === FUNCTION_CONSTRUCTOR_NAME && isUnsafeGlobalCall(context, node)
   );
 }
 

@@ -35,6 +35,12 @@
           "given": "a rule inspects an object expression used as an options argument",
           "when": "the helper evaluates a named property's literal true value",
           "then": "the matching true property is reported as present"
+        },
+        {
+          "name": "should distinguish literal keys from dynamic computed identifiers",
+          "given": "member accesses and option properties using dot, literal bracket, or identifier bracket syntax",
+          "when": "a static name is extracted",
+          "then": "literal names are recognized and dynamic keys remain unresolved"
         }
       ]
     }

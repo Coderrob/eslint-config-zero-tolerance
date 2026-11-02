@@ -5,6 +5,10 @@ describe('no-parameter-reassign', () => {
   ruleTester.run('no-parameter-reassign', noParameterReassign, {
     valid: [
       {
+        name: 'should allow assignment to a block binding shadowing a parameter',
+        code: 'function f(value: number) { { let value = 1; value++; } return value; }',
+      },
+      {
         name: 'should allow reading parameter without reassignment',
         code: 'function f(value: number) { return value + 1; }',
       },
@@ -42,6 +46,27 @@ describe('no-parameter-reassign', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should reject assignments to captured outer parameters',
+        code: 'function f(value: number) { return () => { value = 2; }; }',
+        errors: [{ messageId: 'noParameterReassign', data: { name: 'value' } }],
+      },
+      {
+        name: 'should reject writes to destructured parameter bindings',
+        code: 'function f({value}, [item]) { value++; item = 2; }',
+        errors: [
+          { messageId: 'noParameterReassign', data: { name: 'value' } },
+          { messageId: 'noParameterReassign', data: { name: 'item' } },
+        ],
+      },
+      {
+        name: 'should reject destructuring assignments to parameters',
+        code: 'function f(value: number) { ({value} = result); [value] = values; }',
+        errors: [
+          { messageId: 'noParameterReassign', data: { name: 'value' } },
+          { messageId: 'noParameterReassign', data: { name: 'value' } },
+        ],
+      },
       {
         name: 'should disallow direct assignment to parameter',
         code: 'function f(value: number) { value = value + 1; return value; }',

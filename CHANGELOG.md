@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **Release automation**: Added a manually dispatched plugin release PR workflow with major, minor, and revision choices, version/changelog rollover fixtures, and a GitHub Release workflow that validates the tag and publishes the plugin to npm.
 - **GitHub Actions pinning check**: Added a repository fixture that rejects tag and branch references in external `uses:` steps, requiring full commit SHAs across workflows.
+- **GitHub Actions releases**: Added dispatchable plugin-only release preparation and npm publication workflows, stable tag/version/changelog guards, npm trusted publishing, and tested release helpers.
+
+- **Parser regression audit**: Added 924 parser compatibility checks across all 77 rules, direct security AST helper tests, and expanded prototype, optional-access, negated matcher, and computed-property fixtures.
+
 - **Rule fixture validation**: Extended `validate:rules` to require valid and invalid fixture groups, behavior-style test descriptions beginning with `should`, and asserted output fixtures for every autofixable rule.
 
 ### Fixed
@@ -21,6 +25,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Boolean and nullish simplification**: Restricted `no-redundant-boolean` comparisons to syntactically boolean operands, preserved boolean results for ternaries, and limited `prefer-nullish-coalescing` autofixes to repeated locally bound identifiers.
 - **Autofix precedence and comments**: Parenthesized simplified boolean expressions and nullish fallbacks to preserve grouping, and withheld fixes when they would remove comments.
 - **Rule gap fixtures**: Added positive and negative cases for falsy values, inherited keys, getters, prototype keys, JSON cloning differences, and nonboolean operands, with matching BDD scenarios and documentation.
+- **Fixture validation**: Parse RuleTester suites with TypeScript instead of indentation-sensitive regular expressions; reject empty groups, unnamed fixtures, missing diagnostic assertions, and placeholder autofix outputs.
+- **Rule correctness**: Honor `max-params` zero limits, preserve precedence in nullish-coalescing fixes, preserve boolean coercion and restrict unsafe boolean-comparison fixes, resolve parameter writes by lexical binding, and distinguish unrelated or dynamically computed code-generation API names.
+
 - **Review follow-up**: Kept real credentials in test-named hosts detectable, preserved file headers during function sorting, and retained interface renames when an earlier diagnostic is suppressed.
 - **Rule fixture validation**: Required nonempty named fixtures and a concrete invalid-fixture autofix output instead of accepting empty arrays, missing names, comments, or `output: null`.
 - **Rule fixture validation**: Read behavior names from actual RuleTester fixtures regardless of formatting, without treating names inside fixture code or options as test descriptions.
