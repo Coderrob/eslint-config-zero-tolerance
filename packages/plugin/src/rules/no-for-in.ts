@@ -20,25 +20,6 @@ import { createRule } from './support/rule-factory';
 type NoForInContext = Readonly<TSESLint.RuleContext<'noForIn', []>>;
 
 /**
- * Creates a fixer that rewrites for..in loops to for..of with Object.keys.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - For-in statement node.
- * @param fixer - ESLint fixer helper.
- * @returns Text replacement fix.
- */
-function createForInFix(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: Readonly<TSESTree.ForInStatement>,
-  fixer: Readonly<TSESLint.RuleFixer>,
-): TSESLint.RuleFix {
-  const leftText = sourceCode.getText(node.left);
-  const rightText = sourceCode.getText(node.right);
-  const bodyText = sourceCode.getText(node.body);
-  return fixer.replaceText(node, `for (${leftText} of Object.keys(${rightText})) ${bodyText}`);
-}
-
-/**
  * Creates listeners for no-for-in rule execution.
  *
  * @param context - ESLint rule execution context.
@@ -63,7 +44,6 @@ function reportForInUsage(
   context.report({
     node,
     messageId: 'noForIn',
-    fix: createForInFix.bind(undefined, context.sourceCode, node),
   });
 }
 
@@ -74,7 +54,6 @@ export const noForIn = createRule({
   name: 'no-for-in',
   meta: {
     type: 'problem',
-    fixable: 'code',
     docs: {
       description:
         'Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration',

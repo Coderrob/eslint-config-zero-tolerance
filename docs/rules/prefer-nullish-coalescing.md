@@ -1,6 +1,6 @@
 # prefer-nullish-coalescing
 
-Prefer using the nullish coalescing operator (`??`) instead of ternary expressions that only guard against `null`/`undefined`.
+Prefer `??` for ternaries that repeat a locally bound identifier after a loose nullish check.
 
 ## Rule Details
 
@@ -13,28 +13,12 @@ Prefer using the nullish coalescing operator (`??`) instead of ternary expressio
 
 ## Rationale
 
-A nullish guard ternary (`value != null ? value : fallback`) is functionally equivalent to `value ?? fallback`, but the coalescing operator is shorter and more expressive about the intent to fall back only for `null`/`undefined` values.
+`value != null ? value : fallback` can be shortened to a nullish coalescing expression when `value` is a declared local binding. The fixer parenthesizes the fallback to preserve the grouping of logical and conditional expressions. The rule skips unbound identifiers, which may resolve to global accessors. Member access, calls, and expressions containing comments are also left unchanged because rewriting them could change behavior or discard comments.
 
 ## Examples
 
-### ✅ Correct
-
-```typescript
-const userName = input ?? 'guest';
-const description = config?.description ?? 'Not provided';
-```
-
-### ❌ Incorrect
-
-```typescript
-const userName = input != null ? input : 'guest';
-const description = config == null ? 'Not provided' : config.description;
-```
+For a locally declared `value`, `value != null ? value : fallback && ready` is reported and fixed to `value ?? (fallback && ready)`. Repeated member access, calls, unbound identifiers, and commented expressions are allowed.
 
 ## Configuration
 
-This rule has no options:
-
-```js
-'zero-tolerance/prefer-nullish-coalescing': 'error'
-```
+`'zero-tolerance/prefer-nullish-coalescing': 'error'`

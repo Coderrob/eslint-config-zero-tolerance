@@ -1,6 +1,6 @@
 # no-redundant-boolean
 
-Disallow redundant comparisons to `true` or `false` (Sonar S1125).
+Simplify comparisons and ternaries only when their boolean result is preserved.
 
 ## Rule Details
 
@@ -13,48 +13,12 @@ Disallow redundant comparisons to `true` or `false` (Sonar S1125).
 
 ## Rationale
 
-Comparing a boolean expression to `true` or `false` adds noise without adding meaning. `isValid === true` is identical to `isValid`; `isActive !== false` is identical to `isActive`. These redundant comparisons obscure intent and are commonly introduced by developers who are uncertain about the type of the value.
-
-**Checked operators:** `===`, `!==`
-
-## Autofix
-
-The fixer removes redundant boolean comparisons, simplifies `condition ? true : false` and `condition ? false : true`, and removes `!!` only when the wrapped expression is syntactically known to already produce a boolean.
+A strict comparison such as `value === true` cannot safely become `value` unless the operand is known to be boolean: `1 === true` is false, while `1` is truthy. This rule only simplifies comparisons whose operand is syntactically boolean. A ternary such as `condition ? true : false` becomes `!!condition` when the condition's type is unknown, preserving the boolean result. Removing `!!` keeps the inner expression parenthesized so surrounding arithmetic and unary operators retain their precedence. Expressions containing comments are left unchanged.
 
 ## Examples
 
-### ✅ Correct
-
-```typescript
-if (isValid) {
-  /* ... */
-}
-
-if (!isActive) {
-  /* ... */
-}
-
-return hasPermission;
-```
-
-### ❌ Incorrect
-
-```typescript
-if (isValid === true) {
-  /* ... */
-}
-
-if (isActive !== false) {
-  /* ... */
-}
-
-return hasPermission === true;
-```
+`(value > 0) === true` is reported and fixed to `value > 0`. `condition ? true : false` is fixed to `!!condition`. `1 + !!(value > 0)` is fixed to `1 + (value > 0)`. `value === true` is allowed when `value` is not syntactically known to be boolean.
 
 ## Configuration
 
-This rule has no options:
-
-```js
-'zero-tolerance/no-redundant-boolean': 'error'
-```
+`'zero-tolerance/no-redundant-boolean': 'error'`

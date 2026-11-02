@@ -1,0 +1,57 @@
+name: Prepare plugin release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_size:
+        description: Version increase for the published plugin
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - revision
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-plugin-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Prepare version and changelog
+        env:
+          RELEASE_SIZE: ${{ inputs.release_size }}
+        run: node scripts/release-metadata.mjs prepare "$RELEASE_SIZE" "$(date -u +%F)"
+
+      - name: Create release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./packages/plugin/package.json').version")
+          branch="release/v$version"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "Release branch $branch already exists" >&2
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git add packages/plugin/package.json CHANGELOG.md
+          git commit -m "chore: prepare plugin v$version release"
+          git push origin "HEAD:refs/heads/$branch"
+          printf 'Prepare @coderrob/eslint-plugin-zero-tolerance v%s for release.\n\nReview the changelog and merge after CI passes.\n' "$version" > "$RUNNER_TEMP/release-pr-body.md"
+          gh pr create --base main --head "$branch" --title "chore: release plugin v$version" --body-file "$RUNNER_TEMP/release-pr-body.md"
+          gh workflow run ci.yml --ref "$branch"

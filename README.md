@@ -177,7 +177,7 @@ JSDoc, BDD specs, optional chaining, readonly props
 | [require-bdd-spec](docs/rules/require-bdd-spec.md)                                   | 📖  |     |     | R S | Enforce sibling, source-reference, and export relationships for BDD specs                                               |
 | [require-jsdoc-anonymous-functions](docs/rules/require-jsdoc-anonymous-functions.md) | 📖  |     |     | R S | Require JSDoc comments on anonymous function-like constructs except in test files and known test callbacks              |
 | [require-jsdoc-functions](docs/rules/require-jsdoc-functions.md)                     | 📖  | S   | R   |     | Require JSDoc comments on all functions and require @param/@returns/@throws tags when applicable (except in test files) |
-| [require-optional-chaining](docs/rules/require-optional-chaining.md)                 | 📖  | S   | R   |     | Require optional chaining instead of repeated logical guard access                                                      |
+| [require-optional-chaining](docs/rules/require-optional-chaining.md)                 | 📖  |     |     | R S | Report repeated logical guard access for manual review                                                                  |
 | [require-readonly-props](docs/rules/require-readonly-props.md)                       | 📖  | S   | R   |     | Require readonly typing for JSX component props                                                                         |
 
 ### Testing
@@ -229,11 +229,11 @@ Function size, magic values, immutability, sorting
 | [no-map-set-mutation](docs/rules/no-map-set-mutation.md)                     | 📖  | S   | R   |     | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place                                                   |
 | [no-object-mutation](docs/rules/no-object-mutation.md)                       | 📖  | S   | R   |     | Disallow direct object-property mutation; prefer creating new objects with immutable update patterns                                                  |
 | [no-placeholder-implementation](docs/rules/no-placeholder-implementation.md) | ❗  | S   | R   |     | Disallow placeholder, stub, TODO, and not implemented production code                                                                                 |
-| [prefer-nullish-coalescing](docs/rules/prefer-nullish-coalescing.md)         | 📖  | S   | R   |     | Prefer nullish coalescing instead of a nullish guard ternary                                                                                          |
-| [prefer-object-spread](docs/rules/prefer-object-spread.md)                   | 📖  | S   | R   |     | Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument                                              |
+| [prefer-nullish-coalescing](docs/rules/prefer-nullish-coalescing.md)         | 📖  | S   | R   |     | Prefer nullish coalescing for locally bound identifier guard ternaries                                                                                |
+| [prefer-object-spread](docs/rules/prefer-object-spread.md)                   | 📖  |     |     | R S | Report empty-target Object.assign calls for manual review before using object spread                                                                  |
 | [prefer-readonly-parameters](docs/rules/prefer-readonly-parameters.md)       | 📖  | S   | R   |     | Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs                                                  |
 | [prefer-string-raw](docs/rules/prefer-string-raw.md)                         | 📖  | S   | R   |     | Prefer String.raw for string literals containing escaped backslashes (Sonar S7780)                                                                    |
-| [prefer-structured-clone](docs/rules/prefer-structured-clone.md)             | 📖  | S   | R   |     | Prefer structuredClone(...) over JSON.parse(JSON.stringify(...)) when creating a deep clone                                                           |
+| [prefer-structured-clone](docs/rules/prefer-structured-clone.md)             | 📖  |     |     | R S | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)                                                                        |
 | [sort-functions](docs/rules/sort-functions.md)                               | 📖  | S   | R   |     | Require top-level functions to be sorted alphabetically                                                                                               |
 | [sort-imports](docs/rules/sort-imports.md)                                   | 📖  | S   | R   |     | Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group |
 
@@ -344,15 +344,19 @@ pnpm deps:circular
 
 ## Publishing
 
-Only `@coderrob/eslint-plugin-zero-tolerance` is published. Update its version and the dated changelog entry in the release PR, then run the full validation suite. After that commit has passed CI, publish from a clean, authenticated checkout:
+Only `@coderrob/eslint-plugin-zero-tolerance` is published. To prepare a release, run the **Prepare plugin release** GitHub Actions workflow on `main` and choose `major`, `minor`, or `revision` (`revision` means a patch bump). The workflow opens a release PR that updates `packages/plugin/package.json`, moves the current `[Unreleased]` changelog entries into a dated version section, and creates a fresh `[Unreleased]` section. It also starts CI for the release branch. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings, then review the changelog and merge the PR after CI passes.
+
+After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin. Configure npm trusted publishing for `@coderrob/eslint-plugin-zero-tolerance` with repository `Coderrob/eslint-config-zero-tolerance` and workflow filename `publish-plugin.yml` before the first automated release.
+
+The equivalent local checks are:
 
 ```bash
 pnpm lint
 pnpm test
-pnpm release:publish:plugin
+pnpm build
 ```
 
-The publish command targets only `packages/plugin`; its `prepack` lifecycle rebuilds the package before `pnpm publish --access public`. The internal config workspace package is not published.
+The internal config workspace package is not published.
 
 ## License
 

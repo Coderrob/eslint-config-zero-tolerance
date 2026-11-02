@@ -1,57 +1,24 @@
 # prefer-structured-clone
 
-Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning.
+Report `JSON.parse(JSON.stringify(value))` for manual review.
 
 ## Rule Details
 
-| Property        | Value         |
-| --------------- | ------------- |
-| **Type**        | `suggestion`  |
-| **Fixable**     | Yes (`--fix`) |
-| **Recommended** | `warn`        |
-| **Strict**      | `error`       |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `off`        |
+| **Strict**      | `off`        |
 
 ## Rationale
 
-`JSON.parse(JSON.stringify(...))` is a brittle deep-clone pattern. It silently drops values that JSON cannot represent, strips prototypes, and makes the intent harder to read. `structuredClone(...)` is the direct platform API for cloning structured data and communicates that intent clearly.
+JSON cloning and `structuredClone` have different value semantics. JSON cloning drops undefined object properties and serializes dates as strings; structured cloning retains undefined properties and Date values. JSON serialization can also invoke `toJSON`. The rule is opt-in and does not autofix.
 
 ## Examples
 
-### ✅ Correct
-
-```typescript
-const clone = structuredClone(value);
-
-const payload = structuredClone(source.payload);
-
-const parsed = JSON.parse(serializedValue);
-
-const revived = JSON.parse(JSON.stringify(value), reviveValue);
-```
-
-### ❌ Incorrect
-
-```typescript
-const clone = JSON.parse(JSON.stringify(value));
-
-const payload = JSON.parse(JSON.stringify(source.payload));
-
-return JSON.parse(JSON.stringify(buildPayload()));
-```
+`JSON.parse(JSON.stringify(value))` is reported when the rule is enabled. `structuredClone(value)` and ordinary `JSON.parse(serializedValue)` are allowed. Review the data shape and required output before replacing the cloning operation.
 
 ## Configuration
 
-This rule has no options:
-
-```js
-'zero-tolerance/prefer-structured-clone': 'error'
-```
-
-## Autofix Notes
-
-The autofix rewrites the direct deep-clone pattern to `structuredClone(...)` and preserves outer call type arguments when they are present:
-
-- `JSON.parse(JSON.stringify(value))` -> `structuredClone(value)`
-- `JSON.parse<MyType>(JSON.stringify(value))` -> `structuredClone<MyType>(value)`
-
-Calls with extra `JSON.parse(...)` or `JSON.stringify(...)` arguments are intentionally ignored.
+`'zero-tolerance/prefer-structured-clone': 'warn'`

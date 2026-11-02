@@ -1,4 +1,4 @@
-import { ruleTester } from '../testing/test-helper';
+﻿import { ruleTester } from '../testing/test-helper';
 import { noRedundantBoolean } from './no-redundant-boolean';
 
 describe('no-redundant-boolean', () => {
@@ -17,10 +17,6 @@ describe('no-redundant-boolean', () => {
         code: 'const ok = x > 0;',
       },
       {
-        name: 'should allow comparison between non-literals',
-        code: 'if (a === b) {}',
-      },
-      {
         name: 'should allow loose equality with boolean',
         code: 'if (value == true) {}',
       },
@@ -36,66 +32,92 @@ describe('no-redundant-boolean', () => {
         name: 'should allow conditional expression with non-boolean branches',
         code: 'const value = condition ? "yes" : "no";',
       },
+      {
+        name: 'should preserve strict comparison when the operand may be a number',
+        code: 'const result = value === true;',
+      },
+      {
+        name: 'should preserve strict inequality when the operand may be a string',
+        code: 'const result = value !== false;',
+      },
+      {
+        name: 'should preserve a comment inside a boolean comparison',
+        code: 'const result = (value > 0) === /* keep */ true;',
+      },
+      {
+        name: 'should preserve a comment inside a boolean ternary',
+        code: 'const result = condition ? /* keep */ true : false;',
+      },
+      {
+        name: 'should preserve a comment inside a double negation',
+        code: 'const result = !! /* keep */ (value > 0);',
+      },
     ],
     invalid: [
       {
-        name: 'should report strict equality with true',
-        code: 'if (isActive === true) {}',
-        output: 'if (isActive) {}',
+        name: 'should simplify equality with true for a comparison expression',
+        code: 'const ok = (value > 0) === true;',
+        output: 'const ok = value > 0;',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report strict inequality with false',
-        code: 'if (isActive !== false) {}',
-        output: 'if (isActive) {}',
+        name: 'should simplify inequality with false for a comparison expression',
+        code: 'const ok = (value > 0) !== false;',
+        output: 'const ok = value > 0;',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report boolean literal on the left side',
-        code: 'if (true === isActive) {}',
-        output: 'if (isActive) {}',
+        name: 'should simplify boolean literal on the left side',
+        code: 'const ok = true === (value > 0);',
+        output: 'const ok = value > 0;',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report assignment with boolean comparison',
-        code: 'const ok = isValid === true;',
-        output: 'const ok = isValid;',
+        name: 'should negate inequality with true for a comparison expression',
+        code: 'const ok = (value > 0) !== true;',
+        output: 'const ok = !(value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report strict inequality with true',
-        code: 'if (result !== true) {}',
-        output: 'if (!(result)) {}',
+        name: 'should negate equality with false for a comparison expression',
+        code: 'const ok = (value > 0) === false;',
+        output: 'const ok = !(value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report strict equality with false',
-        code: 'if (result === false) {}',
-        output: 'if (!(result)) {}',
-        errors: [{ messageId: 'redundantBoolean' }],
-      },
-      {
-        name: 'should report strict inequality with false',
-        code: 'if (result !== false) {}',
-        output: 'if (result) {}',
-        errors: [{ messageId: 'redundantBoolean' }],
-      },
-      {
-        name: 'should report boolean conditional with true then false branches',
+        name: 'should coerce an unknown ternary condition to boolean',
         code: 'const ok = condition ? true : false;',
-        output: 'const ok = condition;',
+        output: 'const ok = !!(condition);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report boolean conditional with false then true branches',
+        name: 'should negate an unknown ternary condition',
         code: 'const ok = condition ? false : true;',
         output: 'const ok = !(condition);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
       {
-        name: 'should report double negation of boolean comparison',
-        code: 'const ok = !!(value > 0);',
+        name: 'should keep a boolean ternary condition without coercion',
+        code: 'const ok = value > 0 ? true : false;',
         output: 'const ok = value > 0;',
+        errors: [{ messageId: 'redundantBoolean' }],
+      },
+      {
+        name: 'should remove double negation of boolean comparison',
+        code: 'const ok = !!(value > 0);',
+        output: 'const ok = (value > 0);',
+        errors: [{ messageId: 'redundantBoolean' }],
+      },
+      {
+        name: 'should preserve addition precedence when removing double negation',
+        code: 'const result = 1 + !!(value > 0);',
+        output: 'const result = 1 + (value > 0);',
+        errors: [{ messageId: 'redundantBoolean' }],
+      },
+      {
+        name: 'should preserve typeof precedence when removing double negation',
+        code: 'const result = typeof !!(value > 0);',
+        output: 'const result = typeof (value > 0);',
         errors: [{ messageId: 'redundantBoolean' }],
       },
     ],

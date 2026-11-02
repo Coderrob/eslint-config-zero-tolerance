@@ -1,64 +1,24 @@
 # no-for-in
 
-Disallow `for..in` loops.
+Report `for..in` loops, which visit inherited enumerable keys.
 
 ## Rule Details
 
-| Property        | Value         |
-| --------------- | ------------- |
-| **Type**        | `problem`     |
-| **Fixable**     | Yes (`--fix`) |
-| **Recommended** | `warn`        |
-| **Strict**      | `error`       |
+| Property        | Value     |
+| --------------- | --------- |
+| **Type**        | `problem` |
+| **Fixable**     | No        |
+| **Recommended** | `warn`    |
+| **Strict**      | `error`   |
 
 ## Rationale
 
-`for..in` iterates enumerable keys across an object's prototype chain, which can introduce surprising behavior. Prefer `Object.keys`, `Object.values`, or `Object.entries` for predictable own-property iteration.
+`Object.keys` visits only own enumerable keys, while `for..in` also visits inherited enumerable keys. The rule reports the loop without rewriting it so the author can choose the intended iteration behavior.
 
 ## Examples
 
-### ✅ Correct
-
-```typescript
-for (const key of Object.keys(record)) {
-  handle(key);
-}
-
-for (const [key, value] of Object.entries(record)) {
-  handlePair(key, value);
-}
-```
-
-### ❌ Incorrect
-
-```typescript
-for (const key in record) {
-  handle(key);
-}
-```
+`for (const key in record) { handle(key); }` is reported. `for (const key of Object.keys(record)) { handle(key); }` is allowed. If inherited keys are required, review the rule setting for that code.
 
 ## Configuration
 
-This rule has no options:
-
-```js
-'zero-tolerance/no-for-in': 'error'
-```
-
-## Autofix Notes
-
-Autofix rewrites:
-
-```typescript
-for (const key in record) {
-  handle(key);
-}
-```
-
-to:
-
-```typescript
-for (const key of Object.keys(record)) {
-  handle(key);
-}
-```
+`'zero-tolerance/no-for-in': 'error'`

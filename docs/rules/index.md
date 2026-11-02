@@ -28,7 +28,7 @@
 | [require-bdd-spec](require-bdd-spec.md)                                   | suggestion | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
 | [require-jsdoc-anonymous-functions](require-jsdoc-anonymous-functions.md) | suggestion | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
 | [require-jsdoc-functions](require-jsdoc-functions.md)                     | suggestion | Require JSDoc comments on named functions (except test files)                                           |
-| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Require optional chaining instead of repeated guard access                                              |
+| [require-optional-chaining](require-optional-chaining.md)                 | suggestion | Report repeated logical guard access for manual review                                                  |
 | [require-readonly-props](require-readonly-props.md)                       | suggestion | Require JSX component props to be typed as readonly                                                     |
 
 ## Testing
@@ -76,11 +76,11 @@
 | [no-object-mutation](no-object-mutation.md)                       | suggestion | Disallow direct object-property mutation                                                |
 | [sort-imports](sort-imports.md)                                   | suggestion | Require import declarations to be ordered by group and alphabetically within each group |
 | [sort-functions](sort-functions.md)                               | suggestion | Require top-level functions and const function expressions to be sorted alphabetically  |
-| [prefer-nullish-coalescing](prefer-nullish-coalescing.md)         | suggestion | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
-| [prefer-object-spread](prefer-object-spread.md)                   | suggestion | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
+| [prefer-nullish-coalescing](prefer-nullish-coalescing.md)         | suggestion | Prefer nullish coalescing for locally bound identifier guard ternaries                  |
+| [prefer-object-spread](prefer-object-spread.md)                   | suggestion | Report empty-target Object.assign calls for manual review                               |
 | [prefer-readonly-parameters](prefer-readonly-parameters.md)       | suggestion | Prefer readonly typing for object and array-like parameters                             |
 | [prefer-string-raw](prefer-string-raw.md)                         | suggestion | Prefer `String.raw` for strings containing escaped backslashes                          |
-| [prefer-structured-clone](prefer-structured-clone.md)             | suggestion | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
+| [prefer-structured-clone](prefer-structured-clone.md)             | suggestion | Review JSON cloning before considering structuredClone                                  |
 
 ## Error Handling
 
@@ -114,8 +114,8 @@
 | [no-identical-expressions](no-identical-expressions.md)           | problem    | Disallow identical expressions on both sides of a binary or logical operator |
 | [no-identical-branches](no-identical-branches.md)                 | suggestion | Disallow identical conditional branches                                      |
 | [no-boolean-return-trap](no-boolean-return-trap.md)               | suggestion | Disallow ambiguous boolean-return APIs outside predicate naming              |
-| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Disallow redundant comparisons to boolean literals                           |
-| [no-for-in](no-for-in.md)                                         | problem    | Disallow `for..in` loops                                                     |
+| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Simplify comparisons only when the operand is known to be boolean            |
+| [no-for-in](no-for-in.md)                                         | problem    | Disallow for..in loops without rewriting inherited-key behavior              |
 | [no-labels](no-labels.md)                                         | problem    | Disallow labeled statements                                                  |
 | [no-with](no-with.md)                                             | problem    | Disallow `with` statements                                                   |
 | [no-await-in-loop](no-await-in-loop.md)                           | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |

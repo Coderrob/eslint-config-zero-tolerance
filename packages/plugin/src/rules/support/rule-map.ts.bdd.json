@@ -168,10 +168,10 @@
           "then": "the rule is set to warn in Recommended and error in Strict"
         },
         {
-          "name": "should include prefer-structured-clone in built-in presets",
-          "given": "buildRules is called for the Recommended and Strict presets",
-          "when": "the 'zero-tolerance/prefer-structured-clone' entries are read",
-          "then": "the rule is set to warn in Recommended and error in Strict"
+          "name": "should keep semantic rewrite rules disabled in built-in presets",
+          "given": "Recommended and Strict presets are built",
+          "when": "require-optional-chaining, prefer-object-spread, and prefer-structured-clone entries are read",
+          "then": "all three rules are off in both presets and remain available for explicit opt-in"
         }
       ]
     },

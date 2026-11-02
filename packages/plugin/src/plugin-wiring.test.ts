@@ -53,6 +53,8 @@ const RULE_REQUIRE_CLEAN_BARREL = `${PLUGIN_NAMESPACE}/require-clean-barrel`;
 const RULE_REQUIRE_EXHAUSTIVE_SWITCH = `${PLUGIN_NAMESPACE}/require-exhaustive-switch`;
 const RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
 const RULE_PREFER_STRUCTURED_CLONE = `${PLUGIN_NAMESPACE}/prefer-structured-clone`;
+const RULE_PREFER_OBJECT_SPREAD = `${PLUGIN_NAMESPACE}/prefer-object-spread`;
+const RULE_REQUIRE_OPTIONAL_CHAINING = `${PLUGIN_NAMESPACE}/require-optional-chaining`;
 const RULE_SORT_IMPORTS = `${PLUGIN_NAMESPACE}/sort-imports`;
 const LEGACY_RULE_SORT_IMPORTS = `${LEGACY_PLUGIN_NAMESPACE}/sort-imports`;
 const LEGACY_RULE_REQUIRE_JSDOC_ANONYMOUS_FUNCTIONS = `${LEGACY_PLUGIN_NAMESPACE}/require-jsdoc-anonymous-functions`;
@@ -131,8 +133,12 @@ describe('plugin wiring', () => {
     expect(strictRules[RULE_REQUIRE_EXHAUSTIVE_SWITCH]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('warn');
     expect(strictRules[RULE_REQUIRE_EXPORTED_OBJECT_TYPE]).toBe('error');
-    expect(recommendedRules[RULE_PREFER_STRUCTURED_CLONE]).toBe('warn');
-    expect(strictRules[RULE_PREFER_STRUCTURED_CLONE]).toBe('error');
+    expect(recommendedRules[RULE_PREFER_STRUCTURED_CLONE]).toBe('off');
+    expect(strictRules[RULE_PREFER_STRUCTURED_CLONE]).toBe('off');
+    expect(recommendedRules[RULE_PREFER_OBJECT_SPREAD]).toBe('off');
+    expect(strictRules[RULE_PREFER_OBJECT_SPREAD]).toBe('off');
+    expect(recommendedRules[RULE_REQUIRE_OPTIONAL_CHAINING]).toBe('off');
+    expect(strictRules[RULE_REQUIRE_OPTIONAL_CHAINING]).toBe('off');
     expect(recommendedRules[RULE_NO_LITERAL_PROPERTY_UNIONS]).toBe('warn');
     expect(strictRules[RULE_NO_LITERAL_PROPERTY_UNIONS]).toBe('error');
     expect(recommendedRules[RULE_REQUIRE_BDD_SPEC]).toBe('off');
@@ -173,6 +179,15 @@ describe('plugin wiring', () => {
 
     expect(recommendedRules[LEGACY_RULE_SORT_IMPORTS]).toBe('warn');
     expect(strictRules[LEGACY_RULE_SORT_IMPORTS]).toBe('error');
+    for (const ruleName of [
+      'require-optional-chaining',
+      'prefer-object-spread',
+      'prefer-structured-clone',
+    ]) {
+      const ruleKey = `${LEGACY_PLUGIN_NAMESPACE}/${ruleName}`;
+      expect(recommendedRules[ruleKey]).toBe('off');
+      expect(strictRules[ruleKey]).toBe('off');
+    }
     expect(recommendedRules[RULE_SORT_IMPORTS]).toBeUndefined();
     expect(strictRules[RULE_SORT_IMPORTS]).toBeUndefined();
     expect(Object.keys(recommendedRules)).toHaveLength(Object.keys(ruleMap).length);

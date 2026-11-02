@@ -1,42 +1,24 @@
 # require-optional-chaining
 
-Require optional chaining instead of repeated logical guard access.
+Report repeated `&&` guard access for manual review.
 
 ## Rule Details
 
 | Property        | Value        |
 | --------------- | ------------ |
 | **Type**        | `suggestion` |
-| **Fixable**     | Yes (`code`) |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+| **Fixable**     | No           |
+| **Recommended** | `off`        |
+| **Strict**      | `off`        |
 
 ## Rationale
 
-Patterns like `obj && obj.value` or `fn && fn()` duplicate the same guard expression and make code harder to read. Optional chaining expresses the same intent directly in one expression and removes repetition.
+`value && value.member` and `value?.member` can return different values when `value` is falsy but not nullish. For example, `text && text.length` returns an empty string for `text = ''`, while `text?.length` returns zero. Repeated member access can also invoke getters twice. The rule is opt-in and does not autofix.
 
 ## Examples
 
-### ✅ Correct
-
-```typescript
-const profile = user?.profile;
-const result = fn?.();
-const name = account?.owner?.name;
-```
-
-### ❌ Incorrect
-
-```typescript
-const profile = user && user.profile;
-const result = fn && fn();
-const name = account.owner && account.owner.name;
-```
+`user && user.profile` is reported when the rule is enabled. `user?.profile` and unrelated logical guards are allowed. Check falsy values and getter behavior before changing a reported expression.
 
 ## Configuration
 
-This rule has no options:
-
-```js
-'zero-tolerance/require-optional-chaining': 'error'
-```
+`'zero-tolerance/require-optional-chaining': 'warn'`

@@ -65,6 +65,7 @@ nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - Configuration: configuration.md
+  - Rule Fix Safety: rule-fix-safety.md
   - Rules:
       - Overview: rules/index.md
       - Naming Conventions:

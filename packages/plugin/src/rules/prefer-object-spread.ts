@@ -24,70 +24,6 @@ const ASSIGN_METHOD = 'assign';
 type PreferObjectSpreadContext = Readonly<TSESLint.RuleContext<'preferObjectSpread', []>>;
 
 /**
- * Converts a single argument to its spread representation text.
- *
- * @param sourceCode - ESLint source code helper.
- * @param arg - Argument expression node.
- * @returns The spread text fragment for this argument.
- */
-function argumentToSpreadText(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  arg: Readonly<TSESTree.Expression>,
-): string {
-  if (arg.type === AST_NODE_TYPES.ObjectExpression) {
-    return arg.properties
-      .map(/** @param prop - Object property node. */ (prop) => sourceCode.getText(prop))
-      .join(', ');
-  }
-  return `...${sourceCode.getText(arg)}`;
-}
-
-/**
- * Collects spread text parts from all arguments after skipping the leading empty object.
- *
- * @param sourceCode - ESLint source code helper.
- * @param args - Filtered expression arguments from Object.assign call.
- * @returns Array of spread text fragments.
- */
-function collectSpreadParts(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  args: readonly TSESTree.Expression[],
-): string[] {
-  return args
-    .slice(1)
-    .filter(
-      /** @param arg - Object.assign argument to evaluate. */
-      (arg) => !isEmptyObjectLiteral(arg),
-    )
-    .map(
-      /** @param arg - Object.assign argument to convert. */
-      (arg) => argumentToSpreadText(sourceCode, arg),
-    );
-}
-
-/**
- * Creates a fixer that rewrites Object.assign({}, ...args) to spread syntax.
- *
- * @param sourceCode - ESLint source code helper.
- * @param node - The Object.assign call expression.
- * @param fixer - ESLint fixer helper.
- * @returns Text replacement fix.
- */
-function createObjectSpreadFix(
-  sourceCode: Readonly<TSESLint.SourceCode>,
-  node: Readonly<TSESTree.CallExpression>,
-  fixer: Readonly<TSESLint.RuleFixer>,
-): TSESLint.RuleFix {
-  const spreadParts = collectSpreadParts(sourceCode, node.arguments.filter(isExpressionArgument));
-  const inner = spreadParts.length > 0 ? ` ${spreadParts.join(', ')} ` : '';
-  const objectLiteralText = `{${inner}}`;
-  const replacementText = shouldParenthesizeObjectSpread(node)
-    ? `(${objectLiteralText})`
-    : objectLiteralText;
-  return fixer.replaceText(node, replacementText);
-}
-
-/**
  * Creates listeners for the prefer-object-spread rule.
  *
  * @param context - ESLint rule execution context.
@@ -144,18 +80,6 @@ function isEmptyObjectLiteral(node: Readonly<TSESTree.Node>): boolean {
 }
 
 /**
- * Returns true when the call argument is a regular (non-spread) expression.
- *
- * @param node - Call argument to inspect.
- * @returns Whether the argument is not a spread element.
- */
-function isExpressionArgument(
-  node: Readonly<TSESTree.CallExpressionArgument>,
-): node is TSESTree.Expression {
-  return node.type !== AST_NODE_TYPES.SpreadElement;
-}
-
-/**
  * Returns true when the call expression is Object.assign with at least one argument.
  *
  * @param node - Call expression to inspect.
@@ -201,25 +125,7 @@ function reportObjectAssign(
   context.report({
     node,
     messageId: 'preferObjectSpread',
-    fix: createObjectSpreadFix.bind(undefined, context.sourceCode, node),
   });
-}
-
-/**
- * Returns true when replacing the call with an object literal requires parentheses.
- *
- * @param node - Call expression being replaced.
- * @returns Whether the replacement must be parenthesized to remain valid syntax.
- */
-function shouldParenthesizeObjectSpread(node: Readonly<TSESTree.CallExpression>): boolean {
-  const { parent } = node;
-  if (parent.type === AST_NODE_TYPES.ExpressionStatement) {
-    return true;
-  }
-  if (parent.type !== AST_NODE_TYPES.ArrowFunctionExpression) {
-    return false;
-  }
-  return parent.body === node;
 }
 
 /**
@@ -229,14 +135,13 @@ export const preferObjectSpread = createRule({
   name: 'prefer-object-spread',
   meta: {
     type: 'suggestion',
-    fixable: 'code',
     docs: {
       description:
-        'Enforce object spread syntax instead of Object.assign with an empty object literal as the first argument',
+        'Report empty-target Object.assign calls for manual review before using object spread',
     },
     messages: {
       preferObjectSpread:
-        'Use an object spread instead of Object.assign, e.g. `{ ...foo }` instead of `Object.assign({}, foo)`.',
+        'Review this Object.assign call before using object spread; getter and prototype behavior can differ.',
     },
     schema: [],
   },

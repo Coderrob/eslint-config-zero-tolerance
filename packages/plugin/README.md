@@ -101,7 +101,7 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `require-bdd-spec`                  | Enforce that every TypeScript source file has a valid sibling .ts.bdd.json BDD spec                     |
 | `require-jsdoc-anonymous-functions` | Require JSDoc comments on anonymous function-like constructs except test files and known test callbacks |
 | `require-jsdoc-functions`           | Require JSDoc comments on named functions (except test files)                                           |
-| `require-optional-chaining`         | Require optional chaining instead of repeated guard access                                              |
+| `require-optional-chaining`         | Report repeated logical guard access for manual review                                                  |
 | `require-readonly-props`            | Require JSX component props to be typed as readonly                                                     |
 
 ### Testing
@@ -149,11 +149,11 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `no-object-mutation`            | Disallow direct object-property mutation                                                |
 | `sort-imports`                  | Require import declarations to be ordered by group and alphabetically within each group |
 | `sort-functions`                | Require top-level functions and const function expressions to be sorted alphabetically  |
-| `prefer-nullish-coalescing`     | Prefer nullish coalescing instead of repeated nullish guard ternaries                   |
-| `prefer-object-spread`          | Enforce object spread syntax instead of `Object.assign` with an empty object literal    |
+| `prefer-nullish-coalescing`     | Prefer nullish coalescing for locally bound identifier guard ternaries                  |
+| `prefer-object-spread`          | Report empty-target Object.assign calls for manual review before using object spread    |
 | `prefer-readonly-parameters`    | Prefer readonly typing for object and array-like parameters                             |
 | `prefer-string-raw`             | Prefer `String.raw` for strings containing escaped backslashes                          |
-| `prefer-structured-clone`       | Prefer `structuredClone(...)` over `JSON.parse(JSON.stringify(...))` for deep cloning   |
+| `prefer-structured-clone`       | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)          |
 
 ### Error Handling
 
@@ -189,8 +189,8 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `no-identical-expressions`      | Disallow identical expressions on both sides of a binary or logical operator |
 | `no-identical-branches`         | Disallow identical conditional branches                                      |
 | `no-boolean-return-trap`        | Disallow ambiguous boolean-return APIs outside predicate naming              |
-| `no-redundant-boolean`          | Disallow redundant comparisons to boolean literals                           |
-| `no-for-in`                     | Disallow `for..in` loops                                                     |
+| `no-redundant-boolean`          | Simplify comparisons only when the operand is known to be boolean            |
+| `no-for-in`                     | Disallow for..in loops without rewriting inherited-key behavior              |
 | `no-labels`                     | Disallow labeled statements                                                  |
 | `no-with`                       | Disallow `with` statements                                                   |
 | `no-await-in-loop`              | Disallow `await` inside loops; use `Promise.all()` instead                   |

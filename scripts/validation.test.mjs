@@ -179,4 +179,43 @@ describe('repository validation', () => {
       }
     }
   });
+
+  test('should keep the config package private and the root publish command plugin-only', () => {
+    const config = JSON.parse(
+      readFileSync(new URL('../packages/config/package.json', import.meta.url)),
+    );
+    const root = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+    assert.equal(config.private, true);
+    assert.match(root.scripts['release:publish'], /release:publish:plugin/u);
+    assert.doesNotMatch(root.scripts['release:publish'], /changeset publish/u);
+  });
+
+  test('should pin every external GitHub Action to a full commit SHA', () => {
+    const pinnedAction = /^[\w.-]+\/[\w.-]+(?:\/[\w./-]+)?@[0-9a-f]{40}$/u;
+    assert.equal(pinnedAction.test('actions/checkout@v7'), false);
+    assert.equal(
+      pinnedAction.test('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'),
+      true,
+    );
+
+    const workflowDirectory = fileURLToPath(new URL('../.github/workflows/', import.meta.url));
+    const workflowFiles = readdirSync(workflowDirectory).filter((name) => /\.ya?ml$/u.test(name));
+    let actionCount = 0;
+
+    for (const workflowFile of workflowFiles) {
+      const workflow = readFileSync(join(workflowDirectory, workflowFile), 'utf8');
+      const references = workflow.matchAll(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/gmu);
+      for (const reference of references) {
+        if (reference[1].startsWith('./')) continue;
+        assert.match(
+          reference[1],
+          pinnedAction,
+          `${workflowFile}: ${reference[1]} must use a full commit SHA`,
+        );
+        actionCount += 1;
+      }
+    }
+
+    assert.ok(actionCount > 0, 'expected at least one external GitHub Action');
+  });
 });

@@ -81,22 +81,7 @@ function checkLogicalExpression(
   context.report({
     node,
     messageId: 'useOptionalChaining',
-    fix: createLogicalExpressionFix(node, replacement),
   });
-}
-
-/**
- * Creates a text-replacement fixer for a logical expression.
- *
- * @param node - Logical expression node to replace.
- * @param replacement - Replacement text.
- * @returns ESLint fix callback.
- */
-function createLogicalExpressionFix(
-  node: Readonly<TSESTree.LogicalExpression>,
-  replacement: string,
-): TSESLint.ReportFixFunction {
-  return fixLogicalExpression.bind(undefined, node, replacement);
 }
 
 /**
@@ -112,22 +97,6 @@ function createRequireOptionalChainingListeners(
   return {
     LogicalExpression: checkLogicalExpression.bind(undefined, context, sourceCode),
   };
-}
-
-/**
- * Applies the autofix to replace a logical expression with optional chaining.
- *
- * @param node - Logical expression node to replace.
- * @param replacement - Replacement text.
- * @param fixer - ESLint fixer.
- * @returns The generated fix.
- */
-function fixLogicalExpression(
-  node: Readonly<TSESTree.LogicalExpression>,
-  replacement: string,
-  fixer: Readonly<TSESLint.RuleFixer>,
-): TSESLint.RuleFix {
-  return fixer.replaceText(node, replacement);
 }
 
 /**
@@ -244,12 +213,12 @@ export const requireOptionalChaining = createRule({
   name: 'require-optional-chaining',
   meta: {
     type: 'suggestion',
-    fixable: 'code',
     docs: {
-      description: 'Require optional chaining instead of repeated logical guard access',
+      description: 'Report repeated logical guard access for manual review',
     },
     messages: {
-      useOptionalChaining: 'Use optional chaining instead of repeating the same guard expression',
+      useOptionalChaining:
+        'Review this repeated guard before using optional chaining; falsy values can change the result',
     },
     schema: [],
   },
