@@ -1,6 +1,6 @@
 <p align="center">
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 80 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
 <img
     src="public/img/zero-tolerance-icon.png"
     alt="ESLint Plugin Zero Tolerance"
@@ -11,7 +11,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 <h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
 <p align="center">
-  <strong>77 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+  <strong>80 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ This monorepo publishes one package:
 
 | Package                                                                                                          | Description                         |
 | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 77 custom rules |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 80 custom rules |
 
 `packages/config` is retained as an internal workspace package for development and compatibility testing; it is not published to npm.
 
@@ -140,7 +140,7 @@ module.exports = {
 
 <!-- begin auto-generated rules list -->
 
-The plugin ships **77 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
+The plugin ships **80 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
 
 Preset columns report the configured severity: 💼 for `error`, ⚠️ for `warn`, and 🚫 for `off`. A blank cell means the preset does not configure the rule.
 
@@ -148,7 +148,7 @@ Preset columns report the configured severity: 💼 for `error`, ⚠️ for `war
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
-| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Testing](#testing)                       |    11 | Test descriptions, mocks, timers, fetch, interfaces |
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
@@ -188,16 +188,19 @@ JSDoc, BDD specs, optional chaining, readonly props
 
 Test descriptions, mocks, timers, fetch, interfaces
 
-| Name                                                                           | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                                                                                                                                                                          |
-| :----------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [no-fetch-in-tests](docs/rules/no-fetch-in-tests.md)                           | 📖  |     |     | R S | Disallow fetch usage in test files                                                                                                                                                                                                                                   |
-| [no-jest-have-been-called](docs/rules/no-jest-have-been-called.md)             | 📖  | S   | R   |     | Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead |
-| [no-mock-implementation](docs/rules/no-mock-implementation.md)                 | 📖  | S   | R   |     | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds                                                                                                                                                                                 |
-| [no-restricted-imports-in-tests](docs/rules/no-restricted-imports-in-tests.md) | 📖  |     |     | R S | Disallow restricted dependency imports in test files                                                                                                                                                                                                                 |
-| [no-set-interval-in-tests](docs/rules/no-set-interval-in-tests.md)             | 📖  | S   | R   |     | Disallow setInterval usage in test files                                                                                                                                                                                                                             |
-| [no-set-timeout-in-tests](docs/rules/no-set-timeout-in-tests.md)               | 📖  | S   | R   |     | Disallow setTimeout usage in test files                                                                                                                                                                                                                              |
-| [no-test-interface-declaration](docs/rules/no-test-interface-declaration.md)   | 📖  | S   | R   |     | Disallow interface declarations in test files; import production types instead                                                                                                                                                                                       |
-| [require-test-description-style](docs/rules/require-test-description-style.md) | 📖  | S   | R   |     | Enforce that test descriptions start with "should"                                                                                                                                                                                                                   |
+| Name                                                                                   | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                             |
+| :------------------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :---------------------------------------------------------------------------------------------------------------------- |
+| [no-chai-imprecise-spy-assertions](docs/rules/no-chai-imprecise-spy-assertions.md)     | 📖  | S   | R   |     | Require exact Chai-style spy call counts and invocation arguments                                                       |
+| [no-fetch-in-tests](docs/rules/no-fetch-in-tests.md)                                   | 📖  |     |     | R S | Disallow fetch usage in test files                                                                                      |
+| [no-jest-have-been-called](docs/rules/no-jest-have-been-called.md)                     | 📖  | S   | R   |     | Require exact call counts and invocation indices in Jest expect assertions, while allowing negated zero-call assertions |
+| [no-mock-implementation](docs/rules/no-mock-implementation.md)                         | 📖  | S   | R   |     | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds                                    |
+| [no-restricted-imports-in-tests](docs/rules/no-restricted-imports-in-tests.md)         | 📖  |     |     | R S | Disallow restricted dependency imports in test files                                                                    |
+| [no-set-interval-in-tests](docs/rules/no-set-interval-in-tests.md)                     | 📖  | S   | R   |     | Disallow setInterval usage in test files                                                                                |
+| [no-set-timeout-in-tests](docs/rules/no-set-timeout-in-tests.md)                       | 📖  | S   | R   |     | Disallow setTimeout usage in test files                                                                                 |
+| [no-sinon-imprecise-spy-assertions](docs/rules/no-sinon-imprecise-spy-assertions.md)   | 📖  | S   | R   |     | Require exact Sinon spy call counts and invocation arguments                                                            |
+| [no-test-interface-declaration](docs/rules/no-test-interface-declaration.md)           | 📖  | S   | R   |     | Disallow interface declarations in test files; import production types instead                                          |
+| [no-vitest-imprecise-spy-assertions](docs/rules/no-vitest-imprecise-spy-assertions.md) | 📖  | S   | R   |     | Require exact Vitest spy call counts and invocation indices                                                             |
+| [require-test-description-style](docs/rules/require-test-description-style.md)         | 📖  | S   | R   |     | Enforce that test descriptions start with "should"                                                                      |
 
 ### Type Safety
 

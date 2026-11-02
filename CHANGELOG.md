@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Testing framework spy assertions**: Added Vitest, Chai-style, and Sinon rules that require explicit call counts and numbered invocation argument checks while allowing zero-call assertions. Covered Vitest soft assertions and Chai language chains and `lastCalledWith`, while allowing argument checks on indexed Sinon spy calls. Mocha projects are covered through their Chai or Sinon assertion packages.
+- **`no-jest-have-been-called` rule**: Report imprecise matchers only when called through a Jest `expect` assertion, including modifiers, optional and computed calls, global forms, and aliases imported from `@jest/globals`; allow unrelated methods, property reads, and negated assertions that require zero calls.
 - **npm release publishing**: Authenticate the publish step with the `NPM_TOKEN` Actions secret and allow manual retries for an existing published GitHub Release tag.
 
 ## [1.2.7] - 2026-11-02

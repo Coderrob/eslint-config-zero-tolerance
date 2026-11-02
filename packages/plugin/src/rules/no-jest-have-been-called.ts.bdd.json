@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/no-jest-have-been-called.ts",
   "module": {
     "name": "no-jest-have-been-called",
-    "description": "Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit count and toHaveBeenNthCalledWith instead.",
+    "description": "Require exact call counts and invocation indices in Jest expect assertions, while allowing negated zero-call assertions.",
     "exports": ["noJestHaveBeenCalled"]
   },
   "specifications": [
@@ -24,10 +24,46 @@
           "then": "no violation is reported"
         },
         {
+          "name": "should allow negated called matchers that assert zero calls",
+          "given": "expect(fn).not.toHaveBeenCalled() or expect(fn)['not'].toBeCalled()",
+          "when": "the rule evaluates the assertion and its modifiers",
+          "then": "no violation is reported because the assertion requires zero calls"
+        },
+        {
           "name": "should allow inherited object member names",
           "given": "ordinary code accesses an Object.prototype member such as value.toString() or value.constructor",
           "when": "the rule evaluates member expressions",
           "then": "no violation is reported because the name is not an own key of the banned matcher map"
+        },
+        {
+          "name": "should allow unrelated objects with matcher-shaped members",
+          "given": "an object other than a Jest expect result calls or references a member named toHaveBeenCalled",
+          "when": "the rule evaluates the member",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow matcher property references without calls",
+          "given": "expect(fn).toHaveBeenCalled is read without invoking the matcher",
+          "when": "the rule evaluates the member",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow unsupported intermediate members",
+          "given": "expect(fn).custom.toHaveBeenCalled() is called",
+          "when": "the rule traces the matcher receiver",
+          "then": "no violation is reported because custom is not a Jest assertion modifier"
+        },
+        {
+          "name": "should allow shadowed and unrelated expect bindings",
+          "given": "a local expect function or an expect import from another library has a banned matcher name",
+          "when": "the rule resolves the expect binding",
+          "then": "no Jest matcher violation is reported"
+        },
+        {
+          "name": "should allow a shadowed global object",
+          "given": "a local parameter named globalThis has an expect method with a banned matcher name",
+          "when": "the rule resolves the global object binding",
+          "then": "no Jest matcher violation is reported"
         }
       ]
     },
@@ -68,6 +104,24 @@
           "name": "should report toLastCalledWith()",
           "given": "expect(fn).toLastCalledWith(arg)",
           "when": "the rule evaluates the assertion",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report negated argument and promise matcher chains",
+          "given": "expect(fn).resolves.not.toHaveBeenCalledWith(arg) or expect(fn).rejects.toBeCalledWith(arg)",
+          "when": "the rule traces the assertion modifiers",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report global and imported Jest expect calls",
+          "given": "globalThis.expect(fn).toHaveBeenCalled(), globalThis['expect'](fn).toBeCalled(), or an alias imported from @jest/globals calls the matcher",
+          "when": "the rule resolves the expect call",
+          "then": "a noJestHaveBeenCalled violation is reported"
+        },
+        {
+          "name": "should report computed and optional matcher calls",
+          "given": "expect(fn)['toHaveBeenCalled']() or expect(fn)?.toHaveBeenCalled?.()",
+          "when": "the rule evaluates the matcher call",
           "then": "a noJestHaveBeenCalled violation is reported"
         }
       ]

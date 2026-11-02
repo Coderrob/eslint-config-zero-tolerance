@@ -29,6 +29,12 @@
           "then": "contains every rule name defined in the plugin"
         },
         {
+          "name": "should register framework-specific spy assertion rules",
+          "given": "the plugin default export is imported",
+          "when": "the Vitest, Chai, and Sinon spy rule entries are read",
+          "then": "each framework-specific rule implementation is available by its unprefixed name"
+        },
+        {
           "name": "should register require-jsdoc-anonymous-functions as a standalone rule",
           "given": "the plugin default export is imported",
           "when": "plugin.rules['require-jsdoc-anonymous-functions'] is read",

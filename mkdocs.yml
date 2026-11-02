@@ -78,9 +78,12 @@ nav:
           - require-readonly-props: rules/require-readonly-props.md
       - Testing:
           - require-test-description-style: rules/require-test-description-style.md
+          - no-chai-imprecise-spy-assertions: rules/no-chai-imprecise-spy-assertions.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
           - no-mock-implementation: rules/no-mock-implementation.md
+          - no-sinon-imprecise-spy-assertions: rules/no-sinon-imprecise-spy-assertions.md
           - no-set-timeout-in-tests: rules/no-set-timeout-in-tests.md
+          - no-vitest-imprecise-spy-assertions: rules/no-vitest-imprecise-spy-assertions.md
           - no-set-interval-in-tests: rules/no-set-interval-in-tests.md
           - no-fetch-in-tests: rules/no-fetch-in-tests.md
           - no-restricted-imports-in-tests: rules/no-restricted-imports-in-tests.md

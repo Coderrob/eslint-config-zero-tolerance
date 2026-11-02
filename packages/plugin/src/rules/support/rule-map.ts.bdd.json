@@ -24,6 +24,12 @@
           "then": "returns a rules record where default preset rules use their configured strict entries"
         },
         {
+          "name": "should include framework-specific spy assertion rules in every preset",
+          "given": "the Vitest, Chai, and Sinon rules are registered as default rules",
+          "when": "flat or legacy recommended and strict presets are built",
+          "then": "each rule uses warn severity in recommended presets and error severity in strict presets"
+        },
+        {
           "name": "should prefix every rule key with the plugin namespace",
           "given": "any preset is passed to buildRules",
           "when": "Object.keys of the result is inspected",

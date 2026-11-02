@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/test-imports.ts",
+  "module": {
+    "name": "test-imports",
+    "description": "Resolve named, default, and namespace imports by lexical binding so test rules ignore shadowed and unrelated identifiers.",
+    "exports": ["isModuleImport", "isNamedImport"]
+  },
+  "specifications": [
+    {
+      "feature": "Named test package imports",
+      "scenarios": [
+        {
+          "name": "should resolve aliased named imports",
+          "given": "expect is imported as check from vitest",
+          "when": "isNamedImport evaluates the check identifier",
+          "then": "the result is true for vitest expect"
+        },
+        {
+          "name": "should reject shadowed and unrelated named bindings",
+          "given": "an imported name is shadowed locally or imported from another module",
+          "when": "isNamedImport resolves the identifier",
+          "then": "the result is false"
+        }
+      ]
+    },
+    {
+      "feature": "Module object imports",
+      "scenarios": [
+        {
+          "name": "should resolve default and namespace imports",
+          "given": "a module is imported with default or namespace syntax",
+          "when": "isModuleImport resolves the binding",
+          "then": "the result is true for the matching source module"
+        },
+        {
+          "name": "should reject unrelated module bindings",
+          "given": "a local identifier or named import uses the same spelling as a module object",
+          "when": "isModuleImport evaluates the identifier",
+          "then": "the result is false"
+        }
+      ]
+    }
+  ]
+}

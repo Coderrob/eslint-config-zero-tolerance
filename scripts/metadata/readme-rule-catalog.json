@@ -21,13 +21,16 @@
       "focus": "Test descriptions, mocks, timers, fetch, interfaces",
       "rules": [
         "require-test-description-style",
+        "no-chai-imprecise-spy-assertions",
         "no-jest-have-been-called",
         "no-mock-implementation",
+        "no-sinon-imprecise-spy-assertions",
         "no-set-timeout-in-tests",
         "no-set-interval-in-tests",
         "no-fetch-in-tests",
         "no-restricted-imports-in-tests",
-        "no-test-interface-declaration"
+        "no-test-interface-declaration",
+        "no-vitest-imprecise-spy-assertions"
       ]
     },
     {
