@@ -30,6 +30,6 @@ The opt-in rules remain available for manual review. The negative fixtures are a
 - [x] Use one release preparation workflow and one publication workflow, retaining candidate checks, tag ancestry, provenance, and package previews.
 - [x] Check invalid release sizes, version bounds, dates, package eligibility, and unchanged files after invalid requests.
 - [x] Complete all repository validation gates and review the final diff.
-- [ ] Push the verified branch and open a new PR.
+- [x] Push the verified branch and open [PR #52](https://github.com/Coderrob/eslint-config-zero-tolerance/pull/52).
 
 Verification: 2,588 plugin tests, 4 config tests, and 28 script tests pass. Plugin coverage is 99.69% statements and 98.41% branches; every required file meets the 95% gate. Both workspace type checks, the full lint/build/metadata/package gate, and actionlint pass.
