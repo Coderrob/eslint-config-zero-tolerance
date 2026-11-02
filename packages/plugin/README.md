@@ -1,5 +1,7 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
+[Behavioral safety contracts](../../docs/rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
+
 Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
 
 Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
@@ -127,7 +129,7 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `no-non-null-assertion`                  | Disallow non-null assertions using the `!` postfix operator                        |
 | `no-explicit-any`                        | Disallow explicit `any`; require precise modeling or explicit narrowing            |
 | `no-indexed-access-types`                | Disallow TypeScript indexed access types                                           |
-| `no-literal-unions`                      | Ban literal union types in favour of enums                                         |
+| `no-literal-unions`                      | Report literal unions for manual migration to enums                                |
 | `no-literal-property-unions`             | Require property literal unions to use named domain types                          |
 | `require-union-type-alias`               | Require inline union types with multiple type references to use named type aliases |
 | `no-inline-type-import`                  | Disallow inline `import("...").Type` annotations                                   |
@@ -138,24 +140,24 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 
 ### Code Quality
 
-| Rule                            | Description                                                                             |
-| ------------------------------- | --------------------------------------------------------------------------------------- |
-| `max-function-lines`            | Enforce a maximum number of lines per function body                                     |
-| `max-params`                    | Enforce a maximum number of function parameters                                         |
-| `no-array-mutation`             | Disallow mutating array methods                                                         |
-| `no-date-now`                   | Disallow `Date.now()` and no-arg `new Date()` usage                                     |
-| `no-placeholder-implementation` | Disallow placeholder, stub, TODO, and not implemented production code                   |
-| `no-magic-numbers`              | Disallow magic numbers; use named constants instead                                     |
-| `no-magic-strings`              | Disallow magic strings in comparisons and switch cases                                  |
-| `no-map-set-mutation`           | Disallow direct `Map` and `Set` mutation methods                                        |
-| `no-object-mutation`            | Disallow direct object-property mutation                                                |
-| `sort-imports`                  | Require import declarations to be ordered by group and alphabetically within each group |
-| `sort-functions`                | Require top-level functions and const function expressions to be sorted alphabetically  |
-| `prefer-nullish-coalescing`     | Prefer nullish coalescing for locally bound identifier guard ternaries                  |
-| `prefer-object-spread`          | Report empty-target Object.assign calls for manual review before using object spread    |
-| `prefer-readonly-parameters`    | Prefer readonly typing for object and array-like parameters                             |
-| `prefer-string-raw`             | Prefer `String.raw` for strings containing escaped backslashes                          |
-| `prefer-structured-clone`       | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)          |
+| Rule                            | Description                                                                            |
+| ------------------------------- | -------------------------------------------------------------------------------------- |
+| `max-function-lines`            | Enforce a maximum number of lines per function body                                    |
+| `max-params`                    | Enforce a maximum number of function parameters                                        |
+| `no-array-mutation`             | Disallow mutating array methods                                                        |
+| `no-date-now`                   | Disallow `Date.now()` and no-arg `new Date()` usage                                    |
+| `no-placeholder-implementation` | Disallow placeholder, stub, TODO, and not implemented production code                  |
+| `no-magic-numbers`              | Disallow magic numbers; use named constants instead                                    |
+| `no-magic-strings`              | Disallow magic strings in comparisons and switch cases                                 |
+| `no-map-set-mutation`           | Disallow direct `Map` and `Set` mutation methods                                       |
+| `no-object-mutation`            | Disallow direct object-property mutation                                               |
+| `sort-imports`                  | Report import ordering while preserving runtime dependency order                       |
+| `sort-functions`                | Require top-level functions and const function expressions to be sorted alphabetically |
+| `prefer-nullish-coalescing`     | Prefer nullish coalescing for locally bound identifier guard ternaries                 |
+| `prefer-object-spread`          | Report empty-target Object.assign calls for manual review before using object spread   |
+| `prefer-readonly-parameters`    | Prefer readonly typing for object and array-like parameters                            |
+| `prefer-string-raw`             | Prefer native `String.raw` when the constructor is not shadowed                        |
+| `prefer-structured-clone`       | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)         |
 
 ### Error Handling
 
@@ -196,14 +198,14 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `no-labels`                     | Disallow labeled statements                                                  |
 | `no-with`                       | Disallow `with` statements                                                   |
 | `no-await-in-loop`              | Disallow `await` inside loops; use `Promise.all()` instead                   |
-| `no-floating-promises`          | Disallow unhandled promise expressions; require explicit handling            |
+| `no-floating-promises`          | Check explicit, local async, and type-resolved promises                      |
 | `no-math-random`                | Disallow `Math.random()`; inject a random source instead                     |
 | `no-eslint-disable`             | Prevent use of `eslint-disable` comments                                     |
 | `no-parameter-reassign`         | Disallow reassigning function parameters                                     |
 | `no-process-env-outside-config` | Disallow `process.env` reads outside configuration modules                   |
 | `no-flag-argument`              | Disallow boolean flag parameters in function signatures                      |
 | `prefer-guard-clauses`          | Prefer guard clauses by removing else blocks after terminating if branches   |
-| `prefer-shortcut-return`        | Prefer shortcut boolean returns over if branches that return true/false      |
+| `prefer-shortcut-return`        | Simplify boolean returns while retaining comments                            |
 | `no-query-side-effects`         | Disallow side effects in query-style functions                               |
 | `require-timeout-for-io`        | Require timeout or cancellation options for external IO calls                |
 | `require-exhaustive-switch`     | Require exhaustive `switch` statements over finite discriminant types        |

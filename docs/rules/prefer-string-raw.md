@@ -46,3 +46,9 @@ This rule has no options:
 Autofix rewrites only eligible string literals to `String.raw\`\`` form after verifying that the resulting template has the same runtime value. Regex literals are never considered; regex-source strings with redundant backslash escaping are fixed only when their value is preserved.
 
 The rule intentionally skips grammar-sensitive positions such as directives, import/export sources, non-computed property keys, JSX attributes, inline Jest snapshots, and TypeScript literal contexts. It also skips mixed runtime escapes, trailing backslashes, multiline strings, template interpolation markers such as `${...}`, and backticks.
+
+## Behavioral contract
+
+Autofix also skips any lexical scope that declares `String`, including function parameters and bindings declared later in the block. This prevents a new reference from calling a local replacement or entering its temporal dead zone. Scope checks are performed separately for every literal; leaving a shadowed function restores normal handling. The rule assumes the global built-in has not been monkey-patched.
+
+An explicitly disabled `String` global also prevents a fix, even when TypeScript still exposes its built-in symbol in the scope.

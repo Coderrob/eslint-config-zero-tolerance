@@ -1,7 +1,7 @@
 <p align="center">
 
 Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
-  <img
+<img
     src="public/img/zero-tolerance-icon.png"
     alt="ESLint Plugin Zero Tolerance"
     width="200"
@@ -208,7 +208,7 @@ Assertions, unions, imports, exported types
 | [no-indexed-access-types](docs/rules/no-indexed-access-types.md)                               | ❗  | S   | R   |     | Disallow TypeScript indexed access types                                                                                   |
 | [no-inline-type-import](docs/rules/no-inline-type-import.md)                                   | ❗  | S   | R   |     | Disallow TypeScript inline type imports using import("...")                                                                |
 | [no-literal-property-unions](docs/rules/no-literal-property-unions.md)                         | 📖  | S   | R   |     | Require property literal unions to use named domain types                                                                  |
-| [no-literal-unions](docs/rules/no-literal-unions.md)                                           | 📖  | S   | R   |     | Ban literal unions in favor of enums                                                                                       |
+| [no-literal-unions](docs/rules/no-literal-unions.md)                                           | 📖  | S   | R   |     | Report literal unions for manual migration to enums                                                                        |
 | [no-non-null-assertion](docs/rules/no-non-null-assertion.md)                                   | ❗  | S   | R   |     | Disallow non-null assertions using the "!" postfix operator                                                                |
 | [no-return-type](docs/rules/no-return-type.md)                                                 | ❗  | S   | R   |     | Disallow TypeScript ReturnType utility usage                                                                               |
 | [no-type-assertion](docs/rules/no-type-assertion.md)                                           | 📖  | S   | R   |     | Prevent use of TypeScript "as" type assertions                                                                             |
@@ -220,24 +220,24 @@ Assertions, unions, imports, exported types
 
 Function size, magic values, immutability, sorting
 
-| Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                                                           |
-| :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Enforce a maximum number of lines per function body                                                                                                   |
-| [max-params](docs/rules/max-params.md)                                       | 📖  | S   | R   |     | Enforce a maximum number of function parameters                                                                                                       |
-| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted                                                    |
-| [no-date-now](docs/rules/no-date-now.md)                                     | 📖  | S   | R   |     | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior                                                                 |
-| [no-magic-numbers](docs/rules/no-magic-numbers.md)                           | 📖  | S   | R   |     | Disallow magic numbers; use named constants instead of raw numeric literals                                                                           |
-| [no-magic-strings](docs/rules/no-magic-strings.md)                           | 📖  | S   | R   |     | Disallow magic strings in comparisons and switch cases; use named constants instead                                                                   |
-| [no-map-set-mutation](docs/rules/no-map-set-mutation.md)                     | 📖  | S   | R   |     | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place                                                   |
-| [no-object-mutation](docs/rules/no-object-mutation.md)                       | 📖  | S   | R   |     | Disallow direct object-property mutation; prefer creating new objects with immutable update patterns                                                  |
-| [no-placeholder-implementation](docs/rules/no-placeholder-implementation.md) | ❗  | S   | R   |     | Disallow placeholder, stub, TODO, and not implemented production code                                                                                 |
-| [prefer-nullish-coalescing](docs/rules/prefer-nullish-coalescing.md)         | 📖  | S   | R   |     | Prefer nullish coalescing for locally bound identifier guard ternaries                                                                                |
-| [prefer-object-spread](docs/rules/prefer-object-spread.md)                   | 📖  |     |     | R S | Report empty-target Object.assign calls for manual review before using object spread                                                                  |
-| [prefer-readonly-parameters](docs/rules/prefer-readonly-parameters.md)       | 📖  | S   | R   |     | Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs                                                  |
-| [prefer-string-raw](docs/rules/prefer-string-raw.md)                         | 📖  | S   | R   |     | Prefer String.raw for string literals containing escaped backslashes (Sonar S7780)                                                                    |
-| [prefer-structured-clone](docs/rules/prefer-structured-clone.md)             | 📖  |     |     | R S | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)                                                                        |
-| [sort-functions](docs/rules/sort-functions.md)                               | 📖  | S   | R   |     | Require top-level functions to be sorted alphabetically                                                                                               |
-| [sort-imports](docs/rules/sort-imports.md)                                   | 📖  | S   | R   |     | Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group |
+| Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                          |
+| :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :--------------------------------------------------------------------------------------------------- |
+| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Enforce a maximum number of lines per function body                                                  |
+| [max-params](docs/rules/max-params.md)                                       | 📖  | S   | R   |     | Enforce a maximum number of function parameters                                                      |
+| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted   |
+| [no-date-now](docs/rules/no-date-now.md)                                     | 📖  | S   | R   |     | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior                |
+| [no-magic-numbers](docs/rules/no-magic-numbers.md)                           | 📖  | S   | R   |     | Disallow magic numbers; use named constants instead of raw numeric literals                          |
+| [no-magic-strings](docs/rules/no-magic-strings.md)                           | 📖  | S   | R   |     | Disallow magic strings in comparisons and switch cases; use named constants instead                  |
+| [no-map-set-mutation](docs/rules/no-map-set-mutation.md)                     | 📖  | S   | R   |     | Disallow direct Map and Set mutation methods; rebuild collections instead of mutating them in place  |
+| [no-object-mutation](docs/rules/no-object-mutation.md)                       | 📖  | S   | R   |     | Disallow direct object-property mutation; prefer creating new objects with immutable update patterns |
+| [no-placeholder-implementation](docs/rules/no-placeholder-implementation.md) | ❗  | S   | R   |     | Disallow placeholder, stub, TODO, and not implemented production code                                |
+| [prefer-nullish-coalescing](docs/rules/prefer-nullish-coalescing.md)         | 📖  | S   | R   |     | Prefer nullish coalescing for locally bound identifier guard ternaries                               |
+| [prefer-object-spread](docs/rules/prefer-object-spread.md)                   | 📖  |     |     | R S | Report empty-target Object.assign calls for manual review before using object spread                 |
+| [prefer-readonly-parameters](docs/rules/prefer-readonly-parameters.md)       | 📖  | S   | R   |     | Prefer readonly typing for object and array-like parameters to prevent accidental mutation of inputs |
+| [prefer-string-raw](docs/rules/prefer-string-raw.md)                         | 📖  | S   | R   |     | Prefer native String.raw for eligible escaped string literals                                        |
+| [prefer-structured-clone](docs/rules/prefer-structured-clone.md)             | 📖  |     |     | R S | Review JSON.parse(JSON.stringify(...)) before considering structuredClone(...)                       |
+| [sort-functions](docs/rules/sort-functions.md)                               | 📖  | S   | R   |     | Require top-level functions to be sorted alphabetically                                              |
+| [sort-imports](docs/rules/sort-imports.md)                                   | 📖  | S   | R   |     | Require grouped alphabetical imports without changing runtime dependency order                       |
 
 ### Error Handling
 
@@ -278,7 +278,7 @@ Identical code, control flow, async safety
 | [no-boolean-return-trap](docs/rules/no-boolean-return-trap.md)               | 📖  | S   | R   |     | Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites |
 | [no-eslint-disable](docs/rules/no-eslint-disable.md)                         | 📖  | S   | R   |     | Prevent use of eslint-disable comments                                                                        |
 | [no-flag-argument](docs/rules/no-flag-argument.md)                           | 📖  | S   | R   |     | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects          |
-| [no-floating-promises](docs/rules/no-floating-promises.md)                   | ❗  | S   | R   |     | Disallow floating promises; explicitly handle with await, void, or rejection handlers                         |
+| [no-floating-promises](docs/rules/no-floating-promises.md)                   | ❗  | S   | R   |     | Require handling of explicit, local async, and type-resolved promises                                         |
 | [no-for-in](docs/rules/no-for-in.md)                                         | ❗  | S   | R   |     | Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration                     |
 | [no-identical-branches](docs/rules/no-identical-branches.md)                 | 📖  | S   | R   |     | Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments   |
 | [no-identical-expressions](docs/rules/no-identical-expressions.md)           | ❗  | S   | R   |     | Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)                    |
@@ -291,7 +291,7 @@ Identical code, control flow, async safety
 | [no-ts-nocheck](docs/rules/no-ts-nocheck.md)                                 | ❗  | S   | R   |     | Prevent use of @ts-nocheck comments                                                                           |
 | [no-with](docs/rules/no-with.md)                                             | ❗  | S   | R   |     | Disallow with statements because they make scope resolution unpredictable                                     |
 | [prefer-guard-clauses](docs/rules/prefer-guard-clauses.md)                   | 📖  | S   | R   |     | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow            |
-| [prefer-shortcut-return](docs/rules/prefer-shortcut-return.md)               | 📖  | S   | R   |     | Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions     |
+| [prefer-shortcut-return](docs/rules/prefer-shortcut-return.md)               | 📖  | S   | R   |     | Prefer shortcut boolean returns while preserving comments                                                     |
 | [require-exhaustive-switch](docs/rules/require-exhaustive-switch.md)         | 📖  | S   | R   |     | Require exhaustive switch statements over finite union, enum, and boolean discriminants                       |
 | [require-timeout-for-io](docs/rules/require-timeout-for-io.md)               | ❗  | S   | R   |     | Require timeout or cancellation options for external IO calls                                                 |
 

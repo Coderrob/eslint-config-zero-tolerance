@@ -209,6 +209,25 @@ function hasMatchingBooleanPair(booleanPair: Readonly<IBooleanReturnPair>): bool
 }
 
 /**
+ * Checks the complete replacement span for comments that the rewrite would remove.
+ *
+ * @param sourceCode - ESLint source code helper.
+ * @param startNode - First node replaced by the fix.
+ * @param endNode - Last node replaced by the fix.
+ * @returns Whether the candidate satisfies this check.
+ */
+function hasReplacementComments(
+  sourceCode: Readonly<TSESLint.SourceCode>,
+  startNode: Readonly<TSESTree.Node>,
+  endNode: Readonly<TSESTree.Node>,
+): boolean {
+  return sourceCode.getAllComments().some(
+    /** @param comment - Comment that may be inside the replacement span. */
+    (comment) => comment.range[0] >= startNode.range[0] && comment.range[1] <= endNode.range[1],
+  );
+}
+
+/**
  * Reports if-statements that can be reduced to shortcut boolean returns.
  *
  * @param context - ESLint rule execution context.
@@ -220,6 +239,9 @@ function reportIfShortcutReturn(
 ): void {
   const replacement = resolveReplacement(context.sourceCode, node);
   if (replacement === null) {
+    return;
+  }
+  if (hasReplacementComments(context.sourceCode, node, replacement.endNode)) {
     return;
   }
   context.report({
@@ -341,8 +363,7 @@ export const preferShortcutReturn = createRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description:
-        'Prefer shortcut boolean returns by replacing if/return true-false patterns with direct return expressions',
+      description: 'Prefer shortcut boolean returns while preserving comments',
     },
     fixable: 'code',
     messages: {

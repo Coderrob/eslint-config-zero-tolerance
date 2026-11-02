@@ -9,24 +9,32 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: publish-plugin
+  cancel-in-progress: false
+
 jobs:
   publish:
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ format('refs/tags/{0}', github.event.release.tag_name) }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Verify tag is on main
         run: |
+          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
           git fetch origin '+refs/heads/main:refs/remotes/origin/main'
+          test "$(git rev-parse HEAD)" = "$(git rev-parse --verify "refs/tags/${RELEASE_TAG}^{commit}")"
           git merge-base --is-ancestor HEAD origin/main
 
       - name: Verify release metadata
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: node scripts/release-metadata.mjs verify "$RELEASE_TAG"
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -35,7 +43,7 @@ jobs:
         with:
           node-version: '24.18.0'
           registry-url: https://registry.npmjs.org
-          package-manager-cache: false
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -44,8 +52,13 @@ jobs:
         run: |
           pnpm lint
           pnpm test
-          pnpm build
+          pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+          pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+
+      - name: Preview plugin package
+        working-directory: packages/plugin
+        run: npm pack --dry-run --ignore-scripts
 
       - name: Publish plugin
         working-directory: packages/plugin
-        run: npm publish --access public
+        run: npm publish --access public --provenance --ignore-scripts

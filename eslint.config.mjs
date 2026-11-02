@@ -237,6 +237,12 @@ const eslintRuleTestConfig = {
   rules: eslintPlugin.configs['tests-recommended'].rules,
 };
 
+/** Executes fixed, repository-owned fixtures to compare runtime results and side effects. */
+const behaviorContractConfig = {
+  files: ['packages/plugin/src/rule-behavior-contracts.test.ts'],
+  rules: { 'zero-tolerance/no-unsafe-code-generation': 'off' },
+};
+
 /**
  * Configuration for files and directories to ignore.
  */
@@ -266,5 +272,6 @@ export default [
   testConfig,
   eslintRuleConfig,
   eslintRuleTestConfig,
+  behaviorContractConfig,
   ignoreConfig,
 ];

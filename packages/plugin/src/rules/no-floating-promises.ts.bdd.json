@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/no-floating-promises.ts",
   "module": {
     "name": "no-floating-promises",
-    "description": "Disallow floating promises; explicitly handle with await, void, or rejection handlers.",
+    "description": "Require handling of explicit, local async, and type-resolved promises.",
     "exports": ["noFloatingPromises"]
   },
   "specifications": [
@@ -45,6 +45,59 @@
           "given": "a .then() callback that returns a new unhandled promise",
           "when": "the rule evaluates the code",
           "then": "a noFloatingPromises violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should report stable local async declarations and expressions",
+          "given": "an async function declaration or initialized async arrow/function is called without handling",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "a noFloatingPromises diagnostic is reported even if the declaration follows the call"
+        },
+        {
+          "name": "should respect lexical shadowing and overwritten functions",
+          "given": "a synchronous parameter or local variable shadows an async function, or its binding is overwritten",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the name alone does not produce a false async diagnostic"
+        },
+        {
+          "name": "should keep async binding analysis isolated between files",
+          "given": "an async run function in one file is followed by a synchronous or unresolved run in another",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "only the first file is reported"
+        },
+        {
+          "name": "should distinguish async generators from promise producers",
+          "given": "an async generator declaration or immediate generator invocation returns an iterator",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "no floating promise diagnostic is reported"
+        },
+        {
+          "name": "should recognize promises through optional TypeScript services",
+          "given": "a typed external call or value has a callable then property, including a union with a promise member",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the floating result is reported; synchronous values and noncallable then properties are allowed"
+        },
+        {
+          "name": "should require a terminal rejection handler",
+          "given": "a catch is followed by then or finally without another catch",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the newly produced promise is reported instead of accepting an earlier handler"
+        },
+        {
+          "name": "should reject absent or visibly unsafe rejection callbacks",
+          "given": "a terminal callback is missing, null, undefined, async, or visibly throws or returns Promise.reject",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the expression is reported instead of treating the argument count as proof of handling"
+        },
+        {
+          "name": "should allow deliberate promise handling",
+          "given": "the expression is awaited, returned, explicitly voided or has a usable terminal callback",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "no diagnostic is reported"
         }
       ]
     }

@@ -77,4 +77,4 @@ This rule has no options:
 
 ## Autofix Safety
 
-The fixer replaces a complete contiguous import span in one pass, preserving every declaration and its whitespace separators. When sorting would move a side-effect import or cross comments or executable statements between imports, the rule reports the ordering problem without offering an autofix.
+The fixer may reorder explicit `import type` declarations when the relative order of all runtime dependencies stays the same. Imports with default, namespace, or named bindings can also execute module initialization code; their relative order is preserved just like bare imports. The rule reports ordering problems without fixing them when sorting would change runtime order or cross comments or executable statements.

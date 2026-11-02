@@ -77,6 +77,23 @@
           "then": "both operands and the full expression retain their grouping"
         }
       ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve fallback side effects across parameter boundaries",
+          "given": "a locally bound parameter may be nullish or any falsy or truthy non-nullish value and fallback increments a counter",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the fixed expression returns the same value and invokes fallback exactly as many times as the original"
+        },
+        {
+          "name": "should preserve repeated getter state changes",
+          "given": "a property getter increments a counter each time the guarded expression is read",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the source is unchanged and both original getter reads still occur"
+        }
+      ]
     }
   ]
 }

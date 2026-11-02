@@ -4,12 +4,12 @@ Ban literal union types in favour of enums.
 
 ## Rule Details
 
-| Property        | Value         |
-| --------------- | ------------- |
-| **Type**        | `suggestion`  |
-| **Fixable**     | Yes (limited) |
-| **Recommended** | `warn`        |
-| **Strict**      | `error`       |
+| Property        | Value        |
+| --------------- | ------------ |
+| **Type**        | `suggestion` |
+| **Fixable**     | No           |
+| **Recommended** | `warn`       |
+| **Strict**      | `error`      |
 
 ## Rationale
 
@@ -93,55 +93,6 @@ The utility-type exemption is limited to known TypeScript utility types. Custom 
 type WrappedStatus = CustomUtility<'active' | 'inactive'>;
 ```
 
-## Autofix Behavior
+## Migration safety
 
-This rule can auto-convert string-only type aliases to enums. That includes direct string literal unions and type aliases that reference same-file string literal `const` declarations through `typeof`.
-
-### Auto-fixable
-
-```typescript
-type Status = 'active' | 'inactive';
-// becomes:
-enum Status {
-  Active = 'active',
-  Inactive = 'inactive',
-}
-```
-
-```typescript
-const ACTIVE = 'active';
-const INACTIVE = 'inactive';
-
-type Status = typeof ACTIVE | typeof INACTIVE;
-// becomes:
-enum Status {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-}
-```
-
-```typescript
-const ACTIVE = 'active';
-
-type Status = typeof ACTIVE | 'inactive';
-// becomes:
-enum Status {
-  ACTIVE = 'active',
-  Inactive = 'inactive',
-}
-```
-
-### Not auto-fixable
-
-- Generic aliases (for example `type Status<T> = 'active' | 'inactive'`)
-- Non-alias unions (for example function parameter unions)
-- Property declarations (handled by `no-literal-property-unions`)
-- Unions that contain number members, boolean members, or unresolved `typeof` members
-
-## Configuration
-
-This rule has no options:
-
-```js
-'zero-tolerance/no-literal-unions': 'error'
-```
+This rule reports without an autofix. Replacing a string literal union with an enum changes assignability, emits runtime code, and can introduce a value binding that collides with an existing declaration. A migration must update callers and literal values across the project. For example, a value previously assigned as `"active"` must become `Status.Active`.

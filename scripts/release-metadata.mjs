@@ -5,6 +5,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validatePluginManifest } from './release-helpers.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST_PATH = resolve(ROOT, 'packages/plugin/package.json');
@@ -37,7 +38,11 @@ function parseVersion(version) {
  * @throws When the version or release size is invalid.
  */
 export function nextVersion(currentVersion, releaseSize) {
-  const index = { major: 0, minor: 1, revision: 2 }[releaseSize];
+  const index = new Map([
+    ['major', 0],
+    ['minor', 1],
+    ['revision', 2],
+  ]).get(releaseSize);
   if (index === undefined) {
     throw new Error(`Invalid release size: ${releaseSize}`);
   }
@@ -115,6 +120,7 @@ export function rollChangelog(changelog, currentVersion, newVersion, releaseDate
   validateReleaseDate(releaseDate);
   const newline = changelog.includes('\r\n') ? '\r\n' : '\n';
   const headings = getReleaseHeadings(changelog, currentVersion, newVersion);
+  validateVersionIncrease(currentVersion, newVersion);
   const changes = changelog.slice(headings[0].index + headings[0][0].length, headings[1].index);
   if (!/^[-*] \S/mu.test(changes)) {
     throw new Error('Unreleased section must contain at least one change');
@@ -126,6 +132,20 @@ export function rollChangelog(changelog, currentVersion, newVersion, releaseDate
 }
 
 /**
+ * Requires release versions to advance without accepting malformed or overflowing components.
+ *
+ * @param currentVersion - Previously released stable version.
+ * @param newVersion - Requested stable version.
+ * @throws When the requested release does not advance the current version.
+ */
+function validateVersionIncrease(currentVersion, newVersion) {
+  const previous = parseVersion(currentVersion);
+  const next = parseVersion(newVersion);
+  const difference = next.map((part, index) => part - previous[index]).find((part) => part !== 0);
+  if (difference === undefined || difference < 0) throw new Error('Release version must increase');
+}
+
+/**
  * Checks that a release tag matches the plugin manifest and changelog.
  *
  * @param manifest - Parsed plugin package manifest.
@@ -134,17 +154,34 @@ export function rollChangelog(changelog, currentVersion, newVersion, releaseDate
  * @throws When release metadata does not agree.
  */
 export function verifyReleaseMetadata(manifest, changelog, tag) {
-  if (!VERSION_PATTERN.test(manifest.version) || tag !== `v${manifest.version}`) {
+  validatePluginManifest(manifest);
+  parseVersion(manifest.version);
+  if (tag !== `v${manifest.version}`) {
     throw new Error(`Release tag ${tag} must match plugin version v${manifest.version}`);
   }
-  if (
-    !new RegExp(
-      `^## \\[${manifest.version.replaceAll('.', '\\.')}\\] - \\d{4}-\\d{2}-\\d{2}\\r?$`,
-      'mu',
-    ).test(changelog)
-  ) {
-    throw new Error(`Changelog must contain a dated ${manifest.version} release`);
+  const releases = getVerifiedReleaseHeadings(changelog, manifest.version);
+  validateReleaseDate(releases[1][2]);
+  const notes = changelog.slice(releases[1].index + releases[1][0].length, releases[2]?.index);
+  if (!/^[-*] \S/mu.test(notes))
+    throw new Error('Release section must contain at least one change');
+}
+
+/**
+ * Requires one current dated release immediately after the Unreleased section.
+ *
+ * @param changelog - Changelog contents to verify.
+ * @param version - Expected current release version.
+ * @returns Parsed release headings in source order.
+ * @throws When release headings are missing, duplicated, stale, or undated.
+ */
+function getVerifiedReleaseHeadings(changelog, version) {
+  const releases = [...changelog.matchAll(/^## \[([^\]]+)\](?: - ([^\r\n]+))?\r?$/gmu)];
+  validateUnreleasedHeadings(releases);
+  const matches = releases.filter((release) => release[1] === version);
+  if (matches.length !== 1 || releases[1][1] !== version || !matches[0][2]) {
+    throw new Error(`Changelog must contain a dated ${version} release`);
   }
+  return releases;
 }
 
 /**
@@ -156,6 +193,7 @@ export function verifyReleaseMetadata(manifest, changelog, tag) {
 function run(args) {
   const manifestText = readFileSync(MANIFEST_PATH, 'utf8');
   const manifest = JSON.parse(manifestText);
+  validatePluginManifest(manifest);
   const changelog = readFileSync(CHANGELOG_PATH, 'utf8');
   if (args[0] === 'verify') verifyReleaseCommand(args, manifest, changelog);
   else if (args[0] === 'prepare') prepareReleaseCommand(args, manifestText, manifest, changelog);

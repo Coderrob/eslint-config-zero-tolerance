@@ -132,31 +132,52 @@ describe('sort-imports', () => {
     ],
     invalid: [
       {
+        name: 'should sort explicit type imports without changing runtime dependencies',
+        code: "import type { Z } from 'z';\nimport type { A } from 'a';",
+        output: "import type { A } from 'a';\nimport type { Z } from 'z';",
+        errors: [
+          {
+            messageId: 'unsortedImport',
+          },
+        ],
+      },
+      {
+        name: 'should preserve evaluation order of modules with named exports',
+        code: "import { z } from './z';\nimport { a } from './a';",
+        output: null,
+        errors: [
+          {
+            messageId: 'unsortedImport',
+          },
+        ],
+      },
+
+      {
         name: 'should report two external imports out of alphabetical order',
         code: "import b from 'b';\nimport a from 'a';",
-        output: "import a from 'a';\nimport b from 'b';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'b' } }],
       },
       {
         name: 'should report third external import out of alphabetical order',
         code: "import a from 'a';\nimport c from 'c';\nimport b from 'b';",
-        output: "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: 'b', previous: 'c' } }],
       },
       {
         name: 'should report when first external import is not the smallest',
         code: "import z from 'z';\nimport a from 'a';",
-        output: "import a from 'a';\nimport z from 'z';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'z' } }],
       },
       {
         name: 'should report multiple external imports out of alphabetical order',
         code: "import c from 'c';\nimport a from 'a';\nimport b from 'b';",
-        output: "import a from 'a';\nimport b from 'b';\nimport c from 'c';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: 'a', previous: 'c' } }],
       },
       {
-        name: 'should sort a large reversed import run in one pass',
+        name: 'should report a large reversed runtime import run without changing evaluation order',
         code: [
           "import zeta from 'zeta';",
           "import epsilon from 'epsilon';",
@@ -164,13 +185,7 @@ describe('sort-imports', () => {
           "import beta from 'beta';",
           "import alpha from 'alpha';",
         ].join('\n'),
-        output: [
-          "import alpha from 'alpha';",
-          "import beta from 'beta';",
-          "import delta from 'delta';",
-          "import epsilon from 'epsilon';",
-          "import zeta from 'zeta';",
-        ].join('\n'),
+        output: null,
         errors: [
           { messageId: 'unsortedImport', data: { current: 'epsilon', previous: 'zeta' } },
           { messageId: 'unsortedImport', data: { current: 'delta', previous: 'epsilon' } },
@@ -181,13 +196,13 @@ describe('sort-imports', () => {
       {
         name: 'should report case-insensitive alphabetical violation within external group',
         code: "import b from 'Beta';\nimport a from 'alpha';",
-        output: "import a from 'alpha';\nimport b from 'Beta';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: 'alpha', previous: 'Beta' } }],
       },
       {
         name: 'should report parent import placed before external import',
         code: "import utils from '../utils';\nimport express from 'express';",
-        output: "import express from 'express';\nimport utils from '../utils';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -212,7 +227,7 @@ describe('sort-imports', () => {
       {
         name: 'should report peer import placed before external import',
         code: "import auth from './auth';\nimport express from 'express';",
-        output: "import express from 'express';\nimport auth from './auth';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -237,7 +252,7 @@ describe('sort-imports', () => {
       {
         name: 'should report index import placed before external import',
         code: "import self from '.';\nimport express from 'express';",
-        output: "import express from 'express';\nimport self from '.';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -262,7 +277,7 @@ describe('sort-imports', () => {
       {
         name: 'should report peer import placed before parent import',
         code: "import auth from './auth';\nimport utils from '../utils';",
-        output: "import utils from '../utils';\nimport auth from './auth';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -292,8 +307,7 @@ describe('sort-imports', () => {
           "import beta from 'beta';",
           "import auth from './auth';",
         ].join('\n'),
-        output:
-          "import alpha from 'alpha';\nimport beta from 'beta';\nimport utils from '../utils';\nimport auth from './auth';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -318,7 +332,7 @@ describe('sort-imports', () => {
       {
         name: 'should report index import placed before parent import',
         code: "import self from '.';\nimport utils from '../utils';",
-        output: "import utils from '../utils';\nimport self from '.';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -343,7 +357,7 @@ describe('sort-imports', () => {
       {
         name: 'should report index import placed before peer import',
         code: "import self from '.';\nimport auth from './auth';",
-        output: "import auth from './auth';\nimport self from '.';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -368,13 +382,13 @@ describe('sort-imports', () => {
       {
         name: 'should report peer imports out of alphabetical order',
         code: "import users from './users';\nimport auth from './auth';",
-        output: "import auth from './auth';\nimport users from './users';",
+        output: null,
         errors: [{ messageId: 'unsortedImport', data: { current: './auth', previous: './users' } }],
       },
       {
         name: 'should report parent imports out of alphabetical order',
         code: "import utils from '../utils';\nimport models from '../models';",
-        output: "import models from '../models';\nimport utils from '../utils';",
+        output: null,
         errors: [
           {
             messageId: 'unsortedImport',
@@ -383,14 +397,13 @@ describe('sort-imports', () => {
         ],
       },
       {
-        name: 'should sort a non-adjacent wrongGroup violation in one pass',
+        name: 'should report a non-adjacent wrongGroup violation without rewriting runtime imports',
         code: [
           "import auth from './auth';",
           "import express from 'express';",
           "import path from 'path';",
         ].join('\n'),
-        output:
-          "import express from 'express';\nimport path from 'path';\nimport auth from './auth';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -413,14 +426,13 @@ describe('sort-imports', () => {
         ],
       },
       {
-        name: 'should sort a non-adjacent wrongGroupAfter violation in one pass',
+        name: 'should report a non-adjacent wrongGroupAfter violation without rewriting runtime imports',
         code: [
           "import auth from './auth';",
           "import users from './users';",
           "import express from 'express';",
         ].join('\n'),
-        output:
-          "import express from 'express';\nimport auth from './auth';\nimport users from './users';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -495,7 +507,7 @@ describe('sort-imports', () => {
       {
         name: 'should report external import placed before builtin import',
         code: "import express from 'express';\nimport { dirname } from 'node:path';",
-        output: "import { dirname } from 'node:path';\nimport express from 'express';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',
@@ -520,7 +532,7 @@ describe('sort-imports', () => {
       {
         name: 'should report builtin imports out of alphabetical order',
         code: "import { dirname } from 'node:path';\nimport { readFile } from 'node:fs';",
-        output: "import { readFile } from 'node:fs';\nimport { dirname } from 'node:path';",
+        output: null,
         errors: [
           {
             messageId: 'unsortedImport',
@@ -535,8 +547,7 @@ describe('sort-imports', () => {
           "import auth from './auth';",
           "import express from 'express';",
         ].join('\n'),
-        output:
-          "import 'reflect-metadata';\nimport express from 'express';\nimport auth from './auth';",
+        output: null,
         errors: [
           {
             messageId: 'wrongGroupAfter',

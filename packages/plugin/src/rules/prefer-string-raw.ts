@@ -69,6 +69,8 @@ const RESTRICTED_PARENT_TYPES = new Set([
 const TEMPLATE_BACKTICK = '`';
 const TEMPLATE_INTERPOLATION_START = '${';
 const STRING_RAW_TAG_PREFIX = 'String.raw';
+const WITH_SCOPE_TYPE = 'with';
+const DISABLED_GLOBAL_SETTING = 'off';
 
 type PreferStringRawContext = Readonly<TSESLint.RuleContext<'preferStringRaw', []>>;
 
@@ -100,6 +102,9 @@ function checkStringLiteral(
   node: Readonly<TSESTree.Literal>,
 ): void {
   if (!isStringLiteral(node)) {
+    return;
+  }
+  if (!hasNativeStringAvailable(context, node)) {
     return;
   }
   const replacementValue = getSafeStringRawValue(context.sourceCode, node);
@@ -193,6 +198,39 @@ function hasConvertibleBackslashSource(raw: string): boolean {
     return false;
   }
   return !raw.includes(TEMPLATE_BACKTICK) && !raw.includes(TEMPLATE_INTERPOLATION_START);
+}
+
+/**
+ * Checks configured globals as well as parser scopes before introducing String.raw.
+ *
+ * @param context - ESLint execution context and configured language options.
+ * @param node - Literal whose lexical scope is inspected.
+ * @returns Whether the native String constructor is available at this literal.
+ */
+function hasNativeStringAvailable(
+  context: Readonly<PreferStringRawContext>,
+  node: Readonly<TSESTree.StringLiteral>,
+): boolean {
+  const setting = context.languageOptions.globals?.String;
+  if (setting === DISABLED_GLOBAL_SETTING) return false;
+  return hasNativeStringBinding(context.sourceCode.getScope(node));
+}
+
+/**
+ * Checks lexical scopes before introducing a reference to the native String constructor.
+ *
+ * @param scope - Lexical scope containing the expression.
+ * @returns Whether the candidate satisfies this check.
+ */
+function hasNativeStringBinding(scope: TSESLint.Scope.Scope | null): boolean {
+  if (scope === null) {
+    return false;
+  }
+  if (scope.type === WITH_SCOPE_TYPE) {
+    return false;
+  }
+  const binding = scope.set.get('String');
+  return binding === undefined ? hasNativeStringBinding(scope.upper) : binding.defs.length === 0;
 }
 
 /**
@@ -380,8 +418,7 @@ export const preferStringRaw = createRule({
     type: 'suggestion',
     fixable: 'code',
     docs: {
-      description:
-        'Prefer String.raw for string literals containing escaped backslashes (Sonar S7780)',
+      description: 'Prefer native String.raw for eligible escaped string literals',
     },
     messages: {
       preferStringRaw: 'String.raw should be used to avoid escaping backslashes',

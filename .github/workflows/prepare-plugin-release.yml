@@ -25,19 +25,38 @@ jobs:
   prepare:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.18.0'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Prepare version and changelog
         env:
           RELEASE_SIZE: ${{ inputs.release_size }}
         run: node scripts/release-metadata.mjs prepare "$RELEASE_SIZE" "$(date -u +%F)"
 
+      - name: Validate release candidate
+        run: |
+          pnpm lint
+          pnpm test
+          pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+          pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
+
       - name: Create release pull request
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
         run: |
           set -euo pipefail
           version=$(node -p "require('./packages/plugin/package.json').version")

@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/no-literal-unions.ts",
   "module": {
     "name": "no-literal-unions",
-    "description": "Ban literal unions in favor of enums.",
+    "description": "Report literal unions for manual migration to enums.",
     "exports": ["noLiteralUnions"]
   },
   "specifications": [
@@ -87,6 +87,29 @@
           "given": "const Enabled = true; const Disabled = false; export type Toggle = typeof Enabled | typeof Disabled",
           "when": "the rule evaluates the type alias",
           "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve existing literal assignments and parameter contracts",
+          "given": "a string union is used by a variable or function parameter",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "a violation is reported and source text is unchanged so the valid TypeScript still compiles"
+        },
+        {
+          "name": "should keep constant lookup isolated between files",
+          "given": "one file defines string constants and another refers to undeclared identifiers with the same names",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "only the file with locally resolved literal constants is reported; no lookup state is reused"
+        },
+        {
+          "name": "should preserve value bindings during a manual enum migration",
+          "given": "a type alias has the same name as an existing runtime binding",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the rule reports the union without introducing a colliding enum value"
         }
       ]
     }

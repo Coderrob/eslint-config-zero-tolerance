@@ -8,6 +8,36 @@ describe('prefer-string-raw', () => {
   ruleTester.run('prefer-string-raw', preferStringRaw, {
     valid: [
       {
+        name: 'should preserve literals when the String global is disabled',
+        code: String.raw`const pattern = '\\d+';`,
+        languageOptions: {
+          globals: {
+            String: 'off',
+          },
+        },
+      },
+      {
+        name: 'should preserve literals in dynamically scoped with statements',
+        code: String.raw`with (object) { const pattern = '\\d+'; }`,
+        languageOptions: {
+          sourceType: 'script',
+        },
+      },
+
+      {
+        name: 'should preserve literals when String is a function parameter',
+        code: String.raw`function read(String) { return 'C:\\Users'; }`,
+      },
+      {
+        name: 'should preserve literals when a local String is declared later',
+        code: String.raw`function read() { const path = 'C:\\Users'; const String = custom; return path; }`,
+      },
+      {
+        name: 'should preserve literals when the module binds String',
+        code: String.raw`const String = { raw: () => 'wrong' }; const path = 'C:\\Users';`,
+      },
+
+      {
         code: "const greeting = 'hello world';",
         name: 'should allow string literals without backslashes',
       },
@@ -71,10 +101,22 @@ describe('prefer-string-raw', () => {
     ],
     invalid: [
       {
+        name: 'should resume native String handling after leaving a shadowed function',
+        code: String.raw`function read(String) { return 'C:\\Users'; } const path = 'D:\\Work';`,
+        output:
+          "function read(String) { return 'C:\\\\Users'; } const path = String.raw`D:\\Work`;",
+        errors: [
+          {
+            messageId: 'preferStringRaw',
+          },
+        ],
+      },
+
+      {
         code: String.raw`const path = 'C:\\Users\\dev\\repo';`,
         name: 'should report escaped backslashes in plain string literals',
         errors: [{ messageId: 'preferStringRaw' }],
-        output: "const path = String.raw`C:\\Users\\dev\\repo`;",
+        output: 'const path = String.raw`C:\\Users\\dev\\repo`;',
       },
       {
         code: String.raw`const regexSource = '\\d+\\w+';`,

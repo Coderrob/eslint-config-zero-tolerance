@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/sort-imports.ts",
   "module": {
     "name": "sort-imports",
-    "description": "Require import declarations to be grouped (side-effect -> builtin -> external -> parent -> peer -> index) and sorted alphabetically within each group.",
+    "description": "Require grouped alphabetical imports without changing runtime dependency order.",
     "exports": ["sortImports"]
   },
   "specifications": [
@@ -54,15 +54,38 @@
         },
         {
           "name": "should autofix a complete import run in one pass without partial declarations",
-          "given": "five or more safely contiguous imports appear in reverse order",
+          "given": "five or more safely contiguous explicit import type declarations appear in reverse order",
           "when": "the autofix sorts the declaration span",
           "then": "one whole-span replacement retains every complete import and produces final order in one pass"
         },
         {
           "name": "should report without autofixing unsafe import spans",
-          "given": "sorting would move a side-effect import or cross comments or executable code between imports",
+          "given": "sorting would change the relative order of runtime imports or cross comments or executable code",
           "when": "the rule evaluates the import declarations",
           "then": "ordering violations are reported but no autofix is offered"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve runtime module initialization order",
+          "given": "out-of-order named, default, namespace, or bare imports may initialize shared module state",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "ordering diagnostics are reported without changing runtime dependency order"
+        },
+        {
+          "name": "should sort explicit type imports safely",
+          "given": "out-of-order import type declarations are contiguous and contain no intervening comments or executable statements",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the whole span is sorted while the relative order of runtime imports is retained"
+        },
+        {
+          "name": "should reset collected imports between linted files",
+          "given": "the same linter processes an unsorted module followed by an empty or sorted module",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the later module has no diagnostics inherited from the earlier import collection"
         }
       ]
     }

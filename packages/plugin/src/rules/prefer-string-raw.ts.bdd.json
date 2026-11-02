@@ -4,7 +4,7 @@
   "sourceFile": "packages/plugin/src/rules/prefer-string-raw.ts",
   "module": {
     "name": "prefer-string-raw",
-    "description": "Prefer String.raw for string literals containing escaped backslashes (Sonar S7780).",
+    "description": "Prefer native String.raw for eligible escaped string literals.",
     "exports": ["preferStringRaw"]
   },
   "specifications": [
@@ -57,6 +57,35 @@
           "given": "a safely convertible string immediately follows a return-like keyword or appears in a computed property key",
           "when": "the autofix creates the String.raw expression",
           "then": "required whitespace and surrounding expression grammar remain valid"
+        }
+      ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve literals under a shadowed String parameter",
+          "given": "a function parameter named String supplies a different raw implementation",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the rule does not introduce String.raw and the literal retains its original runtime value"
+        },
+        {
+          "name": "should skip a String binding declared later in the scope",
+          "given": "a literal precedes a local declaration named String",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "no fix introduces a temporal-dead-zone access"
+        },
+        {
+          "name": "should restore native String handling outside a shadowed scope",
+          "given": "one function binds String but the following module literal uses the native constructor",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "only the outer literal is fixed; scope state is not carried across nodes or files"
+        },
+        {
+          "name": "should preserve literals when the String global is disabled",
+          "given": "ESLint globals explicitly configure String as off even if the TypeScript scope contains the built-in symbol",
+          "when": "the rule considers introducing String.raw",
+          "then": "no diagnostic or fix introduces a reference to the disabled global"
         }
       ]
     }

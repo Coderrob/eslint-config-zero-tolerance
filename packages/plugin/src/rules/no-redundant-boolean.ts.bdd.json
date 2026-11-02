@@ -71,6 +71,17 @@
           "then": "truthiness conversion and expression grouping are preserved"
         }
       ]
+    },
+    {
+      "feature": "Parameter and state behavioral contracts",
+      "scenarios": [
+        {
+          "name": "should preserve runtime boolean results across parameter boundaries",
+          "given": "a ternary is evaluated with undefined, null, false, true, zero, one, empty string or nonempty string",
+          "when": "ESLint evaluates the rule or applies its offered fix",
+          "then": "the fixed expression produces the same boolean result and keeps surrounding precedence"
+        }
+      ]
     }
   ]
 }
