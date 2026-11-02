@@ -62,6 +62,8 @@ This monorepo publishes one package:
 
 ## Requirements
 
+The workspace build and test suite runs on Node 24.22.2 and 26.13.0. See [Contributing](CONTRIBUTING.md) for pnpm and development prerequisites.
+
 - ESLint 8.57.0+, 9.x, or 10.x
 - TypeScript-ESLint 8.x
 - TypeScript 5.x

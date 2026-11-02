@@ -71,6 +71,17 @@
           "then": "a noReExport violation is reported"
         }
       ]
+    },
+    {
+      "feature": "Dependency upgrade regression contracts",
+      "scenarios": [
+        {
+          "name": "should allow local declaration shapes and child export assignments",
+          "given": "a non-barrel module directly exports destructured or multiple variables or assigns a child module to export equals",
+          "when": "the rule collects declarations and parent imports",
+          "then": "no parent re-export diagnostic is reported"
+        }
+      ]
     }
   ]
 }

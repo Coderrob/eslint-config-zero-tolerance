@@ -22,9 +22,9 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 - Node.js
   - 18.18.0+ when using ESLint 8.57.0+ or 9.x
   - 20.19.0+, 22.13.0+, or 24.0.0+ when using ESLint 10.x
-  - CI-tested LTS releases: 18.20.8, 20.20.2, 22.23.1, and 24.18.0
+  - CI-tested LTS releases: 18.20.8, 20.20.2, 22.23.4, 24.22.2, and 26.13.0
 - ESLint 8.57.0+, 9.x, or 10.x
-  - CI-tested major releases: 8.57.1, 9.39.5, and 10.7.0
+  - CI-tested major releases: 8.57.1, 9.39.5, and 10.14.0
 - `@typescript-eslint/parser` 8.x
 - TypeScript 5.x
 

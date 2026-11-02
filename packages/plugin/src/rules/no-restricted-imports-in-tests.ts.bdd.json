@@ -48,6 +48,17 @@
           "then": "the configured module roots are trimmed, normalized, deduplicated, and used for matching"
         }
       ]
+    },
+    {
+      "feature": "Dependency upgrade regression contracts",
+      "scenarios": [
+        {
+          "name": "should allow local exports without module sources in test files",
+          "given": "a test file exports its own fixture declaration",
+          "when": "the rule checks the named export",
+          "then": "no restricted import diagnostic is reported"
+        }
+      ]
     }
   ]
 }

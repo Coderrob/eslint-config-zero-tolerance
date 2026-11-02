@@ -6,8 +6,8 @@ Thank you for contributing to `@coderrob/eslint-plugin-zero-tolerance`! This gui
 
 | Tool    | Version                                |
 | ------- | -------------------------------------- |
-| Node.js | 20.20.2, 22.23.1, or 24.18.0 (LTS)     |
-| pnpm    | 10+                                    |
+| Node.js | 24.22.2 or 26.13.0 (LTS)               |
+| pnpm    | 12.16.1                                |
 | Python  | 3.x (only if working on the docs site) |
 
 ## Setup
@@ -22,6 +22,10 @@ pnpm install
 ```
 
 Use `pnpm install` for the workspace root. `npm install` is supported for consumers installing the published plugin into their own projects, but not for bootstrapping this monorepo.
+
+The workspace uses pnpm 12.16.1 and runs its full build, lint, and test suite on Node 24 and 26. Older Node releases are covered by separate packed-package consumer checks. Build permissions and dependency overrides are configured in `pnpm-workspace.yaml`.
+
+TypeScript remains on 5.9.3, the newest release satisfying all current peer requirements: `madge` requires TypeScript 5, and `@typescript-eslint/parser` does not support TypeScript 7. Upgrade the compiler when the dependency graph supports it without peer overrides.
 
 ## Building
 

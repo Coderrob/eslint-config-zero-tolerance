@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Dependency refresh**: Updated npm dependencies to their latest compatible stable releases, including pnpm 12.16.1, ESLint 10.14.0, Jest 30.5.2, tsup 9.0.0, TypeScript-ESLint 8.72.1, and Node 26 types. Retained TypeScript 5.9.3 to satisfy current peer requirements. Migrated pnpm build permissions and overrides to workspace configuration and refreshed transitive security fixes.
+- **Node and workflow support**: Run the full validation suite on Node 24.22.2 and 26.13.0; refresh Node 22 consumer coverage and pinned GitHub Actions. Install consumer-check tooling on Node 24 before selecting the older runtime under test.
+- **Jest 30 coverage contracts**: Added barrel-path, direct export, local test export, anonymous call, and namespace-isolation fixtures; removed an unreachable SQL-report guard after argument validation. Preserve per-rule 95% coverage thresholds.
+
 ### Added
 
 - **Release automation**: Added a manually dispatched plugin release PR workflow with major, minor, and revision choices, version/changelog rollover fixtures, and a GitHub Release workflow that verifies stable tags, public plugin metadata, and main ancestry before npm trusted publication.
