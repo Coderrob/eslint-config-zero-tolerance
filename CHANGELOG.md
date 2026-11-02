@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.7] - 2026-11-02
+
 ### Changed
 
 - **Dependency refresh**: Updated npm dependencies to their latest compatible stable releases, including pnpm 12.16.1, ESLint 10.14.0, Jest 30.5.2, tsup 9.0.0, TypeScript-ESLint 8.72.1, and Node 26 types. Retained TypeScript 5.9.3 to satisfy current peer requirements. Migrated pnpm build permissions and overrides to workspace configuration and refreshed transitive security fixes.
