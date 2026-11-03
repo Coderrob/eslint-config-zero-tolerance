@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/repeated-escape.ts",
+  "module": {
+    "name": "repeated-escape",
+    "description": "Detect publication across repeated loop iterations for persistent local containers.",
+    "exports": ["isRepeatedEscape"]
+  },
+  "specifications": [
+    {
+      "feature": "Detect publication across repeated loop iterations for persistent local containers.",
+      "scenarios": [
+        {
+          "name": "should detect repeated publication",
+          "given": "a container allocated outside a for, for-in, for-of, while, or do-while body",
+          "when": "a later reference publishes the container within the loop",
+          "then": "the write is treated as potentially observable on later iterations"
+        },
+        {
+          "name": "should allow per-iteration allocation",
+          "given": "a container initialized within the loop body",
+          "when": "publication follows mutation",
+          "then": "the allocation remains local before publication in that iteration"
+        },
+        {
+          "name": "should handle nested loops",
+          "given": "a container allocated in an outer body and reused by an inner loop",
+          "when": "the inner loop publishes the container",
+          "then": "the write is treated as observable on later inner iterations"
+        },
+        {
+          "name": "should ignore later publication outside loops",
+          "given": "a container published only after its mutation loop",
+          "when": "the mutation is checked",
+          "then": "the later publication does not imply an earlier escape"
+        },
+        {
+          "name": "should stop at function boundaries",
+          "given": "a write with no enclosing persistent loop",
+          "when": "enclosing syntax is traversed",
+          "then": "the search ends at the function boundary"
+        }
+      ]
+    }
+  ]
+}

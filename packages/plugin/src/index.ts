@@ -28,6 +28,8 @@ import noArrayMutation from './rules/no-array-mutation';
 import noAwaitInLoop from './rules/no-await-in-loop';
 import noBarrelParentImports from './rules/no-barrel-parent-imports';
 import noBooleanReturnTrap from './rules/no-boolean-return-trap';
+import noChaiImpreciseSpyAssertions from './rules/no-chai-imprecise-spy-assertions';
+import noConditionalTestAssertion from './rules/no-conditional-test-assertion';
 import noDateNow from './rules/no-date-now';
 import noDestructuredParameterTypeLiteral from './rules/no-destructured-parameter-type-literal';
 import noDynamicImport from './rules/no-dynamic-import';
@@ -68,12 +70,15 @@ import noReturnType from './rules/no-return-type';
 import noSetIntervalInTests from './rules/no-set-interval-in-tests';
 import noSetTimeoutInTests from './rules/no-set-timeout-in-tests';
 import noShellCommandConstruction from './rules/no-shell-command-construction';
+import noSinonImpreciseSpyAssertions from './rules/no-sinon-imprecise-spy-assertions';
 import noTestInterfaceDeclaration from './rules/no-test-interface-declaration';
 import noThrowLiteral from './rules/no-throw-literal';
 import noTsNocheck from './rules/no-ts-nocheck';
 import noTypeAssertion from './rules/no-type-assertion';
+import noUnawaitedAsyncAssertion from './rules/no-unawaited-async-assertion';
 import noUnsafeCodeGeneration from './rules/no-unsafe-code-generation';
 import noUnsafeJsonParse from './rules/no-unsafe-json-parse';
+import noVitestImpreciseSpyAssertions from './rules/no-vitest-imprecise-spy-assertions';
 import noWith from './rules/no-with';
 import preferGuardClauses from './rules/prefer-guard-clauses';
 import preferNullishCoalescing from './rules/prefer-nullish-coalescing';
@@ -86,6 +91,7 @@ import preferStructuredClone from './rules/prefer-structured-clone';
 import requireBarrelRelativeExports from './rules/require-barrel-relative-exports';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
+import requireErrorCause from './rules/require-error-cause';
 import requireExhaustiveSwitch from './rules/require-exhaustive-switch';
 import requireExportedObjectType from './rules/require-exported-object-type';
 import requireInterfacePrefix from './rules/require-interface-prefix';
@@ -128,6 +134,8 @@ const rules: Record<string, unknown> = {
   'no-array-mutation': noArrayMutation,
   'no-await-in-loop': noAwaitInLoop,
   'no-boolean-return-trap': noBooleanReturnTrap,
+  'no-chai-imprecise-spy-assertions': noChaiImpreciseSpyAssertions,
+  'no-conditional-test-assertion': noConditionalTestAssertion,
   'no-date-now': noDateNow,
   'no-destructured-parameter-type-literal': noDestructuredParameterTypeLiteral,
   'no-dynamic-import': noDynamicImport,
@@ -169,6 +177,7 @@ const rules: Record<string, unknown> = {
   'no-return-type': noReturnType,
   'no-set-interval-in-tests': noSetIntervalInTests,
   'no-set-timeout-in-tests': noSetTimeoutInTests,
+  'no-sinon-imprecise-spy-assertions': noSinonImpreciseSpyAssertions,
   'no-shell-command-construction': noShellCommandConstruction,
   'no-test-interface-declaration': noTestInterfaceDeclaration,
   'no-throw-literal': noThrowLiteral,
@@ -176,6 +185,8 @@ const rules: Record<string, unknown> = {
   'no-type-assertion': noTypeAssertion,
   'no-unsafe-code-generation': noUnsafeCodeGeneration,
   'no-unsafe-json-parse': noUnsafeJsonParse,
+  'no-unawaited-async-assertion': noUnawaitedAsyncAssertion,
+  'no-vitest-imprecise-spy-assertions': noVitestImpreciseSpyAssertions,
   'no-with': noWith,
   'prefer-guard-clauses': preferGuardClauses,
   'prefer-nullish-coalescing': preferNullishCoalescing,
@@ -193,6 +204,7 @@ const rules: Record<string, unknown> = {
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-node-protocol': requireNodeProtocol,
   'require-exhaustive-switch': requireExhaustiveSwitch,
+  'require-error-cause': requireErrorCause,
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,

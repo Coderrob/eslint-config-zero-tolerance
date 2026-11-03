@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/vitest-context-expect.ts",
+  "module": {
+    "name": "vitest-context-expect",
+    "description": "Identifies a local expect value destructured from a Vitest test callback context.",
+    "exports": ["isVitestContextExpect"]
+  },
+  "specifications": [
+    {
+      "feature": "Vitest test-context expect resolution",
+      "scenarios": [
+        {
+          "name": "should resolve destructured expect aliases from Vitest test callbacks",
+          "given": "a Vitest test or it callback destructures expect with an optional local alias",
+          "when": "isVitestContextExpect resolves the callback parameter binding",
+          "then": "returns true"
+        },
+        {
+          "name": "should resolve computed expect property names",
+          "given": "a Vitest test callback destructures the static computed expect key",
+          "when": "isVitestContextExpect inspects the object pattern",
+          "then": "returns true"
+        },
+        {
+          "name": "should reject unrelated destructured parameters",
+          "given": "a function with a destructured expect parameter is not a Vitest test callback",
+          "when": "isVitestContextExpect checks its parent call",
+          "then": "returns false"
+        },
+        {
+          "name": "should reject shadowed or unrelated test bindings",
+          "given": "test is locally shadowed or imported from another package",
+          "when": "the callback binding is resolved",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

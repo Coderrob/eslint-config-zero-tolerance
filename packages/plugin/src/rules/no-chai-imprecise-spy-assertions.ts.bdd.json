@@ -1,0 +1,94 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-chai-imprecise-spy-assertions.ts",
+  "module": {
+    "name": "no-chai-imprecise-spy-assertions",
+    "description": "Require explicit call counts and invocation arguments in Chai-style spy assertions from Chai and Vitest imports.",
+    "exports": ["noChaiImpreciseSpyAssertions"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted Chai-style spy assertions",
+      "scenarios": [
+        {
+          "name": "should allow explicit call counts and numbered arguments",
+          "given": "Chai expect uses callCount or checks getCall(index).args",
+          "when": "the rule checks the assertion",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow argument assertions on an indexed Sinon spy call",
+          "given": "Chai expect receives spy.getCall(index) and calls calledWithExactly or calledWith",
+          "when": "the rule traces the assertion receiver",
+          "then": "no violation is reported because the invocation is explicit"
+        },
+        {
+          "name": "should allow negated called properties",
+          "given": "Chai expect uses not.have.been.called or to.not.be.called",
+          "when": "the rule traces the chain",
+          "then": "no violation is reported because zero calls are required"
+        },
+        {
+          "name": "should allow exact single-call assertions",
+          "given": "Chai expect uses calledOnce or calledOnceWithExactly",
+          "when": "the rule checks the matcher",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore unrelated or shadowed expect bindings",
+          "given": "expect comes from another package or is shadowed by a local parameter",
+          "when": "the rule resolves the binding",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore dynamically computed Chai chain words",
+          "given": "a computed chain member has an unknown property name",
+          "when": "the rule traces the assertion",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Imprecise Chai-style spy assertions",
+      "scenarios": [
+        {
+          "name": "should report positive called properties",
+          "given": "expect imported from chai accesses to.have.been.called",
+          "when": "the rule checks the property assertion",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report calledWith variants",
+          "given": "expect imported from chai or vitest calls calledWith, calledWithExactly, calledWithMatch, or Vitest lastCalledWith on the spy",
+          "when": "the rule checks the method call",
+          "then": "an impreciseSpyAssertion violation requests an exact count and invocation arguments"
+        },
+        {
+          "name": "should report alternate Chai language chains",
+          "given": "a Chai assertion uses to.be.called or that.has.been.calledWith",
+          "when": "the rule traces each language chain",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report Vitest soft Chai-style assertions",
+          "given": "expect.soft imported from vitest asserts to.be.called",
+          "when": "the rule resolves the soft expect binding",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report argument assertions without a call index",
+          "given": "Chai expect receives spy.getCall() without an index and calls calledWith",
+          "when": "the rule checks the assertion receiver",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report namespace and computed Chai assertions",
+          "given": "a chai namespace import invokes expect with a computed assertion chain",
+          "when": "the rule traces the chain",
+          "then": "an impreciseSpyAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

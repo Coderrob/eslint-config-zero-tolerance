@@ -1,72 +1,28 @@
 <p align="center">
-
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
-<img
-    src="public/img/zero-tolerance-icon.png"
-    alt="ESLint Plugin Zero Tolerance"
-    width="200"
-  />
+  <img src="public/img/zero-tolerance-icon.png" alt="Zero Tolerance ESLint plugin" width="200" />
 </p>
 
-<h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
+# @coderrob/eslint-plugin-zero-tolerance
 
-<p align="center">
-  <strong>77 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
-</p>
+83 ESLint rules for readable TypeScript, reliable tests, and safer application code. Use individual rules or the existing recommended and strict configurations.
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
-  <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
-  <img src="https://img.shields.io/badge/coverage-%E2%89%A595%25-brightgreen" alt="Coverage threshold: at least 95%" />
-  <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-</p>
+## What the plugin checks
 
----
+- **Code quality:** function size, repeated expressions, mutation, and naming.
+- **Async work:** missing waits, sequential loops, and IO timeout options.
+- **Error handling:** lost error causes and unsafe throw patterns.
+- **Tests:** persistent mocks, imprecise spy assertions, and assertions that may not run.
+- **Project structure:** imports, exports, documentation, and type usage.
 
-> **Zero tolerance** means every rule earns its place. No warnings you learn to ignore. No exceptions you forget about. Every violation is a conversation about quality — and quality always wins.
-
-## Why Zero Tolerance?
-
-Most linting setups start strict and erode over time. A scattered `eslint-disable` here, an `any` cast there, and before long the rules exist in name only.
-
-This plugin takes the opposite approach:
-
-- **No `eslint-disable` comments** — fix the root cause, don't silence the symptom.
-- **No `any` smuggling** — type assertions and non-null assertions are flagged.
-- **No magic values** — every number and string earns a name.
-- **No leaky tests** — persistent mocks, imprecise matchers, and timer abuse are caught.
-- **No complexity hiding** — functions stay short, parameters stay few, imports stay clean.
-
-The result is a codebase where **the rules are the culture** and the culture is visible in every file.
-
----
-
-## Documentation
-
-|                         |                                                            |
-| ----------------------- | ---------------------------------------------------------- |
-| **Hosted docs**         | <https://coderrob.github.io/eslint-config-zero-tolerance/> |
-| **Rules reference**     | [docs/rules/index.md](docs/rules/index.md)                 |
-| **Configuration guide** | [docs/configuration.md](docs/configuration.md)             |
-
-## Packages
-
-This monorepo publishes one package:
-
-| Package                                                                                                          | Description                         |
-| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 77 custom rules |
-
-`packages/config` is retained as an internal workspace package for development and compatibility testing; it is not published to npm.
+Checks have defined limits. Each [rule page](docs/rules/index.md) explains what is reported, gives examples, and describes cases the rule cannot resolve.
 
 ## Requirements
 
-The workspace build and test suite runs on Node 24.22.2 and 26.13.0. See [Contributing](CONTRIBUTING.md) for pnpm and development prerequisites.
+- ESLint 8.57.0+, 9.x, or 10.x.
+- TypeScript-ESLint 8.x and TypeScript 5.x for TypeScript projects.
+- A Node.js version supported by your ESLint version.
 
-- ESLint 8.57.0+, 9.x, or 10.x
-- TypeScript-ESLint 8.x
-- TypeScript 5.x
+The repository's development prerequisites are listed in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Installation
 
@@ -74,73 +30,68 @@ The workspace build and test suite runs on Node 24.22.2 and 26.13.0. See [Contri
 npm install --save-dev @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
 ```
 
-## Usage
+## Configuration
 
-### ESLint 9+ (Flat Config)
+### Enable individual rules
 
-**Using the recommended preset:**
-
-```javascript
-// eslint.config.js
-import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
-
-export default [
-  zeroTolerance.configs.recommended,
-  // your other configs...
-];
-```
-
-**Using the strict preset:**
+This flat-config example enables selected checks for files in a TypeScript project:
 
 ```javascript
-// eslint.config.js
-import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
-
-export default [
-  zeroTolerance.configs.strict,
-  // your other configs...
-];
-```
-
-**Custom configuration:**
-
-```javascript
-// eslint.config.js
+// eslint.config.mjs
+import tsParser from '@typescript-eslint/parser';
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   {
-    plugins: {
-      'zero-tolerance': zeroTolerance,
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { projectService: true },
     },
+    plugins: { 'zero-tolerance': zeroTolerance },
     rules: {
-      'zero-tolerance/require-interface-prefix': 'error',
-      'zero-tolerance/no-throw-literal': 'error',
-      'zero-tolerance/max-function-lines': ['warn', { max: 40 }],
-      // ... other rules
+      'zero-tolerance/no-array-mutation': 'error',
+      'zero-tolerance/require-timeout-for-io': 'error',
+      'zero-tolerance/require-error-cause': 'error',
+      'zero-tolerance/max-function-lines': ['error', { max: 30 }],
     },
   },
 ];
 ```
 
-### ESLint 8.x (Legacy Config)
+Use projectService when checking types from your TypeScript project. Without type information, rules such as no-array-mutation check only values they can identify from source syntax.
 
-**Using `.eslintrc.js`:**
+### Use an existing preset
 
-```javascript
-module.exports = {
-  plugins: ['@coderrob/zero-tolerance'],
-  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
-  // or for strict mode:
-  // extends: ['plugin:@coderrob/zero-tolerance/legacy-strict'],
-};
-```
+For flat config, use zeroTolerance.configs.recommended or zeroTolerance.configs.strict. For ESLint 8 legacy config, use plugin:@coderrob/zero-tolerance/recommended or plugin:@coderrob/zero-tolerance/strict in extends. See the [configuration guide](docs/configuration.md) for complete setup examples and severity settings.
+
+The require-error-cause rule is individually opt-in. The code-quality improvements do not change published presets.
+
+## Choose and tune checks
+
+Start with the rules that match your team's requirements. Review reported code before changing thresholds or allowing sequential work. Use the rule options to express intentional exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](docs/configuration.md#additional-code-quality-checks-individual-opt-in).
+
+## Product documentation
+
+| Guide                                                                            | What you will find                            |
+| -------------------------------------------------------------------------------- | --------------------------------------------- |
+| [Getting started](docs/getting-started.md)                                       | Installation and initial setup.               |
+| [Configuration](docs/configuration.md)                                           | Presets, individual rules, and options.       |
+| [Rule reference](docs/rules/index.md)                                            | Behavior, examples, and limits for each rule. |
+| [Hosted documentation](https://coderrob.github.io/eslint-config-zero-tolerance/) | The browsable documentation site.             |
+| [Changelog](CHANGELOG.md)                                                        | Changes by release.                           |
+
+## Packages
+
+Only @coderrob/eslint-plugin-zero-tolerance is published to npm. The packages/config workspace is internal and supports development and compatibility testing.
 
 ## Rules
 
 <!-- begin auto-generated rules list -->
 
-The plugin ships **77 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
+The plugin ships **83 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
 
 Preset columns report the configured severity: 💼 for `error`, ⚠️ for `warn`, and 🚫 for `off`. A blank cell means the preset does not configure the rule.
 
@@ -148,10 +99,10 @@ Preset columns report the configured severity: 💼 for `error`, ⚠️ for `war
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
-| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Testing](#testing)                       |    13 | Assertions, mocks, timers, fetch, interfaces        |
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
-| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Error Handling](#error-handling)         |     4 | Throw safety, empty catches, Result patterns        |
 | [Imports](#imports)                       |    12 | Barrels, re-exports, dynamic imports, node protocol |
 | [Bug Prevention](#bug-prevention)         |    20 | Identical code, control flow, async safety          |
 
@@ -186,18 +137,23 @@ JSDoc, BDD specs, optional chaining, readonly props
 
 ### Testing
 
-Test descriptions, mocks, timers, fetch, interfaces
+Assertions, mocks, timers, fetch, interfaces
 
-| Name                                                                           | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                                                                                                                                                                          |
-| :----------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [no-fetch-in-tests](docs/rules/no-fetch-in-tests.md)                           | 📖  |     |     | R S | Disallow fetch usage in test files                                                                                                                                                                                                                                   |
-| [no-jest-have-been-called](docs/rules/no-jest-have-been-called.md)             | 📖  | S   | R   |     | Prohibit toBeCalled, toHaveBeenCalled, toBeCalledWith, toHaveBeenCalledWith, toHaveBeenLastCalledWith, and toLastCalledWith; use toHaveBeenCalledTimes with an explicit call count and toHaveBeenNthCalledWith with an explicit nth-call index and arguments instead |
-| [no-mock-implementation](docs/rules/no-mock-implementation.md)                 | 📖  | S   | R   |     | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds                                                                                                                                                                                 |
-| [no-restricted-imports-in-tests](docs/rules/no-restricted-imports-in-tests.md) | 📖  |     |     | R S | Disallow restricted dependency imports in test files                                                                                                                                                                                                                 |
-| [no-set-interval-in-tests](docs/rules/no-set-interval-in-tests.md)             | 📖  | S   | R   |     | Disallow setInterval usage in test files                                                                                                                                                                                                                             |
-| [no-set-timeout-in-tests](docs/rules/no-set-timeout-in-tests.md)               | 📖  | S   | R   |     | Disallow setTimeout usage in test files                                                                                                                                                                                                                              |
-| [no-test-interface-declaration](docs/rules/no-test-interface-declaration.md)   | 📖  | S   | R   |     | Disallow interface declarations in test files; import production types instead                                                                                                                                                                                       |
-| [require-test-description-style](docs/rules/require-test-description-style.md) | 📖  | S   | R   |     | Enforce that test descriptions start with "should"                                                                                                                                                                                                                   |
+| Name                                                                                   | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                             |
+| :------------------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :---------------------------------------------------------------------------------------------------------------------- |
+| [no-chai-imprecise-spy-assertions](docs/rules/no-chai-imprecise-spy-assertions.md)     | 📖  | S   | R   |     | Require exact Chai-style spy call counts and invocation arguments                                                       |
+| [no-conditional-test-assertion](docs/rules/no-conditional-test-assertion.md)           | ❗  | S   | R   |     | Disallow assertions in test branches that may not execute                                                               |
+| [no-fetch-in-tests](docs/rules/no-fetch-in-tests.md)                                   | 📖  |     |     | R S | Disallow fetch usage in test files                                                                                      |
+| [no-jest-have-been-called](docs/rules/no-jest-have-been-called.md)                     | 📖  | S   | R   |     | Require exact call counts and invocation indices in Jest expect assertions, while allowing negated zero-call assertions |
+| [no-mock-implementation](docs/rules/no-mock-implementation.md)                         | 📖  | S   | R   |     | Prohibit persistent mock implementations; use the Once variants to avoid test bleeds                                    |
+| [no-restricted-imports-in-tests](docs/rules/no-restricted-imports-in-tests.md)         | 📖  |     |     | R S | Disallow restricted dependency imports in test files                                                                    |
+| [no-set-interval-in-tests](docs/rules/no-set-interval-in-tests.md)                     | 📖  | S   | R   |     | Disallow setInterval usage in test files                                                                                |
+| [no-set-timeout-in-tests](docs/rules/no-set-timeout-in-tests.md)                       | 📖  | S   | R   |     | Disallow setTimeout usage in test files                                                                                 |
+| [no-sinon-imprecise-spy-assertions](docs/rules/no-sinon-imprecise-spy-assertions.md)   | 📖  | S   | R   |     | Require exact Sinon spy call counts and invocation arguments                                                            |
+| [no-test-interface-declaration](docs/rules/no-test-interface-declaration.md)           | 📖  | S   | R   |     | Disallow interface declarations in test files; import production types instead                                          |
+| [no-unawaited-async-assertion](docs/rules/no-unawaited-async-assertion.md)             | ❗  | S   | R   |     | Require asynchronous test assertions to be awaited or returned                                                          |
+| [no-vitest-imprecise-spy-assertions](docs/rules/no-vitest-imprecise-spy-assertions.md) | 📖  | S   | R   |     | Require exact Vitest spy call counts and invocation indices                                                             |
+| [require-test-description-style](docs/rules/require-test-description-style.md)         | 📖  | S   | R   |     | Enforce that test descriptions start with "should"                                                                      |
 
 ### Type Safety
 
@@ -224,9 +180,9 @@ Function size, magic values, immutability, sorting
 
 | Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                          |
 | :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :--------------------------------------------------------------------------------------------------- |
-| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Enforce a maximum number of lines per function body                                                  |
+| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Limit block and expression function bodies with optional blank/comment exclusions                    |
 | [max-params](docs/rules/max-params.md)                                       | 📖  | S   | R   |     | Enforce a maximum number of function parameters                                                      |
-| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted   |
+| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating methods on known arrays and tuples                                                 |
 | [no-date-now](docs/rules/no-date-now.md)                                     | 📖  | S   | R   |     | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior                |
 | [no-magic-numbers](docs/rules/no-magic-numbers.md)                           | 📖  | S   | R   |     | Disallow magic numbers; use named constants instead of raw numeric literals                          |
 | [no-magic-strings](docs/rules/no-magic-strings.md)                           | 📖  | S   | R   |     | Disallow magic strings in comparisons and switch cases; use named constants instead                  |
@@ -250,6 +206,7 @@ Throw safety, empty catches, Result patterns
 | [no-empty-catch](docs/rules/no-empty-catch.md)             | ❗  | S   | R   |     | Disallow empty catch blocks that silently swallow errors                                                  |
 | [no-throw-literal](docs/rules/no-throw-literal.md)         | ❗  | S   | R   |     | Disallow throwing literals, objects, or templates; always throw a new Error instance                      |
 | [prefer-result-return](docs/rules/prefer-result-return.md) | 📖  |     | S   | R   | Prefer Result-style return values instead of throw statements to make error flows explicit and composable |
+| [require-error-cause](docs/rules/require-error-cause.md)   | ❗  |     |     |     | Preserve the caught exception when throwing a replacement error                                           |
 
 ### Imports
 
@@ -276,93 +233,69 @@ Identical code, control flow, async safety
 
 | Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                   |
 | :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :------------------------------------------------------------------------------------------------------------ |
-| [no-await-in-loop](docs/rules/no-await-in-loop.md)                           | ❗  | S   | R   |     | Disallow await expressions inside loops; use Promise.all() for parallel execution                             |
+| [no-await-in-loop](docs/rules/no-await-in-loop.md)                           | ❗  | S   | R   |     | Review await inside loops with configurable sequential-work exceptions                                        |
 | [no-boolean-return-trap](docs/rules/no-boolean-return-trap.md)               | 📖  | S   | R   |     | Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites |
 | [no-eslint-disable](docs/rules/no-eslint-disable.md)                         | 📖  | S   | R   |     | Prevent use of eslint-disable comments                                                                        |
 | [no-flag-argument](docs/rules/no-flag-argument.md)                           | 📖  | S   | R   |     | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects          |
 | [no-floating-promises](docs/rules/no-floating-promises.md)                   | ❗  | S   | R   |     | Require handling of explicit, local async, and type-resolved promises                                         |
 | [no-for-in](docs/rules/no-for-in.md)                                         | ❗  | S   | R   |     | Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration                     |
 | [no-identical-branches](docs/rules/no-identical-branches.md)                 | 📖  | S   | R   |     | Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments   |
-| [no-identical-expressions](docs/rules/no-identical-expressions.md)           | ❗  | S   | R   |     | Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)                    |
+| [no-identical-expressions](docs/rules/no-identical-expressions.md)           | ❗  | S   | R   |     | Report repeated stable operands in comparisons and logical expressions                                        |
 | [no-labels](docs/rules/no-labels.md)                                         | ❗  | S   | R   |     | Disallow labels because they make control flow harder to reason about                                         |
 | [no-math-random](docs/rules/no-math-random.md)                               | ❗  | S   | R   |     | Disallow Math.random(); inject randomness explicitly or use a dedicated random source                         |
 | [no-parameter-reassign](docs/rules/no-parameter-reassign.md)                 | 📖  | S   | R   |     | Disallow assignments and updates to function parameters; use a new local variable instead                     |
 | [no-process-env-outside-config](docs/rules/no-process-env-outside-config.md) | ❗  | S   | R   |     | Disallow process.env reads outside configuration modules; import typed config instead                         |
-| [no-query-side-effects](docs/rules/no-query-side-effects.md)                 | 📖  | S   | R   |     | Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier     |
+| [no-query-side-effects](docs/rules/no-query-side-effects.md)                 | 📖  | S   | R   |     | Disallow observable mutation in query functions while allowing local computation                              |
 | [no-redundant-boolean](docs/rules/no-redundant-boolean.md)                   | 📖  | S   | R   |     | Disallow redundant comparisons to boolean literals (Sonar S1125)                                              |
 | [no-ts-nocheck](docs/rules/no-ts-nocheck.md)                                 | ❗  | S   | R   |     | Prevent use of @ts-nocheck comments                                                                           |
 | [no-with](docs/rules/no-with.md)                                             | ❗  | S   | R   |     | Disallow with statements because they make scope resolution unpredictable                                     |
 | [prefer-guard-clauses](docs/rules/prefer-guard-clauses.md)                   | 📖  | S   | R   |     | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow            |
 | [prefer-shortcut-return](docs/rules/prefer-shortcut-return.md)               | 📖  | S   | R   |     | Prefer shortcut boolean returns while preserving comments                                                     |
 | [require-exhaustive-switch](docs/rules/require-exhaustive-switch.md)         | 📖  | S   | R   |     | Require exhaustive switch statements over finite union, enum, and boolean discriminants                       |
-| [require-timeout-for-io](docs/rules/require-timeout-for-io.md)               | ❗  | S   | R   |     | Require timeout or cancellation options for external IO calls                                                 |
+| [require-timeout-for-io](docs/rules/require-timeout-for-io.md)               | ❗  | S   | R   |     | Require API-specific timeout or cancellation options for external IO calls                                    |
 
 <!-- end auto-generated rules list -->
 
-## Development
+## Repository development
 
-> This repository itself is a `pnpm` workspace and **dogfoods its own rules** through [`eslint.config.mjs`](eslint.config.mjs). Every source file in the plugin must pass the same rules it enforces on consumers.
+### Dogfooding
 
-### Setup
+This repository applies its plugin through [eslint.config.mjs](eslint.config.mjs). The seven updated rules are explicitly enabled as errors for TypeScript source and repository scripts, including the opt-in require-error-cause rule.
+
+| Files              | Enforcement                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript source  | Existing strict rules plus the explicit repository checks; function bodies are limited to 15 lines.                                                     |
+| Repository scripts | The seven updated rules plus shared correctness checks; function bodies use the rule's 30-line default.                                                 |
+| Tests              | Existing test-specific exceptions remain: function length and checks requiring a TypeScript project are disabled. IO checks skip test files by default. |
+
+CI runs pnpm lint, which builds the plugin before applying it. Configuration tests verify that the updated rules are enabled and report representative violations. Public presets are unchanged by this repository configuration.
+
+### Validate changes
 
 ```bash
 pnpm install
-```
-
-### Building
-
-```bash
-pnpm build
-```
-
-### Testing
-
-```bash
+pnpm lint
 pnpm test
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
 ```
 
-Coverage gates are enforced per-file at **95%** minimum across statements, branches, functions, and lines. The static badge reports this enforced contract rather than a generated point-in-time percentage.
+Rule tests include accepted and rejected cases, behavior-based names, explicit diagnostics, and autofix outputs where applicable. Coverage thresholds are at least 95% for each rule. See the [contributor guide](CONTRIBUTING.md) for all requirements.
 
-### README Sync
+File-based contracts in [test/consumers/rule-contracts](test/consumers/rule-contracts/README.md) run the built plugin against known violations and matching valid files. They verify exact diagnostics and run with `pnpm test`.
+
+### Keep the rule catalog current
 
 ```bash
 pnpm readme:sync
 pnpm validate:readme
 ```
 
-`eslint-doc-generator` builds the root rule catalog from the published plugin shape and deterministic category metadata in `scripts/metadata/readme-rule-catalog.json`. It verifies rule documentation links and derives error, warning, and off states from the exported presets.
+The rule catalog is generated from the built plugin and scripts/metadata/readme-rule-catalog.json. Update rule pages and BDD specifications when behavior changes.
 
-### Type Checking
+## Releases
 
-```bash
-pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
-pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
-```
-
-### Dependency Graph
-
-```bash
-pnpm deps:graph
-pnpm deps:circular
-```
-
-## Publishing
-
-Only `@coderrob/eslint-plugin-zero-tolerance` is published. To prepare a release, run the **Prepare plugin release** GitHub Actions workflow on `main` and choose `major`, `minor`, or `revision` (`revision` means a patch bump). The workflow opens a release PR that updates `packages/plugin/package.json`, moves the current `[Unreleased]` changelog entries into a dated version section, and creates a fresh `[Unreleased]` section. It also starts CI for the release branch. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings, then review the changelog and merge the PR after CI passes.
-
-After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin with provenance. Add a granular npm access token with direct publishing access as the repository Actions secret `NPM_TOKEN` before publishing.
-
-To retry a failed npm publication, run **Publish plugin to npm** manually from `main` and enter the existing published GitHub Release tag as `release_tag`. The workflow repeats the release checks and uses the same `NPM_TOKEN` secret. npm rejects a retry if that package version has already been published.
-
-The equivalent local checks are:
-
-```bash
-pnpm lint
-pnpm test
-pnpm build
-```
-
-The internal config workspace package is not published.
+Only the plugin package is published. Follow the [release process](CONTRIBUTING.md#publishing) to prepare a version, review its changelog, and publish through GitHub Actions.
 
 ## License
 

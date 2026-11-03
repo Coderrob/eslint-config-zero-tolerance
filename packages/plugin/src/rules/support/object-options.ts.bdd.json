@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/object-options.ts",
+  "module": {
+    "name": "object-options",
+    "description": "readOption resolves its effective property.",
+    "exports": ["readOption"]
+  },
+  "specifications": [
+    {
+      "feature": "Conservative static resolution",
+      "scenarios": [
+        {
+          "name": "should resolve local options",
+          "given": "a stable inline or locally initialized object",
+          "when": "readOption resolves its effective property",
+          "then": "the matching static initializer property is returned"
+        },
+        {
+          "name": "should honor spread and override order",
+          "given": "known spreads, duplicate keys, or later unknown spreads",
+          "when": "properties are inspected from right to left",
+          "then": "the final effective value is returned or uncertainty blocks acceptance"
+        },
+        {
+          "name": "should reject unsafe property resolution",
+          "given": "computed unknown keys, accessors, cycles, or directly mutated local objects",
+          "when": "readOption examines the requested property",
+          "then": "null is returned rather than trusting an unreliable initializer"
+        },
+        {
+          "name": "should allow unrelated properties",
+          "given": "known literal properties and spreads lacking the requested key",
+          "when": "the object is resolved",
+          "then": "earlier matching properties remain effective"
+        },
+        {
+          "name": "should retain mutation checks through TypeScript wrappers",
+          "given": "an options identifier wrapped in assertions whose property was directly reassigned",
+          "when": "an option is read",
+          "then": "the initializer is rejected as unreliable even when the identifier is wrapped"
+        },
+        {
+          "name": "should detect writes through asserted receivers",
+          "given": "as, satisfies, angle-bracket, or non-null wrappers around the receiver of an options property",
+          "when": "an assignment, update, or delete is inspected",
+          "then": "the options initializer is rejected, while reads through the same wrappers remain valid"
+        }
+      ]
+    }
+  ]
+}

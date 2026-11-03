@@ -4,71 +4,372 @@
   "sourceFile": "packages/plugin/src/rules/no-query-side-effects.ts",
   "module": {
     "name": "no-query-side-effects",
-    "description": "Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier.",
+    "description": "Keep query functions from changing shared state while allowing local calculations.",
     "exports": ["noQuerySideEffects"]
   },
   "specifications": [
     {
-      "feature": "Pure query functions",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow a query function that only reads and returns a value",
-          "given": "a function named getName that returns a property without mutations",
-          "when": "the rule evaluates the function",
-          "then": "no violation is reported"
+          "name": "should allow asserted fresh array construction",
+          "given": "function getList() { const list = [] as number[]; list.push(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow a non-query function that contains side effects",
-          "given": "a function named updateCount that increments a counter",
-          "when": "the rule evaluates the function",
-          "then": "no violation is reported"
+          "name": "should allow satisfies fresh object construction",
+          "given": "function getResult() { const result = { value: 0 } satisfies { value: number }; result.value = 1; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow a nested inner function with side effects inside a query function",
-          "given": "a get function that contains a nested inner function performing mutations",
-          "when": "the rule evaluates the code",
-          "then": "no violation is reported as the inner function is a separate scope"
+          "name": "should allow angle asserted fresh array construction",
+          "given": "function getList() { const list = <number[]>[]; list.push(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow mutating a locally-declared collection to build a return value",
-          "given": "a get function that declares a local Map, populates it, and returns it",
-          "when": "the rule evaluates the mutating call on the local Map",
-          "then": "no violation is reported because the mutated object was declared within the same scope"
+          "name": "should allow nonnull fresh object construction",
+          "given": "function getResult() { const result = ({ value: 0 })!; result.value++; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow mutating a locally-declared array to build a return value",
-          "given": "a get function that declares a local array, pushes items, and returns it",
-          "when": "the rule evaluates the push call on the local array",
-          "then": "no violation is reported because the mutated object is a local collection"
-        }
-      ]
-    },
-    {
-      "feature": "Side effects in query functions",
-      "scenarios": [
-        {
-          "name": "should report an assignment to an outer-scope variable inside a get function",
-          "given": "a function named getCount that reassigns an external variable total",
-          "when": "the rule evaluates the assignment expression",
-          "then": "a noQuerySideEffects violation is reported"
+          "name": "should allow optional computed local array mutation",
+          "given": "function getList() { const list = []; list?.[\"push\"]?.(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report an update expression inside an is function",
-          "given": "a function named isReady that increments an external counter",
-          "when": "the rule evaluates the update expression",
-          "then": "a noQuerySideEffects violation is reported"
+          "name": "should allow local shadowing of outer state",
+          "given": "let count = 0; function getCount() { let count = 1; count++; return count; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a mutating method call on an externally-scoped collection inside a has function",
-          "given": "a function named hasItems that calls push on a parameter-provided array",
-          "when": "the rule evaluates the call expression",
-          "then": "a noQuerySideEffects violation is reported"
+          "name": "should allow computed data writes with unrelated accessor",
+          "given": "function getResult() { const result = { set other(value) { external = value; }, value: 0 }; result[\"value\"] = 1; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report delete of an external object property inside a can function",
-          "given": "a function named canProceed that deletes a property on a parameter-passed object",
-          "when": "the rule evaluates the unary delete expression",
-          "then": "a noQuerySideEffects violation is reported"
+          "name": "should allow containers recreated per iteration",
+          "given": "function getItems(values) { for (const value of values) { const result = []; result.push(value); publish(result); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow containers published after the loop",
+          "given": "function getItems(values) { const result = []; for (const value of values) { result.push(value); } publish(result); return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow per-iteration object writes",
+          "given": "function getItems(values) { for (const value of values) { const result = {}; result.value = value; publish(result); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow containers recreated in nested loops",
+          "given": "function getItems(values) { for (const group of values) { for (const value of group) { const result = []; result.push(value); publish(result); } } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow later escapes outside loops",
+          "given": "function getItems() { const result = []; result.push(1); publish(result); return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow deleting a local accessor without invoking it",
+          "given": "function getValue() { const local = { set value(v) { shared.value = v; } }; delete local.value; return local; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow writes to unrelated data properties",
+          "given": "function getValue() { const local = { set value(v) { shared.value = v; } }; local.other = 1; return local; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow writes beside static computed accessors",
+          "given": "function getValue() { const local = { set [\"value\"](v) { shared.value = v; } }; local.other = 1; return local; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local data properties copied with spread",
+          "given": "function getValue(input) { const local = { ...input }; local.value = 1; return local; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local counters",
+          "given": "function getTotal() { let total = 0; total += 1; total++; return total; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local array building",
+          "given": "function getItems() { const items = []; items.push(1); return items; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local object construction",
+          "given": "function getValue() { const result = {}; result.value = 1; delete result.value; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow block-local computation",
+          "given": "function getTotal() { if (flag) { let n = 0; n++; return n; } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local parameter rebinding",
+          "given": "function getValue(value) { value = 1; return value; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow pure get function",
+          "given": "function getName(user: {name: string}) { return user.name; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow modifier function with assignment",
+          "given": "function updateName(user: {name: string}) { user.name = \"x\"; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow query function with nested modifier function side effect",
+          "given": "function getResult() { function update() { count++; } return 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow non-mutating method call in query function",
+          "given": "function getResult(list: string[]) { return list.slice(0).join(\",\"); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow direct call expression in query function",
+          "given": "function getResult() { return compute(); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow non-delete unary expression in query function",
+          "given": "function getCount(value: number) { return -value; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow top-level side effect outside any query function scope",
+          "given": "counter = counter + 1;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should reject asserted aliases of shared objects",
+          "given": "function getResult(shared) { const result = shared as { value: number }; result.value++; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"noQuerySideEffects\"}]"
+        },
+        {
+          "name": "should retain publication checks for asserted fresh arrays",
+          "given": "function getList() { const list = [] as number[]; publish(list); list.push(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"noQuerySideEffects\"}]"
+        },
+        {
+          "name": "should retain accessor checks through assertions",
+          "given": "function getResult() { const result = ({ set value(next) { external = next; } }) as { value: number }; result.value = 1; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"noQuerySideEffects\"}]"
+        },
+        {
+          "name": "should retain loop publication checks for asserted arrays",
+          "given": "function getList() { const list = [] as number[]; for (const item of items) { list.push(item); publish(list); } return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"noQuerySideEffects\"}]"
+        },
+        {
+          "name": "should report optional computed shared mutation",
+          "given": "function getList(list) { list?.[\"push\"]?.(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report mutation through asserted shared receiver",
+          "given": "function getList(list) { (list as number[]).push(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report computed local setter effects",
+          "given": "function getResult() { const result = { set value(next) { external = next; } }; result[\"value\"] = 1; return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escaped local array optional mutation",
+          "given": "function getList() { const list = []; publish(list); list?.push?.(1); return list; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report reused arrays published within for-of loops",
+          "given": "function getItems(values) { const result = []; for (const value of values) { result.push(value); publish(result); } return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escapes in while loops",
+          "given": "function getItems() { const result = []; while (more()) { result.push(1); publish(result); } return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escapes in do-while loops",
+          "given": "function getItems() { const result = []; do { result.push(1); publish(result); } while (more()); return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escapes in for-in loops",
+          "given": "function getItems(values) { const result = []; for (const key in values) { result.push(key); publish(result); } return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escapes from for initializer allocations",
+          "given": "function getItems() { for (const result = []; more();) { result.push(1); publish(result); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report inner-loop escapes of outer-body allocations",
+          "given": "function getItems(values) { for (const group of values) { const result = []; for (const value of group) { result.push(value); publish(result); } } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report reused objects published within loops",
+          "given": "function getItems(values) { const result = {}; for (const value of values) { result.value = value; publish(result); } return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report conditional later publications",
+          "given": "function getItems(values) { const result = []; for (const value of values) { result.push(value); if (ready) publish(result); } return result; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report setters on fresh local objects",
+          "given": "function getValue() { const local = { set value(v) { shared.value = v; } }; local.value = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report quoted setter names",
+          "given": "function getValue() { const local = { set \"value\"(v) { shared.value = v; } }; local[\"value\"] = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report computed setter names",
+          "given": "function getValue() { const local = { set [key](v) { shared.value = v; } }; local.value = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report static computed setters",
+          "given": "function getValue() { const local = { set [\"value\"](v) { shared.value = v; } }; local.value++; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report dynamic writes when an accessor may match",
+          "given": "function getValue(key) { const local = { set value(v) { shared.value = v; } }; local[key] = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report arbitrary mutator methods on local objects",
+          "given": "function getValue() { const actions = { set: writeToDatabase }; actions.set(); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report mutation through an argument alias",
+          "given": "function getValue(input) { const alias = input; alias.x = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report closure state changes",
+          "given": "let count = 0; function getValue() { count++; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report nested shared properties",
+          "given": "function getValue(input) { const local = { input }; local.input.x = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report escaped containers",
+          "given": "function getValue() { const local = {}; publish(local); local.x = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report captured containers",
+          "given": "function getValue() { const local = {}; const read = () => local; local.x = 1; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should report destructuring into shared state",
+          "given": "function getValue(input) { ({ x: shared } = input); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects' }]"
+        },
+        {
+          "name": "should disallow assignment in get function",
+          "given": "function getCount() { total = total + 1; return total; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [\n          { messageId: 'noQuerySideEffects', data: { name: 'getCount', kind: 'assignment' } },\n        ]"
+        },
+        {
+          "name": "should disallow update expression in is function",
+          "given": "const isReady = () => { counter++; return true; };",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects', data: { name: 'isReady', kind: 'update' } }]"
+        },
+        {
+          "name": "should disallow mutating method call in has function",
+          "given": "function hasItems(list: string[]) { list.push(\"x\"); return list.length > 0; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [\n          {\n            messageId: 'noQuerySideEffects',\n            data: { name: 'hasItems', kind: 'mutating call \"push\"' },\n          },\n        ]"
+        },
+        {
+          "name": "should disallow delete in can function",
+          "given": "function canProceed(state: {ok?: boolean}) { delete state.ok; return true; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noQuerySideEffects', data: { name: 'canProceed', kind: 'delete' } }]"
         }
       ]
     }

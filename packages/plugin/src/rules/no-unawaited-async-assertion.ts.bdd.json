@@ -1,0 +1,70 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-unawaited-async-assertion.ts",
+  "module": {
+    "name": "no-unawaited-async-assertion",
+    "description": "Requires direct asynchronous test assertions to be awaited or returned across Jest, Vitest, and Chai-as-promised forms.",
+    "exports": ["noUnawaitedAsyncAssertion"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted asynchronous assertions",
+      "scenarios": [
+        {
+          "name": "should allow awaited and returned assertions",
+          "given": "a Jest, Vitest, or Chai-as-promised assertion is awaited or returned",
+          "when": "the rule checks expression statements in a test file",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow assertions stored for later handling",
+          "given": "an async assertion is assigned to a variable instead of discarded",
+          "when": "the rule checks the declaration",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow Chai completion notification",
+          "given": "a Chai-as-promised assertion ends with notify(done)",
+          "when": "the rule checks the assertion statement",
+          "then": "no violation is reported because completion is passed to the callback"
+        },
+        {
+          "name": "should ignore synchronous and unsupported assertions",
+          "given": "a synchronous assertion, unrelated expect binding, or non-test file is checked",
+          "when": "the rule resolves the assertion entry point",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Discarded asynchronous assertions",
+      "scenarios": [
+        {
+          "name": "should report discarded Jest promise matchers",
+          "given": "a Jest expect resolves or rejects matcher is used as a statement",
+          "when": "the rule traces the assertion chain",
+          "then": "an unawaitedAsyncAssertion violation is reported"
+        },
+        {
+          "name": "should report Vitest soft polling and browser assertions",
+          "given": "a Vitest soft promise matcher, local test-context expect, expect.poll, or expect.element assertion is discarded",
+          "when": "the rule resolves imports, globals, and computed properties",
+          "then": "an unawaitedAsyncAssertion violation is reported"
+        },
+        {
+          "name": "should report Chai-as-promised expect and assert forms",
+          "given": "a Chai eventually, rejected, fulfilled, rejectedWith, become, or asynchronous assert result is discarded",
+          "when": "the rule traces imported and namespace assertion chains",
+          "then": "an unawaitedAsyncAssertion violation is reported"
+        },
+        {
+          "name": "should report void-discarded and parenthesized async assertions",
+          "given": "a void-prefixed or optional assertion call spans comments and computed properties",
+          "when": "the rule unwraps the statement and traces its matcher",
+          "then": "an unawaitedAsyncAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

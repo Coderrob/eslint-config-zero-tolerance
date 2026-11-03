@@ -4,41 +4,164 @@
   "sourceFile": "packages/plugin/src/rules/max-function-lines.ts",
   "module": {
     "name": "max-function-lines",
-    "description": "Enforce a maximum number of lines per function body.",
-    "exports": ["maxFunctionLines"]
+    "description": "Keep function bodies short enough to read and review.",
+    "exports": [
+      "maxFunctionLines"
+    ]
   },
   "specifications": [
     {
-      "feature": "Valid function sizes",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow a function whose body is within the configured line limit",
-          "given": "a function whose body has fewer lines than the configured maximum",
-          "when": "the rule evaluates the function",
-          "then": "no violation is reported"
+          "name": "should ignore multiple comments on one line",
+          "given": "function f() {\n/* first */ /* second */\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipComments: true }]",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow an empty function body",
-          "given": "a function with an empty block body",
-          "when": "the rule evaluates the function",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Oversized function body",
-      "scenarios": [
-        {
-          "name": "should report when a function body exceeds the configured maximum",
-          "given": "a function whose body has more lines than the configured maximum",
-          "when": "the rule evaluates the function",
-          "then": "a maxFunctionLines violation is reported on the function node"
+          "name": "should count CRLF function lines at exact limit",
+          "given": "function f() {\r\nreturn 1;\r\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report for arrow functions that exceed the limit",
-          "given": "an arrow function whose body exceeds the maximum line count",
-          "when": "the rule evaluates the arrow function",
-          "then": "a maxFunctionLines violation is reported"
+          "name": "should allow short asserted expression bodies",
+          "given": "const f = () => (value as number);",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore comment text inside template as code",
+          "given": "const f = () => `// literal\n/* literal */`;",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipComments: true }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore blank and comment lines",
+          "given": "function f() {\n\n// comment\n/* multi\nline */\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipBlankLines: true, skipComments: true }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore comments without ignoring blanks",
+          "given": "function f() {\n// comment\n\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_FOUR, skipComments: true }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore blank lines only",
+          "given": "function f() {\n\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipBlankLines: true }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for a 3-line named function with default limit",
+          "given": "function small() {\n  const a = 1;\n}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for a 1-line arrow function",
+          "given": "const fn = () => { return 1; };",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for a function with exactly 30 lines with max 30",
+          "given": "the fixture should pass for a function with exactly 30 lines with max 30",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THIRTY }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for a 5-line function expression assigned to const",
+          "given": "const fn = function() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n};",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for an arrow function expression body without braces",
+          "given": "const fn = (x: number) => x * 2;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should count code beside block comments",
+          "given": "function f() {\n/* comment */ run();\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipComments: true }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should count multiline asserted expression bodies",
+          "given": "const f = () => ([\n1,\n2,\n3\n] as number[]);",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should count template content that resembles comments",
+          "given": "const f = () => `first\n// content\n/* content */\nlast`;",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipComments: true }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should count comments when only blanks are excluded",
+          "given": "function f() {\n// first\n// second\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipBlankLines: true }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should count expression-bodied arrows",
+          "given": "const fn = () => [\n  1,\n  2,\n  3\n];",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should retain mixed code and comments",
+          "given": "function f() {\nconst x = 1; // comment\nreturn x;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE, skipComments: true }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should count comments by default",
+          "given": "function f() {\n// comment\nreturn 1;\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should error for a named function exceeding max with options",
+          "given": "the fixture should error for a named function exceeding max with options",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_FIVE }]",
+          "then": "the expected diagnostic is reported: [\n          {\n            messageId: 'tooManyLines',\n            data: { name: 'tooBig', lines: TOO_BIG_LINE_COUNT, max: MAX_FIVE },\n          },\n        ]"
+        },
+        {
+          "name": "should error for an anonymous arrow function exceeding max",
+          "given": "const fn = () => {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n};",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should error for a class method exceeding the limit",
+          "given": "class C {\n  method() {\n    const a = 1;\n    const b = 2;\n    const c = 3;\n  }\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should error for a function expression variable exceeding the limit",
+          "given": "const fn = function() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n};",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'tooManyLines' }]"
+        },
+        {
+          "name": "should error for computed method key and use anonymous fallback name",
+          "given": "class C {\n  [\"method\"]() {\n    const a = 1;\n    const b = 2;\n    const c = 3;\n  }\n}",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [\n          {\n            messageId: 'tooManyLines',\n            data: { name: '<anonymous>', lines: OVER_LIMIT_LINE_COUNT, max: MAX_THREE },\n          },\n        ]"
+        },
+        {
+          "name": "should error for anonymous function expression and use anonymous fallback name",
+          "given": "(function() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n});",
+          "when": "the rule analyzes the fixture with options [{ max: MAX_THREE }]",
+          "then": "the expected diagnostic is reported: [\n          {\n            messageId: 'tooManyLines',\n            data: { name: '<anonymous>', lines: OVER_LIMIT_LINE_COUNT, max: MAX_THREE },\n          },\n        ]"
         }
       ]
     }

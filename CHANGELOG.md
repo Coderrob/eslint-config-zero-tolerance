@@ -8,8 +8,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **File-based rule contracts**: Run the built plugin against seven pairs of known-invalid and valid TypeScript files, asserting exact rule IDs, messages, severity, and line numbers.
+
+- **Error context**: Added opt-in `require-error-cause` with native Error/AggregateError support and configurable factories; existing presets are unchanged.
+- **Quality guidance**: Documented individual upstream checks for promise misuse, unsafe `any` propagation, callback returns, complexity/nesting, async races, and unsafe `finally` blocks.
+
+- **Test assertion reliability**: Added rules for discarded asynchronous assertions and assertions inside branches that may not execute, including Node assert in Mocha tests, with behavioral contracts for import aliases, computed properties, optional calls, and formatting variations.
+
 ### Changed
 
+- **Options and evaluation safety**: Detect property mutations through TypeScript assertion wrappers for timeout and error-cause options. Cache timeout expression results per check to prevent exponential alias expansion while preserving cycle detection and scope isolation.
+
+- **Review regressions**: Allow unconditional assertions in do-while bodies while retaining nested conditional checks. Normalize named default client imports so direct calls cannot bypass timeout validation.
+
+- **Repository dogfooding**: Explicitly enable the seven updated rules for TypeScript source and scripts, including opt-in error-cause checks. Add configuration regression tests, replace mutable validation accumulators, and clarify root README product and contributor sections.
+
+- **Rule guidance and edge cases**: Consolidate seven rule guides into behavior, examples, options, and limits; replace repeated index notes with links. Allow asserted fresh local containers, exclude separate regular-expression literals from identical-expression checks, and clarify diagnostic wording.
+
+- **Edge-case coverage**: Add paired accepted/rejected fixtures across the seven updated rules for casts, non-null assertions, optional/computed access, aliases, shadowing, nested scopes, and line counting. Resolve angle-bracket and non-null assertions consistently, and retain direct options-mutation checks through wrappers.
+
+- **Timeout constant resolution**: Reject global `NaN` and `Infinity` while respecting local bindings named `undefined`, `NaN`, and `Infinity`, including aliases and logical expressions.
+
+- **Timeout and mutation regressions**: Accept supported numeric timeout arithmetic and fallback expressions; reject known disabled results. Detect local containers that become shared on earlier loop iterations while preserving per-iteration local construction.
+
+- **Review fixes**: Recognize array subclasses and intersections, retain diagnostics for local accessor writes and arbitrary object mutator methods, and reject overwritten catch bindings while accepting original-error aliases captured before reassignment.
+
+- **Rule precision**: Restrict `no-array-mutation` to known arrays/tuples; allow local computation in `no-query-side-effects`; restrict `no-identical-expressions` to stable comparison/logical operands.
+- **IO and sequential work**: Resolve imports and local options for API-specific `require-timeout-for-io` checks; add explicit sequential-function and async-iterator exceptions to `no-await-in-loop`.
+- **Function size**: Check expression-bodied arrows in `max-function-lines` and optionally exclude blank/comment-only lines.
+
+- **Testing framework spy assertions**: Added Vitest, Chai-style, and Sinon rules that require explicit call counts and numbered invocation argument checks while allowing zero-call assertions. Covered Vitest soft assertions and Chai language chains and `lastCalledWith`, while allowing argument checks on indexed Sinon spy calls. Mocha projects are covered through their Chai or Sinon assertion packages.
+- **`no-jest-have-been-called` rule**: Report imprecise matchers only when called through a Jest `expect` assertion, including modifiers, optional and computed calls, global forms, and aliases imported from `@jest/globals`; allow unrelated methods, property reads, and negated assertions that require zero calls.
 - **npm release publishing**: Authenticate the publish step with the `NPM_TOKEN` Actions secret and allow manual retries for an existing published GitHub Release tag.
 
 ## [1.2.7] - 2026-11-02

@@ -1,43 +1,38 @@
 # no-query-side-effects
 
-Disallow side effects in query-style functions (`get*`, `is*`, `has*`, `can*`, `should*`).
+Keep query functions from changing shared state while allowing local calculations.
 
-## Rule Details
+Type: suggestion. No automatic fix. No options.
 
-| Property        | Value        |
-| --------------- | ------------ |
-| **Type**        | `suggestion` |
-| **Fixable**     | No           |
-| **Recommended** | `warn`       |
-| **Strict**      | `error`      |
+## What it checks
 
-## Rationale
+Checks function names that start with get, is, has, can, or should followed by an uppercase letter or underscore, such as getUser and is_ready.
 
-Query functions should answer questions without mutating state. Mixing reads and writes increases coupling and makes behavior harder to reason about. This rule enforces `Separate Query from Modifier`.
+Reports assignments, updates, deletes, and recognized mutating method calls that affect arguments, outer variables, this, or shared objects. Optional calls and static computed property names follow the same checks.
+
+Local variables may be reassigned. Direct writes to fresh local arrays and objects are allowed, including containers declared with TypeScript assertions. Rebinding a parameter is local; changing an object passed as a parameter is shared mutation.
 
 ## Examples
 
-### ✅ Correct
-
 ```typescript
-function getTotal(items: number[]): number {
-  return items.reduce((sum, item) => sum + item, 0);
+function getItems() {
+  const items = [] as number[];
+  items.push(1); // Allowed: builds a fresh local result.
+  return items;
+}
+
+function getUser(user) {
+  user.visits++; // Reported: changes the caller's object.
+  return user;
 }
 ```
 
-### ❌ Incorrect
+## When a local object becomes shared
 
-```typescript
-function getTotal(items: number[]): number {
-  items.push(0);
-  return items.reduce((sum, item) => sum + item, 0);
-}
-```
+Passing an object to another function, creating an alias, or capturing it in a closure can expose it outside the query. Later writes are checked. If a loop reuses and exposes the same object, writes on later iterations are also checked. A new object created inside each iteration can still be built locally before it is exposed.
 
-## Configuration
+Writes through getters or setters remain checked because they may change shared state. Nested property writes also remain checked: a fresh outer object can contain shared inner objects. Casting a shared object does not make it local.
 
-This rule has no options:
+## Limits
 
-```js
-'zero-tolerance/no-query-side-effects': 'error'
-```
+The rule does not inspect the bodies of arbitrary called functions. Method names are used to recognize likely mutations. Each nested function is checked in its own scope. Other immutability rules may reject local mutations that this rule allows.

@@ -1,17 +1,17 @@
 # Rules
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **77 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **83 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
-| [Testing](#testing)                       |     8 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Testing](#testing)                       |    13 | Assertions, mocks, timers, fetch, interfaces        |
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
-| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Error Handling](#error-handling)         |     4 | Throw safety, empty catches, Result patterns        |
 | [Imports](#imports)                       |    12 | Barrels, re-exports, dynamic imports, node protocol |
 | [Bug Prevention](#bug-prevention)         |    20 | Identical code, control flow, async safety          |
 
@@ -35,16 +35,21 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 
 ## Testing
 
-| Rule                                                                | Type       | Description                                                                                                   |
-| ------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| [require-test-description-style](require-test-description-style.md) | suggestion | Enforce that test descriptions start with `should`                                                            |
-| [no-jest-have-been-called](no-jest-have-been-called.md)             | suggestion | Prohibit imprecise call-assertion matchers; use `toHaveBeenCalledTimes` and `toHaveBeenNthCalledWith` instead |
-| [no-mock-implementation](no-mock-implementation.md)                 | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
-| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)               | suggestion | Disallow `setTimeout` usage in test files                                                                     |
-| [no-set-interval-in-tests](no-set-interval-in-tests.md)             | suggestion | Disallow `setInterval` usage in test files                                                                    |
-| [no-fetch-in-tests](no-fetch-in-tests.md)                           | suggestion | Disallow `fetch` usage in test files                                                                          |
-| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md) | suggestion | Disallow configured dependency imports in test files                                                          |
-| [no-test-interface-declaration](no-test-interface-declaration.md)   | suggestion | Disallow interface declarations in test files; import production types instead                                |
+| Rule                                                                        | Type       | Description                                                                                         |
+| --------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| [require-test-description-style](require-test-description-style.md)         | suggestion | Enforce that test descriptions start with `should`                                                  |
+| [no-chai-imprecise-spy-assertions](no-chai-imprecise-spy-assertions.md)     | suggestion | Require exact Chai-style spy call counts and invocation arguments                                   |
+| [no-conditional-test-assertion](no-conditional-test-assertion.md)           | problem    | Disallow assertions in test branches that may not execute                                           |
+| [no-jest-have-been-called](no-jest-have-been-called.md)                     | suggestion | Require exact call counts and invocation indices in Jest assertions; allow negated zero-call checks |
+| [no-mock-implementation](no-mock-implementation.md)                         | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                        |
+| [no-sinon-imprecise-spy-assertions](no-sinon-imprecise-spy-assertions.md)   | suggestion | Require exact Sinon spy call counts and invocation arguments                                        |
+| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)                       | suggestion | Disallow `setTimeout` usage in test files                                                           |
+| [no-set-interval-in-tests](no-set-interval-in-tests.md)                     | suggestion | Disallow `setInterval` usage in test files                                                          |
+| [no-fetch-in-tests](no-fetch-in-tests.md)                                   | suggestion | Disallow `fetch` usage in test files                                                                |
+| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md)         | suggestion | Disallow configured dependency imports in test files                                                |
+| [no-test-interface-declaration](no-test-interface-declaration.md)           | suggestion | Disallow interface declarations in test files; import production types instead                      |
+| [no-unawaited-async-assertion](no-unawaited-async-assertion.md)             | problem    | Require asynchronous test assertions to be awaited or returned                                      |
+| [no-vitest-imprecise-spy-assertions](no-vitest-imprecise-spy-assertions.md) | suggestion | Require exact Vitest spy call counts and invocation indices                                         |
 
 ## Type Safety
 
@@ -67,9 +72,9 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 
 | Rule                                                              | Type       | Description                                                                            |
 | ----------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------- |
-| [max-function-lines](max-function-lines.md)                       | suggestion | Enforce a maximum number of lines per function body                                    |
+| [max-function-lines](max-function-lines.md)                       | suggestion | Limit block and expression function bodies with optional blank/comment exclusions      |
 | [max-params](max-params.md)                                       | suggestion | Enforce a maximum number of function parameters                                        |
-| [no-array-mutation](no-array-mutation.md)                         | suggestion | Disallow mutating array methods                                                        |
+| [no-array-mutation](no-array-mutation.md)                         | suggestion | Disallow mutating methods on known arrays and tuples                                   |
 | [no-date-now](no-date-now.md)                                     | suggestion | Disallow `Date.now()` and no-arg `new Date()` usage                                    |
 | [no-placeholder-implementation](no-placeholder-implementation.md) | problem    | Disallow placeholder, stub, TODO, and not implemented production code                  |
 | [no-magic-numbers](no-magic-numbers.md)                           | suggestion | Disallow magic numbers; use named constants instead                                    |
@@ -89,6 +94,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 | Rule                                            | Type       | Description                                                                          |
 | ----------------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
 | [no-empty-catch](no-empty-catch.md)             | problem    | Disallow empty catch blocks that silently swallow errors                             |
+| [require-error-cause](require-error-cause.md)   | problem    | Preserve caught exceptions when throwing replacement errors (opt-in)                 |
 | [no-throw-literal](no-throw-literal.md)         | problem    | Disallow throwing literals, objects, or templates; always throw a new Error instance |
 | [prefer-result-return](prefer-result-return.md) | suggestion | Prefer returning Result-style values instead of throwing                             |
 
@@ -111,25 +117,31 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 
 ## Bug Prevention
 
-| Rule                                                              | Type       | Description                                                                  |
-| ----------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------- |
-| [no-identical-expressions](no-identical-expressions.md)           | problem    | Disallow identical expressions on both sides of a binary or logical operator |
-| [no-identical-branches](no-identical-branches.md)                 | suggestion | Disallow identical conditional branches                                      |
-| [no-boolean-return-trap](no-boolean-return-trap.md)               | suggestion | Disallow ambiguous boolean-return APIs outside predicate naming              |
-| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Simplify comparisons only when the operand is known to be boolean            |
-| [no-for-in](no-for-in.md)                                         | problem    | Disallow for..in loops without rewriting inherited-key behavior              |
-| [no-labels](no-labels.md)                                         | problem    | Disallow labeled statements                                                  |
-| [no-with](no-with.md)                                             | problem    | Disallow `with` statements                                                   |
-| [no-await-in-loop](no-await-in-loop.md)                           | problem    | Disallow `await` inside loops; use `Promise.all()` instead                   |
-| [no-floating-promises](no-floating-promises.md)                   | problem    | Check explicit, local async, and type-resolved promises                      |
-| [no-math-random](no-math-random.md)                               | problem    | Disallow `Math.random()`; inject a random source instead                     |
-| [no-eslint-disable](no-eslint-disable.md)                         | suggestion | Prevent use of `eslint-disable` comments                                     |
-| [no-ts-nocheck](no-ts-nocheck.md)                                 | problem    | Prevent use of `@ts-nocheck` comments                                        |
-| [no-parameter-reassign](no-parameter-reassign.md)                 | suggestion | Disallow reassigning function parameters                                     |
-| [no-process-env-outside-config](no-process-env-outside-config.md) | problem    | Disallow `process.env` reads outside configuration modules                   |
-| [no-flag-argument](no-flag-argument.md)                           | suggestion | Disallow boolean flag parameters in function signatures                      |
-| [prefer-guard-clauses](prefer-guard-clauses.md)                   | suggestion | Prefer guard clauses by removing else blocks after terminating if branches   |
-| [prefer-shortcut-return](prefer-shortcut-return.md)               | suggestion | Simplify boolean returns while retaining comments                            |
-| [no-query-side-effects](no-query-side-effects.md)                 | suggestion | Disallow side effects in query-style functions                               |
-| [require-timeout-for-io](require-timeout-for-io.md)               | problem    | Require timeout or cancellation options for external IO calls                |
-| [require-exhaustive-switch](require-exhaustive-switch.md)         | suggestion | Require exhaustive `switch` statements over finite discriminant types        |
+| Rule                                                              | Type       | Description                                                                      |
+| ----------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------- |
+| [no-identical-expressions](no-identical-expressions.md)           | problem    | Report repeated stable operands in comparisons and logical expressions           |
+| [no-identical-branches](no-identical-branches.md)                 | suggestion | Disallow identical conditional branches                                          |
+| [no-boolean-return-trap](no-boolean-return-trap.md)               | suggestion | Disallow ambiguous boolean-return APIs outside predicate naming                  |
+| [no-redundant-boolean](no-redundant-boolean.md)                   | suggestion | Simplify comparisons only when the operand is known to be boolean                |
+| [no-for-in](no-for-in.md)                                         | problem    | Disallow for..in loops without rewriting inherited-key behavior                  |
+| [no-labels](no-labels.md)                                         | problem    | Disallow labeled statements                                                      |
+| [no-with](no-with.md)                                             | problem    | Disallow `with` statements                                                       |
+| [no-await-in-loop](no-await-in-loop.md)                           | problem    | Review await inside loops with configurable sequential-work exceptions           |
+| [no-floating-promises](no-floating-promises.md)                   | problem    | Check explicit, local async, and type-resolved promises                          |
+| [no-math-random](no-math-random.md)                               | problem    | Disallow `Math.random()`; inject a random source instead                         |
+| [no-eslint-disable](no-eslint-disable.md)                         | suggestion | Prevent use of `eslint-disable` comments                                         |
+| [no-ts-nocheck](no-ts-nocheck.md)                                 | problem    | Prevent use of `@ts-nocheck` comments                                            |
+| [no-parameter-reassign](no-parameter-reassign.md)                 | suggestion | Disallow reassigning function parameters                                         |
+| [no-process-env-outside-config](no-process-env-outside-config.md) | problem    | Disallow `process.env` reads outside configuration modules                       |
+| [no-flag-argument](no-flag-argument.md)                           | suggestion | Disallow boolean flag parameters in function signatures                          |
+| [prefer-guard-clauses](prefer-guard-clauses.md)                   | suggestion | Prefer guard clauses by removing else blocks after terminating if branches       |
+| [prefer-shortcut-return](prefer-shortcut-return.md)               | suggestion | Simplify boolean returns while retaining comments                                |
+| [no-query-side-effects](no-query-side-effects.md)                 | suggestion | Disallow observable mutation in query functions while allowing local computation |
+| [require-timeout-for-io](require-timeout-for-io.md)               | problem    | Require API-specific timeout or cancellation options for external IO calls       |
+| [require-exhaustive-switch](require-exhaustive-switch.md)         | suggestion | Require exhaustive `switch` statements over finite discriminant types            |
+
+## Choose checks
+
+Each rule page explains what is reported, how to configure the check, and where its analysis stops. Enable [require-error-cause](../rules/require-error-cause.md) individually to preserve original exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](../configuration.md#additional-code-quality-checks-individual-opt-in).

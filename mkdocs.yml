@@ -78,13 +78,18 @@ nav:
           - require-readonly-props: rules/require-readonly-props.md
       - Testing:
           - require-test-description-style: rules/require-test-description-style.md
+          - no-chai-imprecise-spy-assertions: rules/no-chai-imprecise-spy-assertions.md
+          - no-conditional-test-assertion: rules/no-conditional-test-assertion.md
           - no-jest-have-been-called: rules/no-jest-have-been-called.md
           - no-mock-implementation: rules/no-mock-implementation.md
+          - no-sinon-imprecise-spy-assertions: rules/no-sinon-imprecise-spy-assertions.md
           - no-set-timeout-in-tests: rules/no-set-timeout-in-tests.md
+          - no-vitest-imprecise-spy-assertions: rules/no-vitest-imprecise-spy-assertions.md
           - no-set-interval-in-tests: rules/no-set-interval-in-tests.md
           - no-fetch-in-tests: rules/no-fetch-in-tests.md
           - no-restricted-imports-in-tests: rules/no-restricted-imports-in-tests.md
           - no-test-interface-declaration: rules/no-test-interface-declaration.md
+          - no-unawaited-async-assertion: rules/no-unawaited-async-assertion.md
       - Type Safety:
           - no-type-assertion: rules/no-type-assertion.md
           - no-non-null-assertion: rules/no-non-null-assertion.md
@@ -117,6 +122,7 @@ nav:
           - prefer-structured-clone: rules/prefer-structured-clone.md
       - Error Handling:
           - no-empty-catch: rules/no-empty-catch.md
+          - require-error-cause: rules/require-error-cause.md
           - no-throw-literal: rules/no-throw-literal.md
           - prefer-result-return: rules/prefer-result-return.md
       - Imports:

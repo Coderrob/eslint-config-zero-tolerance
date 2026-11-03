@@ -4,65 +4,242 @@
   "sourceFile": "packages/plugin/src/rules/no-array-mutation.ts",
   "module": {
     "name": "no-array-mutation",
-    "description": "Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted.",
-    "exports": ["noArrayMutation"]
+    "description": "Prevent changes to known arrays and tuples through mutating methods.",
+    "exports": [
+      "noArrayMutation"
+    ]
   },
   "specifications": [
     {
-      "feature": "Non-mutating array operations",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow non-mutating array methods such as map, filter, and slice",
-          "given": "a call to array.map() inside any function",
-          "when": "the rule evaluates the call expression",
-          "then": "no violation is reported"
+          "name": "should allow cast custom receiver optional methods",
+          "given": "const router = { push(value: number) {} } as { push(value: number): void }; router?.[\"push\"]?.(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow spread-based array construction",
-          "given": "a spread expression [...arr, newItem]",
-          "when": "the rule evaluates the expression",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Mutating array method calls",
-      "scenarios": [
-        {
-          "name": "should report a call to Array.push()",
-          "given": "a call expression arr.push(value)",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should respect a shadowed array binding",
+          "given": "const list = []; function run(list: { push(n: number): void }) { list.push(1); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a call to Array.pop()",
-          "given": "a call expression arr.pop()",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should allow nonmutating optional computed calls",
+          "given": "const list = [] as number[]; list?.[\"slice\"]?.();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a call to Array.splice()",
-          "given": "a call expression arr.splice(0, 1)",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should avoid inferring an array from a cast alone",
+          "given": "(external as number[]).push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a call to Array.sort()",
-          "given": "a call expression arr.sort(compareFn)",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should allow router push",
+          "given": "router.push(\"/home\");",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a call to Array.reverse()",
-          "given": "a call expression arr.reverse()",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should allow custom sorting",
+          "given": "const custom = { sort() {} }; custom.sort();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a call to Array.fill()",
-          "given": "a call expression arr.fill(0)",
-          "when": "the rule evaluates the call",
-          "then": "a noArrayMutation violation is reported"
+          "name": "should allow reassigned array binding",
+          "given": "let list = []; list = router; list.push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow cyclic aliases",
+          "given": "const a = b; const b = a; a.push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow unrecognized direct calls",
+          "given": "push(item);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow non-mutating slice call",
+          "given": "const out = items.slice(0);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow non-member call expression",
+          "given": "mutate(items);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow unknown member method",
+          "given": "const items = []; items.map((value) => value + 1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow computed member with non-mutating name",
+          "given": "const items = []; items['map']((value) => value + 1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should report optional computed mutation",
+          "given": "const list = []; list?.[\"push\"]?.(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report angle asserted array literal",
+          "given": "(<number[]>[]).push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report nonnull array alias",
+          "given": "const list = []; list!.pop();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report nested satisfies and assertion wrappers",
+          "given": "(([] as number[]) satisfies number[]).reverse();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report literal receiver",
+          "given": "[].push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report stable array aliases",
+          "given": "const list = []; const alias = list; alias.pop();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report asserted literal",
+          "given": "const list = [] as number[]; list.push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report satisfies literal",
+          "given": "const list = [] satisfies number[]; list.push(1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should disallow push mutation",
+          "given": "const items = []; items.push(value);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation', data: { method: 'push' } }]"
+        },
+        {
+          "name": "should disallow sort mutation",
+          "given": "const items = []; items.sort();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation', data: { method: 'sort' } }]"
+        },
+        {
+          "name": "should disallow splice mutation via computed member",
+          "given": "const items = []; items['splice'](0, 1);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation', data: { method: 'splice' } }]"
+        },
+        {
+          "name": "should disallow reverse mutation",
+          "given": "const items = []; items.reverse();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation', data: { method: 'reverse' } }]"
+        },
+        {
+          "name": "should allow unrelated class hierarchies",
+          "given": "class Router { push(value: number) {} } class AppRouter extends Router {} new AppRouter().push(1);",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow unrelated intersections",
+          "given": "function run(value: { push(n: number): void } & { tag: string }) { value.push(1); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow typed custom push",
+          "given": "function run(router: { push(path: string): void }) { router.push(\"/\"); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow unknown receivers",
+          "given": "function run(value: any) { value.push(1); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should report array subclass mutation",
+          "given": "class Items extends Array<number> {} const items = new Items(); items.push(1);",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report indirect generic array subclasses",
+          "given": "class Items<T> extends Array<T> {} class Numbers extends Items<number> {} new Numbers().reverse();",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report branded array intersections",
+          "given": "function mutate(items: number[] & { tag: string }) { items.push(1); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report interfaces extending arrays",
+          "given": "interface Items extends Array<number> { tag: string; } function mutate(items: Items) { items.pop(); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should report tuple intersections",
+          "given": "function mutate(items: [number] & { tag: string }) { items.reverse(); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should detect typed array parameters",
+          "given": "function run(items: number[]) { items.push(1); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should detect tuples",
+          "given": "function run(items: [number]) { items.reverse(); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should detect constrained generics",
+          "given": "function run<T extends number[]>(items: T) { items.pop(); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
+        },
+        {
+          "name": "should detect optional union receivers",
+          "given": "function run(items: number[] | undefined) { items?.push(1); }",
+          "when": "the rule analyzes the fixture with default options at 'src/array-fixture.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noArrayMutation' }]"
         }
       ]
     }

@@ -23,6 +23,19 @@ import ts from 'typescript';
 import { createSchemaValidator, extractNamedExports } from './validate-bdd-specs.mjs';
 import { validateBuiltRegistration, validateRuleFixtures } from './validate-rule-naming.mjs';
 
+/**
+ * Collects repository tests without following dependency directory symlinks.
+ * @param directory - Directory to inspect.
+ * @returns Paths of source test files beneath the directory.
+ */
+function collectTestFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = join(directory, entry.name);
+    if (entry.isDirectory()) return collectTestFiles(entryPath);
+    return /\.(?:spec|test)\.(?:mjs|ts)$/u.test(entry.name) ? [entryPath] : [];
+  });
+}
+
 describe('repository validation', () => {
   test('should validate complete BDD structure through the shared JSON Schema', () => {
     const schema = JSON.parse(readFileSync(new URL('../bdd-spec.schema.json', import.meta.url)));
@@ -60,7 +73,7 @@ describe('repository validation', () => {
     export default direct;
   `);
 
-    assert.deepEqual([...exports].sort(), ['Example', 'alias', 'direct', 'nested']);
+    assert.deepEqual([...exports].toSorted(), ['Example', 'alias', 'direct', 'nested']);
   });
 
   test('should identify missing and unexpected built registrations', () => {
@@ -187,20 +200,10 @@ describe('repository validation', () => {
   });
 
   test('should give every test file exactly one explicit root describe', () => {
-    const pendingDirectories = ['../packages', '.'].map((directory) =>
-      fileURLToPath(new URL(directory, import.meta.url)),
-    );
-    const testFiles = [];
-
-    while (pendingDirectories.length > 0) {
-      const directory = pendingDirectories.pop();
-
-      for (const entry of readdirSync(directory, { withFileTypes: true })) {
-        const entryPath = join(directory, entry.name);
-        if (entry.isDirectory()) pendingDirectories.push(entryPath);
-        else if (/\.(?:spec|test)\.(?:mjs|ts)$/u.test(entry.name)) testFiles.push(entryPath);
-      }
-    }
+    const testFiles = ['../packages', '.'].flatMap((directory) => {
+      const root = fileURLToPath(new URL(directory, import.meta.url));
+      return collectTestFiles(root);
+    });
 
     for (const testFile of testFiles) {
       const sourceFile = ts.createSourceFile(

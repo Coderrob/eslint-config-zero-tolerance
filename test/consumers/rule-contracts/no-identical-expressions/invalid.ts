@@ -1,0 +1,1 @@
+const fallback = value || value;

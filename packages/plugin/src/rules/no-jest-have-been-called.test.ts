@@ -22,6 +22,14 @@ describe('no-jest-have-been-called', () => {
         name: 'should allow negated toHaveBeenCalledTimes',
       },
       {
+        code: 'expect(fn).not.toHaveBeenCalled(); expect(fn).not.toBeCalled();',
+        name: 'should allow negated called matchers that assert zero calls',
+      },
+      {
+        code: 'expect(fn)["not"]["toHaveBeenCalled"](); expect(fn).resolves.not.toBeCalled();',
+        name: 'should allow computed and promise-modified zero-call assertions',
+      },
+      {
         code: 'expect(value).toBe(true);',
         name: 'should allow unrelated matcher',
       },
@@ -45,19 +53,61 @@ describe('no-jest-have-been-called', () => {
         code: 'expect(fn)[0]();',
         name: 'should allow computed numeric property',
       },
+      {
+        code: 'const method = obj.toHaveBeenCalled; obj.toHaveBeenCalled(); obj["toBeCalledWith"]("arg");',
+        name: 'should allow banned names on unrelated objects',
+      },
+      {
+        code: 'const matcher = expect(fn).toHaveBeenCalled; expect(fn).not.toBeCalledWith;',
+        name: 'should allow matcher property references without invocation',
+      },
+      {
+        code: 'other.expect(fn).toHaveBeenCalled(); wrap(expect(fn)).toBeCalled();',
+        name: 'should allow calls outside a Jest expect chain',
+      },
+      {
+        code: 'expect(fn).custom.toHaveBeenCalled(); expect(fn).not.custom.toBeCalled();',
+        name: 'should allow unsupported intermediate properties',
+      },
+      {
+        code: 'function check(expect) { expect(fn).toHaveBeenCalled(); } const expect = customExpect;',
+        name: 'should allow a shadowed non-Jest expect function',
+      },
+      {
+        code: 'import { expect as check } from "other-test-library"; check(fn).toHaveBeenCalled();',
+        name: 'should allow expect imported from an unrelated library',
+      },
+      {
+        code: 'function check(globalThis) { globalThis.expect(fn).toHaveBeenCalled(); }',
+        name: 'should allow a shadowed global object',
+      },
+      {
+        code: 'import { expect as check } from "@jest/globals"; (check)(fn)?.["not"]?.["toHaveBeenCalled"]?.();',
+        name: 'should allow parenthesized optional zero-call assertions',
+      },
     ],
     invalid: [
       {
-        name: 'should reject asynchronous negated computed matchers',
-        code: 'expect(fn).resolves.not["toHaveBeenCalled"](); expect(fn).rejects.toHaveBeenCalledWith("arg");',
+        name: 'should reject matchers across multiline comments and parenthesized calls',
+        code: 'import { expect as check } from "@jest/globals";\nvoid (check)(fn)\n  /* assertion modifier */ ["not"]\n  ?.["toHaveBeenCalledWith"]?.("a");',
         errors: [
           {
             messageId: 'noHaveBeenCalled',
-            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+            data: { matcher: 'toHaveBeenCalledWith', replacement: 'toHaveBeenNthCalledWith' },
           },
+        ],
+      },
+      {
+        name: 'should reject asynchronous negated argument matchers',
+        code: 'expect(fn).resolves.not["toHaveBeenCalledWith"]("arg"); expect(fn).rejects.toBeCalledWith("arg");',
+        errors: [
           {
             messageId: 'noHaveBeenCalled',
             data: { matcher: 'toHaveBeenCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+          },
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toBeCalledWith', replacement: 'toHaveBeenNthCalledWith' },
           },
         ],
       },
@@ -122,26 +172,6 @@ describe('no-jest-have-been-called', () => {
         ],
       },
       {
-        code: 'expect(fn).not.toHaveBeenCalled();',
-        name: 'should ban negated toHaveBeenCalled',
-        errors: [
-          {
-            messageId: 'noHaveBeenCalled',
-            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
-          },
-        ],
-      },
-      {
-        code: 'expect(fn).not.toBeCalled();',
-        name: 'should ban negated toBeCalled',
-        errors: [
-          {
-            messageId: 'noHaveBeenCalled',
-            data: { matcher: 'toBeCalled', replacement: 'toHaveBeenCalledTimes' },
-          },
-        ],
-      },
-      {
         code: 'expect(fn).not.toHaveBeenCalledWith("arg");',
         name: 'should ban negated toHaveBeenCalledWith',
         errors: [
@@ -162,9 +192,47 @@ describe('no-jest-have-been-called', () => {
         ],
       },
       {
-        code: 'const x = obj.toHaveBeenCalled;',
-        name: 'should ban property access of toHaveBeenCalled',
+        code: 'globalThis.expect(fn).toHaveBeenCalled(); global.expect(fn).not.toBeCalledWith("arg");',
+        name: 'should ban matchers on global Jest expect calls',
         errors: [
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+          },
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toBeCalledWith', replacement: 'toHaveBeenNthCalledWith' },
+          },
+        ],
+      },
+      {
+        code: 'expect(fn)?.toHaveBeenCalled?.();',
+        name: 'should ban optional matcher calls on Jest expect',
+        errors: [
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+          },
+        ],
+      },
+      {
+        code: 'import { expect as check } from "@jest/globals"; check(fn).toHaveBeenCalled();',
+        name: 'should ban matchers on imported Jest expect aliases',
+        errors: [
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },
+          },
+        ],
+      },
+      {
+        code: 'globalThis["expect"](fn).rejects["toBeCalled"](); expect?.(fn).toHaveBeenCalled();',
+        name: 'should ban computed global expect and optional expect calls',
+        errors: [
+          {
+            messageId: 'noHaveBeenCalled',
+            data: { matcher: 'toBeCalled', replacement: 'toHaveBeenCalledTimes' },
+          },
           {
             messageId: 'noHaveBeenCalled',
             data: { matcher: 'toHaveBeenCalled', replacement: 'toHaveBeenCalledTimes' },

@@ -1,56 +1,24 @@
 # no-identical-expressions
 
-Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764).
+Find likely copy-and-paste mistakes in comparisons and logical expressions.
 
-## Rule Details
+Type: problem. No automatic fix. No options.
 
-| Property        | Value     |
-| --------------- | --------- |
-| **Type**        | `problem` |
-| **Fixable**     | No        |
-| **Recommended** | `warn`    |
-| **Strict**      | `error`   |
+## What it checks
 
-## Rationale
-
-When the left and right operands of a binary or logical expression are identical, the result is always deterministic — and almost certainly a copy-paste error. For example, `a === a` is always `true`, `x || x` is always `x`, and `n - n` is always `0`.
-
-**Checked operators:** `===`, `!==`, `==`, `!=`, `&&`, `||`, `??`, `+`, `-`, `/`, `%`
+Reports repeated identifiers or primitive literals on both sides of ===, !==, ==, !=, &&, ||, or ??. Parentheses and comments do not hide a repeated identifier. Primitive literals include strings, numbers, booleans, null, and bigints.
 
 ## Examples
 
-### ✅ Correct
-
 ```typescript
-if (a === b) {
-  /* ... */
-}
-
-const result = left || right;
-
-const diff = endDate - startDate;
+const fallback = value || value; // Reported: repeats the same value.
+const doubled = text + text; // Allowed: arithmetic may be intentional.
+const same = next() === next(); // Allowed: calls may return different values.
+const equal = /item/ === /item/; // Allowed: creates two separate objects.
 ```
 
-### ❌ Incorrect
+## Limits
 
-```typescript
-if (value === value) {
-  /* always true */
-}
+Calls, property reads, updates, and compound expressions are excluded because evaluating them can have effects. This includes optional calls, computed properties, and getters. Comparing the same regular-expression variable with itself is still reported.
 
-const x = obj || obj; // always obj
-
-const zero = count - count; // always 0
-
-if (user && user) {
-  /* user is checked twice */
-}
-```
-
-## Configuration
-
-This rule has no options:
-
-```js
-'zero-tolerance/no-identical-expressions': 'error'
-```
+A diagnostic asks you to review the expression; it does not prove that the result is constant. For example, self-comparison may intentionally test for NaN. There is no automatic fix because the intended replacement is unknown.

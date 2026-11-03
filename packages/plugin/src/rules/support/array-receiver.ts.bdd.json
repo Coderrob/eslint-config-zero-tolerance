@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/array-receiver.ts",
+  "module": {
+    "name": "array-receiver",
+    "description": "TypeScript services resolve the receiver.",
+    "exports": ["isArrayReceiver"]
+  },
+  "specifications": [
+    {
+      "feature": "Conservative static resolution",
+      "scenarios": [
+        {
+          "name": "should recognize type-resolved arrays",
+          "given": "array, tuple, nullable union, or constrained generic receivers",
+          "when": "TypeScript services resolve the receiver",
+          "then": "array and tuple members are recognized"
+        },
+        {
+          "name": "should allow unrelated methods",
+          "given": "a custom object with a method named push or sort",
+          "when": "the receiver is inspected",
+          "then": "no array receiver is inferred"
+        },
+        {
+          "name": "should use conservative syntax fallback",
+          "given": "an array literal or stable alias with no TypeScript services",
+          "when": "local initializer resolution runs",
+          "then": "only known array literals are recognized; unknown and reassigned bindings are skipped"
+        }
+      ]
+    },
+    {
+      "feature": "Review regression coverage",
+      "scenarios": [
+        {
+          "name": "should recognize derived arrays",
+          "given": "array intersections and direct, indirect, generic, or interface-derived array types",
+          "when": "type resolution traverses constituents and base declarations with cycle protection",
+          "then": "array mutations are recognized without flagging unrelated classes or intersections"
+        }
+      ]
+    }
+  ]
+}

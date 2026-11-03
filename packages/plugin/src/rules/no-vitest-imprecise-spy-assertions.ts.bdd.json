@@ -1,0 +1,88 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-vitest-imprecise-spy-assertions.ts",
+  "module": {
+    "name": "no-vitest-imprecise-spy-assertions",
+    "description": "Require exact call counts and numbered invocation arguments in assertions made with expect imported from Vitest.",
+    "exports": ["noVitestImpreciseSpyAssertions"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted Vitest spy assertions",
+      "scenarios": [
+        {
+          "name": "should allow explicit counts and numbered arguments",
+          "given": "expect is imported from vitest and uses toHaveBeenCalledTimes or toHaveBeenNthCalledWith",
+          "when": "the rule checks the matcher call",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow negated zero-call assertions",
+          "given": "Vitest expect or expect.soft uses not.toHaveBeenCalled",
+          "when": "the rule traces the modifier chain",
+          "then": "no violation is reported because the assertion requires zero calls"
+        },
+        {
+          "name": "should allow unrelated and shadowed expect functions",
+          "given": "expect is imported from another package or a Vitest alias is shadowed",
+          "when": "the rule resolves the expect binding",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow soft methods on unrelated objects",
+          "given": "an object other than imported Vitest expect calls soft and then toHaveBeenCalled",
+          "when": "the rule resolves the assertion entry point",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow matcher property reads",
+          "given": "a banned matcher property is read without invocation",
+          "when": "the rule checks the member",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore dynamically computed modifiers",
+          "given": "a computed assertion modifier has an unknown property name",
+          "when": "the rule traces the matcher receiver",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Imprecise Vitest spy assertions",
+      "scenarios": [
+        {
+          "name": "should report positive called assertions",
+          "given": "Vitest expect or expect.soft calls toHaveBeenCalled",
+          "when": "the rule checks the call",
+          "then": "an impreciseSpyAssertion violation requests an explicit call count"
+        },
+        {
+          "name": "should report called-with assertions",
+          "given": "Vitest expect or computed expect['soft'] calls toHaveBeenCalledWith",
+          "when": "the rule checks the call",
+          "then": "an impreciseSpyAssertion violation requests a numbered invocation"
+        },
+        {
+          "name": "should report last-call assertions",
+          "given": "Vitest expect calls toHaveBeenLastCalledWith",
+          "when": "the rule checks the call",
+          "then": "an impreciseSpyAssertion violation requests a numbered invocation"
+        },
+        {
+          "name": "should report aliased optional and computed matcher calls",
+          "given": "an alias imported from vitest uses optional, computed, or promise matcher syntax",
+          "when": "the rule traces the matcher chain",
+          "then": "the banned matcher is reported"
+        },
+        {
+          "name": "should report a called assertion after a non-negating modifier",
+          "given": "Vitest expect uses resolves.toHaveBeenCalled without not",
+          "when": "the rule evaluates the assertion modifiers",
+          "then": "an impreciseSpyAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

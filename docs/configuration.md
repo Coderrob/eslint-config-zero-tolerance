@@ -224,3 +224,48 @@ Configured module names are trimmed, lowercased, normalized by removing `node:`,
 ```
 
 The rule matches only the first concrete directory reached after `..` traversal, so `../src/foo` is reported but `../shared/src/foo` is not unless `shared` is also protected. Configured directory names are trimmed and deduplicated, and empty entries are ignored.
+
+## Additional code-quality checks (individual opt-in)
+
+Enable the checks you need in your ESLint configuration. The example below combines this plugin with ESLint and TypeScript-ESLint rules. Install `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` first. Type-aware checks need a TypeScript project; `projectService` reads the project that includes each file.
+
+```js
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
+
+export default [
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { projectService: true },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      'zero-tolerance': zeroTolerance,
+    },
+    rules: {
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      'array-callback-return': 'error',
+      complexity: ['warn', { max: 10 }],
+      'max-depth': ['warn', 3],
+      'require-atomic-updates': 'error',
+      'no-unsafe-finally': 'error',
+      'zero-tolerance/require-error-cause': 'error',
+    },
+  },
+];
+```
+
+- [no-misused-promises](https://typescript-eslint.io/rules/no-misused-promises/) complements floating-promise checks by detecting async callbacks where synchronous behavior is expected and promises used as conditions.
+- The [unsafe type rules](https://typescript-eslint.io/rules/) catch inferred or dependency-provided any values that no-explicit-any cannot prevent.
+- [array-callback-return](https://eslint.org/docs/latest/rules/array-callback-return) catches missing callback returns; [complexity](https://eslint.org/docs/latest/rules/complexity) and [max-depth](https://eslint.org/docs/latest/rules/max-depth) assess branching independently of physical line counts. Adjust thresholds to your project.
+- [require-atomic-updates](https://eslint.org/docs/latest/rules/require-atomic-updates) checks stale read/write operations across asynchronous suspension; [no-unsafe-finally](https://eslint.org/docs/latest/rules/no-unsafe-finally) catches cleanup control flow that overrides a pending return or throw.
+
+See the rule pages for [sequential-await exceptions](rules/no-await-in-loop.md), [function-length options](rules/max-function-lines.md), and [error cause preservation](rules/require-error-cause.md). Each rule page defines its supported patterns and limits. A passing lint check does not prove that a program is free of side effects, timeout failures, or data races.

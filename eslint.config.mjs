@@ -61,6 +61,17 @@ const ROOT_DIR = path.dirname(fileURLToPath(import.meta.url));
 /** Strict zero-tolerance rules used to dogfood the plugin across this repository. */
 const ZERO_TOLERANCE_STRICT_RULES = zeroTolerancePlugin.configs.strict.rules;
 
+/** Updated rules enabled explicitly for repository source and scripts, including opt-in rules. */
+const REPOSITORY_QUALITY_RULES = {
+  'zero-tolerance/no-array-mutation': 'error',
+  'zero-tolerance/no-query-side-effects': 'error',
+  'zero-tolerance/no-identical-expressions': 'error',
+  'zero-tolerance/require-timeout-for-io': 'error',
+  'zero-tolerance/no-await-in-loop': 'error',
+  'zero-tolerance/max-function-lines': 'error',
+  'zero-tolerance/require-error-cause': 'error',
+};
+
 /** Jest global variables for test files */
 const JEST_GLOBALS = {
   afterAll: 'readonly',
@@ -76,6 +87,9 @@ const JEST_GLOBALS = {
 
 /** Language-independent quality rules shared by source files and scripts. */
 const CORE_QUALITY_RULES = {
+  'array-callback-return': 'error',
+  'no-unsafe-finally': 'error',
+  'require-atomic-updates': 'error',
   complexity: ['error', { max: MAX_COMPLEXITY }],
   'max-depth': ['error', MAX_DEPTH],
   'no-restricted-syntax': [
@@ -161,6 +175,7 @@ const baseConfig = {
 
     // Zero-tolerance plugin rules (dogfooding)
     ...ZERO_TOLERANCE_STRICT_RULES,
+    ...REPOSITORY_QUALITY_RULES,
 
     // Repository-specific stricter metrics
     'zero-tolerance/max-function-lines': ['error', { max: MAX_FUNCTION_LINES }],
@@ -185,6 +200,7 @@ const scriptConfig = {
   },
   rules: {
     ...CORE_QUALITY_RULES,
+    ...REPOSITORY_QUALITY_RULES,
     'zero-tolerance/require-jsdoc-functions': 'error',
   },
 };

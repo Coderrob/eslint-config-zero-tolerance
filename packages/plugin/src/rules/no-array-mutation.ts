@@ -15,7 +15,9 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { getMatchingCallMemberMethodName } from '../helpers/ast/calls';
+import { isArrayReceiver } from './support/array-receiver';
 import { createRule } from './support/rule-factory';
 
 const MUTATING_ARRAY_METHODS = new Set([
@@ -43,7 +45,10 @@ function checkCallExpression(
   node: Readonly<TSESTree.CallExpression>,
 ): void {
   const methodName = getMatchingCallMemberMethodName(node, MUTATING_ARRAY_METHODS);
-  if (methodName === null) {
+  if (methodName === null || node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+    return;
+  }
+  if (!isArrayReceiver(context.sourceCode, node.callee.object)) {
     return;
   }
   context.report({
@@ -73,8 +78,7 @@ export const noArrayMutation = createRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description:
-        'Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted',
+      description: 'Disallow mutating methods on known arrays and tuples',
     },
     messages: {
       noArrayMutation:

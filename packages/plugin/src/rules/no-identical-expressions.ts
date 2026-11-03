@@ -18,19 +18,7 @@ import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from './support/rule-factory';
 
-const CHECKED_BINARY_OPERATORS = new Set([
-  '===',
-  '!==',
-  '==',
-  '!=',
-  '&&',
-  '||',
-  '??',
-  '+',
-  '-',
-  '/',
-  '%',
-]);
+const CHECKED_BINARY_OPERATORS = new Set(['===', '!==', '==', '!=', '&&', '||', '??']);
 
 type NoIdenticalExpressionsContext = Readonly<TSESLint.RuleContext<'identicalExpressions', []>>;
 
@@ -50,7 +38,7 @@ function checkExpression(
     return;
   }
   if (
-    !isExpressionNode(node.left) ||
+    !isStableOperand(node.left) ||
     !hasIdenticalExpressionText(sourceCode, node.left, node.right)
   ) {
     return;
@@ -105,13 +93,18 @@ function isCheckedOperator(operator: string): boolean {
 }
 
 /**
- * Returns true when node is an ESTree expression (not a private identifier).
+ * Limits comparisons to identifiers and primitive literals, excluding new regular expression objects.
  *
  * @param node - Candidate node.
- * @returns True when node is an expression.
+ * @returns True when the operand has a supported stable syntax shape.
  */
-function isExpressionNode(node: Readonly<TSESTree.Node>): node is TSESTree.Expression {
-  return node.type !== AST_NODE_TYPES.PrivateIdentifier;
+function isStableOperand(
+  node: Readonly<TSESTree.Node>,
+): node is TSESTree.Identifier | TSESTree.Literal {
+  return (
+    node.type === AST_NODE_TYPES.Identifier ||
+    (node.type === AST_NODE_TYPES.Literal && !('regex' in node))
+  );
 }
 
 /**
@@ -139,12 +132,11 @@ export const noIdenticalExpressions = createRule({
   meta: {
     type: 'problem',
     docs: {
-      description:
-        'Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)',
+      description: 'Report repeated stable operands in comparisons and logical expressions',
     },
     messages: {
       identicalExpressions:
-        'Identical expressions on both sides of "{{operator}}" are always a bug; check for a copy-paste error',
+        'Repeated operands on both sides of "{{operator}}"; review for a copy-paste error',
     },
     schema: [],
   },

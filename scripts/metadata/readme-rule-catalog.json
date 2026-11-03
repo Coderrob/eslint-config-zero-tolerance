@@ -18,16 +18,21 @@
     },
     {
       "title": "Testing",
-      "focus": "Test descriptions, mocks, timers, fetch, interfaces",
+      "focus": "Assertions, mocks, timers, fetch, interfaces",
       "rules": [
         "require-test-description-style",
+        "no-chai-imprecise-spy-assertions",
+        "no-conditional-test-assertion",
         "no-jest-have-been-called",
         "no-mock-implementation",
+        "no-sinon-imprecise-spy-assertions",
         "no-set-timeout-in-tests",
         "no-set-interval-in-tests",
         "no-fetch-in-tests",
         "no-restricted-imports-in-tests",
-        "no-test-interface-declaration"
+        "no-test-interface-declaration",
+        "no-unawaited-async-assertion",
+        "no-vitest-imprecise-spy-assertions"
       ]
     },
     {
@@ -73,7 +78,7 @@
     {
       "title": "Error Handling",
       "focus": "Throw safety, empty catches, Result patterns",
-      "rules": ["no-empty-catch", "no-throw-literal", "prefer-result-return"]
+      "rules": ["no-empty-catch", "no-throw-literal", "prefer-result-return", "require-error-cause"]
     },
     {
       "title": "Imports",

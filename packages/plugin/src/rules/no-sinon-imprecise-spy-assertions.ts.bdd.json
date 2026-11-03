@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-sinon-imprecise-spy-assertions.ts",
+  "module": {
+    "name": "no-sinon-imprecise-spy-assertions",
+    "description": "Require explicit count and numbered-call argument checks in Sinon assert calls.",
+    "exports": ["noSinonImpreciseSpyAssertions"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted Sinon assertions",
+      "scenarios": [
+        {
+          "name": "should allow explicit call counts and zero calls",
+          "given": "sinon.assert.callCount or sinon.assert.notCalled is used",
+          "when": "the rule evaluates the assertion",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow arguments for a numbered invocation",
+          "given": "sinon.assert.calledWithExactly receives spy.getCall(index)",
+          "when": "the rule inspects the first argument",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow exact single-call arguments",
+          "given": "sinon.assert.calledOnceWithExactly receives the spy",
+          "when": "the rule checks the method name",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore unrelated or shadowed assert objects",
+          "given": "assert comes from another package or a Sinon import is shadowed",
+          "when": "the rule resolves the binding",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Imprecise Sinon assertions",
+      "scenarios": [
+        {
+          "name": "should report called without an exact count",
+          "given": "sinon.assert.called receives a spy or one of its numbered calls",
+          "when": "the rule checks the call",
+          "then": "an impreciseSpyAssertion violation recommends callCount"
+        },
+        {
+          "name": "should report calledWith variants on a whole spy",
+          "given": "calledWith, calledWithExactly, or calledWithMatch receives the whole spy",
+          "when": "the rule checks the call",
+          "then": "an impreciseSpyAssertion violation recommends getCall"
+        },
+        {
+          "name": "should report getCall without an index",
+          "given": "calledWithExactly receives spy.getCall() with no index",
+          "when": "the rule checks the first argument",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report argument matchers without a spy argument",
+          "given": "sinon.assert.calledWith is called without arguments",
+          "when": "the rule checks the first argument",
+          "then": "an impreciseSpyAssertion violation is reported"
+        },
+        {
+          "name": "should report aliased and computed Sinon assertions",
+          "given": "a default, namespace, or named Sinon import uses a computed assertion member",
+          "when": "the rule resolves the assertion",
+          "then": "the imprecise call is reported"
+        }
+      ]
+    }
+  ]
+}

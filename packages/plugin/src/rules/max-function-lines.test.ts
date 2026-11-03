@@ -1,6 +1,7 @@
 import { ruleTester } from '../testing/test-helper';
 import { maxFunctionLines } from './max-function-lines';
 
+const MAX_FOUR = 4;
 const MAX_THREE = 3;
 const MAX_FIVE = 5;
 const MAX_THIRTY = 30;
@@ -11,6 +12,41 @@ const REPEATED_BODY_LINES = 28;
 describe('max-function-lines', () => {
   ruleTester.run('max-function-lines', maxFunctionLines, {
     valid: [
+      {
+        name: 'should ignore multiple comments on one line',
+        code: 'function f() {\n/* first */ /* second */\nreturn 1;\n}',
+        options: [{ max: MAX_THREE, skipComments: true }],
+      },
+      {
+        name: 'should count CRLF function lines at exact limit',
+        code: 'function f() {\r\nreturn 1;\r\n}',
+        options: [{ max: MAX_THREE }],
+      },
+      {
+        name: 'should allow short asserted expression bodies',
+        code: 'const f = () => (value as number);',
+        options: [{ max: MAX_THREE }],
+      },
+      {
+        name: 'should ignore comment text inside template as code',
+        code: 'const f = () => `// literal\n/* literal */`;',
+        options: [{ max: MAX_THREE, skipComments: true }],
+      },
+      {
+        name: 'should ignore blank and comment lines',
+        code: 'function f() {\n\n// comment\n/* multi\nline */\nreturn 1;\n}',
+        options: [{ max: MAX_THREE, skipBlankLines: true, skipComments: true }],
+      },
+      {
+        name: 'should ignore comments without ignoring blanks',
+        code: 'function f() {\n// comment\n\nreturn 1;\n}',
+        options: [{ max: MAX_FOUR, skipComments: true }],
+      },
+      {
+        name: 'should ignore blank lines only',
+        code: 'function f() {\n\nreturn 1;\n}',
+        options: [{ max: MAX_THREE, skipBlankLines: true }],
+      },
       {
         name: 'should pass for a 3-line named function with default limit',
         code: 'function small() {\n  const a = 1;\n}',
@@ -34,6 +70,48 @@ describe('max-function-lines', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should count code beside block comments',
+        code: 'function f() {\n/* comment */ run();\nreturn 1;\n}',
+        options: [{ max: MAX_THREE, skipComments: true }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should count multiline asserted expression bodies',
+        code: 'const f = () => ([\n1,\n2,\n3\n] as number[]);',
+        options: [{ max: MAX_THREE }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should count template content that resembles comments',
+        code: 'const f = () => `first\n// content\n/* content */\nlast`;',
+        options: [{ max: MAX_THREE, skipComments: true }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should count comments when only blanks are excluded',
+        code: 'function f() {\n// first\n// second\nreturn 1;\n}',
+        options: [{ max: MAX_THREE, skipBlankLines: true }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should count expression-bodied arrows',
+        code: 'const fn = () => [\n  1,\n  2,\n  3\n];',
+        options: [{ max: MAX_THREE }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should retain mixed code and comments',
+        code: 'function f() {\nconst x = 1; // comment\nreturn x;\n}',
+        options: [{ max: MAX_THREE, skipComments: true }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
+      {
+        name: 'should count comments by default',
+        code: 'function f() {\n// comment\nreturn 1;\n}',
+        options: [{ max: MAX_THREE }],
+        errors: [{ messageId: 'tooManyLines' }],
+      },
       {
         name: 'should error for a named function exceeding max with options',
         options: [{ max: MAX_FIVE }],
