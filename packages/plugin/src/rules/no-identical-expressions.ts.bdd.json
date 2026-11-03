@@ -4,41 +4,186 @@
   "sourceFile": "packages/plugin/src/rules/no-identical-expressions.ts",
   "module": {
     "name": "no-identical-expressions",
-    "description": "Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764).",
+    "description": "Find likely copy-and-paste mistakes in comparisons and logical expressions.",
     "exports": ["noIdenticalExpressions"]
   },
   "specifications": [
     {
-      "feature": "Binary expressions with distinct operands",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow a binary expression with different left and right operands",
-          "given": "the expression a === b",
-          "when": "the rule evaluates the code",
-          "then": "no violation is reported"
+          "name": "should allow comparisons of separate regular expression objects",
+          "given": "const same = /value/ === /value/;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow a logical expression with different operands",
-          "given": "the expression a && b",
-          "when": "the rule evaluates the code",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Identical operands on both sides",
-      "scenarios": [
-        {
-          "name": "should report a binary expression where both operands are identical",
-          "given": "the expression a === a",
-          "when": "the rule evaluates the binary expression",
-          "then": "a noIdenticalExpressions violation is reported"
+          "name": "should allow loose comparisons of separate regular expression objects",
+          "given": "const same = /value/i == /value/i;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report a logical expression where both operands are identical",
-          "given": "the expression a && a",
-          "when": "the rule evaluates the logical expression",
-          "then": "a noIdenticalExpressions violation is reported"
+          "name": "should allow optional repeated getter reads",
+          "given": "const same = obj?.value === obj?.value;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow repeated computed getter reads",
+          "given": "const same = obj[\"value\"] === obj[\"value\"];",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow repeated generic calls",
+          "given": "const same = next<number>() === next<number>();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow different primitive literals",
+          "given": "const same = 1 === 2;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow repeated arithmetic",
+          "given": "const doubled = text + text; const difference = next() - next();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow repeated calls",
+          "given": "if (next() === next()) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow getter reads",
+          "given": "if (obj.prop === obj.prop) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow updates",
+          "given": "if (i++ === i++) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow private brand checks",
+          "given": "class C { #x; check(other) { return #x in other; } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for different operands with ===",
+          "given": "if (a === b) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for different operands with +",
+          "given": "const x = a + b;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for different operands with ||",
+          "given": "const y = a || b;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for different operands with &&",
+          "given": "const z = a && b;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for different operands with !==",
+          "given": "if (a !== b) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should pass for identical operands with unsupported operator",
+          "given": "const squared = a * a;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should report repeated regular expression binding",
+          "given": "const expression = /value/; const same = expression === expression;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"identicalExpressions\"}]"
+        },
+        {
+          "name": "should report parenthesized repeated identifier",
+          "given": "const same = (value) === ((value));",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report repeated bigint literals",
+          "given": "const same = 1n === 1n;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report repeated booleans",
+          "given": "const same = true !== true;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report repetition despite intervening comments",
+          "given": "const same = value /* left */ === /* right */ value;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report identical literals",
+          "given": "if (\"x\" === \"x\") {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report nullish repetition",
+          "given": "const value = x ?? x;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should report loose self comparisons",
+          "given": "const same = x == x;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions' }]"
+        },
+        {
+          "name": "should error for identical operands with ===",
+          "given": "if (a === a) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions', data: { operator: '===' } }]"
+        },
+        {
+          "name": "should error for identical operands with !==",
+          "given": "if (x !== x) {}",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions', data: { operator: '!==' } }]"
+        },
+        {
+          "name": "should error for identical operands with ||",
+          "given": "const r = value || value;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions', data: { operator: '||' } }]"
+        },
+        {
+          "name": "should error for identical operands with &&",
+          "given": "const r = value && value;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'identicalExpressions', data: { operator: '&&' } }]"
         }
       ]
     }

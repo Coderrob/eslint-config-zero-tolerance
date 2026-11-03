@@ -78,7 +78,7 @@
     {
       "title": "Error Handling",
       "focus": "Throw safety, empty catches, Result patterns",
-      "rules": ["no-empty-catch", "no-throw-literal", "prefer-result-return"]
+      "rules": ["no-empty-catch", "no-throw-literal", "prefer-result-return", "require-error-cause"]
     },
     {
       "title": "Imports",

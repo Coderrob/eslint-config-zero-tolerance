@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/local-values.ts",
+  "module": {
+    "name": "local-values",
+    "description": "findBinding resolves a reference.",
+    "exports": [
+      "findBinding",
+      "getArgument",
+      "getStableInitializer",
+      "resolveLocalValue",
+      "unwrapTypeExpression"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Conservative static resolution",
+      "scenarios": [
+        {
+          "name": "should respect lexical shadowing",
+          "given": "identifiers with names shared by inner and outer scopes",
+          "when": "findBinding resolves a reference",
+          "then": "the nearest lexical binding is returned, or null for an unresolved name"
+        },
+        {
+          "name": "should resolve stable aliases",
+          "given": "simple unreassigned variables and assertion or satisfies wrappers",
+          "when": "resolveLocalValue follows initializers",
+          "then": "the underlying value is returned"
+        },
+        {
+          "name": "should stop unresolved and cyclic aliases",
+          "given": "reassigned variables, destructured declarations, parameters, or cycles",
+          "when": "initializer resolution runs",
+          "then": "an uncertain original expression is retained without infinite recursion"
+        },
+        {
+          "name": "should read optional arguments safely",
+          "given": "a call or constructor with fewer arguments than requested",
+          "when": "getArgument reads the index",
+          "then": "null is returned instead of assuming an argument exists"
+        },
+        {
+          "name": "should unwrap every supported TypeScript value wrapper",
+          "given": "as, satisfies, angle-bracket, or non-null assertions, including nested wrappers and stable aliases",
+          "when": "local values are resolved",
+          "then": "the original runtime expression is returned without treating the asserted type as runtime evidence"
+        },
+        {
+          "name": "should preserve binding identity when unwrapping syntax",
+          "given": "an identifier wrapped in TypeScript assertions",
+          "when": "unwrapTypeExpression is called",
+          "then": "the identifier is returned without following its initializer"
+        }
+      ]
+    }
+  ]
+}

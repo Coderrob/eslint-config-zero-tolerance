@@ -1,0 +1,76 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/local-mutation.ts",
+  "module": {
+    "name": "local-mutation",
+    "description": "Distinguish fresh local computation from externally observable mutation.",
+    "exports": ["isLocalMutation"]
+  },
+  "specifications": [
+    {
+      "feature": "Conservative static resolution",
+      "scenarios": [
+        {
+          "name": "should allow local computation",
+          "given": "variables declared in the current function or its blocks",
+          "when": "an assignment or increment is inspected",
+          "then": "the write is recognized as local"
+        },
+        {
+          "name": "should allow fresh local construction",
+          "given": "a fresh local array or object with no earlier escape",
+          "when": "a direct property write or mutating method is inspected",
+          "then": "the mutation is recognized as local"
+        },
+        {
+          "name": "should retain shared-state diagnostics",
+          "given": "an argument, outer binding, this, nested property, or alias of shared data",
+          "when": "a mutation is inspected",
+          "then": "the mutation is not classified as safely local"
+        },
+        {
+          "name": "should reject escaped containers",
+          "given": "a fresh container passed or aliased before mutation or captured by a closure",
+          "when": "ownership is inspected",
+          "then": "the container is conservatively treated as shared"
+        },
+        {
+          "name": "should account for publication on previous loop iterations",
+          "given": "a persistent local container published later within a loop body",
+          "when": "a mutation before that publication is checked",
+          "then": "the mutation is treated as observable; containers recreated inside the body remain eligible for local mutation"
+        },
+        {
+          "name": "should preserve local ownership through initializer assertions",
+          "given": "a fresh container initializer wrapped in as, satisfies, angle-bracket, or non-null assertions",
+          "when": "direct writes are checked",
+          "then": "fresh local construction is allowed while shared aliases, accessor writes, and earlier publication remain checked"
+        }
+      ]
+    },
+    {
+      "feature": "Review regression coverage",
+      "scenarios": [
+        {
+          "name": "should retain accessor write diagnostics",
+          "given": "a fresh object with a matching named, quoted, or computed accessor",
+          "when": "an assignment or update targets that accessor or an unknown key",
+          "then": "the mutation is not classified as safely local"
+        },
+        {
+          "name": "should allow independent data writes and deletion",
+          "given": "a fresh object containing an accessor",
+          "when": "an unrelated data property is written or the accessor is deleted",
+          "then": "the operation remains local because it does not invoke the accessor"
+        },
+        {
+          "name": "should retain object method diagnostics",
+          "given": "a fresh object referring to an arbitrary mutator method",
+          "when": "a query invokes that method",
+          "then": "local allocation alone does not exempt the call"
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,44 @@ describe('no-await-in-loop', () => {
   ruleTester.run('no-await-in-loop', noAwaitInLoop, {
     valid: [
       {
+        name: 'should allow nested loops within an opted-in async iterator body',
+        code: 'async function run() { for await (const item of stream) { while (more) { await work(); } } }',
+        options: [{ allowForAwaitOf: true }],
+      },
+      {
+        name: 'should allow asserted awaits outside loops',
+        code: 'async function run() { await (work() as Promise<void>); }',
+      },
+      {
+        name: 'should allow optional calls in configured retry',
+        code: 'async function retry() { while (more) { await work?.(); } }',
+        options: [{ allowedFunctionNames: ['retry'] }],
+      },
+      {
+        name: 'should keep function boundaries inside loop headers',
+        code: 'async function run() { while (factory(async () => { await work(); })) {} }',
+      },
+      {
+        name: 'should allow configured retry function',
+        code: 'async function retry() { while (true) { await attempt(); } }',
+        options: [{ allowedFunctionNames: ['retry'] }],
+      },
+      {
+        name: 'should allow configured arrow binding',
+        code: 'const paginate = async () => { while (more) { await page(); } };',
+        options: [{ allowedFunctionNames: ['paginate'] }],
+      },
+      {
+        name: 'should allow named function expression',
+        code: 'const task = async function retry() { while (true) { await attempt(); } };',
+        options: [{ allowedFunctionNames: ['retry'] }],
+      },
+      {
+        name: 'should allow async iterator work when configured',
+        code: 'async function run() { for await (const x of stream) { await consume(x); } }',
+        options: [{ allowForAwaitOf: true }],
+      },
+      {
         name: 'should allow await outside loop',
         code: 'async function main() { await fetch(url); }',
       },
@@ -36,6 +74,54 @@ describe('no-await-in-loop', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should report cast await within loop',
+        code: 'async function run() { while (more) { await (work() as Promise<void>); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should report optional awaited loop call',
+        code: 'async function run() { for (const item of list) { await work?.(item); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should avoid inheriting an allowed outer name',
+        code: 'async function retry() { const worker = async () => { while (more) { await work(); } }; }',
+        options: [{ allowedFunctionNames: ['retry'] }],
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+
+      {
+        name: 'should check anonymous callbacks',
+        code: 'run(async function () { while (more) { await work(); } });',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should check anonymous arrows',
+        code: 'run(async () => { while (more) { await work(); } });',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should check destructured arrow bindings',
+        code: 'const { run } = async () => { while (more) { await work(); } };',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should keep unrelated loops checked',
+        code: 'async function run() { for (const x of list) { await work(x); } }',
+        options: [{ allowedFunctionNames: ['retry'] }],
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should keep async iterator bodies checked by default',
+        code: 'async function run() { for await (const x of stream) { await consume(x); } }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
+      {
+        name: 'should keep top-level loops checked',
+        code: 'for (const x of items) { await consume(x); }',
+        errors: [{ messageId: 'noAwaitInLoop' }],
+      },
       {
         name: 'should report await in for-of loop',
         code: 'async function main() { for (const x of items) { await process(x); } }',

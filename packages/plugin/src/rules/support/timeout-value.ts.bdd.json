@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/timeout-value.ts",
+  "module": {
+    "name": "timeout-value",
+    "description": "Recognize supported numeric timeout expressions without executing source code; use Number.NaN internally for invalid values.",
+    "exports": ["isRuntimeTimeoutObject", "isTimeoutExpression"]
+  },
+  "specifications": [
+    {
+      "feature": "Recognize supported numeric timeout expressions without executing source code.",
+      "scenarios": [
+        {
+          "name": "should accept numeric arithmetic",
+          "given": "numeric literals, stable aliases, arithmetic operators, and unary signs",
+          "when": "a timeout is checked",
+          "then": "positive finite results and unresolved numeric runtime expressions are accepted"
+        },
+        {
+          "name": "should reject disabled numeric results",
+          "given": "zero, negative, nonfinite, or unsupported expressions",
+          "when": "a timeout is checked",
+          "then": "the expression is rejected without coercion or execution"
+        },
+        {
+          "name": "should resolve logical fallbacks",
+          "given": "numeric, nullish, or unresolved logical operands",
+          "when": "a timeout is checked",
+          "then": "known branches are selected and known disabled fallback values are rejected"
+        },
+        {
+          "name": "should distinguish runtime options objects",
+          "given": "an unresolved identifier, call, or member expression",
+          "when": "Got timeout options are checked",
+          "then": "runtime options are accepted while numeric expressions are rejected"
+        },
+        {
+          "name": "should stop evaluation of cyclic expression aliases",
+          "given": "self-referential or mutually recursive aliases inside arithmetic or fallback expressions",
+          "when": "timeout expressions are resolved",
+          "then": "the expressions are rejected without unbounded recursion"
+        },
+        {
+          "name": "should reject unshadowed invalid globals",
+          "given": "global NaN, Infinity, or undefined used directly, through aliases, or in supported timeout expressions",
+          "when": "a numeric timeout or runtime timeout object is checked",
+          "then": "the invalid global value is rejected"
+        },
+        {
+          "name": "should respect shadowed special-value bindings",
+          "given": "parameters or local declarations named NaN, Infinity, or undefined",
+          "when": "timeouts and logical fallbacks are checked",
+          "then": "known initializers are validated and unknown parameter values remain runtime values instead of being classified by name"
+        }
+      ]
+    }
+  ]
+}

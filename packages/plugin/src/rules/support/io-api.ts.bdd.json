@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/io-api.ts",
+  "module": {
+    "name": "io-api",
+    "description": "resolveIoApi inspects a call.",
+    "exports": ["IIoApi", "ioOptionsIndex", "resolveIoApi"]
+  },
+  "specifications": [
+    {
+      "feature": "Conservative static resolution",
+      "scenarios": [
+        {
+          "name": "should resolve import aliases",
+          "given": "default, named, and namespace HTTP or child_process imports",
+          "when": "resolveIoApi inspects a call",
+          "then": "the original client and method are identified while unrelated and shadowed bindings are skipped"
+        },
+        {
+          "name": "should select actual options positions",
+          "given": "Axios body methods, config-only calls, fetch, or subprocess optional argv",
+          "when": "ioOptionsIndex selects the configuration",
+          "then": "request payloads and argv are not treated as option objects"
+        },
+        {
+          "name": "should ignore unrelated methods",
+          "given": "a client factory, dynamic call, or unsupported namespace member",
+          "when": "the API is resolved",
+          "then": "no supported IO call is inferred"
+        }
+      ]
+    }
+  ]
+}

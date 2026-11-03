@@ -19,7 +19,14 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { isInsideBoundary } from '../helpers/ast/navigation';
 import { createRule } from './support/rule-factory';
 
-type NoAwaitInLoopContext = Readonly<TSESLint.RuleContext<'noAwaitInLoop', []>>;
+interface INoAwaitInLoopOptions {
+  allowedFunctionNames?: readonly string[];
+  allowForAwaitOf?: boolean;
+}
+
+type NoAwaitInLoopContext = Readonly<
+  TSESLint.RuleContext<'noAwaitInLoop', [INoAwaitInLoopOptions?]>
+>;
 
 const LOOP_TYPES = new Set([
   AST_NODE_TYPES.ForStatement,
@@ -36,6 +43,92 @@ const FUNCTION_BOUNDARY_TYPES = new Set([
 ]);
 
 /**
+ * Tests the async-iterator exception without treating ordinary loops as sequential.
+ * @param node - AST node to inspect.
+ * @param options - Configured rule options.
+ * @returns The result of the described check or resolution.
+ */
+function isAllowedAsyncIterator(
+  node: Readonly<TSESTree.Node>,
+  options: Readonly<INoAwaitInLoopOptions>,
+): boolean {
+  return (
+    options.allowForAwaitOf === true && node.type === AST_NODE_TYPES.ForOfStatement && node.await
+  );
+}
+
+/**
+ * Matches a sequential function's declared name or variable binding.
+ * @param node - AST node to inspect.
+ * @param names - Configured function names.
+ * @returns The result of the described check or resolution.
+ */
+function isAllowedFunction(node: Readonly<TSESTree.Node>, names: readonly string[]): boolean {
+  return names.includes(sequentialFunctionName(node)) || names.includes(variableFunctionName(node));
+}
+
+/**
+ * Allows explicitly configured sequential functions and async iterator loops.
+ * @param context - ESLint rule context.
+ * @param ancestors - Enclosing nodes in traversal order.
+ * @returns The result of the described check or resolution.
+ */
+function isAllowedSequentialAwait(
+  context: Readonly<NoAwaitInLoopContext>,
+  ancestors: readonly TSESTree.Node[],
+): boolean {
+  const options = context.options[0] ?? {};
+  const boundary = lastSequentialBoundary(ancestors, options);
+  return boundary !== null && isSequentialException(boundary, options);
+}
+
+/**
+ * Identifies the nearest function or explicitly allowed async iterator.
+ * @param node - AST node to inspect.
+ * @param options - Configured rule options.
+ * @returns The result of the described check or resolution.
+ */
+function isSequentialBoundary(
+  node: Readonly<TSESTree.Node>,
+  options: Readonly<INoAwaitInLoopOptions>,
+): boolean {
+  if (FUNCTION_BOUNDARY_TYPES.has(node.type)) return true;
+  return isAllowedAsyncIterator(node, options);
+}
+
+/**
+ * Checks the configured exception at the current function boundary.
+ * @param node - AST node to inspect.
+ * @param options - Configured rule options.
+ * @returns The result of the described check or resolution.
+ */
+function isSequentialException(
+  node: Readonly<TSESTree.Node>,
+  options: Readonly<INoAwaitInLoopOptions>,
+): boolean {
+  return (
+    node.type === AST_NODE_TYPES.ForOfStatement ||
+    isAllowedFunction(node, options.allowedFunctionNames ?? [])
+  );
+}
+
+/**
+ * Returns the innermost sequential boundary, if present.
+ * @param ancestors - Enclosing AST nodes in traversal order.
+ * @param options - Configured rule options.
+ * @returns The result of the described check or resolution.
+ */
+function lastSequentialBoundary(
+  ancestors: readonly TSESTree.Node[],
+  options: Readonly<INoAwaitInLoopOptions>,
+): TSESTree.Node | null {
+  return ancestors.reduce<TSESTree.Node | null>(
+    (last, node) => (isSequentialBoundary(node, options) ? node : last),
+    null,
+  );
+}
+
+/**
  * Reports await-in-loop violations for await expression nodes.
  *
  * @param context - ESLint rule execution context.
@@ -46,6 +139,7 @@ function reportAwaitExpressionInLoop(
   node: Readonly<TSESTree.AwaitExpression>,
 ): void {
   const ancestors = context.sourceCode.getAncestors(node);
+  if (isAllowedSequentialAwait(context, ancestors)) return;
   if (isInsideBoundary(ancestors, LOOP_TYPES, FUNCTION_BOUNDARY_TYPES)) {
     context.report({ node, messageId: 'noAwaitInLoop' });
   }
@@ -64,6 +158,32 @@ function resolveListeners(context: Readonly<NoAwaitInLoopContext>): TSESLint.Rul
 }
 
 /**
+ * Finds the name of a declared function or function-valued variable.
+ * @param node - AST node to inspect.
+ * @returns The result of the described check or resolution.
+ */
+function sequentialFunctionName(node: Readonly<TSESTree.Node>): string {
+  if (
+    node.type === AST_NODE_TYPES.FunctionDeclaration ||
+    node.type === AST_NODE_TYPES.FunctionExpression
+  ) {
+    if (node.id !== null) return node.id.name;
+  }
+  return variableFunctionName(node);
+}
+
+/**
+ * Reads a function-valued variable name.
+ * @param node - AST node to inspect.
+ * @returns The result of the described check or resolution.
+ */
+function variableFunctionName(node: Readonly<TSESTree.Node>): string {
+  const parent = node.parent;
+  if (parent?.type !== AST_NODE_TYPES.VariableDeclarator) return '';
+  return parent.id.type === AST_NODE_TYPES.Identifier ? parent.id.name : '';
+}
+
+/**
  * ESLint rule that disallows await expressions inside loops.
  */
 export const noAwaitInLoop = createRule({
@@ -71,14 +191,22 @@ export const noAwaitInLoop = createRule({
   meta: {
     type: 'problem',
     docs: {
-      description:
-        'Disallow await expressions inside loops; use Promise.all() for parallel execution',
+      description: 'Review await inside loops with configurable sequential-work exceptions',
     },
     messages: {
       noAwaitInLoop:
-        'Unexpected await inside a loop; refactor to use Promise.all() or Promise.allSettled() for parallel execution',
+        'Review sequential await: use bounded concurrency for independent work, or configure an exception for ordering, retries, pagination, or rate limits.',
     },
-    schema: [],
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allowedFunctionNames: { type: 'array', items: { type: 'string' }, uniqueItems: true },
+          allowForAwaitOf: { type: 'boolean' },
+        },
+        additionalProperties: false,
+      },
+    ],
   },
   defaultOptions: [],
   create: resolveListeners,

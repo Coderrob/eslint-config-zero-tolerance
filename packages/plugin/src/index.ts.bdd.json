@@ -159,6 +159,17 @@
           "then": "returns a legacy ESLint config object using scoped rule identifiers set to error severity"
         }
       ]
+    },
+    {
+      "feature": "Opt-in error-cause rule",
+      "scenarios": [
+        {
+          "name": "should register error cause preservation without changing presets",
+          "given": "the plugin registry and existing preset configurations",
+          "when": "a consumer enables require-error-cause individually",
+          "then": "the rule is available and the existing presets retain their configured rules"
+        }
+      ]
     }
   ]
 }

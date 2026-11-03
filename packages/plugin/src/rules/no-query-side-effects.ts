@@ -15,16 +15,22 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { type FunctionNode } from '../helpers/ast-guards';
 import { resolveFunctionName } from '../helpers/ast-helpers';
 import { getMatchingCallMemberMethodName } from '../helpers/ast/calls';
 import { createFunctionNodeEnterExitListeners } from './support/function-listeners';
+import { isLocalMutation } from './support/local-mutation';
 import { createRule } from './support/rule-factory';
 
 const DELETE_OPERATOR = 'delete';
+
 const UPDATE_KIND = 'update';
+
 const ASSIGNMENT_KIND = 'assignment';
+
 const QUERY_NAME_PATTERN = /^(get|is|has|can|should)[A-Z_]/;
+
 const MUTATING_METHODS = new Set([
   'set',
   'add',
@@ -42,10 +48,13 @@ const MUTATING_METHODS = new Set([
 ]);
 
 type QueryScopeInfo = {
+  node: FunctionNode;
   isQuery: boolean;
   name: string;
 };
+
 type NoQuerySideEffectsContext = Readonly<TSESLint.RuleContext<'noQuerySideEffects', []>>;
+
 type QueryScopeStack = QueryScopeInfo[];
 
 /**
@@ -206,6 +215,7 @@ function enterFunctionScope(
   const name = resolveFunctionName(node);
   Reflect.apply(Array.prototype.push, functionStack, [
     {
+      node,
       name,
       isQuery: isQueryName(name),
     },
@@ -233,6 +243,17 @@ function exitFunctionScope(
  */
 function getCurrentScope(functionStack: Readonly<QueryScopeStack>): QueryScopeInfo | null {
   return functionStack[functionStack.length - 1] ?? null;
+}
+
+/**
+ * Returns the binding or property affected by a mutation expression.
+ * @param node - AST node to inspect.
+ * @returns The result of the described check or resolution.
+ */
+function getMutationTarget(node: Readonly<TSESTree.Node>): TSESTree.Node {
+  if (node.type === AST_NODE_TYPES.AssignmentExpression) return node.left;
+  if (node.type === AST_NODE_TYPES.CallExpression) return node.callee;
+  return unaryMutationTarget(node);
 }
 
 /**
@@ -273,11 +294,25 @@ function reportIfQueryScope(
   if (current === null || !current.isQuery) {
     return;
   }
+  if (isLocalMutation(context.sourceCode, getMutationTarget(node), current.node, node)) {
+    return;
+  }
   context.report({
     node,
     messageId: 'noQuerySideEffects',
     data: { name: current.name, kind },
   });
+}
+
+/**
+ * Returns the operand of update and delete operations.
+ * @param node - AST node to inspect.
+ * @returns The result of the described check or resolution.
+ */
+function unaryMutationTarget(node: Readonly<TSESTree.Node>): TSESTree.Node {
+  if (node.type === AST_NODE_TYPES.UpdateExpression || node.type === AST_NODE_TYPES.UnaryExpression)
+    return node.argument;
+  return node;
 }
 
 /** Disallows side effects in query-style functions. */
@@ -287,7 +322,7 @@ export const noQuerySideEffects = createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier',
+        'Disallow observable mutation in query functions while allowing local computation',
     },
     messages: {
       noQuerySideEffects:

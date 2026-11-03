@@ -4,47 +4,182 @@
   "sourceFile": "packages/plugin/src/rules/no-await-in-loop.ts",
   "module": {
     "name": "no-await-in-loop",
-    "description": "Disallow await expressions inside loops; use Promise.all() for parallel execution.",
-    "exports": ["noAwaitInLoop"]
+    "description": "Review repeated waits inside loops and allow intentional sequential work.",
+    "exports": [
+      "noAwaitInLoop"
+    ]
   },
   "specifications": [
     {
-      "feature": "Await outside loops",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow await at the top level of an async function",
-          "given": "an await expression that is not inside any loop",
-          "when": "the rule evaluates the expression",
-          "then": "no violation is reported"
+          "name": "should allow nested loops within an opted-in async iterator body",
+          "given": "async function run() { for await (const item of stream) { while (more) { await work(); } } }",
+          "when": "the rule analyzes the fixture with options [{ allowForAwaitOf: true }]",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should allow Promise.all() inside a loop",
-          "given": "a for..of loop that awaits Promise.all()",
-          "when": "the rule evaluates the expression",
-          "then": "no violation is reported"
-        }
-      ]
-    },
-    {
-      "feature": "Await inside loop constructs",
-      "scenarios": [
-        {
-          "name": "should report an await expression inside a for loop",
-          "given": "an await expression nested inside a for() loop body",
-          "when": "the rule evaluates the code",
-          "then": "a noAwaitInLoop violation is reported"
+          "name": "should allow asserted awaits outside loops",
+          "given": "async function run() { await (work() as Promise<void>); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report an await expression inside a for..of loop",
-          "given": "an await expression nested inside a for..of loop body",
-          "when": "the rule evaluates the code",
-          "then": "a noAwaitInLoop violation is reported"
+          "name": "should allow optional calls in configured retry",
+          "given": "async function retry() { while (more) { await work?.(); } }",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['retry'] }]",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report an await expression inside a while loop",
-          "given": "an await expression nested inside a while loop body",
-          "when": "the rule evaluates the code",
-          "then": "a noAwaitInLoop violation is reported"
+          "name": "should keep function boundaries inside loop headers",
+          "given": "async function run() { while (factory(async () => { await work(); })) {} }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow configured retry function",
+          "given": "async function retry() { while (true) { await attempt(); } }",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['retry'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow configured arrow binding",
+          "given": "const paginate = async () => { while (more) { await page(); } };",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['paginate'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow named function expression",
+          "given": "const task = async function retry() { while (true) { await attempt(); } };",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['retry'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow async iterator work when configured",
+          "given": "async function run() { for await (const x of stream) { await consume(x); } }",
+          "when": "the rule analyzes the fixture with options [{ allowForAwaitOf: true }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow await outside loop",
+          "given": "async function main() { await fetch(url); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow Promise.all usage",
+          "given": "async function main() { const results = await Promise.all(items.map(x => process(x))); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow await inside nested async function within loop",
+          "given": "async function main() { for (const x of items) { const fn = async () => { await process(x); }; fn(); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow await in nested async function inside while loop",
+          "given": "async function main() { while (true) { const fn = async () => await work(); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow Promise.allSettled usage",
+          "given": "async function main() { await Promise.allSettled(items.map(x => process(x))); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow top-level await outside any loop",
+          "given": "await fetch(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should report cast await within loop",
+          "given": "async function run() { while (more) { await (work() as Promise<void>); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report optional awaited loop call",
+          "given": "async function run() { for (const item of list) { await work?.(item); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should avoid inheriting an allowed outer name",
+          "given": "async function retry() { const worker = async () => { while (more) { await work(); } }; }",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['retry'] }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should check anonymous callbacks",
+          "given": "run(async function () { while (more) { await work(); } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should check anonymous arrows",
+          "given": "run(async () => { while (more) { await work(); } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should check destructured arrow bindings",
+          "given": "const { run } = async () => { while (more) { await work(); } };",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should keep unrelated loops checked",
+          "given": "async function run() { for (const x of list) { await work(x); } }",
+          "when": "the rule analyzes the fixture with options [{ allowedFunctionNames: ['retry'] }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should keep async iterator bodies checked by default",
+          "given": "async function run() { for await (const x of stream) { await consume(x); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should keep top-level loops checked",
+          "given": "for (const x of items) { await consume(x); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report await in for-of loop",
+          "given": "async function main() { for (const x of items) { await process(x); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report await in for loop",
+          "given": "async function main() { for (let i = 0; i < 10; i++) { await step(i); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report await in while loop",
+          "given": "async function main() { while (condition()) { await poll(); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report await in do-while loop",
+          "given": "async function main() { do { await tick(); } while (running); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
+        },
+        {
+          "name": "should report await in for-in loop",
+          "given": "async function main() { for (const k in obj) { await handle(k); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'noAwaitInLoop' }]"
         }
       ]
     }

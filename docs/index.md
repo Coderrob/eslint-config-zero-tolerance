@@ -2,9 +2,9 @@
 
 [Behavioral safety contracts](rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
 
-**82 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
+**83 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
@@ -56,3 +56,9 @@ export default [zeroTolerance.configs.recommended];
 ```
 
 See the [Getting Started](getting-started.md) guide for full setup instructions and the [Rules](rules/index.md) reference for descriptions of every rule.
+
+## Choose checks
+
+Use the [rule reference](rules/index.md) to choose checks and review examples, options, and limits. Enable [require-error-cause](rules/require-error-cause.md) individually to preserve original exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](configuration.md#additional-code-quality-checks-individual-opt-in).

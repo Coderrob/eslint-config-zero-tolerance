@@ -1,0 +1,253 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/require-error-cause.ts",
+  "module": {
+    "name": "require-error-cause",
+    "description": "Keep the original exception when throwing a replacement error.",
+    "exports": [
+      "requireErrorCause"
+    ]
+  },
+  "specifications": [
+    {
+      "feature": "Supported behavior and regression cases",
+      "scenarios": [
+        {
+          "name": "should preserve angle asserted cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: <unknown>error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve nonnull cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: error! }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve nested satisfies cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: (error as unknown) satisfies unknown }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve computed static cause key",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { [\"cause\"]: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve aliases captured before reassignment",
+          "given": "try { run(); } catch (error) { const original = error; error = other; throw new Error(\"failed\", { cause: original }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve options captured before reassignment",
+          "given": "try { run(); } catch (error) { const options = { cause: error }; error = other; throw new Error(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve chained aliases captured before reassignment",
+          "given": "try { run(); } catch (error) { const first = error; error = other; const second = first; throw new Error(\"failed\", { cause: second }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore later writes after the cause was captured",
+          "given": "try { run(); } catch (error) { if (flag) throw new Error(\"failed\", { cause: error }); error = other; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve factory aliases captured before reassignment",
+          "given": "try { run(); } catch (error) { const original = error; error = other; throw wrap(\"failed\", original); }",
+          "when": "the rule analyzes the fixture with options [{ errorFactoryNames: ['wrap'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow original rethrow",
+          "given": "try { run(); } catch (error) { throw error; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow native cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow callable Error",
+          "given": "try { run(); } catch (error) { throw Error(\"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow local cause aliases",
+          "given": "try { run(); } catch (error) { const original = error; const options = { cause: original }; throw new TypeError(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow aggregate cause",
+          "given": "try { run(); } catch (error) { throw new AggregateError([], \"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow configured factories",
+          "given": "try { run(); } catch (error) { throw wrap(\"failed\", error); }",
+          "when": "the rule analyzes the fixture with options [{ errorFactoryNames: ['wrap'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore throws outside catch",
+          "given": "throw new Error(\"failed\");",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore deferred functions",
+          "given": "try { run(); } catch (error) { const later = () => { throw new Error(\"later\"); }; }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore shadowed constructors",
+          "given": "function run(Error) { try { work(); } catch (error) { throw new Error(\"custom\"); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore custom constructors",
+          "given": "try { run(); } catch (error) { throw new CustomError(\"custom\"); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore member constructors",
+          "given": "try { run(); } catch (error) { throw new errors.CustomError(\"custom\"); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should reject overwritten cause behind asserted options",
+          "given": "try { run(); } catch (error) { const options = { cause: error }; options.cause = other; throw new Error(\"failed\", options!); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject an asserted unrelated cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: other as unknown }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject a nonnull unrelated cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: other! }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject overwritten cause from spread",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: error, ...{ cause: other } }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should preserve nearest nested catch identity",
+          "given": "try { run(); } catch (outer) { try { work(); } catch (inner) { throw new Error(\"failed\", { cause: outer }); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject reassigned catch variables",
+          "given": "try { run(); } catch (error) { error = new Error(\"replacement\"); throw new Error(\"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject aliases captured after reassignment",
+          "given": "try { run(); } catch (error) { error = other; const alias = error; throw new Error(\"failed\", { cause: alias }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject conditional reassignments before cause reads",
+          "given": "try { run(); } catch (error) { if (flag) error = other; throw new Error(\"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject destructuring writes to catch variables",
+          "given": "try { run(); } catch (error) { ({ error } = other); throw new Error(\"failed\", { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject reassigned errors passed to factories",
+          "given": "try { run(); } catch (error) { error = other; throw wrap(\"failed\", error); }",
+          "when": "the rule analyzes the fixture with options [{ errorFactoryNames: ['wrap'] }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report lost cause",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\"); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report wrong cause",
+          "given": "try { run(); } catch (error) { throw new TypeError(\"failed\", { cause: other }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report missing cause property",
+          "given": "try { run(); } catch (error) { throw new Error(\"failed\", {}); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report missing catch binding",
+          "given": "try { run(); } catch { throw new Error(\"failed\"); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report destructured catch binding",
+          "given": "try { run(); } catch ({ message }) { throw new Error(message, { cause: message }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report shadowed catch binding",
+          "given": "try { run(); } catch (error) { { const error = other; throw new Error(\"failed\", { cause: error }); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report wrong aggregate options position",
+          "given": "try { run(); } catch (error) { throw new AggregateError([], { cause: error }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report factory dropping cause",
+          "given": "try { run(); } catch (error) { throw wrap(\"failed\"); }",
+          "when": "the rule analyzes the fixture with options [{ errorFactoryNames: ['wrap'] }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should report inner error wrapping outer cause",
+          "given": "try { run(); } catch (outer) { try { work(); } catch (inner) { throw new Error(\"failed\", { cause: outer }); } }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        }
+      ]
+    }
+  ]
+}

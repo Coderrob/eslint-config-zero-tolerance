@@ -1,53 +1,47 @@
 # no-await-in-loop
 
-Disallow `await` expressions inside loop bodies; use `Promise.all()` or `Promise.allSettled()` instead.
+Review repeated waits inside loops and allow intentional sequential work.
 
-## Rule Details
+Type: problem. No automatic fix.
 
-| Property        | Value     |
-| --------------- | --------- |
-| **Type**        | `problem` |
-| **Fixable**     | No        |
-| **Recommended** | `warn`    |
-| **Strict**      | `error`   |
+## What it checks
 
-## Rationale
+Reports explicit await expressions inside loops. An await in a nested function is checked in that function's own scope. Type assertions and optional calls do not change this behavior.
 
-`await` inside a loop serialises asynchronous operations: each iteration waits for the previous one to finish before starting the next. This is almost never the intended behaviour and is a significant performance bottleneck. `Promise.all()` runs the operations in parallel, completing in the time of the slowest single operation rather than the sum of all operations.
+Retries, pagination, and rate limits may require sequential work. Run independent work concurrently only when ordering, resources, and error handling permit it. Limit concurrency for large collections.
 
-The rule detects `await` inside `for`, `for...in`, `for...of`, `while`, and `do...while` loops. It does **not** flag `await` inside callbacks or async functions nested within the loop body.
+## Options
+
+| Option                 | Default | Meaning                                                                               |
+| ---------------------- | ------- | ------------------------------------------------------------------------------------- |
+| `allowedFunctionNames` | []      | Exact function names or function-valued variable names allowed to await inside loops. |
+| `allowForAwaitOf`      | false   | Allow explicit awaits within for-await-of bodies, including nested loops.             |
+
+```js
+'zero-tolerance/no-await-in-loop': ['error', {
+  allowedFunctionNames: ['retry', 'paginate'],
+  allowForAwaitOf: true,
+}]
+```
 
 ## Examples
 
-### ✅ Correct
-
 ```typescript
-// Run all requests in parallel
-const results = await Promise.all(ids.map((id) => fetchUser(id)));
-
-// Settle all, collecting errors
-const settled = await Promise.allSettled(items.map((item) => process(item)));
-```
-
-### ❌ Incorrect
-
-```typescript
-for (const id of ids) {
-  // Serialised — each request waits for the previous
-  const user = await fetchUser(id);
-  users.push(user);
+async function loadAll(items) {
+  for (const item of items) {
+    await load(item); // Reported with default options.
+  }
 }
 
-while (queue.length > 0) {
-  const item = queue.shift()!;
-  await process(item);
+async function retry() {
+  while (pending) {
+    await attempt(); // Allowed when 'retry' is configured above.
+  }
 }
 ```
 
-## Configuration
+## Limits
 
-This rule has no options:
+Exceptions stop at nested function boundaries. A callback does not inherit an outer function's exception. A named exception allows all awaits within that function, so keep exception functions focused. Class and object method names are not matched by `allowedFunctionNames`.
 
-```js
-'zero-tolerance/no-await-in-loop': 'error'
-```
+The rule checks explicit await expressions, not the implicit waits performed by async iteration. It does not automatically replace loops with Promise.all.

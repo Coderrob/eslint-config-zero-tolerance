@@ -1,6 +1,6 @@
 <p align="center">
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
 <img
     src="public/img/zero-tolerance-icon.png"
     alt="ESLint Plugin Zero Tolerance"
@@ -11,7 +11,7 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 <h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
 
 <p align="center">
-  <strong>82 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
+  <strong>83 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ This monorepo publishes one package:
 
 | Package                                                                                                          | Description                         |
 | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 82 custom rules |
+| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 83 custom rules |
 
 `packages/config` is retained as an internal workspace package for development and compatibility testing; it is not published to npm.
 
@@ -140,7 +140,7 @@ module.exports = {
 
 <!-- begin auto-generated rules list -->
 
-The plugin ships **82 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
+The plugin ships **83 rules** across 8 categories. The grouped catalog below is exhaustive and links every rule to its dedicated documentation page.
 
 Preset columns report the configured severity: 💼 for `error`, ⚠️ for `warn`, and 🚫 for `off`. A blank cell means the preset does not configure the rule.
 
@@ -151,7 +151,7 @@ Preset columns report the configured severity: 💼 for `error`, ⚠️ for `war
 | [Testing](#testing)                       |    13 | Assertions, mocks, timers, fetch, interfaces        |
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
-| [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
+| [Error Handling](#error-handling)         |     4 | Throw safety, empty catches, Result patterns        |
 | [Imports](#imports)                       |    12 | Barrels, re-exports, dynamic imports, node protocol |
 | [Bug Prevention](#bug-prevention)         |    20 | Identical code, control flow, async safety          |
 
@@ -229,9 +229,9 @@ Function size, magic values, immutability, sorting
 
 | Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                          |
 | :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :--------------------------------------------------------------------------------------------------- |
-| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Enforce a maximum number of lines per function body                                                  |
+| [max-function-lines](docs/rules/max-function-lines.md)                       | 📖  | S   | R   |     | Limit block and expression function bodies with optional blank/comment exclusions                    |
 | [max-params](docs/rules/max-params.md)                                       | 📖  | S   | R   |     | Enforce a maximum number of function parameters                                                      |
-| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating array methods; prefer immutable alternatives such as spread, slice, and toSorted   |
+| [no-array-mutation](docs/rules/no-array-mutation.md)                         | 📖  | S   | R   |     | Disallow mutating methods on known arrays and tuples                                                 |
 | [no-date-now](docs/rules/no-date-now.md)                                     | 📖  | S   | R   |     | Disallow Date.now() and new Date(); prefer injected clocks for deterministic behavior                |
 | [no-magic-numbers](docs/rules/no-magic-numbers.md)                           | 📖  | S   | R   |     | Disallow magic numbers; use named constants instead of raw numeric literals                          |
 | [no-magic-strings](docs/rules/no-magic-strings.md)                           | 📖  | S   | R   |     | Disallow magic strings in comparisons and switch cases; use named constants instead                  |
@@ -255,6 +255,7 @@ Throw safety, empty catches, Result patterns
 | [no-empty-catch](docs/rules/no-empty-catch.md)             | ❗  | S   | R   |     | Disallow empty catch blocks that silently swallow errors                                                  |
 | [no-throw-literal](docs/rules/no-throw-literal.md)         | ❗  | S   | R   |     | Disallow throwing literals, objects, or templates; always throw a new Error instance                      |
 | [prefer-result-return](docs/rules/prefer-result-return.md) | 📖  |     | S   | R   | Prefer Result-style return values instead of throw statements to make error flows explicit and composable |
+| [require-error-cause](docs/rules/require-error-cause.md)   | ❗  |     |     |     | Preserve the caught exception when throwing a replacement error                                           |
 
 ### Imports
 
@@ -281,26 +282,26 @@ Identical code, control flow, async safety
 
 | Name                                                                         | 🗂️  | 💼  | ⚠️  | 🚫  | Description                                                                                                   |
 | :--------------------------------------------------------------------------- | :-- | :-- | :-- | :-- | :------------------------------------------------------------------------------------------------------------ |
-| [no-await-in-loop](docs/rules/no-await-in-loop.md)                           | ❗  | S   | R   |     | Disallow await expressions inside loops; use Promise.all() for parallel execution                             |
+| [no-await-in-loop](docs/rules/no-await-in-loop.md)                           | ❗  | S   | R   |     | Review await inside loops with configurable sequential-work exceptions                                        |
 | [no-boolean-return-trap](docs/rules/no-boolean-return-trap.md)               | 📖  | S   | R   |     | Disallow ambiguous boolean-return APIs; prefer predicate naming or richer result types for clearer call sites |
 | [no-eslint-disable](docs/rules/no-eslint-disable.md)                         | 📖  | S   | R   |     | Prevent use of eslint-disable comments                                                                        |
 | [no-flag-argument](docs/rules/no-flag-argument.md)                           | 📖  | S   | R   |     | Disallow boolean flag arguments in function declarations; prefer explicit methods or command objects          |
 | [no-floating-promises](docs/rules/no-floating-promises.md)                   | ❗  | S   | R   |     | Require handling of explicit, local async, and type-resolved promises                                         |
 | [no-for-in](docs/rules/no-for-in.md)                                         | ❗  | S   | R   |     | Disallow for..in loops; use Object.keys/values/entries to avoid prototype-chain iteration                     |
 | [no-identical-branches](docs/rules/no-identical-branches.md)                 | 📖  | S   | R   |     | Disallow identical if/else and conditional-expression branches; consolidate duplicate conditional fragments   |
-| [no-identical-expressions](docs/rules/no-identical-expressions.md)           | ❗  | S   | R   |     | Disallow identical expressions on both sides of a binary or logical operator (Sonar S1764)                    |
+| [no-identical-expressions](docs/rules/no-identical-expressions.md)           | ❗  | S   | R   |     | Report repeated stable operands in comparisons and logical expressions                                        |
 | [no-labels](docs/rules/no-labels.md)                                         | ❗  | S   | R   |     | Disallow labels because they make control flow harder to reason about                                         |
 | [no-math-random](docs/rules/no-math-random.md)                               | ❗  | S   | R   |     | Disallow Math.random(); inject randomness explicitly or use a dedicated random source                         |
 | [no-parameter-reassign](docs/rules/no-parameter-reassign.md)                 | 📖  | S   | R   |     | Disallow assignments and updates to function parameters; use a new local variable instead                     |
 | [no-process-env-outside-config](docs/rules/no-process-env-outside-config.md) | ❗  | S   | R   |     | Disallow process.env reads outside configuration modules; import typed config instead                         |
-| [no-query-side-effects](docs/rules/no-query-side-effects.md)                 | 📖  | S   | R   |     | Disallow side effects in query-style functions (get*/is*/has*/can*/should*); separate query from modifier     |
+| [no-query-side-effects](docs/rules/no-query-side-effects.md)                 | 📖  | S   | R   |     | Disallow observable mutation in query functions while allowing local computation                              |
 | [no-redundant-boolean](docs/rules/no-redundant-boolean.md)                   | 📖  | S   | R   |     | Disallow redundant comparisons to boolean literals (Sonar S1125)                                              |
 | [no-ts-nocheck](docs/rules/no-ts-nocheck.md)                                 | ❗  | S   | R   |     | Prevent use of @ts-nocheck comments                                                                           |
 | [no-with](docs/rules/no-with.md)                                             | ❗  | S   | R   |     | Disallow with statements because they make scope resolution unpredictable                                     |
 | [prefer-guard-clauses](docs/rules/prefer-guard-clauses.md)                   | 📖  | S   | R   |     | Prefer guard clauses by disallowing else blocks when the if branch already terminates control flow            |
 | [prefer-shortcut-return](docs/rules/prefer-shortcut-return.md)               | 📖  | S   | R   |     | Prefer shortcut boolean returns while preserving comments                                                     |
 | [require-exhaustive-switch](docs/rules/require-exhaustive-switch.md)         | 📖  | S   | R   |     | Require exhaustive switch statements over finite union, enum, and boolean discriminants                       |
-| [require-timeout-for-io](docs/rules/require-timeout-for-io.md)               | ❗  | S   | R   |     | Require timeout or cancellation options for external IO calls                                                 |
+| [require-timeout-for-io](docs/rules/require-timeout-for-io.md)               | ❗  | S   | R   |     | Require API-specific timeout or cancellation options for external IO calls                                    |
 
 <!-- end auto-generated rules list -->
 
@@ -368,6 +369,12 @@ pnpm build
 ```
 
 The internal config workspace package is not published.
+
+## Choose checks
+
+Use the [rule reference](docs/rules/index.md) to choose checks and review examples, options, and limits. Enable [require-error-cause](docs/rules/require-error-cause.md) individually to preserve original exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](docs/configuration.md#additional-code-quality-checks-individual-opt-in).
 
 ## License
 

@@ -2,7 +2,7 @@
 
 [Behavioral safety contracts](../../docs/rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
 
 Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
 
@@ -11,7 +11,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **82 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **83 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` generally uses warning severity for gradual adoption, while `strict` generally uses error severity; strict-only and opt-in exceptions are identified below
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -220,6 +220,12 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 Full rule documentation with examples is available at:
 
 <https://coderrob.github.io/eslint-config-zero-tolerance/>
+
+## Choose checks
+
+Use the [rule reference](../../docs/rules/index.md) to choose checks and review examples, options, and limits. Enable [require-error-cause](../../docs/rules/require-error-cause.md) individually to preserve original exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](../../docs/configuration.md#additional-code-quality-checks-individual-opt-in).
 
 ## License
 

@@ -91,6 +91,7 @@ import preferStructuredClone from './rules/prefer-structured-clone';
 import requireBarrelRelativeExports from './rules/require-barrel-relative-exports';
 import requireBddSpec from './rules/require-bdd-spec';
 import requireCleanBarrel from './rules/require-clean-barrel';
+import requireErrorCause from './rules/require-error-cause';
 import requireExhaustiveSwitch from './rules/require-exhaustive-switch';
 import requireExportedObjectType from './rules/require-exported-object-type';
 import requireInterfacePrefix from './rules/require-interface-prefix';
@@ -203,6 +204,7 @@ const rules: Record<string, unknown> = {
   'require-jsdoc-functions': requireJsdocFunctions,
   'require-node-protocol': requireNodeProtocol,
   'require-exhaustive-switch': requireExhaustiveSwitch,
+  'require-error-cause': requireErrorCause,
   'require-optional-chaining': requireOptionalChaining,
   'require-readonly-props': requireReadonlyProps,
   'require-test-description-style': requireTestDescriptionStyle,

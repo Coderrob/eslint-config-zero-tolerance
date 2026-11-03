@@ -1,56 +1,43 @@
 # max-function-lines
 
-Enforce a maximum number of lines per function body.
+Keep function bodies short enough to read and review.
 
-## Rule Details
+Type: suggestion. No automatic fix.
 
-| Property        | Value             |
-| --------------- | ----------------- |
-| **Type**        | `suggestion`      |
-| **Fixable**     | No                |
-| **Recommended** | `warn` (max: 30)  |
-| **Strict**      | `error` (max: 25) |
+## What it counts
 
-## Rationale
-
-Long functions are harder to understand, test, and maintain. Keeping functions small forces a single-responsibility design: each function does one thing, has a clear name, and can be tested in isolation. This rule counts the lines of a function's block body (inclusive of opening and closing braces) and reports any function that exceeds the configured limit. Arrow functions with concise expression bodies (no block) are not checked.
-
-## Examples
-
-### ✅ Correct
-
-```typescript
-/**
- * Validates a user registration payload.
- */
-function validateRegistration(payload: IRegistrationPayload): IValidationResult {
-  const errors: string[] = [];
-  if (!payload.email) errors.push('Email is required');
-  if (!payload.password) errors.push('Password is required');
-  return { valid: errors.length === 0, errors };
-}
-```
-
-### ❌ Incorrect (exceeds limit)
-
-```typescript
-function doEverything(user: IUser) {
-  // 35+ lines of mixed concerns...
-}
-```
+Counts the source lines occupied by a function body, including braces. Expression-bodied arrows are included. The rule's default limit is 30 lines; an existing configuration can set a different limit.
 
 ## Options
 
-| Option | Type     | Default | Description                              |
-| ------ | -------- | ------- | ---------------------------------------- |
-| `max`  | `number` | `30`    | Maximum allowed lines in a function body |
-
-The standalone default is **30** lines. The `recommended` preset keeps this at **30** and the `strict` preset sets it to **25**.
+| Option           | Default | Meaning                                          |
+| ---------------- | ------- | ------------------------------------------------ |
+| max              | 30      | Maximum body length; must be a positive integer. |
+| `skipBlankLines` | false   | Exclude lines containing only whitespace.        |
+| `skipComments`   | false   | Exclude lines containing only comments.          |
 
 ```js
-// Use the recommended preset value (30 lines)
-'zero-tolerance/max-function-lines': 'warn'
-
-// Custom limit
-'zero-tolerance/max-function-lines': ['error', { max: 50 }]
+'zero-tolerance/max-function-lines': ['error', {
+  max: 30,
+  skipBlankLines: true,
+  skipComments: true,
+}]
 ```
+
+## Examples
+
+```typescript
+// Three body lines, including braces.
+function getValue() {
+  return 1;
+}
+
+// Five expression-body lines.
+const getValues = () => [1, 2, 3];
+```
+
+## Counting details
+
+Code beside a comment still counts. Comment-like text inside strings or template literals is code. Multiple comments on one line, Windows line endings, and TypeScript assertions do not change these rules.
+
+Line count measures size, not branching. Use complexity and max-depth separately when you also want to limit decision paths and nesting.

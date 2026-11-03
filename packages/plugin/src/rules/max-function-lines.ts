@@ -15,7 +15,7 @@
  */
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { type FunctionNode, isBlockStatementNode } from '../helpers/ast-guards';
+import { type FunctionNode } from '../helpers/ast-guards';
 import { getOptionMaxValue, resolveFunctionName } from '../helpers/ast-helpers';
 import { isNumber } from '../helpers/type-guards';
 import { createFunctionNodeListeners } from './support/function-listeners';
@@ -23,26 +23,32 @@ import { createRule } from './support/rule-factory';
 
 const DEFAULT_MAX_FUNCTION_LINES = 30;
 
-type MaxFunctionLinesContext = Readonly<TSESLint.RuleContext<'tooManyLines', []>>;
-
-/**
- * Counts the lines occupied by a block-statement function body.
- *
- * @param body - The block statement to count lines for.
- * @returns The number of lines in the block statement.
- */
-function countBodyLines(body: Readonly<TSESTree.BlockStatement>): number {
-  return body.loc.end.line - body.loc.start.line + 1;
+interface IMaxFunctionLinesOptions {
+  max?: number;
+  skipBlankLines?: boolean;
+  skipComments?: boolean;
 }
 
+type MaxFunctionLinesContext = Readonly<
+  TSESLint.RuleContext<'tooManyLines', [IMaxFunctionLinesOptions?]>
+>;
+
 /**
- * Returns block body for function nodes, or null for expression-bodied arrows.
- *
- * @param node - Function node to inspect.
- * @returns Block body when present, otherwise null.
+ * Counts body lines, optionally excluding blank and comment-only lines.
+ * @param context - ESLint rule context.
+ * @param body - Input body for this operation.
+ * @returns The result of the described check or resolution.
  */
-function getBlockBody(node: Readonly<FunctionNode>): TSESTree.BlockStatement | null {
-  return isBlockStatementNode(node.body) ? node.body : null;
+function countBodyLines(
+  context: Readonly<MaxFunctionLinesContext>,
+  body: Readonly<TSESTree.Node>,
+): number {
+  const options = context.options[0];
+  const lines = context.sourceCode.lines.slice(body.loc.start.line - 1, body.loc.end.line);
+  const comments = context.sourceCode.getAllComments();
+  return lines.filter((line, offset) =>
+    isCountedLine(line, body.loc.start.line + offset, comments, options),
+  ).length;
 }
 
 /**
@@ -55,6 +61,73 @@ function getConfiguredMaxValue(options: readonly unknown[]): number {
   const firstOption = options[0];
   const maxValue = getOptionMaxValue(firstOption);
   return isNumber(maxValue) && maxValue > 0 ? maxValue : DEFAULT_MAX_FUNCTION_LINES;
+}
+
+/**
+ * Checks whether a comment intersects a source line.
+ * @param comment - Comment whose range is inspected.
+ * @param lineNumber - One-based source line number.
+ * @returns The result of the described check or resolution.
+ */
+function isCommentLine(comment: Readonly<TSESTree.Comment>, lineNumber: number): boolean {
+  return lineNumber >= comment.loc.start.line && lineNumber <= comment.loc.end.line;
+}
+
+/**
+ * Determines whether one source line contributes to the function limit.
+ * @param line - Source line text.
+ * @param lineNumber - One-based source line number.
+ * @param comments - Parsed source comments.
+ * @param options - Configured rule options.
+ * @returns The result of the described check or resolution.
+ */
+function isCountedLine(
+  line: string,
+  lineNumber: number,
+  comments: readonly TSESTree.Comment[],
+  options: IMaxFunctionLinesOptions | undefined,
+): boolean {
+  const settings = options ?? {};
+  if (line.trim() === '') return settings.skipBlankLines !== true;
+  return (
+    settings.skipComments !== true || removeLineComments(line, lineNumber, comments).trim() !== ''
+  );
+}
+
+/**
+ * Removes a single comment's intersection with a source line.
+ * @param line - Source line text.
+ * @param lineNumber - One-based source line number.
+ * @param comment - Comment whose range is inspected.
+ * @returns The result of the described check or resolution.
+ */
+function removeCommentSegment(
+  line: string,
+  lineNumber: number,
+  comment: Readonly<TSESTree.Comment>,
+): string {
+  if (!isCommentLine(comment, lineNumber)) return line;
+  const start = lineNumber === comment.loc.start.line ? comment.loc.start.column : 0;
+  const end = lineNumber === comment.loc.end.line ? comment.loc.end.column : line.length;
+  return line.slice(0, start) + line.slice(end);
+}
+
+/**
+ * Removes only comment ranges while preserving code on the same line.
+ * @param line - Source line text.
+ * @param lineNumber - One-based source line number.
+ * @param comments - Parsed source comments.
+ * @returns The result of the described check or resolution.
+ */
+function removeLineComments(
+  line: string,
+  lineNumber: number,
+  comments: readonly TSESTree.Comment[],
+): string {
+  return comments.reduceRight(
+    (text, comment) => removeCommentSegment(text, lineNumber, comment),
+    line,
+  );
 }
 
 /**
@@ -90,11 +163,7 @@ function reportIfFunctionExceedsLimit(
   maxLines: number,
   node: Readonly<FunctionNode>,
 ): void {
-  const blockBody = getBlockBody(node);
-  if (blockBody === null) {
-    return;
-  }
-  const lineCount = countBodyLines(blockBody);
+  const lineCount = countBodyLines(context, node.body);
   if (lineCount > maxLines) {
     reportFunctionLineViolation(context, node, lineCount, maxLines);
   }
@@ -121,7 +190,8 @@ export const maxFunctionLines = createRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Enforce a maximum number of lines per function body',
+      description:
+        'Limit block and expression function bodies with optional blank/comment exclusions',
     },
     messages: {
       tooManyLines:
@@ -130,7 +200,11 @@ export const maxFunctionLines = createRule({
     schema: [
       {
         type: 'object',
-        properties: { max: { type: 'number', minimum: 1 } },
+        properties: {
+          max: { type: 'integer', minimum: 1 },
+          skipBlankLines: { type: 'boolean' },
+          skipComments: { type: 'boolean' },
+        },
         additionalProperties: false,
       },
     ],

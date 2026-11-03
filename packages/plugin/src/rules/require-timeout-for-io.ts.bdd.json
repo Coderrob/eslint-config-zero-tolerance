@@ -4,36 +4,842 @@
   "sourceFile": "packages/plugin/src/rules/require-timeout-for-io.ts",
   "module": {
     "name": "require-timeout-for-io",
-    "description": "Require timeout or cancellation options for external IO calls.",
-    "exports": ["requireTimeoutForIo"]
+    "description": "Require supported timeout or cancellation options on external IO calls.",
+    "exports": [
+      "requireTimeoutForIo"
+    ]
   },
   "specifications": [
     {
-      "feature": "IO timeout enforcement",
+      "feature": "Supported behavior and regression cases",
       "scenarios": [
         {
-          "name": "should allow IO calls with signal, timeout, or approved wrappers",
-          "given": "code that calls fetch, HTTP clients, subprocesses, or custom IO through a usable signal, a positive or runtime timeout using an identifier or quoted property name, or an approved wrapper",
-          "when": "the rule evaluates the call",
-          "then": "no violation is reported"
+          "name": "should accept angle asserted timeout options",
+          "given": "axios.get(url, <{ timeout: number }>{ timeout: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should report fetch, HTTP client, and subprocess calls without cancellation",
-          "given": "production code that calls external IO without timeout or signal options, including direct, imported, or namespaced child_process subprocess calls",
-          "when": "the rule evaluates the call",
-          "then": "a missingTimeout violation is reported"
+          "name": "should accept nonnull timeout aliases",
+          "given": "const options = { timeout: 1000 }; axios.get(url, options!);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should reject cancellation options that are explicitly disabled",
-          "given": "an IO call uses signal undefined, timeout zero, or an empty chained timeout call",
-          "when": "the rule evaluates cancellation configuration",
-          "then": "a missingTimeout violation is reported because the call can still wait indefinitely"
+          "name": "should accept optional computed imported client calls",
+          "given": "import { default as client } from \"axios\"; client?.[\"get\"]?.(url, { timeout: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
         },
         {
-          "name": "should skip tests by default and check them when configured",
-          "given": "IO calls appear in test files",
-          "when": "checkTests is false or true",
-          "then": "test files are exempt by default and reported when configured"
+          "name": "should respect nested client shadowing",
+          "given": "import client from \"axios\"; function run(client) { client.get(url); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept nested timeout value assertions",
+          "given": "axios.get(url, { timeout: ((1000 as number) satisfies number)! });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept computed static timeout keys",
+          "given": "axios.get(url, { [\"timeout\"]: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept shadowed special-value parameters",
+          "given": "function load(undefined, NaN, Infinity) { axios.get(url, { timeout: undefined }); axios.get(url, { timeout: NaN }); axios.get(url, { timeout: Infinity }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve positive local constants with global names",
+          "given": "function load() { const undefined = 1000; const NaN = 2000; const Infinity = 3000; axios.get(url, { timeout: undefined }); axios.get(url, { timeout: NaN }); axios.get(url, { timeout: Infinity }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should treat shadowed undefined as runtime in logical expressions",
+          "given": "function load(undefined) { axios.get(url, { timeout: undefined && 5000 }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept a shadowed runtime Got timeout object",
+          "given": "function load(Infinity) { got(url, { timeout: Infinity }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should retain runtime aliases of shadowed constants",
+          "given": "function load(NaN) { const timeout = NaN; axios.get(url, { timeout }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept constant timeout arithmetic",
+          "given": "axios.get(url, { timeout: 5 * 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve arithmetic constants and aliases",
+          "given": "const duration = 5 * 1000; const timeout = duration; axios.get(url, { timeout });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept runtime arithmetic",
+          "given": "axios.get(url, { timeout: seconds * 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept nullish runtime fallbacks",
+          "given": "axios.get(url, { timeout: configuredTimeout ?? 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept undefined and null fallbacks",
+          "given": "axios.get(url, { timeout: undefined ?? 5000 }); axios.get(url, { timeout: null ?? 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept void fallbacks",
+          "given": "axios.get(url, { timeout: void 0 ?? 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept numeric OR fallbacks",
+          "given": "axios.get(url, { timeout: 0 || 5000 }); axios.get(url, { timeout: 5000 || 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept numeric AND branches",
+          "given": "axios.get(url, { timeout: 1 && 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept runtime logical fallbacks",
+          "given": "axios.get(url, { timeout: configuredTimeout || 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept supported arithmetic operators",
+          "given": "axios.get(url, { timeout: (2 ** 3 + 6 - 2) / 2 % 5 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept unary numeric signs",
+          "given": "axios.get(url, { timeout: -(-5000) }); axios.get(url, { timeout: +5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept signed runtime timeout",
+          "given": "axios.get(url, { timeout: +duration });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept arithmetic Got phase timeouts",
+          "given": "got(url, { timeout: { request: 5 * 1000 } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept arithmetic chained timeouts",
+          "given": "superagent.get(url).timeout(5 * 1000);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept arithmetic subprocess timeouts",
+          "given": "spawn(cmd, [], { timeout: 5 * 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept unresolved Got timeout objects",
+          "given": "got(url, { timeout: settings.timeout });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow observed options",
+          "given": "const options = { signal }; const state = typeof options.signal; fetch(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow spread options without overrides",
+          "given": "const options = { signal }; fetch(url, { ...options, method: \"GET\" });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow preceding signal and a known unrelated spread",
+          "given": "const extra = { method: \"GET\" }; fetch(url, { signal, ...extra });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve local options",
+          "given": "const options = { signal }; fetch(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve alias imports",
+          "given": "import http from \"axios\"; http.post(url, body, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve named imports",
+          "given": "import { get as read } from \"axios\"; read(url, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should resolve fetch import",
+          "given": "import read from \"node-fetch\"; read(url, { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore shadowed clients",
+          "given": "function run(fetch, axios, spawn) { fetch(url); axios.get(url); spawn(cmd); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore unrelated imports",
+          "given": "import { exec } from \"other\"; exec(cmd);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore client factories",
+          "given": "axios.create();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow config-only axios",
+          "given": "axios({ url, timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow axios request",
+          "given": "axios.request({ url, timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow got timeout objects",
+          "given": "got(url, { timeout: { request: 100 } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow got config-only calls",
+          "given": "got({ url, timeout: { response: 100 } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow superagent deadline objects",
+          "given": "superagent.get(url).timeout({ deadline: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow subprocess omitted argv",
+          "given": "spawn(cmd, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow subprocess default imports",
+          "given": "import cp from \"node:child_process\"; cp.execFile(cmd, [], { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow stable spreads",
+          "given": "const options = { signal }; fetch(url, { ...options });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow final explicit option",
+          "given": "fetch(url, { ...unknown, signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow custom IO options",
+          "given": "readRemote(url, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with options [{ additionalIoFunctionNames: ['readRemote'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow fetch with signal",
+          "given": "fetch(url, { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow axios with timeout",
+          "given": "axios.get(url, { timeout: 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow a quoted timeout property",
+          "given": "axios.get(url, { 'timeout': 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow a runtime timeout expression",
+          "given": "axios.get(url, { timeout: requestTimeout });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow subprocess with timeout",
+          "given": "spawn('git', ['status'], { timeout: 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow namespaced subprocess with timeout",
+          "given": "import * as cp from 'node:child_process'; cp.exec('git status', { timeout: 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow approved IO wrapper",
+          "given": "fetchWithTimeout(url);",
+          "when": "the rule analyzes the fixture with options [{ approvedWrapperNames: ['fetchWithTimeout'] }]",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should skip test files by default",
+          "given": "fetch(url);",
+          "when": "the rule analyzes the fixture with default options at 'src/http.test.ts'",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow regex exec calls without timeout",
+          "given": "const match = pattern.exec(value);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow superagent timeout chains",
+          "given": "superagent.get(url).timeout(5000);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should allow dynamic calls without IO names",
+          "given": "(getClient())(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore imports from non child process modules",
+          "given": "import { exec } from 'not-child-process'; const value = 1;",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should reject mutations behind nonnull options",
+          "given": "const options = { timeout: 1000 }; options.timeout = 0; axios.get(url, options!);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject mutations behind nested asserted options",
+          "given": "const options = { timeout: 1000 }; options.timeout = 0; axios.get(url, (<{ timeout: number }>options) as { timeout: number });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject zero through angle assertion",
+          "given": "axios.get(url, { timeout: <number>0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject nonfinite values through nonnull assertion",
+          "given": "axios.get(url, { timeout: Infinity! });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report optional imported IO without timeout",
+          "given": "import client from \"axios\"; client?.[\"get\"]?.(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed key overriding timeout",
+          "given": "axios.get(url, { timeout: 1000, [key]: 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject a later spread disabling timeout",
+          "given": "const disabled = { timeout: 0 }; axios.get(url, { timeout: 1000, ...disabled });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject body timeout on optional post",
+          "given": "axios?.post?.(url, { timeout: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject global NaN",
+          "given": "axios.get(url, { timeout: NaN });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject global Infinity",
+          "given": "axios.get(url, { timeout: Infinity });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject negative global Infinity",
+          "given": "axios.get(url, { timeout: -Infinity });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject aliases of global nonfinite constants",
+          "given": "const timeout = Infinity; axios.get(url, { timeout });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject arithmetic using global NaN",
+          "given": "axios.get(url, { timeout: NaN * 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject a global nonfinite Got timeout object",
+          "given": "got(url, { timeout: Infinity });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject disabled shadowing initializers",
+          "given": "function load() { const Infinity = 0; axios.get(url, { timeout: Infinity }); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject global nonfinite nullish fallbacks",
+          "given": "axios.get(url, { timeout: NaN ?? 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject undefined through a local alias",
+          "given": "const timeout = undefined; axios.get(url, { timeout });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject cyclic arithmetic timeout aliases without recursion",
+          "given": "const delay = delay * 2; axios.get(url, { timeout: delay });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject mutually cyclic fallback timeout aliases without recursion",
+          "given": "const first = second ?? 1000; const second = first + 1; axios.get(url, { timeout: first });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed zero",
+          "given": "axios.get(url, { timeout: 5 - 5 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed negative values",
+          "given": "axios.get(url, { timeout: 5 * -1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject division by zero",
+          "given": "axios.get(url, { timeout: 1 / 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed NaN",
+          "given": "axios.get(url, { timeout: 0 / 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject known disabled nullish left operands",
+          "given": "axios.get(url, { timeout: 0 ?? 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject disabled runtime fallback branches",
+          "given": "axios.get(url, { timeout: configuredTimeout ?? 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject nullish AND results",
+          "given": "axios.get(url, { timeout: null && 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject disabled numeric AND results",
+          "given": "axios.get(url, { timeout: 0 && 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject string arithmetic",
+          "given": "axios.get(url, { timeout: \"5\" + 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject boolean arithmetic with runtime operands",
+          "given": "axios.get(url, { timeout: duration + false });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject comparison expressions",
+          "given": "axios.get(url, { timeout: duration > 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject unsupported unary expressions",
+          "given": "axios.get(url, { timeout: !duration });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject invalid literal fallback operands",
+          "given": "axios.get(url, { timeout: \"disabled\" || 5000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject nonnumeric fallback expressions",
+          "given": "axios.get(url, { timeout: configuredTimeout ?? \"disabled\" });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed numeric Got options",
+          "given": "got(url, { timeout: 5 * 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject unsupported sequence expressions",
+          "given": "axios.get(url, { timeout: (log(), 5000) });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject mutated options initializers",
+          "given": "const options = { signal }; options.signal = undefined; fetch(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject deleted options",
+          "given": "const options = { signal }; delete options.signal; fetch(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject incremented options",
+          "given": "const options = { timeout: 100 }; options.timeout--; axios.get(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject AbortSignal for synchronous subprocess calls",
+          "given": "spawnSync(cmd, [], { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject unsupported request signals",
+          "given": "request(url, { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject bare numeric Got timeouts",
+          "given": "got(url, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject body timeouts",
+          "given": "axios.post(url, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject fetch timeout properties",
+          "given": "fetch(url, { timeout: 100 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject URL object cancellation",
+          "given": "fetch({ signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject unrelated third arguments",
+          "given": "fetch(url, {}, { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject aliases without cancellation",
+          "given": "import http from \"axios\"; http.get(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject null signals",
+          "given": "fetch(url, { signal: null });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject false signals",
+          "given": "fetch(url, { signal: false });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject void signals",
+          "given": "fetch(url, { signal: void 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject locally disabled cancellation",
+          "given": "const signal = undefined; fetch(url, { signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject overwritten options",
+          "given": "let options = { signal }; options = {}; fetch(url, options);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject overwritten properties",
+          "given": "fetch(url, { signal, signal: undefined });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject later unknown spreads",
+          "given": "fetch(url, { signal, ...options });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject computed dynamic keys",
+          "given": "fetch(url, { [signal]: controller.signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject getters",
+          "given": "fetch(url, { get signal() { return controller.signal; } });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject negative timeouts",
+          "given": "axios.get(url, { timeout: -1 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject boolean timeouts",
+          "given": "axios.get(url, { timeout: false });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject axios timeout objects",
+          "given": "axios.get(url, { timeout: {} });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject empty got timeout objects",
+          "given": "got(url, { timeout: {} });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject foreign timeout chains",
+          "given": "axios.get(url).timeout(100);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should check imported undici fetch",
+          "given": "import { fetch as read } from \"undici\"; read(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should reject circular option aliases",
+          "given": "const a = b; const b = a; fetch(url, a);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report bare fetch",
+          "given": "fetch(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report fetch with an undefined signal",
+          "given": "fetch(url, { signal: undefined });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report an explicitly disabled timeout",
+          "given": "axios.get(url, { timeout: 0 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report an empty chained timeout call",
+          "given": "superagent.get(url).timeout();",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report a non-timeout chain after an uncancelled request",
+          "given": "axios.get(url).then(handle);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report a chained timeout with only spread arguments",
+          "given": "superagent.get(url).timeout(...args);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report an option object containing only spread properties",
+          "given": "fetch(url, { ...options });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report an option object without a named cancellation property",
+          "given": "fetch(url, { 0: true });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report an explicitly undefined timeout",
+          "given": "axios.get(url, { timeout: undefined });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report axios without timeout",
+          "given": "axios.get(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report direct axios without timeout",
+          "given": "axios(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report got without timeout",
+          "given": "got(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report spawn without timeout",
+          "given": "spawn('git', ['status']);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report namespaced subprocess without timeout",
+          "given": "import * as cp from 'node:child_process'; cp.exec('git status');",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report aliased subprocess import without timeout",
+          "given": "import { exec as run } from 'child_process'; run('git status');",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report configured IO function",
+          "given": "readRemote(url);",
+          "when": "the rule analyzes the fixture with options [{ additionalIoFunctionNames: ['readRemote'] }]",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
+        },
+        {
+          "name": "should report test files when configured",
+          "given": "fetch(url);",
+          "when": "the rule analyzes the fixture with options [{ checkTests: true }] at 'src/http.test.ts'",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingTimeout' }]"
         }
       ]
     }
