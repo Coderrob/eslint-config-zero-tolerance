@@ -679,6 +679,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#choose-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1078,6 +1089,62 @@
   
   
     <li class="md-nav__item">
+      <a href="no-chai-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-chai-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-conditional-test-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-conditional-test-assertion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-jest-have-been-called/" class="md-nav__link">
         
   
@@ -1134,6 +1201,34 @@
   
   
     <li class="md-nav__item">
+      <a href="no-sinon-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-sinon-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="no-set-timeout-in-tests/" class="md-nav__link">
         
   
@@ -1142,6 +1237,34 @@
     
   
     no-set-timeout-in-tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-vitest-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-vitest-imprecise-spy-assertions
   
 
     
@@ -1254,6 +1377,34 @@
     
   
     no-test-interface-declaration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="no-unawaited-async-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unawaited-async-assertion
   
 
     
@@ -2261,6 +2412,34 @@
     
   
     no-empty-catch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="require-error-cause/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-error-cause
   
 
     
@@ -3485,6 +3664,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#choose-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3511,8 +3701,8 @@
 
 
 <h1 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h1>
-<p>Rule suites require nonempty valid and invalid fixtures, named <code>should</code> cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md">the contributor guide</a> for validation requirements.</p>
-<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>77 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
+<p>Rule suites require nonempty valid and invalid fixtures, named <code>should</code> cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md">the contributor guide</a> for validation requirements.</p>
+<p><code>@coderrob/eslint-plugin-zero-tolerance</code> provides <strong>83 custom rules</strong> grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.</p>
 <table>
 <thead>
 <tr>
@@ -3534,8 +3724,8 @@
 </tr>
 <tr>
 <td><a href="#testing">Testing</a></td>
-<td style="text-align: right;">8</td>
-<td>Test descriptions, mocks, timers, fetch, interfaces</td>
+<td style="text-align: right;">13</td>
+<td>Assertions, mocks, timers, fetch, interfaces</td>
 </tr>
 <tr>
 <td><a href="#type-safety">Type Safety</a></td>
@@ -3549,7 +3739,7 @@
 </tr>
 <tr>
 <td><a href="#error-handling">Error Handling</a></td>
-<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
 <td>Throw safety, empty catches, Result patterns</td>
 </tr>
 <tr>
@@ -3635,14 +3825,29 @@
 <td>Enforce that test descriptions start with <code>should</code></td>
 </tr>
 <tr>
+<td><a href="no-chai-imprecise-spy-assertions/">no-chai-imprecise-spy-assertions</a></td>
+<td>suggestion</td>
+<td>Require exact Chai-style spy call counts and invocation arguments</td>
+</tr>
+<tr>
+<td><a href="no-conditional-test-assertion/">no-conditional-test-assertion</a></td>
+<td>problem</td>
+<td>Disallow assertions in test branches that may not execute</td>
+</tr>
+<tr>
 <td><a href="no-jest-have-been-called/">no-jest-have-been-called</a></td>
 <td>suggestion</td>
-<td>Prohibit imprecise call-assertion matchers; use <code>toHaveBeenCalledTimes</code> and <code>toHaveBeenNthCalledWith</code> instead</td>
+<td>Require exact call counts and invocation indices in Jest assertions; allow negated zero-call checks</td>
 </tr>
 <tr>
 <td><a href="no-mock-implementation/">no-mock-implementation</a></td>
 <td>suggestion</td>
 <td>Prohibit persistent mock methods; use <code>Once</code> variants to prevent test bleeds</td>
+</tr>
+<tr>
+<td><a href="no-sinon-imprecise-spy-assertions/">no-sinon-imprecise-spy-assertions</a></td>
+<td>suggestion</td>
+<td>Require exact Sinon spy call counts and invocation arguments</td>
 </tr>
 <tr>
 <td><a href="no-set-timeout-in-tests/">no-set-timeout-in-tests</a></td>
@@ -3668,6 +3873,16 @@
 <td><a href="no-test-interface-declaration/">no-test-interface-declaration</a></td>
 <td>suggestion</td>
 <td>Disallow interface declarations in test files; import production types instead</td>
+</tr>
+<tr>
+<td><a href="no-unawaited-async-assertion/">no-unawaited-async-assertion</a></td>
+<td>problem</td>
+<td>Require asynchronous test assertions to be awaited or returned</td>
+</tr>
+<tr>
+<td><a href="no-vitest-imprecise-spy-assertions/">no-vitest-imprecise-spy-assertions</a></td>
+<td>suggestion</td>
+<td>Require exact Vitest spy call counts and invocation indices</td>
 </tr>
 </tbody>
 </table>
@@ -3756,7 +3971,7 @@
 <tr>
 <td><a href="max-function-lines/">max-function-lines</a></td>
 <td>suggestion</td>
-<td>Enforce a maximum number of lines per function body</td>
+<td>Limit block and expression function bodies with optional blank/comment exclusions</td>
 </tr>
 <tr>
 <td><a href="max-params/">max-params</a></td>
@@ -3766,7 +3981,7 @@
 <tr>
 <td><a href="no-array-mutation/">no-array-mutation</a></td>
 <td>suggestion</td>
-<td>Disallow mutating array methods</td>
+<td>Disallow mutating methods on known arrays and tuples</td>
 </tr>
 <tr>
 <td><a href="no-date-now/">no-date-now</a></td>
@@ -3849,6 +4064,11 @@
 <td><a href="no-empty-catch/">no-empty-catch</a></td>
 <td>problem</td>
 <td>Disallow empty catch blocks that silently swallow errors</td>
+</tr>
+<tr>
+<td><a href="require-error-cause/">require-error-cause</a></td>
+<td>problem</td>
+<td>Preserve caught exceptions when throwing replacement errors (opt-in)</td>
 </tr>
 <tr>
 <td><a href="no-throw-literal/">no-throw-literal</a></td>
@@ -3947,7 +4167,7 @@
 <tr>
 <td><a href="no-identical-expressions/">no-identical-expressions</a></td>
 <td>problem</td>
-<td>Disallow identical expressions on both sides of a binary or logical operator</td>
+<td>Report repeated stable operands in comparisons and logical expressions</td>
 </tr>
 <tr>
 <td><a href="no-identical-branches/">no-identical-branches</a></td>
@@ -3982,7 +4202,7 @@
 <tr>
 <td><a href="no-await-in-loop/">no-await-in-loop</a></td>
 <td>problem</td>
-<td>Disallow <code>await</code> inside loops; use <code>Promise.all()</code> instead</td>
+<td>Review await inside loops with configurable sequential-work exceptions</td>
 </tr>
 <tr>
 <td><a href="no-floating-promises/">no-floating-promises</a></td>
@@ -4032,12 +4252,12 @@
 <tr>
 <td><a href="no-query-side-effects/">no-query-side-effects</a></td>
 <td>suggestion</td>
-<td>Disallow side effects in query-style functions</td>
+<td>Disallow observable mutation in query functions while allowing local computation</td>
 </tr>
 <tr>
 <td><a href="require-timeout-for-io/">require-timeout-for-io</a></td>
 <td>problem</td>
-<td>Require timeout or cancellation options for external IO calls</td>
+<td>Require API-specific timeout or cancellation options for external IO calls</td>
 </tr>
 <tr>
 <td><a href="require-exhaustive-switch/">require-exhaustive-switch</a></td>
@@ -4046,6 +4266,9 @@
 </tr>
 </tbody>
 </table>
+<h2 id="choose-checks">Choose checks<a class="headerlink" href="#choose-checks" title="Permanent link">&para;</a></h2>
+<p>Each rule page explains what is reported, how to configure the check, and where its analysis stops. Enable <a href="require-error-cause/">require-error-cause</a> individually to preserve original exceptions.</p>
+<p>For promise handling, unsafe types, callback returns, and branching limits, see <a href="../configuration/#additional-code-quality-checks-individual-opt-in">additional code-quality checks</a>.</p>
 
 
 

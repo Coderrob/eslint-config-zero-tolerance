@@ -696,6 +696,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#additional-code-quality-checks-individual-opt-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional code-quality checks (individual opt-in)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1194,6 +1205,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../rules/no-chai-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-chai-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/no-conditional-test-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-conditional-test-assertion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../rules/no-jest-have-been-called/" class="md-nav__link">
         
   
@@ -1250,6 +1317,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../rules/no-sinon-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-sinon-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../rules/no-set-timeout-in-tests/" class="md-nav__link">
         
   
@@ -1258,6 +1353,34 @@
     
   
     no-set-timeout-in-tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/no-vitest-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-vitest-imprecise-spy-assertions
   
 
     
@@ -1370,6 +1493,34 @@
     
   
     no-test-interface-declaration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/no-unawaited-async-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unawaited-async-assertion
   
 
     
@@ -2368,6 +2519,34 @@
     
   
     no-empty-catch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rules/require-error-cause/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-error-cause
   
 
     
@@ -3714,6 +3893,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#additional-code-quality-checks-individual-opt-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional code-quality checks (individual opt-in)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4220,6 +4410,47 @@ added manually to a legacy config must use <code>@coderrob/zero-tolerance/&lt;ru
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">]</span>
 </code></pre></div>
 <p>The rule matches only the first concrete directory reached after <code>..</code> traversal, so <code>../src/foo</code> is reported but <code>../shared/src/foo</code> is not unless <code>shared</code> is also protected. Configured directory names are trimmed and deduplicated, and empty entries are ignored.</p>
+<h2 id="additional-code-quality-checks-individual-opt-in">Additional code-quality checks (individual opt-in)<a class="headerlink" href="#additional-code-quality-checks-individual-opt-in" title="Permanent link">&para;</a></h2>
+<p>Enable the checks you need in your ESLint configuration. The example below combines this plugin with ESLint and TypeScript-ESLint rules. Install <code>@typescript-eslint/eslint-plugin</code> and <code>@typescript-eslint/parser</code> first. Type-aware checks need a TypeScript project; <code>projectService</code> reads the project that includes each file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">import</span><span class="w"> </span><span class="nx">tsPlugin</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@typescript-eslint/eslint-plugin'</span><span class="p">;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">import</span><span class="w"> </span><span class="nx">tsParser</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@typescript-eslint/parser'</span><span class="p">;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">import</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@coderrob/eslint-plugin-zero-tolerance'</span><span class="p">;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nx">files</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'**/*.ts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'**/*.tsx'</span><span class="p">],</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nx">languageOptions</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">      </span><span class="nx">parser</span><span class="o">:</span><span class="w"> </span><span class="nx">tsParser</span><span class="p">,</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">      </span><span class="nx">parserOptions</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">projectService</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="nx">plugins</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">      </span><span class="s1">'@typescript-eslint'</span><span class="o">:</span><span class="w"> </span><span class="nx">tsPlugin</span><span class="p">,</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">      </span><span class="s1">'zero-tolerance'</span><span class="o">:</span><span class="w"> </span><span class="nx">zeroTolerance</span><span class="p">,</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">    </span><span class="nx">rules</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-misused-promises'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-unsafe-assignment'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-unsafe-argument'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-unsafe-return'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-unsafe-call'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">      </span><span class="s1">'@typescript-eslint/no-unsafe-member-access'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">      </span><span class="s1">'array-callback-return'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">      </span><span class="nx">complexity</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'warn'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">max</span><span class="o">:</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="p">}],</span>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">      </span><span class="s1">'max-depth'</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'warn'</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">],</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">      </span><span class="s1">'require-atomic-updates'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="w">      </span><span class="s1">'no-unsafe-finally'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">      </span><span class="s1">'zero-tolerance/require-error-cause'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span><span class="p">,</span>
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="p">];</span>
+</code></pre></div>
+<ul>
+<li><a href="https://typescript-eslint.io/rules/no-misused-promises/">no-misused-promises</a> complements floating-promise checks by detecting async callbacks where synchronous behavior is expected and promises used as conditions.</li>
+<li>The <a href="https://typescript-eslint.io/rules/">unsafe type rules</a> catch inferred or dependency-provided any values that no-explicit-any cannot prevent.</li>
+<li><a href="https://eslint.org/docs/latest/rules/array-callback-return">array-callback-return</a> catches missing callback returns; <a href="https://eslint.org/docs/latest/rules/complexity">complexity</a> and <a href="https://eslint.org/docs/latest/rules/max-depth">max-depth</a> assess branching independently of physical line counts. Adjust thresholds to your project.</li>
+<li><a href="https://eslint.org/docs/latest/rules/require-atomic-updates">require-atomic-updates</a> checks stale read/write operations across asynchronous suspension; <a href="https://eslint.org/docs/latest/rules/no-unsafe-finally">no-unsafe-finally</a> catches cleanup control flow that overrides a pending return or throw.</li>
+</ul>
+<p>See the rule pages for <a href="../rules/no-await-in-loop/">sequential-await exceptions</a>, <a href="../rules/max-function-lines/">function-length options</a>, and <a href="../rules/require-error-cause/">error cause preservation</a>. Each rule page defines its supported patterns and limits. A passing lint check does not prove that a program is free of side effects, timeout failures, or data races.</p>
 
 
 

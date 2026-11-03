@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://coderrob.github.io/eslint-config-zero-tolerance/rules/no-jest-have-been-called/">
       
       
-        <link rel="prev" href="../require-test-description-style/">
+        <link rel="prev" href="../no-conditional-test-assertion/">
       
       
         <link rel="next" href="../no-mock-implementation/">
@@ -940,6 +940,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-chai-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-chai-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-conditional-test-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-conditional-test-assertion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1129,6 +1185,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../no-sinon-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-sinon-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../no-set-timeout-in-tests/" class="md-nav__link">
         
   
@@ -1137,6 +1221,34 @@
     
   
     no-set-timeout-in-tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-vitest-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-vitest-imprecise-spy-assertions
   
 
     
@@ -1249,6 +1361,34 @@
     
   
     no-test-interface-declaration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-unawaited-async-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unawaited-async-assertion
   
 
     
@@ -2256,6 +2396,34 @@
     
   
     no-empty-catch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../require-error-cause/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-error-cause
   
 
     
@@ -3501,7 +3669,7 @@
 
 
 <h1 id="no-jest-have-been-called">no-jest-have-been-called<a class="headerlink" href="#no-jest-have-been-called" title="Permanent link">&para;</a></h1>
-<p>Prohibit imprecise call-assertion matchers; use <code>toHaveBeenCalledTimes</code> and <code>toHaveBeenNthCalledWith</code> instead.</p>
+<p>Require explicit call counts and invocation indices in Jest <code>expect(...)</code> assertions. Negated <code>toHaveBeenCalled</code> and <code>toBeCalled</code> assertions are allowed because they assert zero calls.</p>
 <h2 id="rule-details">Rule Details<a class="headerlink" href="#rule-details" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3531,7 +3699,9 @@
 </table>
 <h2 id="rationale">Rationale<a class="headerlink" href="#rationale" title="Permanent link">&para;</a></h2>
 <p><code>toHaveBeenCalled</code> / <code>toBeCalled</code> only asserts that a mock was called <em>at least once</em> without specifying how many times. <code>toHaveBeenCalledWith</code> / <code>toBeCalledWith</code> does not specify <em>which</em> invocation is being checked. <code>toHaveBeenLastCalledWith</code> / <code>toLastCalledWith</code> implicitly asserts only the final invocation, silently ignoring all others. All of these matchers can pass for the wrong reasons, producing false confidence.</p>
+<p>The negated <code>not.toHaveBeenCalled()</code> and <code>not.toBeCalled()</code> forms assert exactly zero calls, so the rule allows them.</p>
 <p>Using <code>toHaveBeenCalledTimes(n)</code> forces you to declare the exact call count. Using <code>toHaveBeenNthCalledWith(n, ...args)</code> forces you to assert the arguments for a specific invocation. Together they produce precise, non-ambiguous test assertions.</p>
+<p>The rule checks calls on <code>expect(...)</code>, <code>globalThis.expect(...)</code>, and <code>global.expect(...)</code>, including aliases imported from <code>@jest/globals</code>. It follows <code>not</code>, <code>resolves</code>, and <code>rejects</code> modifiers. A same-named method on an unrelated object, or a matcher property read without a call, is allowed.</p>
 <table>
 <thead>
 <tr>
@@ -3571,6 +3741,8 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">expect</span><span class="p">(</span><span class="nx">mockFn</span><span class="p">).</span><span class="nx">toHaveBeenCalledTimes</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nx">expect</span><span class="p">(</span><span class="nx">mockFn</span><span class="p">).</span><span class="nx">toHaveBeenNthCalledWith</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s1">'expected-argument'</span><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nx">expect</span><span class="p">(</span><span class="nx">mockFn</span><span class="p">).</span><span class="nx">not</span><span class="p">.</span><span class="nx">toHaveBeenCalled</span><span class="p">();</span>
 </code></pre></div>
 <h3 id="incorrect">❌ Incorrect<a class="headerlink" href="#incorrect" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">expect</span><span class="p">(</span><span class="nx">mockFn</span><span class="p">).</span><span class="nx">toHaveBeenCalled</span><span class="p">();</span>
@@ -3587,7 +3759,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s1">'zero-tolerance/no-jest-have-been-called'</span><span class="o">:</span><span class="w"> </span><span class="s1">'error'</span>
 </code></pre></div>
 <h2 id="parsing-and-fix-safety">Parsing and fix safety<a class="headerlink" href="#parsing-and-fix-safety" title="Permanent link">&para;</a></h2>
-<p>Object prototype properties, including optional and bracket access to <code>toString</code>, <code>valueOf</code>, and <code>constructor</code>, are allowed. Async, negated, and computed banned matchers remain reported.</p>
+<p>Object prototype properties, including optional and bracket access to <code>toString</code>, <code>valueOf</code>, and <code>constructor</code>, are allowed. Async, computed, and optional banned matcher calls remain reported when they belong to a Jest assertion. Negated argument matchers such as <code>not.toHaveBeenCalledWith(...)</code> remain reported.</p>
 
 
 

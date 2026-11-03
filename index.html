@@ -468,6 +468,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#choose-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1020,6 +1031,62 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-chai-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-chai-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-conditional-test-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-conditional-test-assertion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-jest-have-been-called/" class="md-nav__link">
         
   
@@ -1076,6 +1143,34 @@
   
   
     <li class="md-nav__item">
+      <a href="rules/no-sinon-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-sinon-imprecise-spy-assertions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="rules/no-set-timeout-in-tests/" class="md-nav__link">
         
   
@@ -1084,6 +1179,34 @@
     
   
     no-set-timeout-in-tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-vitest-imprecise-spy-assertions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-vitest-imprecise-spy-assertions
   
 
     
@@ -1196,6 +1319,34 @@
     
   
     no-test-interface-declaration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/no-unawaited-async-assertion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    no-unawaited-async-assertion
   
 
     
@@ -2194,6 +2345,34 @@
     
   
     no-empty-catch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="rules/require-error-cause/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    require-error-cause
   
 
     
@@ -3368,6 +3547,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#choose-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3395,8 +3585,8 @@
 
 <h1 id="coderrobeslint-plugin-zero-tolerance">@coderrob/eslint-plugin-zero-tolerance<a class="headerlink" href="#coderrobeslint-plugin-zero-tolerance" title="Permanent link">&para;</a></h1>
 <p><a href="rule-fix-safety/">Behavioral safety contracts</a> document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.</p>
-<p>Rule suites require nonempty valid and invalid fixtures, named <code>should</code> cases, explicit diagnostics, and concrete autofix outputs. All 77 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md">the contributor guide</a> for validation requirements.</p>
-<p><strong>77 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
+<p>Rule suites require nonempty valid and invalid fixtures, named <code>should</code> cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md">the contributor guide</a> for validation requirements.</p>
+<p><strong>83 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong></p>
 <p><a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img alt="npm version" src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" /></a>
 <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" /></a></p>
 <p><strong>Supports ESLint 8.57+, 9.x, and 10.x</strong></p>
@@ -3424,7 +3614,7 @@
 </tr>
 <tr>
 <td><strong>Testing</strong></td>
-<td>Require <code>should</code>-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse</td>
+<td>Require <code>should</code>-prefixed descriptions, await async assertions, and prevent skipped assertions and leaky mocks</td>
 </tr>
 <tr>
 <td><strong>Bug Prevention</strong></td>
@@ -3473,6 +3663,9 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="p">[</span><span class="nx">zeroTolerance</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">recommended</span><span class="p">];</span>
 </code></pre></div>
 <p>See the <a href="getting-started/">Getting Started</a> guide for full setup instructions and the <a href="rules/">Rules</a> reference for descriptions of every rule.</p>
+<h2 id="choose-checks">Choose checks<a class="headerlink" href="#choose-checks" title="Permanent link">&para;</a></h2>
+<p>Use the <a href="rules/">rule reference</a> to choose checks and review examples, options, and limits. Enable <a href="rules/require-error-cause/">require-error-cause</a> individually to preserve original exceptions.</p>
+<p>For promise handling, unsafe types, callback returns, and branching limits, see <a href="configuration/#additional-code-quality-checks-individual-opt-in">additional code-quality checks</a>.</p>
 
 
 
