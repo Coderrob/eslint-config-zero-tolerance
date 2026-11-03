@@ -52,6 +52,18 @@
           "given": "parameters or local declarations named NaN, Infinity, or undefined",
           "when": "timeouts and logical fallbacks are checked",
           "then": "known initializers are validated and unknown parameter values remain runtime values instead of being classified by name"
+        },
+        {
+          "name": "should reuse results for shared expression branches",
+          "given": "a deep alias graph whose arithmetic operands repeatedly refer to the same initializer",
+          "when": "timeout values are evaluated",
+          "then": "each resolved expression is evaluated once per check, including unknown and disabled results"
+        },
+        {
+          "name": "should isolate caches and detect active cycles",
+          "given": "separate timeout checks with different lexical bindings or a recursive alias graph",
+          "when": "evaluation runs",
+          "then": "results never leak between checks and recursive references are rejected safely"
         }
       ]
     }

@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Options and evaluation safety**: Detect property mutations through TypeScript assertion wrappers for timeout and error-cause options. Cache timeout expression results per check to prevent exponential alias expansion while preserving cycle detection and scope isolation.
+
 - **Review regressions**: Allow unconditional assertions in do-while bodies while retaining nested conditional checks. Normalize named default client imports so direct calls cannot bypass timeout validation.
 
 - **Repository dogfooding**: Explicitly enable the seven updated rules for TypeScript source and scripts, including opt-in error-cause checks. Add configuration regression tests, replace mutable validation accumulators, and clarify root README product and contributor sections.

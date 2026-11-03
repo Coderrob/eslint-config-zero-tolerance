@@ -34,7 +34,7 @@ fetch(url, { timeout: 5000 }); // Reported: fetch requires a signal.
 
 Accepts positive finite numbers, supported numeric arithmetic, and fallbacks such as configuredTimeout ?? 5000. Rejects known disabled values, including zero, negative numbers, null, false, global undefined, NaN, and Infinity. Local declarations with those names are checked using their own bindings.
 
-Local aliases are followed when their values have not been reassigned. TypeScript assertions preserve the underlying value. Cycles stop safely. Object spreads and duplicate keys follow override order; unknown overrides and directly modified options are not trusted.
+Local aliases are followed when their values have not been reassigned. TypeScript assertions preserve the underlying value. Cycles stop safely. Object spreads and duplicate keys follow override order; unknown overrides and directly modified options are not trusted. This includes writes, updates, and deletes through TypeScript assertions around the options object. Reused expression branches are evaluated once per timeout check, so deep alias graphs do not cause repeated expansion.
 
 ## Options
 

@@ -40,6 +40,12 @@
           "given": "an options identifier wrapped in assertions whose property was directly reassigned",
           "when": "an option is read",
           "then": "the initializer is rejected as unreliable even when the identifier is wrapped"
+        },
+        {
+          "name": "should detect writes through asserted receivers",
+          "given": "as, satisfies, angle-bracket, or non-null wrappers around the receiver of an options property",
+          "when": "an assignment, update, or delete is inspected",
+          "then": "the options initializer is rejected, while reads through the same wrappers remain valid"
         }
       ]
     }

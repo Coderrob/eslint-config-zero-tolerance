@@ -42,6 +42,6 @@ Rethrowing the original exception is allowed. AggregateError takes its options o
 
 ## Limits
 
-Reassigning the caught variable before using it as a cause is reported, including conditional writes. An alias or options object that captured the original value before reassignment remains valid. Directly modified options are not trusted, even through a type assertion.
+Reassigning the caught variable before using it as a cause is reported, including conditional writes. An alias or options object that captured the original value before reassignment remains valid. Directly modified options are not trusted. This includes overwriting or deleting a cause through a type assertion or non-null assertion around the options object.
 
 The rule uses source order; it does not trace every possible execution path. Custom or shadowed constructors, nested function bodies, and errors created earlier and thrown through variables are outside its scope.

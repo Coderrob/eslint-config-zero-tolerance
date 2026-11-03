@@ -56,21 +56,37 @@ function applyArithmetic(
 /** Evaluates whitelisted arithmetic operators on numeric operands only.
  * @param source - Source code and lexical bindings.
  * @param node - Binary expression.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns Its constant result or an unknown/invalid marker.
  */
 function arithmeticNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.BinaryExpression>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   const operation = ARITHMETIC.get(node.operator);
   if (operation === undefined) return Number.NaN;
   return applyArithmetic(
     operation,
-    timeoutNumber(source, node.left, seen),
-    timeoutNumber(source, node.right, seen),
+    timeoutNumber(source, node.left, cache),
+    timeoutNumber(source, node.right, cache),
   );
+}
+
+/** Evaluates a resolved expression once, sharing results across operand branches.
+ * @param source - Source code and lexical bindings.
+ * @param value - Resolved expression.
+ * @param cache - Results and active-cycle markers for this evaluation.
+ * @returns A constant, runtime marker, or invalid-value marker.
+ */
+function evaluateNumber(
+  source: Readonly<TSESLint.SourceCode>,
+  value: Readonly<TSESTree.Node>,
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
+): number | null {
+  if (value.type === AST_NODE_TYPES.BinaryExpression) return arithmeticNumber(source, value, cache);
+  if (value.type === AST_NODE_TYPES.LogicalExpression) return logicalNumber(source, value, cache);
+  return simpleNumber(source, value, cache);
 }
 
 /** Rejects invalid predefined values while preserving shadowed runtime identifiers.
@@ -158,7 +174,7 @@ export function isTimeoutExpression(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.Node>,
 ): boolean {
-  return isUsableNumber(timeoutNumber(source, node, []));
+  return isUsableNumber(timeoutNumber(source, node, new WeakMap()));
 }
 
 /** Validates resolved timeout numbers while allowing unresolved runtime values.
@@ -172,35 +188,35 @@ function isUsableNumber(value: number | null): boolean {
 /** Evaluates fallback expressions, rejecting branches known to disable the timeout.
  * @param source - Source code and lexical bindings.
  * @param node - Logical expression.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns The selected numeric value or an unknown/invalid marker.
  */
 function logicalNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.LogicalExpression>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   const leftNode = resolveLocalValue(source, node.left);
-  if (isNullishValue(source, leftNode)) return nullishBranch(source, node, seen);
-  const left = timeoutNumber(source, leftNode, seen);
+  if (isNullishValue(source, leftNode)) return nullishBranch(source, node, cache);
+  const left = timeoutNumber(source, leftNode, cache);
   if (left === null)
-    return isUsableNumber(timeoutNumber(source, node.right, seen)) ? null : Number.NaN;
-  return selectedLogicalNumber(source, node, left, seen);
+    return isUsableNumber(timeoutNumber(source, node.right, cache)) ? null : Number.NaN;
+  return selectedLogicalNumber(source, node, left, cache);
 }
 
 /** Selects a known nullish logical operand without treating null as numeric zero.
  * @param source - Source code and lexical bindings.
  * @param node - Logical expression with a nullish left side.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns Its fallback value, or NaN for a nullish AND result.
  */
 function nullishBranch(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.LogicalExpression>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   return node.operator === NULLISH_OPERATOR || node.operator === OR_OPERATOR
-    ? timeoutNumber(source, node.right, seen)
+    ? timeoutNumber(source, node.right, cache)
     : Number.NaN;
 }
 
@@ -221,71 +237,71 @@ function runtimeNumber(
  * @param source - Source code and lexical bindings.
  * @param node - Logical expression.
  * @param left - Statically evaluated left operand.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns The branch that supplies the timeout value.
  */
 function selectedLogicalNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.LogicalExpression>,
   left: number,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   if (Number.isNaN(left)) return Number.NaN;
   return isLeftOperandSelected(node.operator, left)
     ? left
-    : timeoutNumber(source, node.right, seen);
+    : timeoutNumber(source, node.right, cache);
 }
 
 /** Handles literals, unary arithmetic, and runtime leaves.
  * @param source - Source code and lexical bindings.
  * @param node - Resolved expression.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns Its numeric value or an unknown/invalid marker.
  */
 function simpleNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.Node>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   if (node.type === AST_NODE_TYPES.Literal)
     return typeof node.value === 'number' ? node.value : Number.NaN;
-  if (node.type === AST_NODE_TYPES.UnaryExpression) return unaryNumber(source, node, seen);
+  if (node.type === AST_NODE_TYPES.UnaryExpression) return unaryNumber(source, node, cache);
   return runtimeNumber(source, node);
 }
 
 /** Evaluates supported syntax: null denotes unknown runtime values, NaN invalid values.
  * @param source - Source code and lexical bindings.
  * @param node - Expression being evaluated.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns A numeric constant, null for runtime values, or NaN for unsupported syntax.
  */
 function timeoutNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.Node>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   const value = resolveLocalValue(source, node);
-  if (seen.includes(value)) return Number.NaN;
-  if (value.type === AST_NODE_TYPES.BinaryExpression)
-    return arithmeticNumber(source, value, [...seen, value]);
-  if (value.type === AST_NODE_TYPES.LogicalExpression)
-    return logicalNumber(source, value, [...seen, value]);
-  return simpleNumber(source, value, [...seen, value]);
+  const cached = cache.get(value);
+  if (cached !== undefined) return cached;
+  cache.set(value, Number.NaN);
+  const result = evaluateNumber(source, value, cache);
+  cache.set(value, result);
+  return result;
 }
 
 /** Evaluates unary numeric signs without accepting boolean or string coercion.
  * @param source - Source code and lexical bindings.
  * @param node - Unary expression.
- * @param seen - Expressions already visited on this evaluation path.
+ * @param cache - Results and active-cycle markers for this evaluation.
  * @returns Its constant result or an unknown/invalid marker.
  */
 function unaryNumber(
   source: Readonly<TSESLint.SourceCode>,
   node: Readonly<TSESTree.UnaryExpression>,
-  seen: readonly TSESTree.Node[],
+  cache: Readonly<WeakMap<TSESTree.Node, number | null>>,
 ): number | null {
   const operation = UNARY_ARITHMETIC.get(node.operator);
   if (operation === undefined) return Number.NaN;
-  const value = timeoutNumber(source, node.argument, seen);
+  const value = timeoutNumber(source, node.argument, cache);
   return value === null ? null : operation(value);
 }

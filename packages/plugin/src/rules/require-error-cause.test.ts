@@ -6,6 +6,10 @@ describe('require-error-cause', () => {
   tester.run('require-error-cause', requireErrorCause, {
     valid: [
       {
+        name: 'should allow reading a cause through asserted options',
+        code: 'try { work(); } catch (error) { const options = { cause: error }; const original = options!.cause; throw new Error("failed", options); }',
+      },
+      {
         name: 'should preserve angle asserted cause',
         code: 'try { run(); } catch (error) { throw new Error("failed", { cause: <unknown>error }); }',
       },
@@ -86,6 +90,21 @@ describe('require-error-cause', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should reject overwritten cause through asserted receiver',
+        code: 'try { work(); } catch (error) { const options = { cause: error }; (options as { cause: unknown }).cause = other; throw new Error("failed", options); }',
+        errors: [{ messageId: 'missingCause' }],
+      },
+      {
+        name: 'should reject overwritten cause through nonnull receiver',
+        code: 'try { work(); } catch (error) { const options = { cause: error }; options!.cause = other; throw new Error("failed", options); }',
+        errors: [{ messageId: 'missingCause' }],
+      },
+      {
+        name: 'should reject deleted cause through nested assertions',
+        code: 'try { work(); } catch (error) { const options = { cause: error }; delete ((options as { cause: unknown })!).cause; throw new Error("failed", options); }',
+        errors: [{ messageId: 'missingCause' }],
+      },
       {
         name: 'should reject overwritten cause behind asserted options',
         code: 'try { run(); } catch (error) { const options = { cause: error }; options.cause = other; throw new Error("failed", options!); }',

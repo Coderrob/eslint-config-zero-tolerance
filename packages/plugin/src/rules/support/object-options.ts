@@ -48,6 +48,16 @@ function isModifiedOptionsBinding(
   return binding !== null && binding.references.some(isPropertyWrite);
 }
 
+/** Checks whether a member is the target of an assignment, update, or deletion.
+ * @param member - Member access being inspected.
+ * @returns Whether the surrounding operation writes to the member.
+ */
+function isPropertyMutation(member: Readonly<TSESTree.MemberExpression>): boolean {
+  const operation = member.parent;
+  if (operation.type === AST_NODE_TYPES.AssignmentExpression) return operation.left === member;
+  return isPropertyUpdate(operation);
+}
+
 /** Recognizes property update and deletion nodes.
  * @param node - Parent of the referenced member.
  * @returns Whether the operation mutates the property.
@@ -64,11 +74,10 @@ function isPropertyUpdate(node: Readonly<TSESTree.Node>): boolean {
  * @returns Whether the reference writes to a property.
  */
 function isPropertyWrite(reference: Readonly<TSESLint.Scope.Reference>): boolean {
-  const member = reference.identifier.parent;
-  if (member.type !== AST_NODE_TYPES.MemberExpression) return false;
-  const operation = member.parent;
-  if (operation.type === AST_NODE_TYPES.AssignmentExpression) return operation.left === member;
-  return isPropertyUpdate(operation);
+  const receiver = outerTypeExpression(reference.identifier);
+  const member = receiver.parent;
+  if (member?.type !== AST_NODE_TYPES.MemberExpression || member.object !== receiver) return false;
+  return isPropertyMutation(member);
 }
 
 /**
@@ -90,6 +99,17 @@ function optionName(property: Readonly<TSESTree.Property>): string | null {
   if (!property.computed && property.key.type === AST_NODE_TYPES.Identifier)
     return property.key.name;
   return literalKey(property.key);
+}
+
+/** Finds the outermost assertion around a reference without following aliases.
+ * @param node - Reference or assertion wrapper.
+ * @returns The expression used by the surrounding operation.
+ */
+function outerTypeExpression(node: Readonly<TSESTree.Node>): TSESTree.Node {
+  const parent = node.parent;
+  return parent != null && unwrapTypeExpression(parent) !== parent
+    ? outerTypeExpression(parent)
+    : node;
 }
 
 /**

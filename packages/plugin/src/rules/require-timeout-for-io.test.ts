@@ -1,9 +1,39 @@
 import { ruleTester } from '../testing/test-helper';
 import { requireTimeoutForIo } from './require-timeout-for-io';
 
+const REPEATED_ALIAS_DEPTH = 32;
+
+function repeatedAliasSource(initialValue: string): string {
+  const declarations = Array.from(
+    { length: REPEATED_ALIAS_DEPTH },
+    (_, index) => `const timeout${index + 1} = timeout${index} + timeout${index};`,
+  );
+  return [
+    `const timeout0 = ${initialValue};`,
+    ...declarations,
+    `axios.get(url, { timeout: timeout${REPEATED_ALIAS_DEPTH} });`,
+  ].join('\n');
+}
+
 describe('require-timeout-for-io', () => {
   ruleTester.run('require-timeout-for-io', requireTimeoutForIo, {
     valid: [
+      {
+        name: 'should efficiently resolve repeated constant alias branches',
+        code: repeatedAliasSource('1'),
+      },
+      {
+        name: 'should reuse unknown runtime results across repeated alias branches',
+        code: repeatedAliasSource('configuredTimeout'),
+      },
+      {
+        name: 'should allow reading timeout through an asserted receiver',
+        code: 'const options = { timeout: 1000 }; const timeout = (options as { timeout: number }).timeout; axios.get(url, options);',
+      },
+      {
+        name: 'should keep assertion cache isolated by lexical binding',
+        code: 'function first() { const timeout = 1000; axios.get(url, { timeout }); } function second(timeout) { axios.get(url, { timeout }); }',
+      },
       {
         name: 'should accept named default Axios with a timeout',
         code: 'import { default as client } from "axios"; client(url, { timeout: 1000 });',
@@ -243,6 +273,41 @@ describe('require-timeout-for-io', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should retain disabled values across repeated alias branches',
+        code: repeatedAliasSource('0'),
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should reject assignment through asserted options receiver',
+        code: 'const options = { timeout: 1000 }; (options as { timeout: number }).timeout = 0; axios.get(url, options);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should reject assignment through nonnull options receiver',
+        code: 'const options = { timeout: 1000 }; options!.timeout = 0; axios.get(url, options);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should reject updates through angle asserted options receiver',
+        code: 'const options = { timeout: 1 }; (<{ timeout: number }>options).timeout--; axios.get(url, options);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should reject deletion through satisfies options receiver',
+        code: 'const options = { timeout: 1000 }; delete (options satisfies { timeout: number }).timeout; axios.get(url, options);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should reject nested wrapper mutations',
+        code: 'const options = { timeout: 1000 }; ((options as { timeout: number })!).timeout = 0; axios.get(url, options);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should keep cached results isolated between timeout checks',
+        code: 'function first() { const timeout = 1000; axios.get(url, { timeout }); } function second() { const timeout = 0; axios.get(url, { timeout }); }',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
       {
         name: 'should report named default Axios without a timeout',
         code: 'import { default as axios } from "axios"; axios(url);',

@@ -5,14 +5,18 @@
   "module": {
     "name": "require-error-cause",
     "description": "Keep the original exception when throwing a replacement error.",
-    "exports": [
-      "requireErrorCause"
-    ]
+    "exports": ["requireErrorCause"]
   },
   "specifications": [
     {
       "feature": "Supported behavior and regression cases",
       "scenarios": [
+        {
+          "name": "should allow reading a cause through asserted options",
+          "given": "try { work(); } catch (error) { const options = { cause: error }; const original = options!.cause; throw new Error(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
         {
           "name": "should preserve angle asserted cause",
           "given": "try { run(); } catch (error) { throw new Error(\"failed\", { cause: <unknown>error }); }",
@@ -132,6 +136,24 @@
           "given": "try { run(); } catch (error) { throw new errors.CustomError(\"custom\"); }",
           "when": "the rule analyzes the fixture with default options",
           "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should reject overwritten cause through asserted receiver",
+          "given": "try { work(); } catch (error) { const options = { cause: error }; (options as { cause: unknown }).cause = other; throw new Error(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject overwritten cause through nonnull receiver",
+          "given": "try { work(); } catch (error) { const options = { cause: error }; options!.cause = other; throw new Error(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
+        },
+        {
+          "name": "should reject deleted cause through nested assertions",
+          "given": "try { work(); } catch (error) { const options = { cause: error }; delete ((options as { cause: unknown })!).cause; throw new Error(\"failed\", options); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{ messageId: 'missingCause' }]"
         },
         {
           "name": "should reject overwritten cause behind asserted options",
