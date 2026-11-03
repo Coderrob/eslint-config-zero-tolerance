@@ -6,7 +6,7 @@ Type: problem. No automatic fix.
 
 ## What it checks
 
-Looks for timeout or cancellation options in the argument accepted by each API. A timeout in request data does not count. Recognizes supported imports and aliases, optional calls, and static computed API names. A local binding that replaces a conventional client name is not assumed to be that client.
+Looks for timeout or cancellation options in the argument accepted by each API. A timeout in request data does not count. Recognizes supported imports and aliases, including `import { default as client }`, optional calls, and static computed API names. A local binding that replaces a conventional client name is not assumed to be that client.
 
 | API                                                           | Accepted options                                                             |
 | ------------------------------------------------------------- | ---------------------------------------------------------------------------- |

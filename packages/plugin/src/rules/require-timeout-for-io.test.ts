@@ -5,6 +5,22 @@ describe('require-timeout-for-io', () => {
   ruleTester.run('require-timeout-for-io', requireTimeoutForIo, {
     valid: [
       {
+        name: 'should accept named default Axios with a timeout',
+        code: 'import { default as client } from "axios"; client(url, { timeout: 1000 });',
+      },
+      {
+        name: 'should accept named default fetch with a signal',
+        code: 'import { default as load } from "node-fetch"; load(url, { signal: controller.signal });',
+      },
+      {
+        name: 'should preserve shadowing of a named default import',
+        code: 'import { default as client } from "axios"; function run(client) { client(url); }',
+      },
+      {
+        name: 'should ignore named default imports from unrelated modules',
+        code: 'import { default as client } from "other"; client(url);',
+      },
+      {
         name: 'should accept angle asserted timeout options',
         code: 'axios.get(url, <{ timeout: number }>{ timeout: 1000 });',
       },
@@ -227,6 +243,31 @@ describe('require-timeout-for-io', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should report named default Axios without a timeout',
+        code: 'import { default as axios } from "axios"; axios(url);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report named default Axios config calls without a timeout',
+        code: 'import { default as client } from "axios"; client({ url });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report named default fetch without cancellation',
+        code: 'import { default as load } from "node-fetch"; load(url);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report named default Got without timeout options',
+        code: 'import { default as client } from "got"; client(url);',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
+      {
+        name: 'should report named default Axios payloads without options',
+        code: 'import { default as client } from "axios"; client.post(url, { timeout: 1000 });',
+        errors: [{ messageId: 'missingTimeout' }],
+      },
       {
         name: 'should reject mutations behind nonnull options',
         code: 'const options = { timeout: 1000 }; options.timeout = 0; axios.get(url, options!);',

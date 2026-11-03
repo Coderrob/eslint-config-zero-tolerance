@@ -68,6 +68,7 @@ const AXIOS_CLIENT = 'axios';
 const FETCH_CLIENT = 'fetch';
 
 const IMPORT_BINDING = 'ImportBinding';
+const DEFAULT_EXPORT = 'default';
 
 const BODY_OPTIONS_INDEX = 2;
 
@@ -130,14 +131,14 @@ function importedApi(moduleName: string, method: string): IIoApi | null {
 }
 
 /**
- * Reads the original exported name of an aliased import.
+ * Reads an imported method, treating both default-import forms as the client itself.
  * @param specifier - Import specifier being inspected.
  * @returns The result of the described check or resolution.
  */
 function importedMethod(specifier: Readonly<TSESTree.Node>): string {
-  return specifier.type === AST_NODE_TYPES.ImportSpecifier
-    ? (getCalleeName(specifier.imported) ?? '')
-    : '';
+  if (specifier.type !== AST_NODE_TYPES.ImportSpecifier) return '';
+  const method = getCalleeName(specifier.imported) ?? '';
+  return method === DEFAULT_EXPORT ? '' : method;
 }
 
 /**

@@ -28,6 +28,12 @@
           "given": "a client factory, dynamic call, or unsupported namespace member",
           "when": "the API is resolved",
           "then": "no supported IO call is inferred"
+        },
+        {
+          "name": "should normalize named default imports",
+          "given": "a supported client imported using default as a named import",
+          "when": "the client is resolved",
+          "then": "the import resolves identically to an ordinary default import, including direct calls and options positions"
         }
       ]
     }

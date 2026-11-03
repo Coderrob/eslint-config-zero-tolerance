@@ -15,7 +15,7 @@ Require assertions in test files to execute on every applicable path.
 
 An assertion inside an `if`, ternary branch, short-circuit right operand, `catch`, switch case, or loop body can be skipped. A test can then pass without checking the intended behavior. Split the cases into separate tests or place an assertion after conditional setup.
 
-The rule recognizes Jest and Vitest `expect`, Chai `expect` and `assert`, Sinon `assert`, and imported Node `assert` (including direct calls). It supports aliases, Vitest local test-context `expect`, supported namespace access, and computed properties. It checks test files and recognizes assertions inside promise `catch` callbacks. A conditional expression used to prepare an assertion's input is allowed. Assertions inside `for…of` loops over array literals with a fixed element are allowed because the loop body must execute.
+The rule recognizes Jest and Vitest `expect`, Chai `expect` and `assert`, Sinon `assert`, and imported Node `assert` (including direct calls). It supports aliases, Vitest local test-context `expect`, supported namespace access, and computed properties. It checks test files and recognizes assertions inside promise `catch` callbacks. A conditional expression used to prepare an assertion's input is allowed. Assertions directly inside `do...while` bodies or `for...of` loops over array literals with a fixed element are allowed because the body executes at least once. Conditional branches inside those bodies and skippable outer loops remain checked.
 
 ### Correct
 

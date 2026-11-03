@@ -34,6 +34,18 @@
           "given": "the source is not a test file or expect has no matcher member",
           "when": "the rule checks a call",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow unconditional do while assertions",
+          "given": "an assertion directly inside a do while body",
+          "when": "the rule checks loop ancestry",
+          "then": "no diagnostic is reported because the body executes at least once"
+        },
+        {
+          "name": "should retain conditional checks around do while assertions",
+          "given": "a do while assertion inside a conditional branch or skippable outer loop",
+          "when": "the rule checks assertion ancestry",
+          "then": "the conditional assertion is reported"
         }
       ]
     },

@@ -5,6 +5,16 @@ describe('no-conditional-test-assertion', () => {
   ruleTester.run('no-conditional-test-assertion', noConditionalTestAssertion, {
     valid: [
       {
+        name: 'should allow an unconditional assertion in a do while body',
+        code: 'do { expect(actual).toBe(expected); } while (false);',
+        filename: 'example.test.ts',
+      },
+      {
+        name: 'should allow imported assert in a do while body',
+        code: 'import assert from "node:assert/strict"; do { assert.equal(actual, expected); } while (pending);',
+        filename: 'example.test.ts',
+      },
+      {
         name: 'should allow conditional test data with an unconditional assertion',
         filename: 'example.test.ts',
         code: 'const actual = condition ? first : second; if (condition) prepare(); expect(actual).toBe(expected);',
@@ -46,6 +56,24 @@ describe('no-conditional-test-assertion', () => {
       },
     ],
     invalid: [
+      {
+        name: 'should report conditional branches within a do while body',
+        code: 'do { if (condition) expect(actual).toBe(expected); } while (false);',
+        filename: 'example.test.ts',
+        errors: [{ messageId: 'conditionalTestAssertion' }],
+      },
+      {
+        name: 'should report a do while assertion inside a skippable outer loop',
+        code: 'while (pending) { do { expect(actual).toBe(expected); } while (false); }',
+        filename: 'example.test.ts',
+        errors: [{ messageId: 'conditionalTestAssertion' }],
+      },
+      {
+        name: 'should report short circuit assertions in a do while body',
+        code: 'do { condition && expect(actual).toBe(expected); } while (false);',
+        filename: 'example.test.ts',
+        errors: [{ messageId: 'conditionalTestAssertion' }],
+      },
       {
         name: 'should report assertions inside if and else branches',
         filename: 'example.test.ts',

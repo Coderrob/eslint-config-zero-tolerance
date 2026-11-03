@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Review regressions**: Allow unconditional assertions in do-while bodies while retaining nested conditional checks. Normalize named default client imports so direct calls cannot bypass timeout validation.
+
 - **Repository dogfooding**: Explicitly enable the seven updated rules for TypeScript source and scripts, including opt-in error-cause checks. Add configuration regression tests, replace mutable validation accumulators, and clarify root README product and contributor sections.
 
 - **Rule guidance and edge cases**: Consolidate seven rule guides into behavior, examples, options, and limits; replace repeated index notes with links. Allow asserted fresh local containers, exclude separate regular-expression literals from identical-expression checks, and clarify diagnostic wording.

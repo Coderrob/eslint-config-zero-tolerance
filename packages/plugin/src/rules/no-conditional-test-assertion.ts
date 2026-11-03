@@ -28,7 +28,6 @@ const FUNCTION_TYPES = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.FunctionExpression,
 ]);
 const LOOP_TYPES = new Set<AST_NODE_TYPES>([
-  AST_NODE_TYPES.DoWhileStatement,
   AST_NODE_TYPES.ForInStatement,
   AST_NODE_TYPES.ForOfStatement,
   AST_NODE_TYPES.ForStatement,

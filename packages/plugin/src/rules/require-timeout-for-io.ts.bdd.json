@@ -5,14 +5,36 @@
   "module": {
     "name": "require-timeout-for-io",
     "description": "Require supported timeout or cancellation options on external IO calls.",
-    "exports": [
-      "requireTimeoutForIo"
-    ]
+    "exports": ["requireTimeoutForIo"]
   },
   "specifications": [
     {
       "feature": "Supported behavior and regression cases",
       "scenarios": [
+        {
+          "name": "should accept named default Axios with a timeout",
+          "given": "import { default as client } from \"axios\"; client(url, { timeout: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should accept named default fetch with a signal",
+          "given": "import { default as load } from \"node-fetch\"; load(url, { signal: controller.signal });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should preserve shadowing of a named default import",
+          "given": "import { default as client } from \"axios\"; function run(client) { client(url); }",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should ignore named default imports from unrelated modules",
+          "given": "import { default as client } from \"other\"; client(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "no diagnostic is reported"
+        },
         {
           "name": "should accept angle asserted timeout options",
           "given": "axios.get(url, <{ timeout: number }>{ timeout: 1000 });",
@@ -366,6 +388,36 @@
           "given": "import { exec } from 'not-child-process'; const value = 1;",
           "when": "the rule analyzes the fixture with default options",
           "then": "no diagnostic is reported"
+        },
+        {
+          "name": "should report named default Axios without a timeout",
+          "given": "import { default as axios } from \"axios\"; axios(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"missingTimeout\"}]"
+        },
+        {
+          "name": "should report named default Axios config calls without a timeout",
+          "given": "import { default as client } from \"axios\"; client({ url });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"missingTimeout\"}]"
+        },
+        {
+          "name": "should report named default fetch without cancellation",
+          "given": "import { default as load } from \"node-fetch\"; load(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"missingTimeout\"}]"
+        },
+        {
+          "name": "should report named default Got without timeout options",
+          "given": "import { default as client } from \"got\"; client(url);",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"missingTimeout\"}]"
+        },
+        {
+          "name": "should report named default Axios payloads without options",
+          "given": "import { default as client } from \"axios\"; client.post(url, { timeout: 1000 });",
+          "when": "the rule analyzes the fixture with default options",
+          "then": "the expected diagnostic is reported: [{\"messageId\":\"missingTimeout\"}]"
         },
         {
           "name": "should reject mutations behind nonnull options",
