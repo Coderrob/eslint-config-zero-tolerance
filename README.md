@@ -1,72 +1,28 @@
 <p align="center">
-
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](CONTRIBUTING.md) for validation requirements.
-<img
-    src="public/img/zero-tolerance-icon.png"
-    alt="ESLint Plugin Zero Tolerance"
-    width="200"
-  />
+  <img src="public/img/zero-tolerance-icon.png" alt="Zero Tolerance ESLint plugin" width="200" />
 </p>
 
-<h1 align="center">@coderrob/eslint-plugin-zero-tolerance</h1>
+# @coderrob/eslint-plugin-zero-tolerance
 
-<p align="center">
-  <strong>83 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.</strong>
-</p>
+83 ESLint rules for readable TypeScript, reliable tests, and safer application code. Use individual rules or the existing recommended and strict configurations.
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance"><img src="https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg" alt="npm version" /></a>
-  <a href="https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg" alt="License" /></a>
-  <img src="https://img.shields.io/badge/coverage-%E2%89%A595%25-brightgreen" alt="Coverage threshold: at least 95%" />
-  <img src="https://img.shields.io/badge/ESLint-8.57%2B%20%7C%209.x%20%7C%2010.x-4B32C3?logo=eslint" alt="ESLint" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-</p>
+## What the plugin checks
 
----
+- **Code quality:** function size, repeated expressions, mutation, and naming.
+- **Async work:** missing waits, sequential loops, and IO timeout options.
+- **Error handling:** lost error causes and unsafe throw patterns.
+- **Tests:** persistent mocks, imprecise spy assertions, and assertions that may not run.
+- **Project structure:** imports, exports, documentation, and type usage.
 
-> **Zero tolerance** means every rule earns its place. No warnings you learn to ignore. No exceptions you forget about. Every violation is a conversation about quality — and quality always wins.
-
-## Why Zero Tolerance?
-
-Most linting setups start strict and erode over time. A scattered `eslint-disable` here, an `any` cast there, and before long the rules exist in name only.
-
-This plugin takes the opposite approach:
-
-- **No `eslint-disable` comments** — fix the root cause, don't silence the symptom.
-- **No `any` smuggling** — type assertions and non-null assertions are flagged.
-- **No magic values** — every number and string earns a name.
-- **No leaky tests** — persistent mocks, imprecise matchers, and timer abuse are caught.
-- **No complexity hiding** — functions stay short, parameters stay few, imports stay clean.
-
-The result is a codebase where **the rules are the culture** and the culture is visible in every file.
-
----
-
-## Documentation
-
-|                         |                                                            |
-| ----------------------- | ---------------------------------------------------------- |
-| **Hosted docs**         | <https://coderrob.github.io/eslint-config-zero-tolerance/> |
-| **Rules reference**     | [docs/rules/index.md](docs/rules/index.md)                 |
-| **Configuration guide** | [docs/configuration.md](docs/configuration.md)             |
-
-## Packages
-
-This monorepo publishes one package:
-
-| Package                                                                                                          | Description                         |
-| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| [`@coderrob/eslint-plugin-zero-tolerance`](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance) | The ESLint plugin — 83 custom rules |
-
-`packages/config` is retained as an internal workspace package for development and compatibility testing; it is not published to npm.
+Checks have defined limits. Each [rule page](docs/rules/index.md) explains what is reported, gives examples, and describes cases the rule cannot resolve.
 
 ## Requirements
 
-The workspace build and test suite runs on Node 24.22.2 and 26.13.0. See [Contributing](CONTRIBUTING.md) for pnpm and development prerequisites.
+- ESLint 8.57.0+, 9.x, or 10.x.
+- TypeScript-ESLint 8.x and TypeScript 5.x for TypeScript projects.
+- A Node.js version supported by your ESLint version.
 
-- ESLint 8.57.0+, 9.x, or 10.x
-- TypeScript-ESLint 8.x
-- TypeScript 5.x
+The repository's development prerequisites are listed in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Installation
 
@@ -74,67 +30,62 @@ The workspace build and test suite runs on Node 24.22.2 and 26.13.0. See [Contri
 npm install --save-dev @coderrob/eslint-plugin-zero-tolerance @typescript-eslint/parser
 ```
 
-## Usage
+## Configuration
 
-### ESLint 9+ (Flat Config)
+### Enable individual rules
 
-**Using the recommended preset:**
-
-```javascript
-// eslint.config.js
-import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
-
-export default [
-  zeroTolerance.configs.recommended,
-  // your other configs...
-];
-```
-
-**Using the strict preset:**
+This flat-config example enables selected checks for files in a TypeScript project:
 
 ```javascript
-// eslint.config.js
-import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
-
-export default [
-  zeroTolerance.configs.strict,
-  // your other configs...
-];
-```
-
-**Custom configuration:**
-
-```javascript
-// eslint.config.js
+// eslint.config.mjs
+import tsParser from '@typescript-eslint/parser';
 import zeroTolerance from '@coderrob/eslint-plugin-zero-tolerance';
 
 export default [
   {
-    plugins: {
-      'zero-tolerance': zeroTolerance,
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { projectService: true },
     },
+    plugins: { 'zero-tolerance': zeroTolerance },
     rules: {
-      'zero-tolerance/require-interface-prefix': 'error',
-      'zero-tolerance/no-throw-literal': 'error',
-      'zero-tolerance/max-function-lines': ['warn', { max: 40 }],
-      // ... other rules
+      'zero-tolerance/no-array-mutation': 'error',
+      'zero-tolerance/require-timeout-for-io': 'error',
+      'zero-tolerance/require-error-cause': 'error',
+      'zero-tolerance/max-function-lines': ['error', { max: 30 }],
     },
   },
 ];
 ```
 
-### ESLint 8.x (Legacy Config)
+Use projectService when checking types from your TypeScript project. Without type information, rules such as no-array-mutation check only values they can identify from source syntax.
 
-**Using `.eslintrc.js`:**
+### Use an existing preset
 
-```javascript
-module.exports = {
-  plugins: ['@coderrob/zero-tolerance'],
-  extends: ['plugin:@coderrob/zero-tolerance/legacy-recommended'],
-  // or for strict mode:
-  // extends: ['plugin:@coderrob/zero-tolerance/legacy-strict'],
-};
-```
+For flat config, use zeroTolerance.configs.recommended or zeroTolerance.configs.strict. For ESLint 8 legacy config, use plugin:@coderrob/zero-tolerance/recommended or plugin:@coderrob/zero-tolerance/strict in extends. See the [configuration guide](docs/configuration.md) for complete setup examples and severity settings.
+
+The require-error-cause rule is individually opt-in. The code-quality improvements do not change published presets.
+
+## Choose and tune checks
+
+Start with the rules that match your team's requirements. Review reported code before changing thresholds or allowing sequential work. Use the rule options to express intentional exceptions.
+
+For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](docs/configuration.md#additional-code-quality-checks-individual-opt-in).
+
+## Product documentation
+
+| Guide                                                                            | What you will find                            |
+| -------------------------------------------------------------------------------- | --------------------------------------------- |
+| [Getting started](docs/getting-started.md)                                       | Installation and initial setup.               |
+| [Configuration](docs/configuration.md)                                           | Presets, individual rules, and options.       |
+| [Rule reference](docs/rules/index.md)                                            | Behavior, examples, and limits for each rule. |
+| [Hosted documentation](https://coderrob.github.io/eslint-config-zero-tolerance/) | The browsable documentation site.             |
+| [Changelog](CHANGELOG.md)                                                        | Changes by release.                           |
+
+## Packages
+
+Only @coderrob/eslint-plugin-zero-tolerance is published to npm. The packages/config workspace is internal and supports development and compatibility testing.
 
 ## Rules
 
@@ -305,76 +256,44 @@ Identical code, control flow, async safety
 
 <!-- end auto-generated rules list -->
 
-## Development
+## Repository development
 
-> This repository itself is a `pnpm` workspace and **dogfoods its own rules** through [`eslint.config.mjs`](eslint.config.mjs). Every source file in the plugin must pass the same rules it enforces on consumers.
+### Dogfooding
 
-### Setup
+This repository applies its plugin through [eslint.config.mjs](eslint.config.mjs). The seven updated rules are explicitly enabled as errors for TypeScript source and repository scripts, including the opt-in require-error-cause rule.
+
+| Files              | Enforcement                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript source  | Existing strict rules plus the explicit repository checks; function bodies are limited to 15 lines.                                                     |
+| Repository scripts | The seven updated rules plus shared correctness checks; function bodies use the rule's 30-line default.                                                 |
+| Tests              | Existing test-specific exceptions remain: function length and checks requiring a TypeScript project are disabled. IO checks skip test files by default. |
+
+CI runs pnpm lint, which builds the plugin before applying it. Configuration tests verify that the updated rules are enabled and report representative violations. Public presets are unchanged by this repository configuration.
+
+### Validate changes
 
 ```bash
 pnpm install
-```
-
-### Building
-
-```bash
-pnpm build
-```
-
-### Testing
-
-```bash
+pnpm lint
 pnpm test
+pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
+pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
 ```
 
-Coverage gates are enforced per-file at **95%** minimum across statements, branches, functions, and lines. The static badge reports this enforced contract rather than a generated point-in-time percentage.
+Rule tests include accepted and rejected cases, behavior-based names, explicit diagnostics, and autofix outputs where applicable. Coverage thresholds are at least 95% for each rule. See the [contributor guide](CONTRIBUTING.md) for all requirements.
 
-### README Sync
+### Keep the rule catalog current
 
 ```bash
 pnpm readme:sync
 pnpm validate:readme
 ```
 
-`eslint-doc-generator` builds the root rule catalog from the published plugin shape and deterministic category metadata in `scripts/metadata/readme-rule-catalog.json`. It verifies rule documentation links and derives error, warning, and off states from the exported presets.
+The rule catalog is generated from the built plugin and scripts/metadata/readme-rule-catalog.json. Update rule pages and BDD specifications when behavior changes.
 
-### Type Checking
+## Releases
 
-```bash
-pnpm --filter @coderrob/eslint-plugin-zero-tolerance exec tsc -p tsconfig.json --noEmit
-pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json --noEmit
-```
-
-### Dependency Graph
-
-```bash
-pnpm deps:graph
-pnpm deps:circular
-```
-
-## Publishing
-
-Only `@coderrob/eslint-plugin-zero-tolerance` is published. To prepare a release, run the **Prepare plugin release** GitHub Actions workflow on `main` and choose `major`, `minor`, or `revision` (`revision` means a patch bump). The workflow opens a release PR that updates `packages/plugin/package.json`, moves the current `[Unreleased]` changelog entries into a dated version section, and creates a fresh `[Unreleased]` section. It also starts CI for the release branch. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings, then review the changelog and merge the PR after CI passes.
-
-After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin with provenance. Add a granular npm access token with direct publishing access as the repository Actions secret `NPM_TOKEN` before publishing.
-
-To retry a failed npm publication, run **Publish plugin to npm** manually from `main` and enter the existing published GitHub Release tag as `release_tag`. The workflow repeats the release checks and uses the same `NPM_TOKEN` secret. npm rejects a retry if that package version has already been published.
-
-The equivalent local checks are:
-
-```bash
-pnpm lint
-pnpm test
-pnpm build
-```
-
-The internal config workspace package is not published.
-
-## Choose checks
-
-Use the [rule reference](docs/rules/index.md) to choose checks and review examples, options, and limits. Enable [require-error-cause](docs/rules/require-error-cause.md) individually to preserve original exceptions.
-
-For promise handling, unsafe types, callback returns, and branching limits, see [additional code-quality checks](docs/configuration.md#additional-code-quality-checks-individual-opt-in).
+Only the plugin package is published. Follow the [release process](CONTRIBUTING.md#publishing) to prepare a version, review its changelog, and publish through GitHub Actions.
 
 ## License
 

@@ -52,10 +52,12 @@ pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- sort-imports.test.t
 
 ## Coding Standards
 
-This repository dogfoods its own rules. All source code in `packages/` must pass:
+This repository applies its plugin to TypeScript source and repository scripts. The seven updated rules, including opt-in `require-error-cause`, are enabled explicitly in `eslint.config.mjs`. TypeScript source keeps a 15-line function limit; scripts use the 30-line default. Test-specific exceptions remain in place. See the [dogfooding overview](README.md#dogfooding).
+
+Run the repository checks with:
 
 ```bash
-pnpm build && pnpm lint
+pnpm lint
 ```
 
 Key conventions enforced by the plugin and documented in [`AGENTS.md`](AGENTS.md):
@@ -226,3 +228,21 @@ mkdocs build --strict
 ## Release Process
 
 Run the **Prepare plugin release** workflow on `main` with a `major`, `minor`, or `revision` bump. Review its PR, including every change since the previous tag in `CHANGELOG.md`, and merge after CI passes. Tag the merge commit as `v<plugin-version>` and publish a non-prerelease GitHub Release to start npm publication. Configure the repository Actions secret `NPM_TOKEN` with npm publish access. To retry publication, manually run **Publish plugin to npm** from `main` with the published release tag; see the [publishing instructions](README.md#publishing) for the full setup.
+
+## Publishing
+
+Only `@coderrob/eslint-plugin-zero-tolerance` is published. To prepare a release, run the **Prepare plugin release** GitHub Actions workflow on `main` and choose `major`, `minor`, or `revision` (`revision` means a patch bump). The workflow opens a release PR that updates `packages/plugin/package.json`, moves the current `[Unreleased]` changelog entries into a dated version section, and creates a fresh `[Unreleased]` section. It also starts CI for the release branch. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings, then review the changelog and merge the PR after CI passes.
+
+After merging, create a tag named `v<plugin-version>` on the merge commit and publish a non-prerelease GitHub Release for that tag. The **Publish plugin to npm** workflow checks that the tag is on `main`, matches the plugin manifest, and has a dated changelog section; then it validates and publishes the plugin with provenance. Add a granular npm access token with direct publishing access as the repository Actions secret `NPM_TOKEN` before publishing.
+
+To retry a failed npm publication, run **Publish plugin to npm** manually from `main` and enter the existing published GitHub Release tag as `release_tag`. The workflow repeats the release checks and uses the same `NPM_TOKEN` secret. npm rejects a retry if that package version has already been published.
+
+The equivalent local checks are:
+
+```bash
+pnpm lint
+pnpm test
+pnpm build
+```
+
+The internal config workspace package is not published.

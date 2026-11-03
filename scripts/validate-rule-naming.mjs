@@ -126,26 +126,27 @@ export function collectRuleNames() {
  * @returns Naming and missing-test diagnostics.
  */
 export function validateSourceLayout(ruleNames) {
-  return ruleNames.flatMap((ruleName) => {
-    const failures = [];
-    const rulePath = join(RULES_DIR, `${ruleName}.ts`);
-    const testPath = join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`);
-    if (!RULE_NAME_PATTERN.test(ruleName)) {
-      failures.push(`${ruleName}.ts: unsupported prefix or non-kebab-case rule name`);
-    }
-    if (!existsSync(testPath)) {
-      failures.push(`${ruleName}.ts: missing "${ruleName}${RULE_TEST_SUFFIX}"`);
-    } else {
-      failures.push(
-        ...validateRuleFixtures(
-          ruleName,
-          readFileSync(rulePath, 'utf8'),
-          readFileSync(testPath, 'utf8'),
-        ),
-      );
-    }
-    return failures;
-  });
+  return ruleNames.flatMap((ruleName) => [
+    ...(!RULE_NAME_PATTERN.test(ruleName)
+      ? [`${ruleName}.ts: unsupported prefix or non-kebab-case rule name`]
+      : []),
+    ...validateSourceFixtures(ruleName),
+  ]);
+}
+
+/**
+ * Validates a rule's test file or reports its absence.
+ * @param ruleName - Canonical rule name.
+ * @returns Missing-test and fixture diagnostics.
+ */
+function validateSourceFixtures(ruleName) {
+  const testPath = join(RULES_DIR, `${ruleName}${RULE_TEST_SUFFIX}`);
+  if (!existsSync(testPath)) return [`${ruleName}.ts: missing "${ruleName}${RULE_TEST_SUFFIX}"`];
+  return validateRuleFixtures(
+    ruleName,
+    readFileSync(join(RULES_DIR, `${ruleName}.ts`), 'utf8'),
+    readFileSync(testPath, 'utf8'),
+  );
 }
 
 /**
