@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Test assertion reliability**: Added rules for discarded asynchronous assertions and assertions inside branches that may not execute, including Node assert in Mocha tests, with behavioral contracts for import aliases, computed properties, optional calls, and formatting variations.
+
 ### Changed
 
 - **Testing framework spy assertions**: Added Vitest, Chai-style, and Sinon rules that require explicit call counts and numbered invocation argument checks while allowing zero-call assertions. Covered Vitest soft assertions and Chai language chains and `lastCalledWith`, while allowing argument checks on indexed Sinon spy calls. Mocha projects are covered through their Chai or Sinon assertion packages.

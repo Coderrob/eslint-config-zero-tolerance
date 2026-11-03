@@ -5,9 +5,26 @@
   "module": {
     "name": "test-imports",
     "description": "Resolve named, default, and namespace imports by lexical binding so test rules ignore shadowed and unrelated identifiers.",
-    "exports": ["isModuleImport", "isNamedImport"]
+    "exports": ["getBinding", "isModuleImport", "isNamedImport"]
   },
   "specifications": [
+    {
+      "feature": "Lexical binding lookup",
+      "scenarios": [
+        {
+          "name": "should find the nearest binding across nested scopes",
+          "given": "an identifier is declared in a containing lexical scope",
+          "when": "getBinding resolves the identifier",
+          "then": "returns the nearest variable definition"
+        },
+        {
+          "name": "should return null for an unbound identifier",
+          "given": "no lexical scope declares the identifier",
+          "when": "getBinding resolves the identifier",
+          "then": "returns null"
+        }
+      ]
+    },
     {
       "feature": "Named test package imports",
       "scenarios": [

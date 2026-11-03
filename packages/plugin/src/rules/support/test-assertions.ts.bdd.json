@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/support/test-assertions.ts",
+  "module": {
+    "name": "test-assertions",
+    "description": "Resolves supported expect and assert calls through imports and unshadowed globals.",
+    "exports": ["isSupportedAssertCall", "isSupportedExpectCall"]
+  },
+  "specifications": [
+    {
+      "feature": "Supported assertion bindings",
+      "scenarios": [
+        {
+          "name": "should resolve Jest Vitest and Chai expect calls",
+          "given": "expect is an unshadowed global, supported named import, Vitest test-context parameter, Chai namespace member, or Vitest soft poll or element member",
+          "when": "isSupportedExpectCall resolves the callee",
+          "then": "returns true"
+        },
+        {
+          "name": "should resolve Chai Sinon and Vitest assert methods",
+          "given": "assert is a supported named import or Chai or Sinon namespace member",
+          "when": "isSupportedAssertCall resolves an assertion method",
+          "then": "returns true"
+        },
+        {
+          "name": "should resolve Node assert calls and methods",
+          "given": "Node assert is imported as a default, namespace, or named strict binding from a built-in assert module",
+          "when": "isSupportedAssertCall resolves a direct call or method call",
+          "then": "returns true"
+        },
+        {
+          "name": "should ignore unrelated and shadowed bindings",
+          "given": "expect or assert is shadowed or imported from an unrelated package",
+          "when": "the binding is resolved",
+          "then": "returns false"
+        },
+        {
+          "name": "should ignore unrelated member chains",
+          "given": "a call uses an object unrelated to a supported assertion import",
+          "when": "the receiver chain is resolved",
+          "then": "returns false"
+        }
+      ]
+    }
+  ]
+}

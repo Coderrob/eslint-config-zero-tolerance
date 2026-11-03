@@ -29,6 +29,7 @@ import noAwaitInLoop from './rules/no-await-in-loop';
 import noBarrelParentImports from './rules/no-barrel-parent-imports';
 import noBooleanReturnTrap from './rules/no-boolean-return-trap';
 import noChaiImpreciseSpyAssertions from './rules/no-chai-imprecise-spy-assertions';
+import noConditionalTestAssertion from './rules/no-conditional-test-assertion';
 import noDateNow from './rules/no-date-now';
 import noDestructuredParameterTypeLiteral from './rules/no-destructured-parameter-type-literal';
 import noDynamicImport from './rules/no-dynamic-import';
@@ -74,6 +75,7 @@ import noTestInterfaceDeclaration from './rules/no-test-interface-declaration';
 import noThrowLiteral from './rules/no-throw-literal';
 import noTsNocheck from './rules/no-ts-nocheck';
 import noTypeAssertion from './rules/no-type-assertion';
+import noUnawaitedAsyncAssertion from './rules/no-unawaited-async-assertion';
 import noUnsafeCodeGeneration from './rules/no-unsafe-code-generation';
 import noUnsafeJsonParse from './rules/no-unsafe-json-parse';
 import noVitestImpreciseSpyAssertions from './rules/no-vitest-imprecise-spy-assertions';
@@ -132,6 +134,7 @@ const rules: Record<string, unknown> = {
   'no-await-in-loop': noAwaitInLoop,
   'no-boolean-return-trap': noBooleanReturnTrap,
   'no-chai-imprecise-spy-assertions': noChaiImpreciseSpyAssertions,
+  'no-conditional-test-assertion': noConditionalTestAssertion,
   'no-date-now': noDateNow,
   'no-destructured-parameter-type-literal': noDestructuredParameterTypeLiteral,
   'no-dynamic-import': noDynamicImport,
@@ -181,6 +184,7 @@ const rules: Record<string, unknown> = {
   'no-type-assertion': noTypeAssertion,
   'no-unsafe-code-generation': noUnsafeCodeGeneration,
   'no-unsafe-json-parse': noUnsafeJsonParse,
+  'no-unawaited-async-assertion': noUnawaitedAsyncAssertion,
   'no-vitest-imprecise-spy-assertions': noVitestImpreciseSpyAssertions,
   'no-with': noWith,
   'prefer-guard-clauses': preferGuardClauses,

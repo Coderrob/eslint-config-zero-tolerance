@@ -1,0 +1,64 @@
+{
+  "$schema": "../../../../bdd-spec.schema.json",
+  "schemaVersion": "1.0.0",
+  "sourceFile": "packages/plugin/src/rules/no-conditional-test-assertion.ts",
+  "module": {
+    "name": "no-conditional-test-assertion",
+    "description": "Reports test assertions inside branches that can be skipped while allowing conditional test data preparation.",
+    "exports": ["noConditionalTestAssertion"]
+  },
+  "specifications": [
+    {
+      "feature": "Permitted test expressions",
+      "scenarios": [
+        {
+          "name": "should allow conditional setup with an unconditional assertion",
+          "given": "a test selects its input conditionally and asserts after the branch",
+          "when": "the rule checks the assertion ancestry",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow assertions in guaranteed nonempty loops",
+          "given": "a for-of loop iterates an array literal with a fixed element",
+          "when": "the rule checks the loop body",
+          "then": "no violation is reported because the body executes at least once"
+        },
+        {
+          "name": "should ignore unrelated and shadowed assertion bindings",
+          "given": "expect or assert is imported from another package or shadowed locally",
+          "when": "the rule resolves the binding",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should ignore non-test files and matcher-free expect calls",
+          "given": "the source is not a test file or expect has no matcher member",
+          "when": "the rule checks a call",
+          "then": "no violation is reported"
+        }
+      ]
+    },
+    {
+      "feature": "Conditional test assertions",
+      "scenarios": [
+        {
+          "name": "should report assertions in if ternary logical and switch branches",
+          "given": "a supported assertion occurs in a potentially skipped branch",
+          "when": "the rule walks the assertion ancestry",
+          "then": "a conditionalTestAssertion violation is reported"
+        },
+        {
+          "name": "should report assertions in catch callbacks and loop bodies",
+          "given": "an assertion occurs in a catch clause, promise catch callback, or loop body",
+          "when": "the rule checks whether the body may run zero times",
+          "then": "a conditionalTestAssertion violation is reported"
+        },
+        {
+          "name": "should report imported and computed assertion forms",
+          "given": "Jest, Vitest, Chai, Sinon, or Node assert assertions use aliases, Vitest local test context, namespace access, or computed properties",
+          "when": "the rule resolves the assertion binding across formatting variations",
+          "then": "a conditionalTestAssertion violation is reported"
+        }
+      ]
+    }
+  ]
+}

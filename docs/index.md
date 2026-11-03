@@ -2,9 +2,9 @@
 
 [Behavioral safety contracts](rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 80 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
 
-**80 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
+**82 opinionated ESLint rules for TypeScript teams that refuse to compromise on code quality.**
 
 [![npm version](https://img.shields.io/npm/v/@coderrob/eslint-plugin-zero-tolerance.svg)](https://www.npmjs.com/package/@coderrob/eslint-plugin-zero-tolerance)
 [![License](https://img.shields.io/npm/l/@coderrob/eslint-plugin-zero-tolerance.svg)](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/LICENSE)
@@ -27,7 +27,7 @@ This plugin takes the opposite approach. Every rule earns its place, every viola
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | **Type Safety**    | Ban unsafe assertions (`as`, `!`), unsafe JSON parsing, literal unions, inline imports, and untyped exports                |
 | **Code Quality**   | Limit function size and parameters, eliminate placeholders, magic values, immutability, and sort order                     |
-| **Testing**        | Require `should`-prefixed descriptions, ban leaky mocks, imprecise matchers, and timer/fetch abuse                         |
+| **Testing**        | Require `should`-prefixed descriptions, await async assertions, and prevent skipped assertions and leaky mocks             |
 | **Bug Prevention** | Flag identical expressions, redundant booleans, missing awaits, floating promises, missing IO timeouts, and flag arguments |
 | **Error Handling** | Require `new Error()` throws, ban empty catches, encourage Result-style returns                                            |
 | **Imports**        | Keep barrels clean, ban risky imports, block injection sinks, and prevent upward traversal                                 |

@@ -18,10 +18,11 @@
     },
     {
       "title": "Testing",
-      "focus": "Test descriptions, mocks, timers, fetch, interfaces",
+      "focus": "Assertions, mocks, timers, fetch, interfaces",
       "rules": [
         "require-test-description-style",
         "no-chai-imprecise-spy-assertions",
+        "no-conditional-test-assertion",
         "no-jest-have-been-called",
         "no-mock-implementation",
         "no-sinon-imprecise-spy-assertions",
@@ -30,6 +31,7 @@
         "no-fetch-in-tests",
         "no-restricted-imports-in-tests",
         "no-test-interface-declaration",
+        "no-unawaited-async-assertion",
         "no-vitest-imprecise-spy-assertions"
       ]
     },

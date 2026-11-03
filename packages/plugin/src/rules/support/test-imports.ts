@@ -37,6 +37,20 @@ function findBinding(
 }
 
 /**
+ * Finds the nearest lexical binding for an identifier.
+ *
+ * @param context - Rule execution context.
+ * @param node - Identifier to resolve.
+ * @returns The nearest binding or null.
+ */
+export function getBinding(
+  context: Readonly<TSESLint.RuleContext<string, readonly unknown[]>>,
+  node: Readonly<TSESTree.Identifier>,
+): TSESLint.Scope.Variable | null {
+  return findBinding(context.sourceCode.getScope(node), node.name);
+}
+
+/**
  * Finds the import declaration that defines an identifier.
  *
  * @param context - Rule execution context.
@@ -47,7 +61,7 @@ function getImportDefinition(
   context: Readonly<TSESLint.RuleContext<string, readonly unknown[]>>,
   node: Readonly<TSESTree.Identifier>,
 ): TSESLint.Scope.Definition | null {
-  const binding = findBinding(context.sourceCode.getScope(node), node.name);
+  const binding = getBinding(context, node);
   return binding?.defs.find(isImportBinding) ?? null;
 }
 

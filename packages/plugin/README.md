@@ -2,7 +2,7 @@
 
 [Behavioral safety contracts](../../docs/rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 80 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](../../CONTRIBUTING.md) for validation requirements.
 
 Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code quality, testing standards, and maintainable patterns — with zero exceptions.
 
@@ -11,7 +11,7 @@ Strict, opinionated ESLint plugin for TypeScript that enforces type safety, code
 
 ## Features
 
-- **80 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
+- **82 custom ESLint rules** across eight categories: type safety, code quality, testing, imports, error handling, bug prevention, naming conventions, and documentation
 - **Two presets** — `recommended` generally uses warning severity for gradual adoption, while `strict` generally uses error severity; strict-only and opt-in exceptions are identified below
 - **ESLint 8.57+, 9.x, and 10.x** — flat config and legacy `.eslintrc` both supported
 - **99%+ test coverage** — every rule is thoroughly tested with both valid and invalid cases
@@ -114,6 +114,7 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | ------------------------------------ | --------------------------------------------------------------------------------------------------- |
 | `require-test-description-style`     | Enforce that test descriptions start with `should`                                                  |
 | `no-chai-imprecise-spy-assertions`   | Require exact Chai-style spy call counts and invocation arguments                                   |
+| `no-conditional-test-assertion`      | Disallow assertions in test branches that may not execute                                           |
 | `no-jest-have-been-called`           | Require exact call counts and invocation indices in Jest assertions; allow negated zero-call checks |
 | `no-mock-implementation`             | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                        |
 | `no-sinon-imprecise-spy-assertions`  | Require exact Sinon spy call counts and invocation arguments                                        |
@@ -122,6 +123,7 @@ Preset severities describe the default for enabled rules. `prefer-result-return`
 | `no-fetch-in-tests`                  | Disallow `fetch` usage in test files                                                                |
 | `no-restricted-imports-in-tests`     | Disallow configured dependency imports in test files                                                |
 | `no-test-interface-declaration`      | Disallow interface declarations in test files; import production types instead                      |
+| `no-unawaited-async-assertion`       | Require asynchronous test assertions to be awaited or returned                                      |
 | `no-vitest-imprecise-spy-assertions` | Require exact Vitest spy call counts and invocation indices                                         |
 
 ### Type Safety

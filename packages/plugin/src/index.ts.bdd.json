@@ -35,6 +35,12 @@
           "then": "each framework-specific rule implementation is available by its unprefixed name"
         },
         {
+          "name": "should register asynchronous and conditional assertion rules",
+          "given": "the plugin default export is imported",
+          "when": "the no-unawaited-async-assertion and no-conditional-test-assertion entries are read",
+          "then": "both test-quality rule implementations are available by their unprefixed names"
+        },
+        {
           "name": "should register require-jsdoc-anonymous-functions as a standalone rule",
           "given": "the plugin default export is imported",
           "when": "plugin.rules['require-jsdoc-anonymous-functions'] is read",

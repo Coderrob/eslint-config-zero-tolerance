@@ -1,14 +1,14 @@
 # Rules
 
-Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 80 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
+Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 82 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
 
-`@coderrob/eslint-plugin-zero-tolerance` provides **80 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
+`@coderrob/eslint-plugin-zero-tolerance` provides **82 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.
 
 | Category                                  | Rules | Focus                                               |
 | ----------------------------------------- | ----: | --------------------------------------------------- |
 | [Naming Conventions](#naming-conventions) |     1 | Interface naming standards                          |
 | [Documentation](#documentation)           |     5 | JSDoc, BDD specs, optional chaining, readonly props |
-| [Testing](#testing)                       |    11 | Test descriptions, mocks, timers, fetch, interfaces |
+| [Testing](#testing)                       |    13 | Assertions, mocks, timers, fetch, interfaces        |
 | [Type Safety](#type-safety)               |    12 | Assertions, unions, imports, exported types         |
 | [Code Quality](#code-quality)             |    16 | Function size, magic values, immutability, sorting  |
 | [Error Handling](#error-handling)         |     3 | Throw safety, empty catches, Result patterns        |
@@ -35,19 +35,21 @@ Rule suites require nonempty valid and invalid fixtures, named `should` cases, e
 
 ## Testing
 
-| Rule                                                                | Type       | Description                                                                                                   |
-| ------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| [require-test-description-style](require-test-description-style.md) | suggestion | Enforce that test descriptions start with `should`                                                            |
-| [no-chai-imprecise-spy-assertions](no-chai-imprecise-spy-assertions.md) | suggestion | Require exact Chai-style spy call counts and invocation arguments |
-| [no-jest-have-been-called](no-jest-have-been-called.md)             | suggestion | Require exact call counts and invocation indices in Jest assertions; allow negated zero-call checks |
-| [no-mock-implementation](no-mock-implementation.md)                 | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                                  |
-| [no-sinon-imprecise-spy-assertions](no-sinon-imprecise-spy-assertions.md) | suggestion | Require exact Sinon spy call counts and invocation arguments |
-| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)               | suggestion | Disallow `setTimeout` usage in test files                                                                     |
-| [no-set-interval-in-tests](no-set-interval-in-tests.md)             | suggestion | Disallow `setInterval` usage in test files                                                                    |
-| [no-fetch-in-tests](no-fetch-in-tests.md)                           | suggestion | Disallow `fetch` usage in test files                                                                          |
-| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md) | suggestion | Disallow configured dependency imports in test files                                                          |
-| [no-test-interface-declaration](no-test-interface-declaration.md)   | suggestion | Disallow interface declarations in test files; import production types instead                                |
-| [no-vitest-imprecise-spy-assertions](no-vitest-imprecise-spy-assertions.md) | suggestion | Require exact Vitest spy call counts and invocation indices |
+| Rule                                                                        | Type       | Description                                                                                         |
+| --------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| [require-test-description-style](require-test-description-style.md)         | suggestion | Enforce that test descriptions start with `should`                                                  |
+| [no-chai-imprecise-spy-assertions](no-chai-imprecise-spy-assertions.md)     | suggestion | Require exact Chai-style spy call counts and invocation arguments                                   |
+| [no-conditional-test-assertion](no-conditional-test-assertion.md)           | problem    | Disallow assertions in test branches that may not execute                                           |
+| [no-jest-have-been-called](no-jest-have-been-called.md)                     | suggestion | Require exact call counts and invocation indices in Jest assertions; allow negated zero-call checks |
+| [no-mock-implementation](no-mock-implementation.md)                         | suggestion | Prohibit persistent mock methods; use `Once` variants to prevent test bleeds                        |
+| [no-sinon-imprecise-spy-assertions](no-sinon-imprecise-spy-assertions.md)   | suggestion | Require exact Sinon spy call counts and invocation arguments                                        |
+| [no-set-timeout-in-tests](no-set-timeout-in-tests.md)                       | suggestion | Disallow `setTimeout` usage in test files                                                           |
+| [no-set-interval-in-tests](no-set-interval-in-tests.md)                     | suggestion | Disallow `setInterval` usage in test files                                                          |
+| [no-fetch-in-tests](no-fetch-in-tests.md)                                   | suggestion | Disallow `fetch` usage in test files                                                                |
+| [no-restricted-imports-in-tests](no-restricted-imports-in-tests.md)         | suggestion | Disallow configured dependency imports in test files                                                |
+| [no-test-interface-declaration](no-test-interface-declaration.md)           | suggestion | Disallow interface declarations in test files; import production types instead                      |
+| [no-unawaited-async-assertion](no-unawaited-async-assertion.md)             | problem    | Require asynchronous test assertions to be awaited or returned                                      |
+| [no-vitest-imprecise-spy-assertions](no-vitest-imprecise-spy-assertions.md) | suggestion | Require exact Vitest spy call counts and invocation indices                                         |
 
 ## Type Safety
 
