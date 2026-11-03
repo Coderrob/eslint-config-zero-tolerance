@@ -1,6 +1,8 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "treatConfigHintsAsErrors": true,
+  // These are parsed lint inputs; example imports are not runtime dependencies.
+  "ignore": ["test/consumers/rule-contracts/**/*.ts"],
   "workspaces": {
     ".": {
       "entry": [

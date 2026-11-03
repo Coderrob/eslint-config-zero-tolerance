@@ -282,6 +282,8 @@ pnpm --filter @coderrob/eslint-config-zero-tolerance exec tsc -p tsconfig.json -
 
 Rule tests include accepted and rejected cases, behavior-based names, explicit diagnostics, and autofix outputs where applicable. Coverage thresholds are at least 95% for each rule. See the [contributor guide](CONTRIBUTING.md) for all requirements.
 
+File-based contracts in [test/consumers/rule-contracts](test/consumers/rule-contracts/README.md) run the built plugin against known violations and matching valid files. They verify exact diagnostics and run with `pnpm test`.
+
 ### Keep the rule catalog current
 
 ```bash

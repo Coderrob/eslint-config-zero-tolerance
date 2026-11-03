@@ -1,0 +1,47 @@
+[
+  {
+    "rule": "no-array-mutation",
+    "messageId": "noArrayMutation",
+    "line": 2
+  },
+  {
+    "rule": "no-query-side-effects",
+    "messageId": "noQuerySideEffects",
+    "line": 2
+  },
+  {
+    "rule": "no-identical-expressions",
+    "messageId": "identicalExpressions",
+    "line": 1
+  },
+  {
+    "rule": "require-timeout-for-io",
+    "messageId": "missingTimeout",
+    "line": 4
+  },
+  {
+    "rule": "no-await-in-loop",
+    "messageId": "noAwaitInLoop",
+    "line": 3,
+    "options": [
+      {
+        "allowedFunctionNames": ["retry"]
+      }
+    ]
+  },
+  {
+    "rule": "max-function-lines",
+    "messageId": "tooManyLines",
+    "line": 1,
+    "options": [
+      {
+        "max": 3
+      }
+    ]
+  },
+  {
+    "rule": "require-error-cause",
+    "messageId": "missingCause",
+    "line": 6
+  }
+]

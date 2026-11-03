@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- **File-based rule contracts**: Run the built plugin against seven pairs of known-invalid and valid TypeScript files, asserting exact rule IDs, messages, severity, and line numbers.
+
 - **Error context**: Added opt-in `require-error-cause` with native Error/AggregateError support and configurable factories; existing presets are unchanged.
 - **Quality guidance**: Documented individual upstream checks for promise misuse, unsafe `any` propagation, callback returns, complexity/nesting, async races, and unsafe `finally` blocks.
 

@@ -50,6 +50,12 @@ pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- --watch
 pnpm --filter @coderrob/eslint-plugin-zero-tolerance test -- sort-imports.test.ts
 ```
 
+## File-based rule contracts
+
+File-based contracts in [test/consumers/rule-contracts](test/consumers/rule-contracts/README.md) run the built plugin against known violations and matching valid files. They verify exact diagnostics and run with `pnpm test`.
+
+Run `pnpm build` followed by `node --test scripts/rule-file-contracts.test.mjs` for a focused check.
+
 ## Coding Standards
 
 This repository applies its plugin to TypeScript source and repository scripts. The seven updated rules, including opt-in `require-error-cause`, are enabled explicitly in `eslint.config.mjs`. TypeScript source keeps a 15-line function limit; scripts use the 30-line default. Test-specific exceptions remain in place. See the [dogfooding overview](README.md#dogfooding).
