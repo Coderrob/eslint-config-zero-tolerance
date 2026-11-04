@@ -44,6 +44,18 @@ eslint-config-zero-tolerance/
 
 ---
 
+## Changelog Maintenance
+
+Keep `CHANGELOG.md` up to date with every pull request. This applies to rules, fixes, tests, documentation, repository instructions, tooling, dependencies, and release workflows.
+
+- Add or update an entry under `[Unreleased]` in the same pull request as the change. Do not defer it to a later PR or release.
+- Use the appropriate Keep a Changelog category: Added, Changed, Deprecated, Removed, Fixed, or Security.
+- Describe the final change and its impact in concise, plain language. Update an existing entry when it covers the same work instead of adding duplicate progress notes.
+- Before committing or updating a PR, compare its final diff with the unreleased entries. Revise entries when scope changes so they describe the result being delivered.
+- Preserve published release history. Move unreleased entries into a dated version only through the release process; do not invent release versions or dates.
+
+---
+
 ## Coding Style
 
 ### General Principles
@@ -218,6 +230,6 @@ Before considering any rule or behavior change complete:
 6. Run `pnpm test` (or the relevant workspace test command) and ensure it passes.
 7. Run type checks for plugin and config packages and ensure they pass.
 8. Run `pnpm build` and ensure it passes.
-9. Update `CHANGELOG.md` under `[Unreleased]`.
+9. Update `CHANGELOG.md` under `[Unreleased]` according to [Changelog Maintenance](#changelog-maintenance).
 10. Update documentation (`docs/`, root/package READMEs, and `mkdocs.yml` navigation when needed) so rule lists, configuration tables, and rule pages stay in sync.
 11. Update the sibling `.ts.bdd.json` for every modified `.ts` source file so that BDD scenarios accurately reflect the current behaviour.

@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
+- **Changelog policy**: Require every PR, including documentation, tests, and tooling changes, to maintain a concise and accurate `[Unreleased]` entry; verify entries against the final diff and preserve published release history.
+
 - **Options and evaluation safety**: Detect property mutations through TypeScript assertion wrappers for timeout and error-cause options. Cache timeout expression results per check to prevent exponential alias expansion while preserving cycle detection and scope isolation.
 
 - **Review regressions**: Allow unconditional assertions in do-while bodies while retaining nested conditional checks. Normalize named default client imports so direct calls cannot bypass timeout validation.
