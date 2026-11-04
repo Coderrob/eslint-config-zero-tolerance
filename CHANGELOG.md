@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.8] - 2026-11-04
+
 ### Added
 
 - **File-based rule contracts**: Run the built plugin against seven pairs of known-invalid and valid TypeScript files, asserting exact rule IDs, messages, severity, and line numbers.
