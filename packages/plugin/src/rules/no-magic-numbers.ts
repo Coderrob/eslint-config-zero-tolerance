@@ -16,6 +16,7 @@
 
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import {
+  isBinaryExpressionNode,
   isTSEnumMemberNode,
   isUnaryExpressionNode,
   isVariableDeclaratorNode,
@@ -25,6 +26,8 @@ import { OPERATOR_UNARY_MINUS, VARIABLE_KIND_CONST } from './support/rule-consta
 import { createRule } from './support/rule-factory';
 
 type NoMagicNumbersContext = Readonly<TSESLint.RuleContext<'noMagicNumbers', []>>;
+
+const ARITHMETIC_OPERATORS = new Set(['+', '-', '*', '/', '%', '**']);
 
 /**
  * Checks one literal node and reports disallowed numeric values.
@@ -100,16 +103,14 @@ function getNumericLiteralText(
 }
 
 /**
- * Returns the owning variable declarator for a literal or unary-minus wrapper.
+ * Returns the owning variable declarator through arithmetic expressions.
  *
  * @param node - The literal node to find the declarator for.
  * @returns The variable declarator if found, otherwise null.
  */
-function getVariableDeclarator(
-  node: Readonly<TSESTree.Literal>,
-): TSESTree.VariableDeclarator | null {
-  if (isUnaryMinus(node.parent)) {
-    return getDirectVariableDeclarator(node.parent);
+function getVariableDeclarator(node: Readonly<TSESTree.Node>): TSESTree.VariableDeclarator | null {
+  if (isArithmeticExpression(node.parent)) {
+    return getVariableDeclarator(node.parent);
   }
   return getDirectVariableDeclarator(node);
 }
@@ -148,6 +149,24 @@ function isAllowedValue(node: Readonly<TSESTree.Literal>): boolean {
 }
 
 /**
+ * Checks whether a node combines numeric operands using arithmetic.
+ *
+ * @param node - Candidate expression.
+ * @returns Whether traversal can continue through this expression.
+ */
+function isArithmeticExpression(
+  node: TSESTree.Node | undefined,
+): node is TSESTree.BinaryExpression | TSESTree.UnaryExpression {
+  if (isBinaryExpressionNode(node)) {
+    return ARITHMETIC_OPERATORS.has(node.operator);
+  }
+  if (isUnaryExpressionNode(node)) {
+    return ['+', '-'].includes(node.operator);
+  }
+  return false;
+}
+
+/**
  * Returns true when declaration node is a const variable declaration.
  *
  * @param node - Variable declaration node.
@@ -158,7 +177,7 @@ function isConstVariableDeclaration(node: Readonly<TSESTree.VariableDeclaration>
 }
 
 /**
- * Returns true when the numeric literal is the direct initializer of a
+ * Returns true when the numeric literal contributes through arithmetic to a
  * `const` variable declaration, making it a named constant.
  *
  * @param node - The literal node to check.

@@ -28,6 +28,48 @@
           "given": "an enum member declared as Foo = 42",
           "when": "the rule evaluates the code",
           "then": "no violation is reported"
+        },
+        {
+          "name": "should allow multiplication in named constants",
+          "given": "const SOMETHING = 10 * 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow nested arithmetic in named constants",
+          "given": "const SOMETHING = (24 * 60) * 60 * 1000;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow addition and subtraction in named constants",
+          "given": "const SOMETHING = 10 + 100 - 20;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow division and remainder in named constants",
+          "given": "const SOMETHING = 100 / 10 % 3;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow exponentiation in named constants",
+          "given": "const SOMETHING = 2 ** 10;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow unary signs in named constants",
+          "given": "const SOMETHING = -(10 * +100);",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
+        },
+        {
+          "name": "should allow identifier operands in named constants",
+          "given": "const SOMETHING = BASE * 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "no violation is reported"
         }
       ]
     },
@@ -45,6 +87,78 @@
           "given": "a call expression setTimeout(fn, 3000)",
           "when": "the rule evaluates the argument",
           "then": "a noMagicNumbers violation is reported"
+        },
+        {
+          "name": "should report magic numbers in let declarations",
+          "given": "let value = 10 * 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in var declarations",
+          "given": "var value = 10 * 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in call arguments",
+          "given": "const value = calculate(10 * 100);",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in arrays",
+          "given": "const value = [10 * 100];",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in objects",
+          "given": "const value = { timeout: 10 * 100 };",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in function bodies",
+          "given": "const value = () => 10 * 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in comparisons",
+          "given": "const value = count > 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 100"
+        },
+        {
+          "name": "should report magic numbers in logical expressions",
+          "given": "const value = count && 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 100"
+        },
+        {
+          "name": "should report magic numbers in conditional branches",
+          "given": "const value = enabled ? 10 : 100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 10, 100"
+        },
+        {
+          "name": "should report magic numbers in destructuring defaults",
+          "given": "const { value = 100 } = options;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 100"
+        },
+        {
+          "name": "should report magic numbers in computed access",
+          "given": "const value = items[100];",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 100"
+        },
+        {
+          "name": "should report magic numbers in non-arithmetic unary expressions",
+          "given": "const value = ~100;",
+          "when": "the rule evaluates each numeric literal",
+          "then": "noMagicNumbers violations are reported for 100"
         }
       ]
     }
