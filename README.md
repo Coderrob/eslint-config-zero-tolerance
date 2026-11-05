@@ -2,6 +2,8 @@
   <img src="public/img/zero-tolerance-icon.png" alt="Zero Tolerance ESLint plugin" width="200" />
 </p>
 
+[no-magic-numbers](docs/rules/no-magic-numbers.md) allows arithmetic in named constants, such as `const SOMETHING = 10 * 100;`.
+
 # @coderrob/eslint-plugin-zero-tolerance
 
 83 ESLint rules for readable TypeScript, reliable tests, and safer application code. Use individual rules or the existing recommended and strict configurations.

@@ -1,5 +1,7 @@
 # @coderrob/eslint-plugin-zero-tolerance
 
+[no-magic-numbers](rules/no-magic-numbers.md) allows arithmetic in named constants, such as `const SOMETHING = 10 * 100;`.
+
 [Behavioral safety contracts](rule-fix-safety.md) document positive and negative inputs, parameter boundaries, state isolation, and cases that require manual migration.
 
 Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.

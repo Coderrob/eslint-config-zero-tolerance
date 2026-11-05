@@ -19,15 +19,18 @@ Magic numbers are numeric literals that appear without explanation. They make co
 
 **Allowed locations:**
 
-- `const` variable initialisers — this is how you _define_ a named constant
+- Direct `const` variable initialisers, including arithmetic with `+`, `-`, `*`, `/`, `%`, `**`, and unary signs — this is how you _define_ a named constant
 - TypeScript `enum` member values
+
+Numbers inside calls, arrays, objects, function bodies, comparisons, logical expressions, and conditional branches still require their own named constants, even inside a `const` initialiser.
 
 ## Examples
 
 ### ✅ Correct
 
 ```typescript
-const SECONDS_PER_DAY = 86400;
+const SECONDS_PER_DAY = 24 * 60 * 60;
+const SOMETHING = 10 * 100;
 const MAX_RETRIES = 3;
 const HTTP_OK = 200;
 

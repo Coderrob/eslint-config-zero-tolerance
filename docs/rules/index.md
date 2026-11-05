@@ -1,5 +1,7 @@
 # Rules
 
+[no-magic-numbers](no-magic-numbers.md) allows arithmetic in named constants, such as `const SOMETHING = 10 * 100;`.
+
 Rule suites require nonempty valid and invalid fixtures, named `should` cases, explicit diagnostics, and concrete autofix outputs. All 83 rules also run against shared TypeScript, JSX, optional-access, and Jest-chain parsing fixtures. See [the contributor guide](https://github.com/Coderrob/eslint-config-zero-tolerance/blob/main/CONTRIBUTING.md) for validation requirements.
 
 `@coderrob/eslint-plugin-zero-tolerance` provides **83 custom rules** grouped into eight categories. Each rule links to a dedicated page with rationale, correct/incorrect examples, and configuration options.

@@ -5,6 +5,34 @@ describe('no-magic-numbers', () => {
   ruleTester.run('no-magic-numbers', noMagicNumbers, {
     valid: [
       {
+        code: 'const SOMETHING = 10 * 100;',
+        name: 'should allow multiplication in named constants',
+      },
+      {
+        code: 'const SOMETHING = (24 * 60) * 60 * 1000;',
+        name: 'should allow nested arithmetic in named constants',
+      },
+      {
+        code: 'const SOMETHING = 10 + 100 - 20;',
+        name: 'should allow addition and subtraction in named constants',
+      },
+      {
+        code: 'const SOMETHING = 100 / 10 % 3;',
+        name: 'should allow division and remainder in named constants',
+      },
+      {
+        code: 'const SOMETHING = 2 ** 10;',
+        name: 'should allow exponentiation in named constants',
+      },
+      {
+        code: 'const SOMETHING = -(10 * +100);',
+        name: 'should allow unary signs in named constants',
+      },
+      {
+        code: 'const SOMETHING = BASE * 100;',
+        name: 'should allow identifier operands in named constants',
+      },
+      {
         code: 'const x = 0;',
         name: 'should allow 0 as literal value',
       },
@@ -46,6 +74,87 @@ describe('no-magic-numbers', () => {
       },
     ],
     invalid: [
+      {
+        code: 'let value = 10 * 100;',
+        name: 'should report magic numbers in let declarations',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'var value = 10 * 100;',
+        name: 'should report magic numbers in var declarations',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const value = calculate(10 * 100);',
+        name: 'should report magic numbers in call arguments',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const value = [10 * 100];',
+        name: 'should report magic numbers in arrays',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const value = { timeout: 10 * 100 };',
+        name: 'should report magic numbers in objects',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const value = () => 10 * 100;',
+        name: 'should report magic numbers in function bodies',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const value = count > 100;',
+        name: 'should report magic numbers in comparisons',
+        errors: [{ messageId: 'noMagicNumbers', data: { value: '100' } }],
+      },
+      {
+        code: 'const value = count && 100;',
+        name: 'should report magic numbers in logical expressions',
+        errors: [{ messageId: 'noMagicNumbers', data: { value: '100' } }],
+      },
+      {
+        code: 'const value = enabled ? 10 : 100;',
+        name: 'should report magic numbers in conditional branches',
+        errors: [
+          { messageId: 'noMagicNumbers', data: { value: '10' } },
+          { messageId: 'noMagicNumbers', data: { value: '100' } },
+        ],
+      },
+      {
+        code: 'const { value = 100 } = options;',
+        name: 'should report magic numbers in destructuring defaults',
+        errors: [{ messageId: 'noMagicNumbers', data: { value: '100' } }],
+      },
+      {
+        code: 'const value = items[100];',
+        name: 'should report magic numbers in computed access',
+        errors: [{ messageId: 'noMagicNumbers', data: { value: '100' } }],
+      },
+      {
+        code: 'const value = ~100;',
+        name: 'should report magic numbers in non-arithmetic unary expressions',
+        errors: [{ messageId: 'noMagicNumbers', data: { value: '100' } }],
+      },
       {
         code: 'setTimeout(fn, 3000)',
         name: 'should disallow magic number as function argument',
