@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.2.9] - 2026-11-05
+
 ### Fixed
 
 - **Named numeric constants**: Allow arithmetic initialisers such as `const SOMETHING = 10 * 100` in `no-magic-numbers`, while preserving checks in nested calls, containers, and functions.
